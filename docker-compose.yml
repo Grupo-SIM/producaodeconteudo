@@ -1,0 +1,28 @@
+services:
+  pdc:
+    image: ghcr.io/grupo-sim/producaodeconteudo:latest
+    env_file: .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - DATA_DIR=/data
+      - TRUST_PROXY=1
+    init: true
+    shm_size: 1gb # Chromium (Playwright) precisa para renderizar video
+    networks:
+      - proxy
+    volumes:
+      - data:/data
+    restart: unless-stopped
+    labels:
+      # front + "api" no mesmo container: o front chama /api no mesmo dominio
+      caddy: pdc.simintermediacoes.com, apipdc.simintermediacoes.com
+      caddy.import: cloudflare
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+volumes:
+  data:
+
+networks:
+  proxy:
+    external: true

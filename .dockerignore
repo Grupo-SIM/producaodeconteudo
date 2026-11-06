@@ -1,0 +1,13 @@
+.git
+.serena
+.env
+data
+node_modules
+objetos
+voz
+previa
+*.mp4
+*.log
+biblioteca-central
+clippyme
+banco3d
