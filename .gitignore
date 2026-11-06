@@ -6,3 +6,8 @@ voz/
 previa/
 *.mp4
 .m2d-*/
+clippyme/app/
+*.db
+*.db-wal
+*.db-shm
+*.log

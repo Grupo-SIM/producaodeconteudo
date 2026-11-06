@@ -1430,3 +1430,38 @@ Causa: ao apagar um estilo da casa numa marca, o painel apagava junto os estilos
 - “Usar em outra marca”: copia a diagramação trocando cores e fonte pela identidade da marca de destino.
 - Cérebro: erro de diagramação aprendido numa marca vira regra geral (em teste) para as outras; marca com pouco padrão próprio recebe como referência a diagramação acertada em outras marcas; o Cérebro avisa em quais marcas o layout salvo pode ser replicado.
 - Vitrine: layouts por marca, o mais recente primeiro, com “Em uso nas notícias”.
+
+## Build 2026-11-06.217 (inclui .216) — vitrine do Estúdio de arte organizada
+
+A aba **Estilos** agora tem três blocos recolhíveis (o painel lembra o que você abriu):
+- **Salvos por você**: seus layouts e estilos, em cards compactos, com o selo "No Cérebro". Layouts de todas as marcas ficam numa grade só, com a marca em etiqueta.
+- **Estilos originais da casa**: os prontos, fixos.
+- **Estilos originais apagados** e **Lixeira** (7 dias): só aparecem quando há algo.
+
+Os botões secundários de cada card ficam em "Mais". As abas de formato mostram a quantidade (estilos + layouts), para nada parecer sumido. Nenhum dado foi alterado: só a tela.
+
+Na .217 as prévias dos estilos só são desenhadas quando o card aparece na tela: seções recolhidas e cards fora da vista não pesam no motor de imagem (evita travar a vitrine com "Failed to fetch").
+
+## Build 2026-11-06.218 — painel que não cai e estilos que não somem
+
+- **Failed to fetch**: um erro solto numa tarefa de fundo derrubava o painel inteiro. Agora o erro é registrado na janela preta e o painel continua; o `iniciar-windows.bat` também religa sozinho se o painel parar.
+- **Cópia de segurança automática**: qualquer estilo ou layout que saia do banco, por qualquer caminho, deixa uma cópia completa na tabela `art_apagados_copia` (guardada por 60 dias). Assim nada some sem deixar rastro.
+- "Restaurar original" agora manda a versão do dono para a Lixeira (7 dias) e registra no histórico. Antes apagava sem aviso.
+- “Templete Notícia” (Seguidores em Alta) volta se estiver faltando (restauro único `restauro_estilos_217`).
+
+## Build 2026-11-06.219 — vitrine única e nada volta depois de apagado
+
+- **Estúdio de arte › Estilos** virou uma vitrine só: layouts e estilos juntos, sem blocos separados. Com uma marca escolhida é uma grade só; em "Todas as marcas" cada marca tem o seu bloco.
+- Estilo original da casa que foi apagado em TODAS as marcas não aparece mais na visão geral (antes reaparecia ali).
+- O restauro automático de estilos foi desligado: nada volta sozinho.
+- "Esvaziar a lixeira" e "Apagar agora" também apagam a cópia de segurança correspondente. Depois disso o item não existe em lugar nenhum.
+
+## Build 2026-11-06.220 — vitrine de uma marca por vez
+
+- Sem "Todas as marcas": a vitrine abre sempre numa marca (a primeira, ou a última que você usou).
+- Feed, Carrossel e Stories saíram da tela e foram para **Filtros** (recolhido). Sem filtro, a vitrine mostra todos os formatos juntos e cada estilo abre no seu formato principal.
+- "Novo estilo" agora pergunta o formato.
+
+## Build 2026-11-06.221 — salvar fecha o editor
+
+Depois de salvar um layout ou template pelo editor, o editor fecha e volta para a vitrine da marca. Assim não fica uma cópia velha aberta que possa gerar conflito. "Salvar estilo" já fechava.

@@ -27,5 +27,12 @@ if exist clippyme\app\docker-compose.yml (
 )
 echo Abrindo o Agentes SIM em http://localhost:3000  (feche esta janela para parar)
 start "" http://localhost:3000
+:painel
 node --disable-warning=ExperimentalWarning server.js
+if errorlevel 1 (
+  echo.
+  echo O painel parou por um erro. Religando em 3 segundos... (feche esta janela para parar de vez)
+  timeout /t 3 /nobreak >nul
+  goto painel
+)
 pause

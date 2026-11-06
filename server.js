@@ -49,7 +49,10 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const als = new AsyncLocalStorage();
 class DryRun extends Error { constructor(p) { super('dry'); this.prompt = p; } }
-const BUILD = '2026-11-06.214'; // tem de ser igual ao UI_BUILD do public/index.html
+const BUILD = '2026-11-06.221'; // tem de ser igual ao UI_BUILD do public/index.html
+// Um erro solto numa tarefa de fundo não pode derrubar o painel (era isso que dava "Failed to fetch" no navegador): registra e segue
+process.on('uncaughtException', e => { try { console.error('[erro não tratado]', e && e.stack || e); } catch { } });
+process.on('unhandledRejection', e => { try { console.error('[promessa rejeitada]', e && e.stack || e); } catch { } });
 const DEFAULT_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
 
 if (ADMIN_PASSWORD.length < 8) {
@@ -1365,7 +1368,26 @@ function radarAdotaLayout(brand, lid, nome) {
     return true;
   } catch (e) { console.error('layout de notícia mais recente:', e.message); return false; }
 }
-// Uma vez: layout que o dono salvou de uma notícia da marca depois do estilo que as notícias ainda usam → passa a valer o layout
+
+// A troca automática da versão .214 foi desfeita a pedido do dono: se ela aconteceu, a marca volta ao estilo que tinha antes. Nada é apagado.
+function radarDesfazTrocaAutomatica() {
+  try {
+    if (one("SELECT value FROM settings WHERE key='radar_desfaz_215'")) return;
+    const raw = jparse(one("SELECT value FROM settings WHERE key='radar_cfg'")?.value, {}) || {}; let mud = false;
+    for (const a of all("SELECT message FROM activity WHERE message LIKE 'As notícias da marca % agora usam o layout salvo mais recente%(no lugar de %' ORDER BY id")) {
+      const m = /^As notícias da marca (.+) agora usam o layout salvo mais recente, “(.*)” \(no lugar de ([\w-]+)\)$/.exec(a.message); if (!m) continue;
+      const k = Object.keys(raw.marcas || {}).find(x => mesmaMarca(x, m[1])), cur = raw.marcas?.[k]?.estilo || '';
+      if (k && /^layout-\d+$/.test(cur) && one('SELECT name FROM art_layouts WHERE id=?', +cur.slice(7))?.name === m[2]) {
+        const volta = /^dono-(\d+)$/.test(m[3]) ? !!one('SELECT 1 x FROM art_templates WHERE id=?', +m[3].slice(5)) : /^layout-(\d+)$/.test(m[3]) ? !!one('SELECT 1 x FROM art_layouts WHERE id=?', +m[3].slice(7)) : !!templateDe(m[3]);
+        if (volta) { raw.marcas[k].estilo = m[3]; mud = true; log('designer', `As notícias da marca ${k} voltaram ao estilo que tinham antes (${m[3]}), como você pediu. O layout “${m[2]}” continua salvo, nada foi apagado`); }
+      }
+    }
+    if (mud) run("INSERT INTO settings(key,value) VALUES('radar_cfg',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(raw));
+    run("INSERT INTO settings(key,value) VALUES('radar_desfaz_215','1') ON CONFLICT(key) DO UPDATE SET value=excluded.value"); run("INSERT INTO settings(key,value) VALUES('radar_recente_214','1') ON CONFLICT(key) DO UPDATE SET value=excluded.value");
+    if (mud) changed();
+  } catch (e) { console.error('desfazer troca de estilo:', e.message); }
+}
+// (desativado) Uma vez: layout que o dono salvou de uma notícia da marca depois do estilo que as notícias ainda usam → passa a valer o layout
 function radarLayoutRecenteUmaVez() {
   try {
     if (one("SELECT value FROM settings WHERE key='radar_recente_214'")) return;
@@ -2441,7 +2463,12 @@ const templatesVisiveis = brand => { const ap = tplApagados(brand); return templ
 // Cada estilo do dono pertence a UMA marca: a marca só enxerga os próprios (mais os da casa e da Central, que são de todas). Sem marca = visão geral
 const mesmaMarca = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
 const templatesDaMarca = brand => {
-  const T = templatesVisiveis(brand); if (!String(brand || '').trim()) return T;
+  const T = templatesVisiveis(brand);
+  if (!String(brand || '').trim()) {   // visão geral: estilo da casa que você apagou em todas as marcas não aparece mais
+    const marcas = all('SELECT lower(name) n FROM brands').map(r => r.n); if (!marcas.length) return T;
+    const hid = {}; for (const r of all('SELECT id, brand FROM art_hidden_b')) (hid[r.id] ||= new Set()).add(r.brand);
+    return T.filter(t => !(t.casa && hid[t.id] && marcas.every(m => hid[t.id].has(m))));
+  }
   const doMarca = t => !t.marcas || t.marcas.some(m => mesmaMarca(m, brand));   // estilo da casa feito para marcas específicas
   const deriv = new Set(T.filter(t => t.brand && mesmaMarca(t.brand, brand) && t.deriva).map(t => t.deriva));   // a marca já tem a própria versão deste estilo da casa
   const proprios = new Set(T.filter(t => !t.casa && t.brand && mesmaMarca(t.brand, brand)).map(t => t.id));   // ajuste da própria marca de um estilo da casa (mesmo id): vale ele, não o original
@@ -3745,7 +3772,7 @@ function layoutSalva(c, name, brand, origem = 'dono', meta = {}) {
     brainSincronizaSalvos();
     const faltam = all('SELECT name FROM brands').map(b => b.name).filter(b => !mesmaMarca(b, br) && !one('SELECT 1 x FROM art_layouts WHERE brand=? COLLATE NOCASE AND format=?', b, c.format));
     if (br && faltam.length) run("INSERT INTO brain_events(ts,agent,kind,content_id,brand,title,summary,detail,tags,formato) VALUES(?,?,?,?,?,?,?,?,?,?)", T(), 'designer', 'layout_replicavel', null, br, '', `O layout “${name}” (${br}) pode servir de base para: ${faltam.join(', ')}, que ainda não têm layout de ${c.format}. Em Estúdio de arte, use “Usar em outra marca”.`.slice(0, 400), '', tagsSql([]), fmtGrupo(c.format));
-    if (c.kind === 'noticia' && br && meta.adotar !== false) radarAdotaLayout(br, id, name);
+    if (c.kind === 'noticia' && br && meta.adotar === true) radarAdotaLayout(br, id, name);   // só se pedirem de propósito: não troca mais o estilo das notícias sozinho
     meta.out = { id, atualizado, nome: name, faltam: br ? faltam : [] };
   } catch { /* o Cérebro sincroniza no próximo início */ }
   return id;
@@ -4652,8 +4679,9 @@ async function reparaPecasForaDaTela() {   // peças já montadas cuja manchete 
 }
 // Estilos salvos pelo dono que versões anteriores apagaram junto ao esconder um estilo da casa: voltam uma única vez, com o id e a marca de antes
 function restauraEstilosApagados() {
+  return;   // desligado: o que você apaga (e esvazia da lixeira) não volta mais por nenhum caminho automático
   try {
-    if (one("SELECT value FROM settings WHERE key='restauro_estilos_211'")) return;
+    if (one("SELECT value FROM settings WHERE key='restauro_estilos_217'")) return;
     const f = path.join(__dirname, 'motor', 'estilos-restaurar.json'); if (!fs.existsSync(f)) return;
     const back = [], prot = [...estilosProtegidos()];
     for (const r of JSON.parse(fs.readFileSync(f, 'utf8'))) {
@@ -4663,7 +4691,7 @@ function restauraEstilosApagados() {
       back.push(`“${r.nome}” (${r.brand})`);
       prot.push(r.id);
     }
-    run("INSERT INTO settings(key,value) VALUES('restauro_estilos_211','1') ON CONFLICT(key) DO UPDATE SET value=excluded.value");
+    run("INSERT INTO settings(key,value) VALUES('restauro_estilos_217','1') ON CONFLICT(key) DO UPDATE SET value=excluded.value");
     if (back.length) run("INSERT INTO settings(key,value) VALUES('estilos_sem_migracao',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(prot));
     if (back.length) { log('designer', `Estilo(s) salvo(s) que tinham sido apagados junto com um estilo da casa voltaram: ${back.join(', ')}`); changed(); }
   } catch (e) { console.error('restauro de estilos:', e.message); }
@@ -6921,7 +6949,7 @@ async function api(req, res, url) {
     if (acao === 'restaurar') {   // volta um estilo da casa ao original (apaga a versão do dono)
       const row = tplRow(id); if (!row || row.central || !(row.base || (row.deriva && TEMPLATES_CASA.some(t => t.id === row.deriva)))) throw fail(400, 'Este estilo já está no original');
       { const pd = estilosPadrao(); let mud = false; for (const k of Object.keys(pd)) if (pd[k] === 'dono-' + row.id && row.deriva) { pd[k] = row.deriva; mud = true; } if (mud) run("INSERT INTO settings(key,value) VALUES('estilo_padrao',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(pd)); }
-      run('DELETE FROM art_templates WHERE id=?', row.id); changed(); return send(res, 200, { ok: true }); }
+      lixeiraGuarda('estilo', row, 'Voltou ao original'); run('DELETE FROM art_templates WHERE id=?', row.id); log('designer', `Estilo “${row.nome}” voltou ao original (a sua versão fica ${LIXEIRA_DIAS} dias na lixeira)`); changed(); return send(res, 200, { ok: true }); }
     // visual: guarda TUDO o que o dono mexeu na arte de prévia (estrutura + visual) neste estilo
     const c = getContent(+b.content_id); if (!c || c.teste !== 3) throw fail(404, 'Arte de edição não encontrada');
     const sp = jparse(c.art_spec, {}); if (!(sp.slides || []).some(x => x.modelo)) throw fail(400, 'Esta arte não tem páginas montadas com os modelos');
@@ -7195,9 +7223,9 @@ async function api(req, res, url) {
       run('DELETE FROM lixeira_arte WHERE id=?', r.id); try { brainSincronizaSalvos(); } catch { /* ok */ }
       log('designer', msg); changed(); return send(res, 200, { ok: true, msg });
     }
-    if (!mt[2] && m === 'DELETE') { run('DELETE FROM lixeira_arte WHERE id=?', r.id); changed(); return send(res, 200, { ok: true }); }
+    if (!mt[2] && m === 'DELETE') { run('DELETE FROM lixeira_arte WHERE id=?', r.id); try { run('DELETE FROM art_apagados_copia WHERE tabela=? AND ref=?', r.tipo === 'estilo' ? 'art_templates' : 'art_layouts', r.orig_id); } catch { } changed(); return send(res, 200, { ok: true }); }
   }
-  if (p === '/api/lixeira/esvaziar' && m === 'POST') { const n = run('DELETE FROM lixeira_arte').changes; log('designer', `Lixeira de artes esvaziada (${n} item(ns))`); changed(); return send(res, 200, { ok: true, n }); }
+  if (p === '/api/lixeira/esvaziar' && m === 'POST') { const n = run('DELETE FROM lixeira_arte').changes; try { run('DELETE FROM art_apagados_copia'); } catch { } log('designer', `Lixeira de artes esvaziada (${n} item(ns))`); changed(); return send(res, 200, { ok: true, n }); }
   if ((mt = p.match(/^\/api\/art-layouts\/(\d+)(\/thumb)?$/))) {
     const l = one('SELECT * FROM art_layouts WHERE id=?', +mt[1]); if (!l) throw fail(404, 'Layout não encontrado');
     if (mt[2] && m === 'GET') { const f = path.join(LAYOUT_DIR, l.id + '.jpg'); if (!fs.existsSync(f)) throw fail(404, 'Sem miniatura'); res.writeHead(200, { 'content-type': 'image/jpeg', 'cache-control': 'no-store' }); return res.end(fs.readFileSync(f)); }
@@ -7645,11 +7673,17 @@ setTimeout(() => {
     } catch (e) { console.error('reparo de carrossel:', e.message); }
   }
 }, 4000);
+try {   // rede de segurança: qualquer estilo/layout que sair do banco, por qualquer caminho, deixa uma cópia completa aqui
+  db.exec(`CREATE TABLE IF NOT EXISTS art_apagados_copia(id INTEGER PRIMARY KEY AUTOINCREMENT, tabela TEXT, ref INTEGER, dados TEXT, quando TEXT);
+    CREATE TRIGGER IF NOT EXISTS art_tpl_antes_apagar BEFORE DELETE ON art_templates BEGIN INSERT INTO art_apagados_copia(tabela,ref,dados,quando) VALUES('art_templates',OLD.id,json_object('id',OLD.id,'nome',OLD.nome,'uso',OLD.uso,'nivel',OLD.nivel,'formatos',OLD.formatos,'seq',OLD.seq,'exemplo',OLD.exemplo,'brand',OLD.brand,'usos',OLD.usos,'created_at',OLD.created_at,'central',OLD.central,'visual',OLD.visual,'visual_brand',OLD.visual_brand,'base',OLD.base,'visual_at',OLD.visual_at,'tema',OLD.tema,'deriva',OLD.deriva),strftime('%Y-%m-%dT%H:%M:%fZ','now')); END;
+    CREATE TRIGGER IF NOT EXISTS art_lay_antes_apagar BEFORE DELETE ON art_layouts BEGIN INSERT INTO art_apagados_copia(tabela,ref,dados,quando) VALUES('art_layouts',OLD.id,json_object('id',OLD.id,'brand',OLD.brand,'name',OLD.name,'format',OLD.format,'spec',OLD.spec,'origem',OLD.origem,'uses',OLD.uses,'created_at',OLD.created_at,'uso',OLD.uso,'tema',OLD.tema),strftime('%Y-%m-%dT%H:%M:%fZ','now')); END;`);
+  run("DELETE FROM art_apagados_copia WHERE quando < strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days')");
+} catch (e) { console.error('cópia de segurança de estilos:', e.message); }
 restauraEstilosApagados();
 lixeiraLimpa();
 brainLimpaPrevias();
 try { brainReplicaRegrasGerais(); } catch (e) { console.error('regras gerais:', e.message); }
-radarLayoutRecenteUmaVez();
+radarDesfazTrocaAutomatica();
 migraNoticiaTemplates();   // grava nos templates/layouts de notícia a regra da legenda e a contracapa
 try { brainSincronizaSalvos(); } catch (e) { console.error('cérebro (salvos):', e.message); }
 setInterval(lixeiraLimpa, 3600e3).unref();
