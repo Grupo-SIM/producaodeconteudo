@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca Central</title>
+<style>
+:root{--bg:#0a0a0c;--bg2:#121216;--bg3:#18181d;--bd:#26262d;--tx:#f4f4f6;--mut:#8b8b96;--acc:#e8e8ee;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--r:14px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:22px}.top h1{font-size:22px;margin:0;letter-spacing:-.01em}.sp{flex:1}
+.mut{color:var(--mut)}.small{font-size:12.5px}
+.btn{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}.btn:hover{border-color:#3a3a44}
+.btn.pri{background:var(--acc);color:#0a0a0c;border-color:var(--acc);font-weight:600}.btn.sm{padding:5px 10px;font-size:12.5px}.btn.danger{color:var(--bad)}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}.tabs button{background:none;border:1px solid transparent;border-radius:10px;padding:8px 14px;color:var(--mut);cursor:pointer}.tabs button.on{background:var(--bg3);border-color:var(--bd);color:var(--tx)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}.kpi b{font-size:26px;display:block;letter-spacing:-.02em}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--bd);vertical-align:middle}th{font-weight:500;color:var(--mut);font-size:12.5px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid var(--bd);font-size:11.5px;color:var(--mut)}.pill.ok{color:var(--ok);border-color:rgba(52,211,153,.35)}.pill.warn{color:var(--warn);border-color:rgba(251,191,36,.35)}.pill.bad{color:var(--bad);border-color:rgba(248,113,113,.35)}
+input[type=text],input[type=password],input[type=date],select,textarea{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px 11px;outline:none}textarea{resize:vertical;min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--mut)}.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.stack{display:flex;flex-direction:column;gap:12px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.login{max-width:380px;margin:12vh auto}.thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--bd)}
+.mod{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px;z-index:20}.mod .card{width:min(680px,100%);max-height:88vh;overflow:auto}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;z-index:30;max-width:420px}
+code{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:2px 6px;font-size:12px;word-break:break-all}
+.empty{padding:30px;text-align:center;color:var(--mut)}
+svg{flex:none}
+@media(max-width:700px){th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const $ = s => document.querySelector(s);
+const h = (t, a, ...c) => { const e = document.createElement(t); for (const [k, v] of Object.entries(a || {})) { if (v == null || v === false) continue; if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (k === 'style' && typeof v === 'object') Object.assign(e.style, v); else e.setAttribute(k, v === true ? '' : v); } for (const x of c.flat(9)) if (x != null && x !== false) e.append(x.nodeType ? x : document.createTextNode(String(x))); return e; };
+const ico = d => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', 16); s.setAttribute('height', 16); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.innerHTML = d; return s; };
+const I = { up: '<path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>', plus: '<path d="M12 5v14M5 12h14"/>', trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/>', copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>', out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>', doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/>' };
+const toast = m => { const t = h('div', { class: 'toast' }, m); document.body.append(t); setTimeout(() => t.remove(), 4200); };
+const api = async (p, m = 'GET', b, raw) => { const r = await fetch(p, { method: m, headers: raw ? { 'content-type': 'application/octet-stream' } : b ? { 'content-type': 'application/json' } : {}, body: raw || (b ? JSON.stringify(b) : undefined) }); const j = await r.json().catch(() => ({})); if (r.status === 401 && !p.endsWith('/login')) { S.logado = false; render(); } if (!r.ok) throw new Error(j.error || 'Erro ' + r.status); return j; };
+const guard = fn => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message); } };
+const fmtB = n => n > 1e6 ? (n / 1e6).toFixed(1) + ' MB' : n > 1e3 ? Math.round(n / 1e3) + ' KB' : (n || 0) + ' B';
+const data = t => t ? new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'nunca';
+const TIPO = { midia: 'Mídia', template: 'Template de arte', conhecimento: 'Conhecimento', estilo_video: 'Estilo de vídeo' };
+const KINDS = [['fundo', 'Fundo'], ['textura', 'Textura'], ['foto', 'Foto / objeto recortado'], ['mascote', 'Personagem'], ['logo', 'Logo/ícone'], ['musica', 'Música'], ['efeito', 'Efeito sonoro'], ['fonte', 'Fonte'], ['video', 'Vídeo'], ['outro', 'Outro']];
+const AGENTES = [['designer', 'Designer'], ['editor', 'Editor de vídeo'], ['roteirista', 'Roteirista'], ['revisorcopy', 'Revisor de copy'], ['gerente', 'Revisor (gerente de qualidade)'], ['chefe', 'Gerente'], ['publicador', 'Social Media']];
+const S = { logado: true, tab: 'resumo', filtro: '' };
+const modal = (titulo, corpo, acoes) => { const m = h('div', { class: 'mod', onclick: e => { if (e.target === m) m.remove(); } }, h('div', { class: 'card stack' }, h('h3', { style: { margin: 0 } }, titulo), corpo, h('div', { class: 'row', style: { justifyContent: 'flex-end' } }, h('button', { class: 'btn', onclick: () => m.remove() }, 'Cancelar'), ...(acoes || [])))); document.body.append(m); return m; };
+const copiar = t => navigator.clipboard.writeText(t).then(() => toast('Copiado'));
+
+async function render() {
+  const app = $('#app'); app.replaceChildren();
+  if (!S.logado) {
+    const pw = h('input', { type: 'password', placeholder: 'Senha de administrador' });
+    const entrar = guard(async () => { await api('/api/admin/login', 'POST', { senha: pw.value }); S.logado = true; render(); });
+    pw.addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+    app.append(h('div', { class: 'login card stack' }, h('h1', { style: { margin: 0, fontSize: '20px' } }, 'Biblioteca Central'), h('div', { class: 'mut small' }, 'Mídia, templates, conhecimento e estilos que abastecem todos os painéis.'), pw, h('button', { class: 'btn pri', onclick: entrar }, 'Entrar')));
+    setTimeout(() => pw.focus(), 50); return;
+  }
+  let r; try { r = await api('/api/admin/resumo'); } catch { return; }
+  app.append(h('div', { class: 'top' }, h('h1', null, 'Biblioteca Central'), h('span', { class: 'pill' }, 'versão ' + r.rev), h('div', { class: 'sp' }), h('button', { class: 'btn sm', onclick: guard(async () => { await api('/api/admin/logout', 'POST'); S.logado = false; render(); }) }, ico(I.out), 'Sair')));
+  app.append(h('div', { class: 'tabs' }, [['resumo', 'Resumo'], ['itens', 'Itens'], ['clientes', `Clientes (${r.clientes.length})`], ['hist', 'Histórico']].map(([k, l]) => h('button', { class: S.tab === k ? 'on' : '', onclick: () => { S.tab = k; render(); } }, l))));
+  if (S.tab === 'resumo') {
+    app.append(h('div', { class: 'grid' }, Object.entries(r.porTipo).map(([k, n]) => h('div', { class: 'card kpi' }, h('b', null, n), h('span', { class: 'mut' }, TIPO[k]))), h('div', { class: 'card kpi' }, h('b', null, fmtB(r.espaco)), h('span', { class: 'mut' }, 'Espaço dos arquivos'))));
+    const em = r.clientes.filter(c => c.ativo && c.em_dia).length;
+    app.append(h('div', { class: 'card stack', style: { marginTop: '14px' } }, h('b', null, 'Clientes'), h('div', { class: 'mut' }, `${r.clientes.filter(c => c.ativo).length} ativo(s), ${em} já com a versão ${r.rev}. Os painéis buscam novidades sozinhos a cada 6 horas (ou na hora, pelo botão "Atualizar agora" em Configurações › Biblioteca Central).`),
+      h('div', { class: 'mut small' }, 'Como publicar: pelo seu painel matriz (Configurações › Biblioteca Central › Publicar) ou aqui na aba Itens. Tudo o que você publica ou atualiza chega a todos os clientes ativos.')));
+  }
+  if (S.tab === 'itens') {
+    const it = (await api('/api/admin/itens')).itens, filtro = h('select', { onchange: e => { S.filtro = e.target.value; render(); } }, h('option', { value: '' }, 'Todos os tipos'), Object.entries(TIPO).map(([k, l]) => h('option', { value: k, selected: S.filtro === k }, l)));
+    const ls = it.filter(x => !S.filtro || x.tipo === S.filtro);
+    app.append(h('div', { class: 'row', style: { marginBottom: '12px' } }, h('div', { style: { width: '220px' } }, filtro), h('div', { class: 'sp' }), h('button', { class: 'btn', onclick: enviarMidia }, ico(I.up), 'Enviar arquivos'), h('button', { class: 'btn', onclick: () => editarTexto('conhecimento') }, ico(I.doc), 'Novo conhecimento'), h('button', { class: 'btn', onclick: () => editarTexto('template') }, ico(I.plus), 'Novo template'), h('button', { class: 'btn', onclick: () => editarTexto('estilo_video') }, ico(I.plus), 'Novo estilo de vídeo')));
+    app.append(h('div', { class: 'card' }, ls.length ? h('table', null, h('thead', null, h('tr', null, h('th', null, ''), h('th', null, 'Título'), h('th', null, 'Tipo'), h('th', null, 'Detalhe'), h('th', null, 'Atualizado'), h('th', null, ''))),
+      h('tbody', null, ls.map(x => h('tr', null, h('td', null, x.tipo === 'midia' && /png|jpe?g|webp|gif|svg/.test(x.ext) ? h('img', { class: 'thumb', src: '/api/admin/arquivo/' + x.sha, loading: 'lazy', alt: '' }) : h('span', { class: 'thumb', style: { display: 'grid', placeItems: 'center' } }, ico(I.doc))),
+        h('td', null, h('div', null, x.titulo), h('div', { class: 'mut small' }, x.chave)), h('td', null, h('span', { class: 'pill' }, TIPO[x.tipo])),
+        h('td', { class: 'mut small' }, x.tipo === 'midia' ? `${x.meta.kind || ''} · ${x.ext} · ${fmtB(x.size)}` : x.tipo === 'conhecimento' ? `${x.meta.agente || ''} · ${x.meta.modo === 'auto' ? 'quando o assunto pede' : 'sempre'}` : ''),
+        h('td', { class: 'mut small' }, data(x.updated_at)),
+        h('td', { style: { textAlign: 'right', whiteSpace: 'nowrap' } }, x.tipo !== 'midia' ? h('button', { class: 'btn sm', onclick: guard(async () => editarTexto(x.tipo, await api('/api/admin/itens/' + encodeURIComponent(x.chave)))) }, 'Editar') : null, ' ', h('button', { class: 'btn sm danger', onclick: guard(async () => { if (!confirm(`Retirar “${x.titulo}” da biblioteca? Ele some dos painéis dos clientes na próxima atualização.`)) return; await api('/api/admin/itens/' + encodeURIComponent(x.chave), 'DELETE'); toast('Retirado'); render(); }) }, ico(I.trash))))))) : h('div', { class: 'empty' }, 'Nenhum item ainda. Publique pelo seu painel matriz ou envie aqui.')));
+  }
+  if (S.tab === 'clientes') {
+    app.append(h('div', { class: 'row', style: { marginBottom: '12px' } }, h('div', { class: 'mut small sp' }, 'Cada cliente white label recebe uma chave. Ela vai no .env do painel dele (BIBLIOTECA_URL e BIBLIOTECA_CHAVE).'), h('button', { class: 'btn pri', onclick: novoCliente }, ico(I.plus), 'Novo cliente')));
+    app.append(h('div', { class: 'card' }, r.clientes.length ? h('table', null, h('thead', null, h('tr', null, h('th', null, 'Cliente'), h('th', null, 'Plano'), h('th', null, 'Situação'), h('th', null, 'Última atualização'), h('th', null, 'Vence'), h('th', null, ''))),
+      h('tbody', null, r.clientes.map(c => h('tr', null, h('td', null, h('div', null, c.nome), h('div', { class: 'mut small' }, c.contato || c.chave)), h('td', null, c.plano),
+        h('td', null, !c.ativo ? h('span', { class: 'pill bad' }, 'Suspenso') : c.expira && c.expira < new Date().toISOString().slice(0, 10) ? h('span', { class: 'pill bad' }, 'Vencido') : c.em_dia ? h('span', { class: 'pill ok' }, 'Em dia') : h('span', { class: 'pill warn' }, c.ultimo_sync ? 'Atualizando' : 'Nunca conectou')),
+        h('td', { class: 'mut small' }, data(c.ultimo_sync) + (c.versao_painel ? ' · painel ' + c.versao_painel : '')), h('td', { class: 'mut small' }, c.expira ? c.expira.split('-').reverse().join('/') : 'sem data'),
+        h('td', { style: { textAlign: 'right', whiteSpace: 'nowrap' } },
+          h('button', { class: 'btn sm', title: 'Ver e copiar a chave', onclick: guard(async () => { const k = (await api(`/api/admin/clientes/${c.id}/chave`)).chave; mostraChave(c.nome, k); }) }, ico(I.key)), ' ',
+          h('button', { class: 'btn sm', onclick: () => editarCliente(c) }, 'Editar'), ' ',
+          h('button', { class: 'btn sm', onclick: guard(async () => { await api(`/api/admin/clientes/${c.id}`, 'PUT', { ativo: !c.ativo }); toast(c.ativo ? 'Cliente suspenso: para de receber atualizações' : 'Cliente reativado'); render(); }) }, c.ativo ? 'Suspender' : 'Reativar')))))) : h('div', { class: 'empty' }, 'Nenhum cliente cadastrado. Seu próprio painel também é um cliente: cadastre-o para ele receber o que você publicar.')));
+  }
+  if (S.tab === 'hist') app.append(h('div', { class: 'card' }, r.historico.length ? h('table', null, h('tbody', null, r.historico.map(x => h('tr', null, h('td', { class: 'mut small', style: { width: '140px' } }, data(x.ts)), h('td', null, x.msg))))) : h('div', { class: 'empty' }, 'Nada ainda.')));
+}
+function mostraChave(nome, k) {
+  const url = location.origin;
+  modal('Chave de ' + nome, h('div', { class: 'stack' }, h('div', { class: 'mut small' }, 'Coloque estas duas linhas no arquivo .env do painel do cliente e reinicie o painel. Ele passa a baixar e atualizar a biblioteca sozinho.'),
+    h('code', null, 'BIBLIOTECA_URL=' + url), h('code', null, 'BIBLIOTECA_CHAVE=' + k)), [h('button', { class: 'btn pri', onclick: () => copiar(`BIBLIOTECA_URL=${url}\nBIBLIOTECA_CHAVE=${k}`) }, ico(I.copy), 'Copiar as duas linhas')]);
+}
+function novoCliente() {
+  const nome = h('input', { type: 'text', placeholder: 'Ex.: Agência XPTO' }), contato = h('input', { type: 'text', placeholder: 'E-mail ou WhatsApp' }), plano = h('input', { type: 'text', value: 'completo' }), expira = h('input', { type: 'date' });
+  const m = modal('Novo cliente', h('div', { class: 'fg' }, h('label', { class: 'f' }, 'Nome', nome), h('label', { class: 'f' }, 'Contato', contato), h('label', { class: 'f' }, 'Plano', plano), h('label', { class: 'f' }, 'Vence em (opcional)', expira)),
+    [h('button', { class: 'btn pri', onclick: guard(async () => { const r = await api('/api/admin/clientes', 'POST', { nome: nome.value, contato: contato.value, plano: plano.value, expira: expira.value }); m.remove(); await render(); mostraChave(nome.value, r.chave); }) }, 'Criar e gerar a chave')]);
+}
+function editarCliente(c) {
+  const nome = h('input', { type: 'text', value: c.nome }), contato = h('input', { type: 'text', value: c.contato || '' }), plano = h('input', { type: 'text', value: c.plano }), expira = h('input', { type: 'date', value: c.expira || '' });
+  const m = modal('Editar cliente', h('div', { class: 'stack' }, h('div', { class: 'fg' }, h('label', { class: 'f' }, 'Nome', nome), h('label', { class: 'f' }, 'Contato', contato), h('label', { class: 'f' }, 'Plano', plano), h('label', { class: 'f' }, 'Vence em', expira)),
+    h('div', { class: 'row' }, h('button', { class: 'btn sm', onclick: guard(async () => { if (!confirm('Gerar uma chave nova? A chave antiga para de funcionar na hora.')) return; const r = await api(`/api/admin/clientes/${c.id}/nova-chave`, 'POST'); m.remove(); mostraChave(c.nome, r.chave); }) }, ico(I.key), 'Trocar a chave'), h('button', { class: 'btn sm danger', onclick: guard(async () => { if (!confirm(`Apagar ${c.nome}? A chave para de funcionar.`)) return; await api(`/api/admin/clientes/${c.id}`, 'DELETE'); m.remove(); render(); }) }, ico(I.trash), 'Apagar cliente'))),
+    [h('button', { class: 'btn pri', onclick: guard(async () => { await api(`/api/admin/clientes/${c.id}`, 'PUT', { nome: nome.value, contato: contato.value, plano: plano.value, expira: expira.value }); m.remove(); render(); }) }, 'Salvar')]);
+}
+function enviarMidia() {
+  const files = h('input', { type: 'file', multiple: true }), kind = h('select', null, KINDS.map(([k, l]) => h('option', { value: k }, l))), tags = h('input', { type: 'text', placeholder: 'Ex.: escuro, neon, dinheiro' }), nota = h('input', { type: 'text', placeholder: 'Crédito ou licença (opcional)' });
+  const m = modal('Enviar arquivos de mídia', h('div', { class: 'stack' }, h('label', { class: 'f' }, 'Arquivos (imagem, áudio, vídeo ou fonte)', files), h('div', { class: 'fg' }, h('label', { class: 'f' }, 'Tipo', kind), h('label', { class: 'f' }, 'Etiquetas', tags)), h('label', { class: 'f' }, 'Nota', nota)),
+    [h('button', { class: 'btn pri', onclick: guard(async () => {
+      const fs = [...files.files]; if (!fs.length) return toast('Escolha os arquivos');
+      for (const f of fs) { const ext = (f.name.match(/\.([a-z0-9]+)$/i) || [])[1] || '', nomeB = f.name.replace(/\.[^.]+$/, ''); await api(`/api/admin/midia?${new URLSearchParams({ titulo: nomeB, nome: nomeB, ext, kind: kind.value, tags: tags.value, nota: nota.value })}`, 'POST', null, f); }
+      m.remove(); toast(`${fs.length} arquivo(s) publicado(s)`); render();
+    }) }, ico(I.up), 'Publicar')]);
+}
+function editarTexto(tipo, it) {
+  const titulo = h('input', { type: 'text', value: it?.titulo || '' }), cont = h('textarea', { rows: 14 }); cont.value = it?.conteudo || (tipo === 'template' ? JSON.stringify({ nome: '', uso: '', nivel: 'robusto', formatos: ['carrossel'], seq: [{ modelo: 'revista', papel: 'capa' }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }, null, 2) : tipo === 'estilo_video' ? '{\n  "nome": "",\n  "look": "editorial",\n  "resumo": "",\n  "receita": ""\n}' : '');
+  const ag = h('select', null, AGENTES.map(([k, l]) => h('option', { value: k, selected: it?.meta?.agente === k }, l))), modo = h('select', null, h('option', { value: 'sempre' }, 'Vale em todo pedido'), h('option', { value: 'auto', selected: it?.meta?.modo === 'auto' }, 'Só quando o assunto pede'));
+  const m = modal((it ? 'Editar ' : 'Novo ') + TIPO[tipo].toLowerCase(), h('div', { class: 'stack' }, h('label', { class: 'f' }, 'Título', titulo), tipo === 'conhecimento' ? h('div', { class: 'fg' }, h('label', { class: 'f' }, 'Agente', ag), h('label', { class: 'f' }, 'Quando usar', modo)) : null, h('label', { class: 'f' }, tipo === 'conhecimento' ? 'Texto (Markdown)' : 'Conteúdo (JSON)', cont)),
+    [h('button', { class: 'btn pri', onclick: guard(async () => { await api('/api/admin/itens', 'POST', { tipo, chave: it?.chave, titulo: titulo.value, conteudo: cont.value, meta: tipo === 'conhecimento' ? { agente: ag.value, modo: modo.value } : (it?.meta || {}) }); m.remove(); toast('Publicado'); render(); }) }, 'Publicar')]);
+}
+render();
+</script>
+</body>
+</html>

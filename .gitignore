@@ -1,0 +1,8 @@
+.env
+data/
+node_modules/
+objetos/
+voz/
+previa/
+*.mp4
+.m2d-*/

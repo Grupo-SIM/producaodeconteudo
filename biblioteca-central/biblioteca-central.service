@@ -1,0 +1,13 @@
+[Unit]
+Description=Biblioteca Central (Agentes SIM)
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/biblioteca-central
+ExecStart=/usr/bin/node server.js
+Restart=always
+User=biblioteca
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

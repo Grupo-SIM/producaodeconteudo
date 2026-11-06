@@ -1,0 +1,16 @@
+{
+  "name": "agentes-sim",
+  "version": "1.0.0",
+  "description": "Agência autônoma de conteúdo: Roteirista, Designer, Editor, Gerente e Social Media com painel CRM.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js"
+  },
+  "dependencies": {
+    "playwright": "^1.65.0"
+  }
+}

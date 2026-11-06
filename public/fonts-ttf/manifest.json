@@ -1,0 +1,704 @@
+{
+"abril-fatface-latin-400-normal": {
+"family": "Abril Fatface",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"anton-latin-400-normal": {
+"family": "Anton",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"archivo-black-latin-400-normal": {
+"family": "Archivo Black",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"bangers-latin-400-normal": {
+"family": "Bangers",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"barlow-condensed-latin-500-normal": {
+"family": "Barlow Condensed Medium",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"barlow-condensed-latin-700-normal": {
+"family": "Barlow Condensed",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"barlow-condensed-latin-800-normal": {
+"family": "Barlow Condensed ExtraBold",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"bebas-neue-latin-400-normal": {
+"family": "Bebas Neue",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"big-shoulders-display-latin-700-normal": {
+"family": "Big Shoulders Display Thin",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"big-shoulders-display-latin-800-normal": {
+"family": "Big Shoulders Display Thin ExtraBold",
+"style": "Regular",
+"family16": "Big Shoulders Display Thin",
+"style17": "ExtraBold"
+},
+"big-shoulders-display-latin-900-normal": {
+"family": "Big Shoulders Display Thin Black",
+"style": "Regular",
+"family16": "Big Shoulders Display Thin",
+"style17": "Black"
+},
+"bungee-latin-400-normal": {
+"family": "Bungee",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"caveat-latin-400-normal": {
+"family": "Caveat",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"caveat-latin-700-normal": {
+"family": "Caveat",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"cormorant-garamond-latin-400-normal": {
+"family": "Cormorant Garamond Light",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"cormorant-garamond-latin-600-normal": {
+"family": "Cormorant Garamond Light SemiBold",
+"style": "Regular",
+"family16": "Cormorant Garamond Light",
+"style17": "SemiBold"
+},
+"cormorant-garamond-latin-700-normal": {
+"family": "Cormorant Garamond Light",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"dancing-script-latin-400-normal": {
+"family": "Dancing Script",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"dancing-script-latin-700-normal": {
+"family": "Dancing Script",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"dm-sans-latin-400-normal": {
+"family": "DM Sans 9pt",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"dm-sans-latin-500-normal": {
+"family": "DM Sans 9pt Medium",
+"style": "Regular",
+"family16": "DM Sans 9pt",
+"style17": "Medium"
+},
+"dm-sans-latin-700-normal": {
+"family": "DM Sans 9pt",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"dm-serif-display-latin-400-normal": {
+"family": "DM Serif Display",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"inter-latin-300-normal": {
+"family": "Inter Light",
+"style": "Regular",
+"family16": "Inter",
+"style17": "Light"
+},
+"inter-latin-400-normal": {
+"family": "Inter",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"inter-latin-500-normal": {
+"family": "Inter Medium",
+"style": "Regular",
+"family16": "Inter",
+"style17": "Medium"
+},
+"inter-latin-600-normal": {
+"family": "Inter SemiBold",
+"style": "Regular",
+"family16": "Inter",
+"style17": "SemiBold"
+},
+"inter-latin-700-normal": {
+"family": "Inter",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"inter-latin-800-normal": {
+"family": "Inter ExtraBold",
+"style": "Regular",
+"family16": "Inter",
+"style17": "ExtraBold"
+},
+"inter-latin-900-normal": {
+"family": "Inter Black",
+"style": "Regular",
+"family16": "Inter",
+"style17": "Black"
+},
+"jetbrains-mono-latin-400-normal": {
+"family": "JetBrains Mono",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"jetbrains-mono-latin-700-normal": {
+"family": "JetBrains Mono",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"league-spartan-latin-400-normal": {
+"family": "League Spartan Thin",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"league-spartan-latin-600-normal": {
+"family": "League Spartan Thin SemiBold",
+"style": "Regular",
+"family16": "League Spartan Thin",
+"style17": "SemiBold"
+},
+"league-spartan-latin-800-normal": {
+"family": "League Spartan Thin ExtraBold",
+"style": "Regular",
+"family16": "League Spartan Thin",
+"style17": "ExtraBold"
+},
+"lobster-latin-400-normal": {
+"family": "Lobster",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"lora-latin-400-normal": {
+"family": "Lora",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"lora-latin-600-normal": {
+"family": "Lora SemiBold",
+"style": "Regular",
+"family16": "Lora",
+"style17": "SemiBold"
+},
+"lora-latin-700-normal": {
+"family": "Lora",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"manrope-latin-400-normal": {
+"family": "Manrope ExtraLight",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"manrope-latin-600-normal": {
+"family": "Manrope ExtraLight SemiBold",
+"style": "Regular",
+"family16": "Manrope ExtraLight",
+"style17": "SemiBold"
+},
+"manrope-latin-800-normal": {
+"family": "Manrope ExtraLight ExtraBold",
+"style": "Regular",
+"family16": "Manrope ExtraLight",
+"style17": "ExtraBold"
+},
+"merriweather-latin-400-normal": {
+"family": "Merriweather Light 18pt",
+"style": "Regular",
+"family16": "Merriweather Light 18pt",
+"style17": "Regular"
+},
+"merriweather-latin-700-normal": {
+"family": "Merriweather Light 18pt",
+"style": "Bold",
+"family16": "Merriweather Light 18pt",
+"style17": "Bold"
+},
+"merriweather-latin-900-normal": {
+"family": "Merriweather Light 18pt Black",
+"style": "Regular",
+"family16": "Merriweather Light 18pt",
+"style17": "Black"
+},
+"montserrat-latin-300-normal": {
+"family": "Montserrat Thin Light",
+"style": "Regular",
+"family16": "Montserrat Thin",
+"style17": "Light"
+},
+"montserrat-latin-400-normal": {
+"family": "Montserrat Thin",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"montserrat-latin-500-normal": {
+"family": "Montserrat Thin Medium",
+"style": "Regular",
+"family16": "Montserrat Thin",
+"style17": "Medium"
+},
+"montserrat-latin-600-normal": {
+"family": "Montserrat Thin SemiBold",
+"style": "Regular",
+"family16": "Montserrat Thin",
+"style17": "SemiBold"
+},
+"montserrat-latin-700-normal": {
+"family": "Montserrat Thin",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"montserrat-latin-800-normal": {
+"family": "Montserrat Thin ExtraBold",
+"style": "Regular",
+"family16": "Montserrat Thin",
+"style17": "ExtraBold"
+},
+"montserrat-latin-900-normal": {
+"family": "Montserrat Thin Black",
+"style": "Regular",
+"family16": "Montserrat Thin",
+"style17": "Black"
+},
+"nunito-latin-400-normal": {
+"family": "Nunito ExtraLight",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"nunito-latin-700-normal": {
+"family": "Nunito ExtraLight",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"nunito-latin-800-normal": {
+"family": "Nunito ExtraLight ExtraBold",
+"style": "Regular",
+"family16": "Nunito ExtraLight",
+"style17": "ExtraBold"
+},
+"orbitron-latin-400-normal": {
+"family": "Orbitron",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"orbitron-latin-500-normal": {
+"family": "Orbitron Medium",
+"style": "Regular",
+"family16": "Orbitron",
+"style17": "Medium"
+},
+"orbitron-latin-600-normal": {
+"family": "Orbitron SemiBold",
+"style": "Regular",
+"family16": "Orbitron",
+"style17": "SemiBold"
+},
+"orbitron-latin-700-normal": {
+"family": "Orbitron",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"orbitron-latin-800-normal": {
+"family": "Orbitron ExtraBold",
+"style": "Regular",
+"family16": "Orbitron",
+"style17": "ExtraBold"
+},
+"orbitron-latin-900-normal": {
+"family": "Orbitron Black",
+"style": "Regular",
+"family16": "Orbitron",
+"style17": "Black"
+},
+"oswald-latin-300-normal": {
+"family": "Oswald Light",
+"style": "Regular",
+"family16": "Oswald",
+"style17": "Light"
+},
+"oswald-latin-400-normal": {
+"family": "Oswald",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"oswald-latin-500-normal": {
+"family": "Oswald Medium",
+"style": "Regular",
+"family16": "Oswald",
+"style17": "Medium"
+},
+"oswald-latin-600-normal": {
+"family": "Oswald SemiBold",
+"style": "Regular",
+"family16": "Oswald",
+"style17": "SemiBold"
+},
+"oswald-latin-700-normal": {
+"family": "Oswald",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"outfit-latin-400-normal": {
+"family": "Outfit Thin",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"outfit-latin-500-normal": {
+"family": "Outfit Thin Medium",
+"style": "Regular",
+"family16": "Outfit Thin",
+"style17": "Medium"
+},
+"outfit-latin-700-normal": {
+"family": "Outfit Thin",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"outfit-latin-800-normal": {
+"family": "Outfit Thin ExtraBold",
+"style": "Regular",
+"family16": "Outfit Thin",
+"style17": "ExtraBold"
+},
+"pacifico-latin-400-normal": {
+"family": "Pacifico",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"passion-one-latin-400-normal": {
+"family": "Passion One",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"passion-one-latin-700-normal": {
+"family": "Passion One",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"passion-one-latin-900-normal": {
+"family": "Passion One Black",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"permanent-marker-latin-400-normal": {
+"family": "Permanent Marker",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"playfair-display-latin-400-normal": {
+"family": "Playfair Display",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"playfair-display-latin-700-normal": {
+"family": "Playfair Display",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"playfair-display-latin-900-normal": {
+"family": "Playfair Display Black",
+"style": "Regular",
+"family16": "Playfair Display",
+"style17": "Black"
+},
+"plus-jakarta-sans-latin-400-normal": {
+"family": "Plus Jakarta Sans",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"plus-jakarta-sans-latin-600-normal": {
+"family": "Plus Jakarta Sans SemiBold",
+"style": "Regular",
+"family16": "Plus Jakarta Sans",
+"style17": "SemiBold"
+},
+"plus-jakarta-sans-latin-800-normal": {
+"family": "Plus Jakarta Sans ExtraBold",
+"style": "Regular",
+"family16": "Plus Jakarta Sans",
+"style17": "ExtraBold"
+},
+"poppins-latin-300-normal": {
+"family": "Poppins Light",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"poppins-latin-400-normal": {
+"family": "Poppins",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"poppins-latin-500-normal": {
+"family": "Poppins Medium",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"poppins-latin-600-normal": {
+"family": "Poppins SemiBold",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"poppins-latin-700-normal": {
+"family": "Poppins",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"poppins-latin-800-normal": {
+"family": "Poppins ExtraBold",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"poppins-latin-900-normal": {
+"family": "Poppins Black",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"raleway-latin-400-normal": {
+"family": "Raleway Thin",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"raleway-latin-600-normal": {
+"family": "Raleway Thin SemiBold",
+"style": "Regular",
+"family16": "Raleway Thin",
+"style17": "SemiBold"
+},
+"raleway-latin-800-normal": {
+"family": "Raleway Thin ExtraBold",
+"style": "Regular",
+"family16": "Raleway Thin",
+"style17": "ExtraBold"
+},
+"righteous-latin-400-normal": {
+"family": "Righteous",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"roboto-latin-400-normal": {
+"family": "Roboto",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"roboto-latin-500-normal": {
+"family": "Roboto Medium",
+"style": "Regular",
+"family16": "Roboto",
+"style17": "Medium"
+},
+"roboto-latin-700-normal": {
+"family": "Roboto",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"roboto-latin-900-normal": {
+"family": "Roboto Black",
+"style": "Regular",
+"family16": "Roboto",
+"style17": "Black"
+},
+"rubik-latin-400-normal": {
+"family": "Rubik Light",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"rubik-latin-500-normal": {
+"family": "Rubik Light Medium",
+"style": "Regular",
+"family16": "Rubik Light",
+"style17": "Medium"
+},
+"rubik-latin-700-normal": {
+"family": "Rubik Light",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"rubik-latin-800-normal": {
+"family": "Rubik Light ExtraBold",
+"style": "Regular",
+"family16": "Rubik Light",
+"style17": "ExtraBold"
+},
+"sora-latin-300-normal": {
+"family": "Sora Light",
+"style": "Regular",
+"family16": "Sora",
+"style17": "Light"
+},
+"sora-latin-400-normal": {
+"family": "Sora",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"sora-latin-500-normal": {
+"family": "Sora Medium",
+"style": "Regular",
+"family16": "Sora",
+"style17": "Medium"
+},
+"sora-latin-600-normal": {
+"family": "Sora SemiBold",
+"style": "Regular",
+"family16": "Sora",
+"style17": "SemiBold"
+},
+"sora-latin-700-normal": {
+"family": "Sora",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"sora-latin-800-normal": {
+"family": "Sora ExtraBold",
+"style": "Regular",
+"family16": "Sora",
+"style17": "ExtraBold"
+},
+"space-grotesk-latin-400-normal": {
+"family": "Space Grotesk Light",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"space-grotesk-latin-500-normal": {
+"family": "Space Grotesk Light Medium",
+"style": "Regular",
+"family16": "Space Grotesk Light",
+"style17": "Medium"
+},
+"space-grotesk-latin-700-normal": {
+"family": "Space Grotesk Light",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"space-mono-latin-400-normal": {
+"family": "Space Mono",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"space-mono-latin-700-normal": {
+"family": "Space Mono",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"staatliches-latin-400-normal": {
+"family": "Staatliches",
+"style": "Regular",
+"family16": null,
+"style17": null
+},
+"syne-latin-600-normal": {
+"family": "Syne SemiBold",
+"style": "Regular",
+"family16": "Syne",
+"style17": "SemiBold"
+},
+"syne-latin-800-normal": {
+"family": "Syne ExtraBold",
+"style": "Regular",
+"family16": "Syne",
+"style17": "ExtraBold"
+},
+"unbounded-latin-500-normal": {
+"family": "Unbounded Medium",
+"style": "Regular",
+"family16": "Unbounded",
+"style17": "Medium"
+},
+"unbounded-latin-700-normal": {
+"family": "Unbounded",
+"style": "Bold",
+"family16": null,
+"style17": null
+},
+"unbounded-latin-900-normal": {
+"family": "Unbounded Black",
+"style": "Regular",
+"family16": "Unbounded",
+"style17": "Black"
+}
+}
