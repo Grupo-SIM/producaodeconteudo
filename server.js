@@ -49,7 +49,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const als = new AsyncLocalStorage();
 class DryRun extends Error { constructor(p) { super('dry'); this.prompt = p; } }
-const BUILD = '2026-11-06.223'; // tem de ser igual ao UI_BUILD do public/index.html
+const BUILD = '2026-11-07.225'; // tem de ser igual ao UI_BUILD do public/index.html
 // Um erro solto numa tarefa de fundo não pode derrubar o painel (era isso que dava "Failed to fetch" no navegador): registra e segue
 process.on('uncaughtException', e => { try { console.error('[erro não tratado]', e && e.stack || e); } catch { } });
 process.on('unhandledRejection', e => { try { console.error('[promessa rejeitada]', e && e.stack || e); } catch { } });
@@ -896,7 +896,10 @@ function changed() {
 }
 setInterval(() => { for (const res of clients) res.write(': ping\n\n'); }, 25000).unref();
 
+// log passo a passo no terminal (Komodo/docker logs): hora local do servidor, etiqueta e mensagem
+const dlog = (tag, msg) => console.log(`${new Date().toLocaleTimeString('pt-BR', { timeZone: process.env.TZ || 'America/Rio_Branco' })} [${tag}] ${msg}`);
 function log(agent, message, contentId = null) {
+  dlog('atividade', `${agent || 'sistema'}: ${message}${contentId ? ' (#' + contentId + ')' : ''}`);
   run('INSERT INTO activity(ts,agent,message,content_id) VALUES(?,?,?,?)', T(), agent, message, contentId);
   run('DELETE FROM activity WHERE id < (SELECT MAX(id) FROM activity) - 500');
   changed();
@@ -1645,12 +1648,14 @@ if (!one("SELECT 1 x FROM settings WHERE key='rev_v1'")) {
 function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter = null) {
   const r = run('INSERT INTO jobs(content_id,agent,kind,status,input,origin,cday,created_at,run_after) VALUES(?,?,?,?,?,?,?,?,?)',
     contentId, agent, kind, 'queued', JSON.stringify(input), origin, today(), T(), runAfter);
+  dlog('fila', `novo pedido #${r.lastInsertRowid}: ${agent}/${kind}${contentId ? ' do conteúdo #' + contentId : ''}${input?.feedback ? ' (devolvido: ' + String(input.feedback).replace(/\s+/g, ' ').slice(0, 160) + ')' : ''}${origin && origin !== 'auto' ? ' origem=' + origin : ''}`);
   changed(); setImmediate(pump);
   return +r.lastInsertRowid;
 }
 const getContent = id => one('SELECT * FROM contents WHERE id=?', id);
 const setContent = (id, fields) => {
   const keys = Object.keys(fields);
+  if ('status' in fields) dlog('conteudo', `#${id} status -> ${fields.status}${fields.error ? ' | ' + String(fields.error).slice(0, 200) : ''}`);
   run(`UPDATE contents SET ${keys.map(k => k + '=?').join(',')}, updated_at=? WHERE id=?`, ...keys.map(k => fields[k] ?? null), T(), id);
   changed();
 };
@@ -5066,6 +5071,8 @@ function resumoArteReal(c) {
 }
 // Conferência local do roteiro ANTES do Revisor: erros mecânicos (limites de palavras, duas versões, pedido duplo, isca) voltam direto ao Roteirista com a correção exata e não gastam rodada do Revisor
 const nPal = t => String(t || '').replace(/\*/g, '').trim().split(/\s+/).filter(Boolean).length;
+// no modo chat cada volta ao Roteirista custa uma ida e volta de copiar/colar: só 1 devolução automática por peça (com API continua o valor das configurações)
+const maxRev = st => MANUAL ? Math.min(+st.max_revisions || 0, 1) : +st.max_revisions;
 function copyLint(c, script) {
   const erros = [];
   if (!script) return erros;
@@ -5159,7 +5166,8 @@ const HANDLERS = {
     setContent(c.id, { script: r.text, caption: parseCaption(r.text), status: 'producing', error: '', art: input.feedback ? '' : c.art, video: input.feedback ? '' : c.video });
     log('roteirista', `Roteiro ${input.feedback ? 'reescrito' : 'escrito'}: "${c.title}"`, c.id);
     { const le = copyLint(c, r.text), volta = +input.lint || 0;
-      if (le.length && volta < 2) { log('roteirista', `Conferência do painel achou ${le.length} erro(s) mecânico(s): volta ao Roteirista sem gastar o Revisor`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: 'CONFERÊNCIA DO PAINEL (limites objetivos, corrija todos e mude só isso):\n- ' + le.join('\n- '), lint: volta + 1 }); return r; } }
+      if (le.length && MANUAL) log('roteirista', `Conferência do painel: ${le.length} ponto(s) fora dos limites (${le.join(' | ').slice(0, 300)}). No modo chat segue para a revisão sem pedir de novo.`, c.id);
+      if (le.length && volta < 2 && !MANUAL) { log('roteirista', `Conferência do painel achou ${le.length} erro(s) mecânico(s): volta ao Roteirista sem gastar o Revisor`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: 'CONFERÊNCIA DO PAINEL (limites objetivos, corrija todos e mude só isso):\n- ' + le.join('\n- '), lint: volta + 1 }); return r; } }
     if (copyRevOn()) enqueue(c.id, 'revisorcopy', 'revcopy'); else enqueue(c.id, 'gerente', 'revisao');
     return r;
   },
@@ -5182,13 +5190,13 @@ const HANDLERS = {
     const fmtc = `${c.format}/${c.kind}${c.goal ? '/' + c.goal : ''}`, det = `${L.correcoes ? 'Correções: ' + L.correcoes.slice(0, 900) + '\n' : ''}${L.licao ? 'Lição: ' + L.licao.slice(0, 400) : ''}`;
     if (ok) brainEvent('roteirista', 'revisao_aprovada', c, `Revisor de Copy aprovou (nota ${L.nota ?? '-'}/5, ${fmtc})`, det);
     else brainEvent('roteirista', 'revisao_reprovada', c, `Revisor de Copy: ${L.veredito} (nota ${L.nota ?? '-'}/5, ${fmtc})`, det);
-    if (ok || c.revisions >= +s.max_revisions) {
+    if (ok || c.revisions >= maxRev(s)) {
       if (!ok) log('revisorcopy', `Ainda há pendências na copy de "${c.title}" após ${c.revisions} rodada(s): o Revisor decide com o laudo na mão`, c.id);
       else log('revisorcopy', `Aprovou a copy de "${c.title}" (nota ${L.nota ?? '-'}/5)`, c.id);
       enqueue(c.id, 'gerente', 'revisao');
     } else {
       setContent(c.id, { revisions: c.revisions + 1, status: 'producing' });
-      log('revisorcopy', `Devolveu a copy de "${c.title}" (${L.veredito}, nota ${L.nota ?? '-'}/5) — rodada ${c.revisions + 1}/${s.max_revisions}`, c.id);
+      log('revisorcopy', `Devolveu a copy de "${c.title}" (${L.veredito}, nota ${L.nota ?? '-'}/5) — rodada ${c.revisions + 1}/${maxRev(s)}`, c.id);
       enqueue(c.id, 'roteirista', 'roteiro', { feedback: `LAUDO DO REVISOR DE COPY (${L.veredito}). Aplique as correções obrigatórias (só elas: não reescreva o que já está bom) e entregue a peça completa de novo, limpa: sem notas dirigidas ao Revisor dentro do texto:\n${L.correcoes || r.text.slice(0, 3000)}` });
     }
     return r;
@@ -5217,7 +5225,7 @@ const HANDLERS = {
     const nota = Math.max(0, Math.min(10, Number(rev.nota) || 0));
     const approved = rev.aprovado === true && nota >= +s.score_min && rev.risco_factual !== 'alto';
     // acabaram as rodadas e a nota está perto do mínimo, sem risco factual alto: a equipe segue (com as ressalvas anotadas) em vez de travar por detalhe
-    const comRessalva = !approved && c.revisions >= +s.max_revisions && nota >= Math.max(5, +s.score_min - 1.5) && rev.risco_factual !== 'alto';
+    const comRessalva = !approved && c.revisions >= maxRev(s) && nota >= Math.max(5, +s.score_min - 1.5) && rev.risco_factual !== 'alto';
     const base = { review: JSON.stringify({ ...rev, nota, aprovado: approved }), score: nota };
     const fmtc = `${c.format}/${c.kind}${c.goal ? '/' + c.goal : ''}`;
     if (approved) brainEvent('roteirista', 'revisao_aprovada', c, `Aprovado com nota ${nota.toFixed(1)} (${fmtc})`, `Pontos fortes: ${(rev.pontos_fortes || []).join(' | ')}${rev.gancho != null ? `\nGancho ${rev.gancho}/10, clareza ${rev.clareza}/10, aderência ${rev.aderencia_diretrizes}/10` : ''}`);
@@ -5236,9 +5244,9 @@ const HANDLERS = {
         setContent(c.id, { ...base });
         paraAprovacao(c, `Aprovou "${c.title}" (nota ${nota.toFixed(1)}) — aguardando sua aprovação final`);
       }
-    } else if (c.revisions < +s.max_revisions) {
+    } else if (c.revisions < maxRev(s)) {
       setContent(c.id, { ...base, revisions: c.revisions + 1, status: 'producing' });
-      log('gerente', `Reprovou "${c.title}" (nota ${nota.toFixed(1)}) — pediu ajustes (${c.revisions + 1}/${s.max_revisions})`, c.id);
+      log('gerente', `Reprovou "${c.title}" (nota ${nota.toFixed(1)}) — pediu ajustes (${c.revisions + 1}/${maxRev(s)})`, c.id);
       enqueue(c.id, 'roteirista', 'roteiro', { feedback: String(rev.ajustes_obrigatorios || (rev.problemas || []).join('\n') || 'Melhore o gancho e a aderência às diretrizes.') });
     } else {
       setContent(c.id, { ...base, status: 'blocked', error: `Reprovado após ${s.max_revisions} revisões automáticas. Veja a aba Revisão e decida.` });
@@ -5644,12 +5652,16 @@ function composePrompt(p, withBase) {
 async function submitManual(job, text) {
   const c = job.content_id ? getContent(job.content_id) : null;
   if (job.content_id && !c) throw fail(404, 'Conteúdo removido');
+  dlog('manual', `resposta colada no pedido #${job.id} (${job.kind}${c ? ', conteúdo #' + c.id + ' "' + String(c.title || '').slice(0, 50) + '"' : ''}): ${text.length} caracteres`);
+  const t0m = Date.now();
   run("UPDATE jobs SET status='running', started_at=?, day=?, attempts=attempts+1 WHERE id=?", T(), today(), job.id);
   try {
     await als.run({ text, brand: jobBrand(job, c), scoped: !!c, ctx: ctxDe(c), fmt: fmtGrupo(c?.format) }, () => HANDLERS[job.kind](job, c));
     run("UPDATE jobs SET status='done', finished_at=?, output=? WHERE id=?", T(), text.slice(0, 20000), job.id);
+    dlog('manual', `pedido #${job.id} (${job.kind}) concluído em ${Date.now() - t0m} ms`);
     if (c && (job.kind === 'arte' || job.kind === 'video')) checkProduction(c.id);
   } catch (e) {
+    console.error(`${new Date().toISOString()} [manual] ERRO no pedido #${job.id} (${job.kind}): ${e.message}\n${(e.stack || '').split('\n').slice(1, 4).join('\n')}`);
     run("UPDATE jobs SET status='queued', error=? WHERE id=?", e.message, job.id);
     changed(); throw fail(400, e.message);
   }
@@ -6542,7 +6554,8 @@ async function api(req, res, url) {
     try { base = await jobPrompt(job); }
     catch (e) { if (e.status === 409) { run('DELETE FROM jobs WHERE id=?', job.id); changed(); } throw e; } // pedido sem utilidade: sai da fila
     const prompt = composePrompt(base, withBase);
-    return send(res, 200, { id: job.id, kind: job.kind, content_id: job.content_id, format: c?.format || '', agent: agentRow(job.agent).name, color: agentRow(job.agent).color, label: STAGE_LABEL[job.kind], title: c?.title || '', prompt, chars: prompt.length, lastError: job.error || '' });
+    dlog('manual', `pedido #${job.id} (${job.kind}) aberto: ${prompt.length} caracteres, base de conhecimento ${withBase ? 'incluída' : 'fora'}`);
+    return send(res, 200, { id: job.id, kind: job.kind, content_id: job.content_id, format: c?.format || '', agent: agentRow(job.agent).name, color: agentRow(job.agent).color, label: STAGE_LABEL[job.kind], title: c?.title || '', prompt, chars: prompt.length, lastError: job.error || '', feedback: String(jparse(job.input, {})?.feedback || '').slice(0, 1500) });
   }
   if ((mt = p.match(/^\/api\/jobs\/(\d+)\/submit$/)) && m === 'POST') {
     const job = one("SELECT * FROM jobs WHERE id=? AND status='queued'", +mt[1]);
@@ -7742,6 +7755,10 @@ const indexFile = path.join(__dirname, 'public', 'index.html');
 
 const server = http.createServer(async (req, res) => {
   for (const [k, v] of Object.entries(SEC_HEADERS)) res.setHeader(k, v);
+  { const t0 = Date.now(), rota = (req.method || 'GET') + ' ' + String(req.url || '').split('?')[0], mut = req.method !== 'GET' && req.method !== 'HEAD', mudo = /^\/api\/(stream|state)$|^\/healthz$/.test(String(req.url || '').split('?')[0]);
+    res.on('finish', () => { if (res.statusCode >= 400 || (mut && !mudo)) dlog('http', `${rota} -> ${res.statusCode} (${Date.now() - t0} ms)`); });
+    res.on('close', () => { if (!res.writableFinished && !mudo) dlog('http', `${rota} interrompida pelo cliente/proxy antes de terminar (${Date.now() - t0} ms)`); });
+    req.on('aborted', () => { if (!mudo) dlog('http', `${rota} abortada no envio (${Date.now() - t0} ms)`); }); }
   try {
     const url = new URL(req.url, 'http://x');
     if (url.pathname === '/healthz') return send(res, 200, { ok: true });
@@ -7755,7 +7772,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/' || url.pathname === '/index.html') return send(res, 200, fs.readFileSync(indexFile, 'utf8'));
     return send(res, 404, { error: 'Não encontrado' });
   } catch (e) {
-    if (!e.status) console.error(e);
+    if (!e.status) console.error(`${new Date().toISOString()} [http] ERRO ${req.method} ${req.url}:`, e); else if (e.status >= 400) dlog('http', `${req.method} ${String(req.url).split('?')[0]} recusada ${e.status}: ${e.message}`);
     if (!res.headersSent) send(res, e.status || 500, { error: e.status ? e.message : 'Erro interno' });
   }
 });

@@ -1479,3 +1479,10 @@ Configurações › Sistema › **Levar tudo para outro painel**:
 - A manchete da capa herdava `nowrap` do layout e saía numa linha só, espremida; agora quebra em várias linhas e usa o maior tamanho que couber (`layoutNoticiaTexto`).
 - A contracapa nunca repete a foto da capa: além do endereço/tamanho, compara a imagem pela impressão visual (dHash 9x8 via ffmpeg, `fotosParecidas`) em `radarGarantiFoto2`, `radarFotoBusca` e `contracapaNoticia`. Sem outra foto, fica o fundo da marca.
 - Ao iniciar, artes de notícia já feitas (últimas 60) com manchete em linha única ou foto repetida são corrigidas e renderizadas de novo.
+
+## Build 2026-11-07.224 — Modo chat: sem voltar ao início
+- No modo chat (sem API) cada devolução ao Roteirista custa um ciclo de copiar/colar. Agora só há 1 devolução automática por peça (`maxRev`), e a conferência mecânica do painel (`copyLint`) não devolve: registra o aviso na atividade e segue para o Revisor.
+- A janela do pedido mostra o motivo quando uma etapa voltou ("Esta etapa voltou para ajuste") e o aviso ao enviar diz "(voltou para ajuste)".
+
+## Build 2026-11-07.225 — Log passo a passo no terminal
+Tudo que acontece aparece no terminal (Komodo / `docker logs`), com hora: `[atividade]` (espelho da aba Atividade), `[fila]` (novo pedido, e o motivo quando é devolvido), `[manual]` (pedido aberto, resposta colada, concluído em N ms, ERRO com a pilha), `[conteudo]` (mudança de status) e `[http]` (POST/PUT/DELETE, qualquer erro 4xx/5xx e conexões cortadas antes de terminar).

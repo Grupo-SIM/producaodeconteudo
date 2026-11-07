@@ -928,7 +928,7 @@ function renderNav() {
     manual() ? h('div', null, h('span', { class: 'dot ' + (st.waiting.length ? 'warn' : '') }), st.waiting.length ? st.waiting.length + ' pedido(s) para o chat' : 'Nenhum pedido pendente') : h('div', null, h('span', { class: 'dot ' + (working ? 'warn' : '') }), working ? working + ' agente(s) trabalhando' : 'Equipe ociosa'));
 }
 document.getElementById('logoSide').src = '/logo-agentes-sim.png';
-const UI_BUILD = '2026-11-06.223';
+const UI_BUILD = '2026-11-07.225';
 async function renderView() {
   const tk = ++S.token, main = $('#main'), fn = VIEWS[S.view];
   try {
@@ -1867,6 +1867,7 @@ async function openJob(id) {
   const ta = h('textarea', { rows: 9, class: 'mono', placeholder: 'Cole aqui a resposta completa do Claude…' });
   const info = h('div', { class: 'small mut' }), view = h('pre', { class: 'mono', style: { whiteSpace: 'pre-wrap', maxHeight: '260px', overflow: 'auto', margin: '8px 0 0', padding: '12px', background: '#070708', border: '1px solid var(--line)', borderRadius: '11px', fontSize: '12px' } });
   const errBox = h('div', { class: 'banner warn', style: { margin: 0 }, hidden: !data.lastError }, data.lastError ? 'A última resposta não foi aceita: ' + data.lastError : '');
+  const fbBox = data.feedback ? h('div', { class: 'banner info', style: { margin: 0 } }, h('b', null, 'Esta etapa voltou para ajuste. '), 'Motivo: ' + data.feedback.slice(0, 600) + (data.feedback.length > 600 ? '…' : '') + ' (o pedido abaixo já leva essas correções)') : null;
   const chk = h('input', { type: 'checkbox', checked: true });
   const paint = () => { info.textContent = num(data.chars) + ' caracteres'; view.textContent = data.prompt; };
   chk.addEventListener('change', guard(async () => { data = await api('/jobs/' + id + '/prompt?base=' + (chk.checked ? 1 : 0)); paint(); }));
@@ -1874,7 +1875,7 @@ async function openJob(id) {
   modal(data.agent + ' · ' + data.label, h('div', { class: 'stack' },
     data.title ? h('div', { class: 'mut' }, '“' + data.title + '”') : null,
     data.content_id ? stepper(data.format, stepIdx(data.format, data.kind, null)) : null,
-    errBox,
+    errBox, fbBox,
     h('div', null, h('b', null, h('span', { class: 'n' }, '1'), 'Copie o pedido e cole no chat com o Claude'), h('div', { class: 'row', style: { margin: '10px 0' } }, h('button', { class: 'btn primary', onclick: () => copy(data.prompt, 'Pedido copiado — cole no chat') }, 'Copiar pedido'), info),
       h('label', { class: 'swrow small mut', style: { alignItems: 'center' } }, chk, 'Incluir a base de conhecimento (desmarque se você já colou “o contexto da marca” neste mesmo chat)'),
       h('details', null, h('summary', { class: 'small mut', style: { cursor: 'pointer', marginTop: '8px' } }, 'Ver o pedido'), view)),
@@ -1888,7 +1889,7 @@ async function openJob(id) {
          await api('/jobs/' + id + '/submit', 'POST', { text: ta.value }); closeModal(); await refresh();
          if (isTest) { toast('✓ Spec do vídeo pronto — agora é só renderizar', 'ok'); S.vt = data.content_id; S.vtTab = 'criar'; go('video'); return; }
          const cid = data.content_id, next = cid ? waitingFor(cid)[0] : null;
-         if (next) { toast('✓ ' + data.label + ' concluído — agora: ' + (STAGE_LABEL_UI[next.kind] || next.label), 'ok'); await openJob(next.id); }
+         if (next) { toast('✓ ' + data.label + ' concluído — agora: ' + (STAGE_LABEL_UI[next.kind] || next.label) + (next.kind === 'roteiro' && data.kind !== 'roteiro' ? ' (voltou para ajuste)' : ''), 'ok'); await openJob(next.id); }
          else if (cid) { toast('✓ Tudo pronto — confira e aprove', 'ok'); await openDrawer(cid); }
          else toast('Resposta registrada', 'ok');
        } catch (e) { errBox.textContent = 'A resposta não foi aceita: ' + e.message; errBox.hidden = false; btn.disabled = false; refresh(); }
