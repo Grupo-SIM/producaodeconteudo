@@ -788,7 +788,7 @@ const PTYPE = { ebook: 'E-book', curso: 'Curso', mentoria: 'Mentoria', servico: 
 const STATUS = { producing: ['Em produção', 'acc'], awaiting_script: ['Aprovar roteiro', 'warn'], awaiting_approval: ['Aprovar final', 'warn'], approved: ['Pronto p/ postar', 'ok'], posted: ['Postado', ''], blocked: ['Precisa de atenção', 'bad'] };
 const CAT = { marca: 'Descrição', tom_de_voz: 'Tom de voz', produtos: 'Produtos', historias: 'Histórias', noticias: 'Notícias', exemplos: 'Exemplos', outros: 'Outros' };
 const CAT_HELP = { marca: 'Descrição da marca: quem é, público, posicionamento e história. (Cores, fontes e logo vão em Identidade visual.)', diretrizes: 'Diretrizes específicas desta marca. As regras comuns a todas as marcas ficam no Cérebro (menu Cérebro › Base geral).', tom_de_voz: 'Como a marca fala; palavras que usa e que evita.', produtos: 'Ofertas, preços, benefícios, provas reais.', historias: 'Histórias reais ou criadas para reaproveitar.', noticias: 'Notícias e eventos para comentar (cole texto e fonte).', exemplos: 'Conteúdos que performaram — o Roteirista imita o padrão.', outros: 'Qualquer outro material de apoio.' };
-const STAGE_LABEL_UI = { radar: 'Agente de Notícias pesquisa o que está em alta', roteiro: 'Roteirista escreve o roteiro', revisao: 'Revisor revisa o roteiro', revcopy: 'Revisor de Copy revisa o roteiro', arte: 'Designer cria a direção de arte', video: 'Editor monta a decupagem', pacote: 'Social Media monta o pacote de postagem', gerencia: 'Revisor revisa a entrega', pautas: 'Gerente define as pautas', relatorio: 'Gerente lê as métricas', cerebro: 'Cérebro consolida o aprendizado', chat: 'Gerente responde a você', teste: 'Teste de agente pedido por você' };
+const STAGE_LABEL_UI = { seo: 'Agente de SEO revisa a matéria do site', radar: 'Agente de Notícias pesquisa o que está em alta', roteiro: 'Roteirista escreve o roteiro', revisao: 'Revisor revisa o roteiro', revcopy: 'Revisor de Copy revisa o roteiro', arte: 'Designer cria a direção de arte', video: 'Editor monta a decupagem', pacote: 'Social Media monta o pacote de postagem', gerencia: 'Revisor revisa a entrega', pautas: 'Gerente define as pautas', relatorio: 'Gerente lê as métricas', cerebro: 'Cérebro consolida o aprendizado', chat: 'Gerente responde a você', teste: 'Teste de agente pedido por você' };
 const ago = iso => { if (!iso) return ''; const s = (Date.now() - new Date(iso)) / 1000; if (s < 60) return 'agora'; if (s < 3600) return Math.floor(s / 60) + ' min'; if (s < 86400) return Math.floor(s / 3600) + ' h'; return Math.floor(s / 86400) + ' d'; };
 const hhmm = iso => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 const num = n => Number(n || 0).toLocaleString('pt-BR');
@@ -803,7 +803,7 @@ const gateScript = () => S.st?.settings?.approve_script === '1';
 const flowSteps = (f, ck) => FLOWS[isVideoF(f) ? 'video' : (f === 'feed' && (ck === 'texto' || ck === 'carta_vendas')) ? 'texto' : 'estatico'].filter(x => x[0] !== 'aprov_rot' || gateScript());
 function stepKey(kind, status) {
   if (kind === 'roteiro' || kind === 'pautas') return 'roteiro';
-  if (kind === 'revisao' || kind === 'revcopy' || kind === 'relatorio') return 'revisao';
+  if (kind === 'revisao' || kind === 'revcopy' || kind === 'seo' || kind === 'relatorio') return 'revisao';
   if (kind === 'arte' || kind === 'video') return 'producao';
   if (kind === 'gerencia') return 'gerencia';
   if (kind === 'pacote') return 'pronto';
@@ -1819,9 +1819,12 @@ function drawerTab(d, D) {
       m.feedback_proxima_tarefa ? h('div', null, h('div', { class: 'small mut' }, 'Para as próximas tarefas'), h('div', null, m.feedback_proxima_tarefa)) : null) : null;
     let cr = null; try { cr = d.copy_review ? JSON.parse(d.copy_review) : null; } catch { /* laudo inválido */ }
     const copyCard = cr?.laudo ? h('div', { class: 'card stack', style: { borderColor: 'rgba(167,139,250,.5)' } }, h('div', { class: 'row' }, h('span', { class: 'tag', style: { background: '#a78bfa' } }, 'Revisor de Copy'), h('b', null, 'Laudo da copy'), h('div', { class: 'sp' }), badge('Nota ' + (cr.nota ?? '—') + '/5', cr.veredito === 'aprovada' ? 'ok' : 'warn'), badge(({ aprovada: 'Aprovada', ajustes: 'Pediu ajustes', refazer: 'Mandou refazer' })[cr.veredito] || cr.veredito, cr.veredito === 'aprovada' ? 'ok' : 'warn')), md(String(cr.laudo))) : null;
-    const r = d.review; if (!r) return (mgr || copyCard) ? h('div', { class: 'stack' }, copyCard, mgr) : h('div', { class: 'empty' }, 'O Revisor ainda não revisou este conteúdo.');
+    let sr = null; try { sr = d.seo_review ? JSON.parse(d.seo_review) : null; } catch { /* laudo inválido */ }
+    const seoCard = d.materia ? h('div', { class: 'card stack', style: { borderColor: 'rgba(34,197,94,.5)' } }, h('div', { class: 'row' }, h('span', { class: 'tag', style: { background: '#22c55e' } }, 'Agente de SEO'), h('b', null, 'Matéria completa do site'), h('div', { class: 'sp' }), sr ? badge(({ aprovada: 'Aprovada', ajustar: 'Pediu ajustes', reprovada: 'Reprovada' })[sr.veredito] || sr.veredito, sr.veredito === 'aprovada' ? 'ok' : 'warn') : badge('Sem revisão de SEO ainda')),
+      h('details', null, h('summary', null, 'Ver a matéria'), md(String(d.materia))), sr?.laudo ? h('details', null, h('summary', null, 'Ver o laudo de SEO'), md(String(sr.laudo))) : null) : null;
+    const r = d.review; if (!r) return (mgr || copyCard || seoCard) ? h('div', { class: 'stack' }, copyCard, seoCard, mgr) : h('div', { class: 'empty' }, 'O Revisor ainda não revisou este conteúdo.');
     const L = (t, arr) => arr?.length ? h('div', null, h('h2', null, t), h('div', { class: 'list' }, arr.map(x => h('div', { class: 'li' }, x)))) : null;
-    return h('div', { class: 'stack' }, copyCard, mgr,
+    return h('div', { class: 'stack' }, copyCard, seoCard, mgr,
       h('div', { class: 'card row' }, h('div', { class: 'score' }, Number(r.nota).toFixed(1)), h('dl', { class: 'kv', style: { margin: 0 } }, h('dt', null, 'Diretrizes'), h('dd', null, r.aderencia_diretrizes ?? '—'), h('dt', null, 'Gancho'), h('dd', null, r.gancho ?? '—'), h('dt', null, 'Clareza'), h('dd', null, r.clareza ?? '—'), h('dt', null, 'Risco factual'), h('dd', null, r.risco_factual || '—')), h('div', { class: 'sp' }), badge(r.aprovado ? 'Aprovado' : 'Reprovado', r.aprovado ? 'ok' : 'bad'), d.revisions ? badge(d.revisions + ' revisão(ões) automática(s)') : null),
       L('Pontos fortes', r.pontos_fortes), L('Problemas', r.problemas), r.ajustes_obrigatorios ? h('div', null, h('h2', null, 'Ajustes pedidos pelo Revisor ao Roteirista'), md(String(r.ajustes_obrigatorios))) : null);
   }
@@ -2227,7 +2230,8 @@ async function agentBasePanel(a) {
   const editar = async it => {
     const x = it ? await api('/agents/' + a.id + '/base/' + it.id) : { titulo: '', conteudo: '', modo: 'sempre' };
     const ti = h('input', { type: 'text', value: x.titulo, placeholder: 'Título do documento' }), ta = h('textarea', { class: 'mono', rows: 20, style: { width: '100%', fontSize: '12.5px' } }); ta.value = x.conteudo;
-    const md = h('select', null, h('option', { value: 'sempre', selected: x.modo !== 'auto' }, 'Sempre (vai em todo pedido)'), h('option', { value: 'auto', selected: x.modo === 'auto' }, 'Quando relevante (só se o assunto combinar)'));
+    const fx = String(x.modo || '').startsWith('fmt:');
+    const md = h('select', null, fx ? h('option', { value: x.modo, selected: true }, 'Só no formato: ' + x.modo.slice(4).replace(/,/g, ', ')) : null, h('option', { value: 'sempre', selected: !fx && x.modo !== 'auto' }, 'Sempre (vai em todo pedido)'), h('option', { value: 'auto', selected: x.modo === 'auto' }, 'Quando relevante (só se o assunto combinar)'));
     modal(it ? 'Documento de ' + a.name : 'Novo documento para ' + a.name, h('div', { class: 'stack' }, fld('Título', ti), fld('Quando usar', md), fld('Conteúdo', ta)),
       [it && x.editado ? h('button', { class: 'btn', onclick: guard(async () => { await api('/agents/' + a.id + '/base/' + it.id + '/restaurar', 'POST'); closeModal(); reload(); }) }, 'Restaurar') : null, h('button', { class: 'btn', onclick: closeModal }, 'Cancelar'),
         h('button', { class: 'btn primary', onclick: guard(async () => { if (it) await api('/agents/' + a.id + '/base/' + it.id, 'PUT', { titulo: ti.value, conteudo: ta.value, modo: md.value }); else await api('/agents/' + a.id + '/base', 'POST', { docs: [{ titulo: ti.value, conteudo: ta.value, modo: md.value }] }); closeModal(); toast('Documento salvo', 'ok'); reload(); }) }, 'Salvar')]);
@@ -2966,6 +2970,11 @@ async function viewRadar() {
       h('div', { style: { marginTop: '8px' } }, h('div', { class: 'small', style: { marginBottom: '4px', fontWeight: 600 } }, 'Chamada da contracapa (seguir ou vender)'),
         h('input', { type: 'text', style: { minWidth: 0, width: '100%' }, disabled: !pode, maxLength: 140, placeholder: 'Ex.: Comente *QUERO* e receba o guia grátis', value: m.cta || '', onchange: e => { m.cta = e.target.value; save(); } }),
         h('div', { class: 'small mut', style: { marginTop: '3px' } }, 'Curta. Use *asteriscos* para negrito. Vazio = "Comente o que achou e siga a página".')),
+      h('div', { style: { marginTop: '8px' } }, h('div', { class: 'small', style: { marginBottom: '4px', fontWeight: 600 } }, 'Jornal da marca (site da matéria completa)'),
+        h('input', { type: 'text', style: { minWidth: 0, width: '100%' }, disabled: !pode, maxLength: 200, placeholder: 'Ex.: Jornal Digital — https://jornaldigital.com.br', value: m.jornal || '', onchange: e => { m.jornal = e.target.value; save(); } }),
+        h('div', { class: 'small mut', style: { marginTop: '3px' } }, 'Várias marcas podem usar o mesmo jornal. Vazio = a matéria completa sai sem nome de jornal.'),
+        h('input', { type: 'text', style: { minWidth: 0, width: '100%', marginTop: '6px' }, disabled: !pode, maxLength: 400, placeholder: 'Seções do jornal, separadas por vírgula (ex.: Tecnologia, Redes Sociais, Finanças)', value: m.secoes || '', onchange: e => { m.secoes = e.target.value; save(); } }),
+        h('div', { class: 'small mut', style: { marginTop: '3px' } }, 'O Roteirista escolhe uma destas seções para cada matéria e o SEO confere.')),
       h('div', { style: { display: 'grid', gridTemplateColumns: '1fr', gap: '8px', marginTop: '8px' } },
         h('select', { style: { minWidth: 0 }, disabled: !pode, onchange: e => { m.max = +e.target.value; save(); } }, [1, 2, 3, 4, 5, 6].map(n => h('option', { value: n, selected: m.max === n }, n + (n === 1 ? ' pauta por dia' : ' pautas por dia')))),
         h('select', { style: { minWidth: 0 }, disabled: !pode, onchange: e => { m.formato = e.target.value; save(); } }, [['carrossel', 'Carrossel'], ['feed', 'Feed'], ['stories', 'Stories']].map(([k, l]) => h('option', { value: k, selected: m.formato === k }, l))),

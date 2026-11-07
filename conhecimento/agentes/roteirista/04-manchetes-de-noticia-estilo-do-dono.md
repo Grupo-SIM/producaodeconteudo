@@ -1,4 +1,4 @@
-<!-- modo: sempre -->
+<!-- modo: formato noticia -->
 # Manchetes de notícia: o estilo que o dono quer (aprendido de páginas de notícia que ele admira)
 
 Material do dono: 22 manchetes reais de páginas de notícia (Zyrion Brasil, Zyrion Mundo e Metrópoles) que ele acha que prendem. Vale para TODA manchete de arte de notícia, a frase de capa e a abertura da legenda. Não copie o assunto nem a frase: copie o **jeito de construir**. O fato vem sempre da matéria pesquisada; nunca invente número, nome, prazo nem citação.
@@ -68,6 +68,12 @@ Material do dono: 22 manchetes reais de páginas de notícia (Zyrion Brasil, Zyr
 - Assunto de crime violento, tragédia, vítima, morte e política partidária, mesmo que a página de referência publique: siga a regra da marca e as pautas que o Radar já filtra. Fato político só quando o dono pedir, sem opinião e com a fonte.
 - Julgamento ou acusação sem decisão oficial: use "revela levantamento", "segundo", "investiga", e cite a fonte.
 - Copiar uma manchete de referência palavra por palavra. Copie a fórmula, não a frase.
+
+## CTA da notícia (regra do dono)
+Post jornalístico NÃO usa o CTA de bio gratuita nem o de debate dos outros formatos. O CTA é sempre:
+"Leia a matéria completa clicando no link da bio."
+A legenda é um resumo da notícia (o que aconteceu, o que muda para quem lê) e termina com essa frase.
+A contracapa (arte 2) NÃO precisa repetir esse CTA. Ela usa um dos CTAs padrão de contracapa: seguir a página ("Nos siga para receber mais conteúdo como esse") ou chamar para a bio. O dono vai definir outros modelos depois.
 
 ## Como entregar (estrutura que o painel confere)
 No bloco da arte de notícia entregue **uma única** manchete, final, assim: `Título: <manchete>` (sem ponto final, sem pergunta, sem exclamação). Se o painel devolver erro, corrija só o que ele apontou e entregue de novo. O painel reprova automaticamente: manchete com mais de 24 palavras ou 150 caracteres, com menos de 10 palavras, parecida demais com a da fonte, que termine em ? ou !, que comece com "Saiba/Confira/Veja/Entenda/Descubra", com adjetivo vazio, ou com número que não está nos fatos do pedido.

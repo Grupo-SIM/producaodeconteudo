@@ -1,7 +1,7 @@
 <!-- modo: auto -->
 # Motion — referências analisadas, áudio, efeitos e fluxo de produção
 
-> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
+> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/counter/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
 
 # 1. O que foi analisado (e o que NÃO foi)
 

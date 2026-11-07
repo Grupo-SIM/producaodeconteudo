@@ -1,7 +1,7 @@
 <!-- modo: auto -->
 # Motion — Estilo M2 Densidade Cinética
 
-> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
+> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/counter/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
 
 ## Prompt curto do estilo
 **M2 Densidade Cinética:** "Estilo M2. Vertical 1080x1920, 30 fps, 20 a 40 s. Papel cinza com grade pontilhada e vinheta forte, ou preto com spotlight; acento vermelho neon `#E3142B`. Sujeito em halftone P&B com aberração cromática ciano/vermelho. Texto: cursiva caligráfica fina + sans arredondada bold; palavra-chave com barra vermelha ou glow neon. Objetos 3D anotados (olho, cérebro, diamante, quebra-cabeça). Cena de preto total antes da frase de impacto. Mural de cortiça com fio vermelho e dolly. CTA com balão de chat."

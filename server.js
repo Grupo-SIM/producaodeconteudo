@@ -182,7 +182,7 @@ if (!db.prepare('PRAGMA table_info(products)').all().some(c => c.name === 'image
 const pbExistia = !!db.prepare("SELECT 1 x FROM sqlite_master WHERE type='table' AND name='product_brands'").get();
 db.exec(`CREATE TABLE IF NOT EXISTS product_brands(product_id INTEGER NOT NULL, brand TEXT NOT NULL, PRIMARY KEY(product_id, brand))`);
 if (!pbExistia) db.exec("INSERT OR IGNORE INTO product_brands(product_id,brand) SELECT id, brand FROM products WHERE brand<>''");
-for (const [col, def] of [['owner_asks', "TEXT DEFAULT '[]'"], ['copy_review', "TEXT DEFAULT ''"], ['goal', "TEXT DEFAULT ''"], ['art_spec_base', "TEXT DEFAULT ''"], ['spec_base', "TEXT DEFAULT ''"], ['spec_edit_at', "TEXT DEFAULT ''"], ['product_id', 'INTEGER'], ['brand', "TEXT DEFAULT ''"], ['spec', "TEXT DEFAULT ''"], ['prod_revisions', 'INTEGER DEFAULT 0'], ['art_spec', "TEXT DEFAULT ''"], ['art_status', "TEXT DEFAULT ''"], ['art_note', "TEXT DEFAULT ''"], ['render_status', "TEXT DEFAULT ''"], ['teste', 'INTEGER DEFAULT 0'], ['manager', "TEXT DEFAULT ''"]]) {
+for (const [col, def] of [['owner_asks', "TEXT DEFAULT '[]'"], ['copy_review', "TEXT DEFAULT ''"], ['materia', "TEXT DEFAULT ''"], ['seo_review', "TEXT DEFAULT ''"], ['goal', "TEXT DEFAULT ''"], ['art_spec_base', "TEXT DEFAULT ''"], ['spec_base', "TEXT DEFAULT ''"], ['spec_edit_at', "TEXT DEFAULT ''"], ['product_id', 'INTEGER'], ['brand', "TEXT DEFAULT ''"], ['spec', "TEXT DEFAULT ''"], ['prod_revisions', 'INTEGER DEFAULT 0'], ['art_spec', "TEXT DEFAULT ''"], ['art_status', "TEXT DEFAULT ''"], ['art_note', "TEXT DEFAULT ''"], ['render_status', "TEXT DEFAULT ''"], ['teste', 'INTEGER DEFAULT 0'], ['manager', "TEXT DEFAULT ''"]]) {
   if (!db.prepare('PRAGMA table_info(contents)').all().some(c => c.name === col)) db.exec(`ALTER TABLE contents ADD COLUMN ${col} ${def}`);
 }
 // Migração dos formatos antigos (2026-10-14.17): formato = onde posta; texto/carta de vendas viraram TIPO de conteúdo
@@ -267,7 +267,7 @@ const textoPuro = c => c.format === 'feed' && KINDS_TEXTO.includes(c.kind);   //
 const agenteLigado = id => !!one('SELECT 1 x FROM agents WHERE id=? AND enabled=1', id);
 const producaoDe = c => textoPuro(c) ? [] : (PRODUCTION[c.format] || []).filter(agenteLigado);   // agente desativado não recebe tarefa (ficaria parada na fila)
 const MANUAL = !API_KEY;
-const STAGE_LABEL = { radar: 'Agente de Notícias pesquisando', estilo: 'Designer aprendendo o estilo de arte', roteiro: 'Roteirista escrevendo', revisao: 'Revisor revisando o roteiro', arte: 'Designer criando a arte', video: 'Editor montando a decupagem', pacote: 'Social Media montando o pacote', gerencia: 'Revisor revisando a entrega', pautas: 'Gerente definindo as pautas', relatorio: 'Gerente lendo as métricas', cerebro: 'Cérebro consolidando o aprendizado', chat: 'Gerente respondendo a você', teste: 'Teste de agente pedido por você' };
+const STAGE_LABEL = { seo: 'Agente de SEO revisando a matéria', radar: 'Agente de Notícias pesquisando', estilo: 'Designer aprendendo o estilo de arte', roteiro: 'Roteirista escrevendo', revisao: 'Revisor revisando o roteiro', arte: 'Designer criando a arte', video: 'Editor montando a decupagem', pacote: 'Social Media montando o pacote', gerencia: 'Revisor revisando a entrega', pautas: 'Gerente definindo as pautas', relatorio: 'Gerente lendo as métricas', cerebro: 'Cérebro consolidando o aprendizado', chat: 'Gerente respondendo a você', teste: 'Teste de agente pedido por você' };
 
 const FORMAT_GUIDE = {
   video_vertical: 'Vídeo vertical 9:16 (Reels, TikTok, Shorts), 20–60 s. Seções: ## GANCHO (primeiros 3 s: fala + texto na tela), ## ROTEIRO (cena a cena, com tempo, fala/narração e ação visual), ## CTA, ## LEGENDA (texto pronto para postar, primeira linha forte), ## HASHTAGS.',
@@ -424,6 +424,8 @@ AGENTS_SEED.push({ id: 'radar', name: 'Agente de Notícias', role: 'Pesquisa o q
   prompt: `Você é o AGENTE DE NOTÍCIAS de uma agência autônoma de conteúdo. Todo dia você pesquisa o que está em alta no Google Trends, no Google Notícias e nos sites de tecnologia de referência, relaciona com cada marca e escolhe SÓ o que combina com o público e o posicionamento da marca. Cada notícia escolhida vira uma pauta: a MANCHETE VERDADEIRA da matéria, ângulo, fatos e fonte, entregue ao Roteirista, que escreve a peça.
 Regras: (1) só use fatos que aparecem nos dados recebidos (título, fonte, data, trecho); nunca invente número, nome, citação ou desfecho. (2) Prefira o que é novo (hoje, ontem), tem força de curiosidade e dá para explicar em linguagem simples a quem não é do meio. (3) Descarte tragédia, política divisiva, boato e o que a marca não deveria comentar. (4) O título da pauta é a manchete verdadeira da matéria: copie a manchete dos dados, podendo só encurtá-la sem mudar o sentido; não invente manchete, não exagere e não prometa o que a notícia não entrega. (5) Se nada for relevante para a marca, devolva lista vazia: melhor nenhuma pauta do que uma fraca.` });
 if (PROMPT_REVCOPY) AGENTS_SEED.push({ id: 'revisorcopy', name: 'Revisor de Copy', role: 'Guardrail do roteiro: verdade, políticas, originalidade e ofício', color: '#a78bfa', prompt: PROMPT_REVCOPY });
+const PROMPT_SEO = lerCon('09-prompt-seo.md');
+if (PROMPT_SEO) AGENTS_SEED.push({ id: 'seo', name: 'Agente de SEO', role: 'Revisa a matéria completa do site de jornal: SEO de notícias, Google Notícias/Discover e busca por IA, sem deixar o texto robótico', color: '#22c55e', prompt: PROMPT_SEO });
 
 // Aprendizados e Evitar iniciais de cada agente (só regras de ofício, que valem para qualquer marca; o que é da marca fica na ficha dela)
 const AGENT_RULES = {
@@ -1078,22 +1080,24 @@ function carregaBasesAgentes() {
     if (!one('SELECT 1 x FROM agents WHERE id=?', ag)) continue; let fs2 = []; try { fs2 = fs.readdirSync(path.join(raiz, ag)).filter(f => /\.md$/i.test(f)).sort(); } catch { continue; }
     fs2.forEach((f, i) => {
       let txt = ''; try { txt = fs.readFileSync(path.join(raiz, ag, f), 'utf8'); } catch { return; }
-      const modo = /<!--\s*modo:\s*auto\s*-->/i.test(txt) ? 'auto' : 'sempre'; txt = txt.replace(/^<!--.*?-->\s*/s, '').trim(); if (txt.length < 40) return;
+      const fm = txt.match(/<!--\s*modo:\s*formato\s+([a-z_,\s]+?)\s*-->/i), modo = fm ? 'fmt:' + fm[1].replace(/\s+/g, '') : /<!--\s*modo:\s*auto\s*-->/i.test(txt) ? 'auto' : 'sempre'; txt = txt.replace(/^<!--.*?-->\s*/s, '').trim(); if (txt.length < 40) return;   // formato: entra só nas peças daquele formato ou tipo (feed, carrossel, stories, video, noticia...)
       const titulo = ((txt.match(/^#\s+(.+)$/m) || [])[1] || f.replace(/\.md$/i, '')).trim().slice(0, 160), ja = one('SELECT * FROM agent_docs WHERE agent=? AND titulo=?', ag, titulo);
       if (!ja) run("INSERT INTO agent_docs(agent,titulo,conteudo,original,modo,ordem,origem,created_at,updated_at) VALUES(?,?,?,?,?,?,'casa',?,?)", ag, titulo, txt, txt, modo, i + 1, T(), T());
       else if (ja.original !== txt) { if (ja.editado) run('UPDATE agent_docs SET original=?, updated_at=? WHERE id=?', txt, T(), ja.id); else run('UPDATE agent_docs SET conteudo=?, original=?, updated_at=? WHERE id=?', txt, txt, T(), ja.id); }
+      if (ja && ja.modo !== modo && (modo.startsWith('fmt:') || String(ja.modo).startsWith('fmt:'))) run('UPDATE agent_docs SET modo=? WHERE id=?', modo, ja.id);   // o formato do arquivo da casa manda
     });
   }
 }
 try { carregaBasesAgentes(); } catch (e) { console.error('bases dos agentes:', e.message); }
-const AGDOC_BUDGET = 45000;
+const AGDOC_BUDGET = 52000;   // cabe a base completa de cada formato do Roteirista (carrossel ~44k, notícia ~47k)
 // Manuais do pacote que também servem às outras etapas (o Roteirista e o Revisor de Copy recebem os deles pela seleção por formato)
 const MANUAIS_AGENTE = { designer: ['M04', 'M16'], editor: ['M16', 'M07'], gerente: ['M00', 'M17'], publicador: ['M05'] };
 const palavrasDoc = t => new Set(String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 4));
 function agentDocsBlock(agentId, query = '') {
   let rows; try { rows = all('SELECT titulo, conteudo, modo FROM agent_docs WHERE agent=? ORDER BY ordem, id', agentId); } catch { return ''; } if (!rows.length) return '';
   const q = palavrasDoc(query), score = r => { if (!q.size) return 0; const tw = palavrasDoc(r.titulo); let n = 0; for (const w of tw) if (q.has(w)) n += 3; const cw = palavrasDoc(String(r.conteudo).slice(0, 4000)); for (const w of q) if (cw.has(w)) n++; return n; };
-  const sempre = rows.filter(r => r.modo !== 'auto'), auto = rows.filter(r => r.modo === 'auto').map(r => ({ r, s: score(r) })).filter(x => x.s >= 4).sort((a, b) => b.s - a.s).map(x => x.r);
+  const st = als.getStore() || {}, tags = new Set([st.fmt, ...String(st.ctx || '').toLowerCase().split(/[^a-z0-9_]+/)].filter(Boolean)), doFmt = r => r.modo.slice(4).split(',').some(x => tags.has(x));
+  const sempre = rows.filter(r => r.modo === 'sempre' || (String(r.modo).startsWith('fmt:') && doFmt(r))), auto = rows.filter(r => r.modo === 'auto').map(r => ({ r, s: score(r) })).filter(x => x.s >= 4).sort((a, b) => b.s - a.s).map(x => x.r);
   let left = AGDOC_BUDGET; const out = [];
   for (const r of [...sempre, ...auto]) { if (left < 400) break; let tx = String(r.conteudo).trim(); if (!/^#/.test(tx)) tx = `## ${r.titulo}\n${tx}`; if (tx.length > left) tx = tx.slice(0, left) + '\n[...cortado pelo limite]'; out.push(tx); left -= tx.length; }
   return out.length ? `# BASE DE CONHECIMENTO DESTE AGENTE (material fornecido pelo dono: siga como manual de trabalho)\n\n${out.join('\n\n---\n\n')}` : '';
@@ -1847,7 +1851,7 @@ ${looks}
 - Transições ("in"): cut, fade, dim, zoom, whip, circle.
 - Decoração ("decor"): grid, dots, scan, stripes, blobs, bars, barcode, badge, curve:s|left|right|arc, none.
 - Texto: "mode" stack (blocos), ticker (palavras deslizando) ou word (uma palavra por vez); tamanho em px (40 a 240); palavra-chave marcada com *asteriscos*.
-- Objetos (NUNCA emoji): img (arquivo da biblioteca), orb (esfera 3D), ring (anel), chart (gráfico), card (lista com ícone numérico), profile, gradientWord, figure, circle; entrada pop, fade, slideL, slideR, slideB, slideT, drop, zoom; movimento parado float, spin, sway, drift, none.
+- Objetos (NUNCA emoji): img (arquivo da biblioteca), orb (esfera 3D), ring (anel), chart (gráfico), card (lista com ícone numérico), profile, gradientWord, counter (número que sobe), figure, circle; entrada pop, fade, slideL, slideR, slideB, slideT, drop, zoom; movimento parado float, spin, sway, drift, none.
 - Câmera por cena: "cam":{"from":1,"to":1.1,"rotTo":-3}.
 
 Devolva SOMENTE um bloco \`\`\`json válido (sem comentários) com estas chaves:
@@ -1937,10 +1941,10 @@ Formato:
    "decor":["grid","dots","scan","stripes","blobs","bars","barcode","badge","curve:s|left|right|arc","scatter:🤡","none"],
    "narration":"frase falada nesta cena",
    "text":{"value":"Você tem as | *ideias* e | *conteúdo*","y":0.42,"size":66,"align":"center|left|right","x":0.42,"mode":"stack|ticker|word"},
-   "items":[{"type":"img|orb|ring|chart|card|profile|gradientWord|figure|circle","asset":"nome-exato (se img)","gen":"opcional, em inglês","color":"#hex opcional (orb, ring, chart)","x":0.5,"y":0.5,"size":420,"rot":0,"at":0,"enter":"pop|fade|slideL|slideR|slideB|slideT|drop|zoom","idle":"float|spin|sway|drift|none"}]}]}
+   "items":[{"type":"img|orb|ring|chart|card|profile|gradientWord|counter|figure|circle","asset":"nome-exato (se img)","gen":"opcional, em inglês","color":"#hex opcional (orb, ring, chart)","x":0.5,"y":0.5,"size":420,"rot":0,"at":0,"enter":"pop|fade|slideL|slideR|slideB|slideT|drop|zoom","idle":"float|spin|sway|drift|none"}]}]}
 - "look" define o visual inteiro (paleta, tipografia, brilho e câmera) e vem da receita do estilo; "mode":"word" mostra uma palavra por vez. x e y são frações da tela (0 a 1) e size é em px. A primeira cena não tem "in". "text" também aceita uma lista de blocos.
 - NUNCA use emoji em objetos nem em ícones. orb = esfera 3D brilhante, ring = anel 3D, chart = gráfico de barras em alta, todos coloridos pelo accent (ou "color"). Em card, "icon" é um número curto ("1", "2") ou vazio (vira um visto).
-- card: "title" e "items":[{"icon":"1","text":"sem alcance"}]. gradientWord: "text". profile: "handle","name","posts","followers","following","bio":[].
+- card: "title" e "items":[{"icon":"1","text":"sem alcance"}]. gradientWord: "text". counter: "from","to","decimals" (casas),"prefix","suffix","dur" (s da contagem); use para número de resultado, ex. {"from":1.2,"to":3.4,"decimals":1,"prefix":"R$ ","suffix":" mi"}. profile: "handle","name","posts","followers","following","bio":[].
 - Se um bloco de texto passa de 4 palavras por linha, reduza "size". Nada de texto sobreposto ao objeto.`;
 
 const LOOKS_VALIDOS = ['editorial', 'neon', 'minimal', 'impacto', 'gradiente', 'cinema', 'cinetico'];
@@ -4370,7 +4374,8 @@ function manuaisCodes(c, { devolvida = false, revisao = false } = {}) {
   const set = new Set(revisao ? ['M00', 'M04', 'M06', 'M15', 'M16'] : ['M00', 'M15', 'M16', 'M04']), add = (...a) => a.forEach(x => set.add(x)), f = c.format, fato = ['noticia', 'historia_real'].includes(c.kind), venda = c.goal === 'produto' || VENDA_KINDS.includes(c.kind);
   if (revisao) { if (fato) add('M12'); if (venda) add('M08'); return [...set]; }
   if (f === 'video_vertical') add('M01', 'M03', 'M05', 'M06'); else if (f === 'video_horizontal') add('M03', 'M05', 'M07'); else add('M01', 'M03', 'M05');
-  if (fato) add('M12', 'M14', 'M13');
+  if (fato) add('M12', 'M13');
+  add('M14');
   if (c.goal === 'conteudo' || c.kind === 'serie_episodio') add('M07', 'M11');
   if (venda) add('M02', 'M08', 'M09', 'M10');
   if (devolvida) add('M17');
@@ -4438,8 +4443,8 @@ const RADAR_FONTES = [
 const RADAR_NICHO_IDS = Object.keys(RADAR_NICHOS);
 function radarCfg() {
   const c = jparse(one("SELECT value FROM settings WHERE key='radar_cfg'")?.value, {}) || {}, marcas = {};
-  for (const [b, m] of Object.entries(c.marcas && typeof c.marcas === 'object' ? c.marcas : {})) marcas[b] = { ativo: !!m?.ativo, termos: String(m?.termos || '').slice(0, 400), max: Math.max(1, Math.min(6, +m?.max || 2)), formato: RADAR_FMTS.includes(m?.formato) ? m.formato : 'carrossel', estilo: String(m?.estilo || '').slice(0, 80), cta: String(m?.cta || '').replace(/\s+/g, ' ').trim().slice(0, 140), nicho: RADAR_NICHO_IDS.includes(m?.nicho) ? m.nicho : '' };
-  for (const b of all('SELECT name FROM brands').map(x => x.name)) if (!marcas[b]) marcas[b] = { ativo: true, termos: '', max: 2, formato: 'carrossel', estilo: '', cta: '', nicho: '' };   // marca sem ajuste próprio: ligada, usa a base de conhecimento dela
+  for (const [b, m] of Object.entries(c.marcas && typeof c.marcas === 'object' ? c.marcas : {})) marcas[b] = { ativo: !!m?.ativo, termos: String(m?.termos || '').slice(0, 400), max: Math.max(1, Math.min(6, +m?.max || 2)), formato: RADAR_FMTS.includes(m?.formato) ? m.formato : 'carrossel', estilo: String(m?.estilo || '').slice(0, 80), cta: String(m?.cta || '').replace(/\s+/g, ' ').trim().slice(0, 140), nicho: RADAR_NICHO_IDS.includes(m?.nicho) ? m.nicho : '', jornal: String(m?.jornal || '').replace(/\s+/g, ' ').trim().slice(0, 200), secoes: String(m?.secoes || '').replace(/\s+/g, ' ').trim().slice(0, 400) };
+  for (const b of all('SELECT name FROM brands').map(x => x.name)) if (!marcas[b]) marcas[b] = { ativo: true, termos: '', max: 2, formato: 'carrossel', estilo: '', cta: '', nicho: '', jornal: '', secoes: '' };   // marca sem ajuste próprio: ligada, usa a base de conhecimento dela
   const fontes = RADAR_FONTES.map(f => ({ ...f, ativo: c.fontes && f.id in c.fontes ? !!c.fontes[f.id] : true })), extras = String(c.extras || '').split(/[\n,;]+/).map(x => x.trim()).filter(x => /^https:\/\//.test(x)).slice(0, 8);
   return { fontes, extras: extras.join('\n'), auto: c.auto == null ? true : !!c.auto, hora: Math.max(0, Math.min(23, +c.hora >= 0 && c.hora !== '' && c.hora != null ? +c.hora : 7)), geo: /^[A-Z]{2}$/.test(String(c.geo || '').toUpperCase()) ? String(c.geo).toUpperCase() : 'BR', marcas };
 }
@@ -5124,6 +5129,15 @@ function copyLint(c, script) {
   }
   return erros;
 }
+// Notícia: o Roteirista entrega o post e, no fim, a matéria completa do site de jornal (seção "## MATÉRIA"); ela fica numa coluna própria
+const MATERIA_RE = /^[ \t]*#{0,3}[ \t]*(?:\*\*)?MAT[ÉE]RIA(?:[ \t]+COMPLETA)?(?:\*\*)?[ \t]*:?[ \t]*$/im;
+const separaMateria = t => { const m = String(t || '').match(MATERIA_RE); return m ? [t.slice(0, m.index).trim(), t.slice(m.index + m[0].length).trim()] : [String(t || ''), '']; };
+const jornalDaMarca = brand => { const m = radarCfg().marcas[brand] || {}; return (m.jornal || '') + (m.secoes ? '\nSeções (editorias) do jornal: ' + m.secoes + '\nEscolha UMA dessas seções para a matéria, a que corresponde ao assunto, e escreva-a na linha "Seção:". Se nenhuma servir, não invente: abra PEDIDO AO GERENTE.' : ''); };
+const MAX_SEO = 2;
+function depoisDaCopy(c, materia = c.materia) {   // notícia com matéria passa pelo Agente de SEO antes do Revisor
+  if (c.kind === 'noticia' && materia && agenteLigado('seo') && (jparse(c.seo_review, {})?.rodadas || 0) < MAX_SEO + 1 && !(jparse(c.seo_review, {})?.fim)) enqueue(c.id, 'seo', 'seo');
+  else enqueue(c.id, 'gerente', 'revisao');
+}
 const HANDLERS = {
   async radar(job) {
     const input = JSON.parse(job.input || '{}'), brand = String(input.brand || ''), cfg = radarCfg(), cfgM = cfg.marcas[brand] || { termos: '', max: 2, formato: 'carrossel' };
@@ -5156,19 +5170,34 @@ const HANDLERS = {
     const mas = all("SELECT name,tags FROM assets WHERE kind='mascote' AND (brand='' OR brand=? COLLATE NOCASE)", c.brand || '');
     if (mas.length && !['texto', 'carta_vendas'].includes(c.kind)) user += `\n\n# MASCOTE DA MARCA\nA marca tem mascote cadastrado: ${mas.map(m => m.name + (m.tags ? ' (' + m.tags + ')' : '')).join('; ')}. Em cada cena ou slide em que o mascote aparecer, escreva entre colchetes a POSE desejada, usando o nome exato de uma pose cadastrada quando existir (ex.: [mascote: nome-da-pose]); se precisar de uma pose que não existe, descreva-a em poucas palavras (ex.: [mascote novo: apontando para a direita, sorrindo]). O Designer e o Editor vão aplicar exatamente o que você indicar.`;
     user += estiloEstruturaBloco(c, 'roteirista');
-    if (input.feedback && c.script) user += `\n\n# VERSÃO ANTERIOR\n${c.script}\n\n# AJUSTES OBRIGATÓRIOS (aplique todos e entregue a peça completa de novo)\n${input.feedback}`;
+    if (input.feedback && c.script) user += `\n\n# VERSÃO ANTERIOR\n${c.script}${c.materia ? '\n\n## MATÉRIA\n' + c.materia : ''}\n\n# AJUSTES OBRIGATÓRIOS (aplique todos e entregue a peça completa de novo)\n${input.feedback}`;
     if (c.kind === 'noticia') user += `\n\n# CONFERÊNCIA OBRIGATÓRIA ANTES DE ENTREGAR (o painel confere e devolve se falhar)\n1. Manchete da arte no estilo do dono: SUA, de 14 a 24 palavras (até 140 caracteres), sujeito reconhecível + verbo no presente + o fato + um detalhe que dá peso (número exato, valor, prazo, recorde ou "primeira vez", contraste, quem participa), mais forte que a da fonte, sem mudar o fato (números, nomes e datas só os do pedido), sem pergunta, sem "saiba/confira/veja". Entenda-se sozinha, sem ler a legenda.\n2. Sem adjetivo vazio (incrível, chocante), sem caça-clique que o fato não sustente, sem boato apresentado como certeza.\n3. Legenda: primeira linha com o gancho do fato, 2 ou 3 frases simples, a fonte e o crédito da foto, UM único pedido no fim, sem isca de engajamento.\n4. Entregue os 7 blocos completos.`;
     else user += `\n\n# CONFERÊNCIA OBRIGATÓRIA ANTES DE ENTREGAR (o painel confere e devolve se falhar)\n1. Gancho/capa: até 12 palavras, promessa específica com número, nome ou consequência, nas palavras do público; nada genérico.\n2. Cada slide: título até 8 palavras, sem ponto final; apoio até 25 palavras; UMA versão só de cada, sem rascunho nem alternativa no texto.\n3. UMA grande ideia, UMA crença, UM pedido: o mesmo pedido na CTA do último slide e na legenda; sem segundo pedido (nada de "segue" junto com "comenta" ou "salva").\n4. Sem isca de engajamento (curtir, marcar amigos, "comente sim se").\n5. Só afirme o que está nos fatos do pedido; sem número ou fonte inventados.\n6. Texto dos slides = frase de gente, direta e específica. NUNCA escreva rótulos de bastidor no slide ("Cena ilustrativa:", "Exemplo:", "personagem fictícia", "Na nossa leitura", "Só mostra: ... / Dá motivo: ..."). Se o exemplo é inventado, declare em 2 ou 3 palavras no fim do apoio ("exemplo ilustrativo") ou na legenda, nunca no título.\n7. Cada slide faz UMA coisa: o título afirma a ideia, o apoio prova com um detalhe concreto (número, nome, lugar, antes e depois). Sem ponte genérica ("E agora?"), sem repetir o título no apoio.\n8. Entregue os 7 blocos completos.`;
+    if (c.kind === 'noticia') { const jn = jornalDaMarca(c.brand || ''); user += `\n\n# MATÉRIA COMPLETA PARA O SITE DE JORNAL${jn ? '\nJornal: ' + jn : ''}\nDepois de TODOS os blocos do post (no fim da resposta), escreva a linha "## MATÉRIA" e, abaixo dela, a matéria completa seguindo a sua base "Matéria completa para o site de jornal da marca" (palavra-chave, título SEO, meta descrição, slug, manchete, linha fina, lide, subtítulos ## em frase normal, fontes). Os subtítulos da matéria NÃO podem ser em CAIXA ALTA. A legenda do post termina com "Leia a matéria completa clicando no link da bio."`; }
     user += `\n\n# COMPATIBILIDADE COM O PAINEL\nEntregue os 7 blocos do seu formato de entrega. Dentro do bloco 4 (roteiro) use os títulos ## do GUIA DO FORMATO acima, porque o painel e os agentes seguintes leem essas seções, e escreva a legenda final também numa seção ## LEGENDA.`;
     user += '\n\n' + manuaisBloco(manuaisCodes(c, { devolvida: !!input.feedback }));
     const search = s.web_search === '1' && ['noticia', 'historia_real'].includes(c.kind);
     const r = await callClaude({ agent: agentRow('roteirista'), user, maxTokens: c.kind === 'carta_vendas' || c.format === 'video_horizontal' ? 8000 : 4096, search });
-    setContent(c.id, { script: r.text, caption: parseCaption(r.text), status: 'producing', error: '', art: input.feedback ? '' : c.art, video: input.feedback ? '' : c.video });
+    const [post, materia] = c.kind === 'noticia' ? separaMateria(r.text) : [r.text, ''];
+    setContent(c.id, { script: post, caption: parseCaption(post), status: 'producing', error: '', art: input.feedback ? '' : c.art, video: input.feedback ? '' : c.video, ...(c.kind === 'noticia' ? { materia: materia || c.materia || '' } : {}) });
     log('roteirista', `Roteiro ${input.feedback ? 'reescrito' : 'escrito'}: "${c.title}"`, c.id);
-    { const le = copyLint(c, r.text), volta = +input.lint || 0;
+    { const le = copyLint(c, post), volta = +input.lint || 0;
       if (le.length && MANUAL) log('roteirista', `Conferência do painel: ${le.length} ponto(s) fora dos limites (${le.join(' | ').slice(0, 300)}). No modo chat segue para a revisão sem pedir de novo.`, c.id);
       if (le.length && volta < 2 && !MANUAL) { log('roteirista', `Conferência do painel achou ${le.length} erro(s) mecânico(s): volta ao Roteirista sem gastar o Revisor`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: 'CONFERÊNCIA DO PAINEL (limites objetivos, corrija todos e mude só isso):\n- ' + le.join('\n- '), lint: volta + 1 }); return r; } }
-    if (copyRevOn()) enqueue(c.id, 'revisorcopy', 'revcopy'); else enqueue(c.id, 'gerente', 'revisao');
+    if (copyRevOn()) enqueue(c.id, 'revisorcopy', 'revcopy'); else depoisDaCopy(c, materia || c.materia);
+    return r;
+  },
+
+  async seo(job, c) {
+    const ant = jparse(c.seo_review, {}) || {}, rodadas = (ant.rodadas || 0) + 1, jn = jornalDaMarca(c.brand || '');
+    const user = `# TAREFA\nRevise a MATÉRIA COMPLETA abaixo seguindo o seu prompt e a sua base. Os fatos permitidos são só os do pedido; se faltar fato, peça ao Roteirista, não invente.${jn ? '\nJornal onde a matéria será publicada: ' + jn : ''}\n\n# PEDIDO (fatos e fonte)\n${brief(c, true)}\n\n# MATÉRIA\n${c.materia}`;
+    const r = await callClaude({ agent: agentRow('seo'), user, maxTokens: 4000 });
+    const v = (String(r.text).match(/VEREDITO\s*:?\s*\**\s*(APROVADA|AJUSTAR|REPROVADA)/i) || [])[1]?.toLowerCase() || 'ajustar', nota = +(String(r.text).match(/NOTA[^\n]*?(\d)(?:[.,]\d)?\s*\/\s*5/i) || [])[1] || null;
+    const ok = v === 'aprovada', fim = ok || rodadas > MAX_SEO;
+    setContent(c.id, { seo_review: JSON.stringify({ veredito: v, nota, laudo: r.text, rodadas, fim, ts: T() }) });
+    brainEvent('roteirista', ok ? 'revisao_aprovada' : 'revisao_reprovada', c, `Agente de SEO: ${v} (matéria do site${nota ? ', nota ' + nota + '/5' : ''})`, String(r.text).slice(0, 1200));
+    if (fim) { log('seo', ok ? `Aprovou a matéria de "${c.title}"` : `A matéria de "${c.title}" ainda tem pendências de SEO após ${rodadas - 1} ajuste(s): segue com o laudo para você decidir`, c.id); enqueue(c.id, 'gerente', 'revisao'); }
+    else { log('seo', `Devolveu a matéria de "${c.title}" (${v}) — rodada ${rodadas}/${MAX_SEO}`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: `LAUDO DO AGENTE DE SEO (${v}) SOBRE A MATÉRIA DO SITE. Aplique só as correções obrigatórias na matéria e mantenha o post das redes como está. Entregue tudo de novo (post + "## MATÉRIA"):\n${r.text.slice(0, 4000)}` }); }
     return r;
   },
 
@@ -5193,7 +5222,7 @@ const HANDLERS = {
     if (ok || c.revisions >= maxRev(s)) {
       if (!ok) log('revisorcopy', `Ainda há pendências na copy de "${c.title}" após ${c.revisions} rodada(s): o Revisor decide com o laudo na mão`, c.id);
       else log('revisorcopy', `Aprovou a copy de "${c.title}" (nota ${L.nota ?? '-'}/5)`, c.id);
-      enqueue(c.id, 'gerente', 'revisao');
+      depoisDaCopy(c);
     } else {
       setContent(c.id, { revisions: c.revisions + 1, status: 'producing' });
       log('revisorcopy', `Devolveu a copy de "${c.title}" (${L.veredito}, nota ${L.nota ?? '-'}/5) — rodada ${c.revisions + 1}/${maxRev(s)}`, c.id);

@@ -6,9 +6,9 @@ Atualize este documento quando a produção ganhar ou perder uma capacidade. O R
 
 - Texto cinético na tela, palavra por palavra, em linhas ou em faixa corrida, com palavra-chave destacada na cor de destaque da marca.
 - Cenas claras ou escuras, com transição (fade, corte seco, zoom, chicote, círculo, escurecer), câmera com zoom e leve rotação, decoração de fundo (grade, pontos, faixas, manchas, curvas, selo da marca).
-- Elementos animados em cena: imagem da Biblioteca da marca (logo, mascote com pose, foto, textura), cartão de lista, perfil de rede social, palavra em degradê, figura humana estilizada, círculo, anel, orbe, gráfico de barras, emoji e objeto 3D gerado.
+- Elementos animados em cena: imagem da Biblioteca da marca (logo, mascote com pose, foto, textura), cartão de lista, perfil de rede social, palavra em degradê, número que sobe contando (ex.: R$ 1,2 mi até R$ 3,4 mi), figura humana estilizada, círculo, anel, orbe, gráfico de barras, emoji e objeto 3D gerado.
 - Fundo com foto ou vídeo real da Biblioteca da marca (estilo VSL: um vídeo por cena, frase curta por cima).
-- Narração por voz sintética (ElevenLabs ou Murf) ou narração gravada da Biblioteca, trilha da Biblioteca ou do sistema, efeitos sonoros automáticos.
+- Narração por voz sintética (ElevenLabs ou Murf) ou narração gravada da Biblioteca (o texto sincroniza palavra por palavra com a fala gravada), trilha da Biblioteca ou do sistema, efeitos sonoros automáticos.
 - Duração típica de 20 a 60 segundos; cena de 1,5 a 6 segundos.
 
 ## Vídeo horizontal 16:9

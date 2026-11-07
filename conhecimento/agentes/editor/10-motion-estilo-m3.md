@@ -1,7 +1,7 @@
 <!-- modo: auto -->
 # Motion — Estilo M3 Documentário Premium
 
-> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
+> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/counter/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
 
 ## Prompt curto do estilo
 **M3 Documentário Premium:** "Estilo M3. Vertical 1080x1920, 30 fps, 30 a 60 s. Cinza frio e preto, acento amarelo `#F2C200`. Retrato fotorrealista do avatar da marca, P&B dessaturado que vira cor, push-in lento. Texto em serifa itálica branca com glow, palavra por palavra no tronco. Palavras de valor maiores com elipse amarela; marco de tempo em caixa de papel rasgado amarelo; mesa de madeira com jornais e círculo desenhado. Cena de respiro em papel cinza. Reveal do logo sobre preto com listras de luz. Conclusão com sans bold glow e CTA no celular sobre mesa."

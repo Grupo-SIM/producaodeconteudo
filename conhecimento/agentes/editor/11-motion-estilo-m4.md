@@ -1,7 +1,7 @@
 <!-- modo: auto -->
 # Motion — Estilo M4 Diorama de Papel Teatral
 
-> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
+> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/counter/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
 
 ## Prompt curto do estilo
 **M4 Diorama de Papel Teatral:** "Estilo M4. Vertical 1080x1920, 15 fps sem interpolação suave. Cenografia de papel em camadas com parallax (1x, 1,5x, 2x): cortinas vermelhas, bilheteria, piso xadrez, ondas de papel, estrelas penduradas. Cartas e cartas de tarô numeradas com palavras de valor. Zoom atravessando moldura dourada. Título gigante em condensada pesada atrás do personagem; frases poéticas em slab com contorno; elipse vermelha desenhada. O personagem é o mascote da marca. Final em amarelo radial com o site em branco."

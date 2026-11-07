@@ -48,6 +48,7 @@ html,body{width:var(--W);height:var(--H);overflow:hidden;background:#000}
 .profile .nm{font-size:32px;font-weight:700;margin-bottom:18px}
 .profile .st{display:flex;gap:56px;font-size:30px}.profile .st b{display:block;font-size:36px}
 .profile .bio{font-size:28px;line-height:1.35;margin-top:24px;color:#ddd}
+.counter{font-family:'Poppins','Inter',sans-serif;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gword{font-family:'Poppins','Inter',sans-serif;font-style:italic;font-weight:700;letter-spacing:-.03em;background:linear-gradient(90deg,#6a3df0,#c2399b 40%,#ee4a4a 65%,#f6a93b);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 10px 20px rgba(0,0,0,.12));white-space:nowrap}
 .badge{display:flex;align-items:center;gap:14px;font-size:20px;font-weight:700;letter-spacing:.08em;color:#222;opacity:.85}
 .dark .badge{color:#ddd}
@@ -159,6 +160,7 @@ function buildItem(it,parent,theme){
   else if(it.type==='card'){inner.innerHTML=`<div class="card" style="position:relative"><div class="pin"></div><h3>${it.title}</h3>${(it.items||[]).map(x=>`<div class="ci">${cardMark(x.icon)}<span>${x.text}</span></div>`).join('')}</div>`;inner.style.transform=`scale(${sz/420})`}
   else if(it.type==='profile'){inner.innerHTML=`<div class="profile"><div class="top"><span>${it.handle} ⌄</span><span style="opacity:.8;font-size:34px">＋ ☰</span></div><div class="row"><div class="av emoji">${it.avatar||'🙂'}</div><div><div class="nm">${it.name||''}</div><div class="st"><span><b>${it.posts||0}</b>posts</span><span><b>${it.followers||0}</b>seguidores</span><span><b>${it.following||0}</b>seguindo</span></div></div></div><div class="bio">${(it.bio||[]).join('<br>')}</div></div>`;inner.style.transform=`scale(${sz/900})`}
   else if(it.type==='gradientWord'){inner.classList.add('gword');inner.style.fontSize=sz+'px';inner.textContent=it.text}
+  else if(it.type==='counter'){inner.classList.add('counter');inner.style.fontSize=sz+'px';inner.style.color=it.color||'var(--accent)'}
   else if(it.type==='figure'){inner.innerHTML=figureSVG();inner.style.transform=`scale(${sz/700})`}
   else if(it.type==='orb'){const c=it.color||'var(--accent)';inner.innerHTML=`<div class="orb" style="width:${sz}px;height:${sz}px;--c:${c}"></div>`}
   else if(it.type==='ring'){const c=it.color||'var(--accent)';inner.innerHTML=`<div class="ringo" style="width:${sz}px;height:${sz}px;--c:${c}"></div>`}
@@ -323,6 +325,7 @@ function renderScene(S,lt){
     // optional exit
     if(it.exit!=null){const q=prog(lt,it.exit,.35);o*=1-q;sc*=1-q*.3}
     wr.style.opacity=o;
+    if(it.type==='counter'){const q=E.outCubic(prog(lt,at+(it.delay??.15),it.dur??1.6)),dec=it.decimals??0,v=(it.from??0)+((it.to??100)-(it.from??0))*q;wr._inner.textContent=(it.prefix||'')+v.toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec})+(it.suffix||'')}
     wr.style.transform=`translate(-50%,-50%) translate(${tx}px,${ty}px) rotate(${r}deg) scale(${sc})`;
     wr.style.filter=bl>0.1?`blur(${bl}px)`:'';
     // card list items

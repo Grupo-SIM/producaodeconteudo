@@ -36,8 +36,7 @@ Escolha UMA destas estruturas por página, conforme o conteúdo:
 ### Última página (CTA)
 - O nome da página indica o tipo de fechamento: "CTA (Fechamento Natural)", "CTA (O Fechamento)", "A CHAMADA DE AÇÃO (Caixa de Notificação)".
 - `Texto:` a frase que fecha o raciocínio ou a pergunta que puxa o desejo.
-- `Chamada:` a ação exata: "Comente \"MINDSET\" e receba o material no Direct.", "Clique no link na bio…", "Acesse nosso site clicando no link na bio…".
-- Quando a chamada é para comentar, escreva a palavra-chave entre aspas e em caixa alta: ela vira o botão da arte.
+- `Chamada:` a ação exata, seguindo o CTA da casa (base "Repertório do especialista", seção CTA): clique na bio ("Clique no link na bio e aprenda de forma 100% gratuita.") ou comentário de debate em peça opinativa ("Se você pensa diferente, me convence nos comentários."). Nunca "comente PALAVRA e receba no Direct", salvo se a ficha da marca pedir.
 - Se o fechamento for um card de notificação, use `Texto do Card:` no lugar de `Texto:`.
 
 ## Legenda do Post
@@ -68,13 +67,13 @@ Título: 3 atalhos que ativam decisão imediata:
 3. Reciprocidade Direcionada: Gerar valor real antes de realizar qualquer pedido de venda.
 📌 Slide 4 — A CHAMADA DE AÇÃO (Caixa de Notificação)
 Texto do Card:
-Quer dominar os 24 gatilhos psicológicos que aceleram as vendas no seu perfil?
-Comente "MINDSET" e receba o material no Direct.
+Quer dominar os gatilhos psicológicos que aceleram as vendas no seu perfil?
+Clique no link na bio e aprenda de forma 100% gratuita.
 
 Legenda do Post
 Por que algumas ofertas vendem todos os dias enquanto outras são completamente ignoradas?
 A resposta está na psicologia do consumidor. Tentar vender listando apenas as características do seu produto é o caminho mais longo para ouvir um "está caro". Quando você aplica a engenharia da persuasão e aciona os estímulos corretos no cérebro do seu cliente, a venda deixa de ser uma disputa de preço e passa a ser uma escolha natural.
-Aprenda a guiar a decisão da sua audiência usando atalhos mentais validados. Comente "MINDSET" nesta publicação para garantir o e-book Gatilhos Mentais - A Arte de Persuadir diretamente no seu Direct!
+Quer aprender a guiar a decisão da sua audiência com atalhos mentais? Clique no link na bio e aprenda de forma 100% gratuita.
 
 ### Central do Marketing
 📌 Slide 1 — CAPA
@@ -92,13 +91,13 @@ Como o amador faz: Promete resultados irrealistas e milagrosos que geram desconf
 Como a marca forte faz: Ancora a oferta na psicologia do consumo (usando os gatilhos mentais certos de prova e escassez real).
 📌 Slide 5 — CTA (Fechamento Natural)
 Texto: A sua imagem de autoridade é construída nos pequenos detalhes da sua operação.
-Chamada: Clique no link na bio que preparamos um bônus gratuito para você.
+Chamada: Quer deixar sua operação com cara de marca forte? Clique no link na bio e aprenda de forma 100% gratuita.
 
 Legenda do Post:
 A percepção de valor do seu cliente é construída nos detalhes antes mesmo de ele testar o seu produto.
 Quando o seu negócio transmite amadorismo na comunicação, no link do perfil ou na forma como responde no Direct, você é obrigado a dar descontos para conseguir fechar uma venda.
 Profissionais que cobram mais caro não têm necessariamente produtos melhores, têm um posicionamento e uma engenharia de vendas mais alinhada. Guarde este checklist para analisar no seu negócio hoje.
-Clique no link da nossa bio para ganhar um bônus gratuito que preparamos pra você.
+Quer deixar sua operação com cara de marca forte? Clique no link na bio e aprenda de forma 100% gratuita.
 
 ### Marketing Raiz
 📌 Slide 1 — CAPA
@@ -112,10 +111,10 @@ A Regra Raíz: Se a sua oferta precisa de mistério para vender, é porque o pro
 Como converter de verdade: Apresente a dor -> mostre a solução -> crie a ancoragem de valor -> declare o preço com orgulho -> abra o checkout.
 📌 Slide 4 — CTA (O Fechamento)
 Texto: Ninguém quer perder tempo mais com enrolação. Quer aprender a criar narrativas de vendas onde o cliente nem questiona o preço?
-Chamada: Acesse nosso site clicando no link na bio e aprenda de maneira 100% gratuita.
+Chamada: Clique no link na bio e aprenda de forma 100% gratuita.
 
 Legenda do Post:
 O "Preço no Direct" não é estratégia de vendas, é preguiça de construir valor na comunicação.
 Se você precisa esconder quanto custa o seu produto, você já começou a conversa perdendo a confiança do seu cliente.
 Quem sabe criar uma narrativa persuasiva não tem medo de mostrar o preço, porque a oferta fica barata perto do valor gerado.
-Acesse nosso site clicando no link na bio e aprenda a construir narrativas de alta conversão de maneira 100% gratuita.
+Quer aprender a construir narrativas que vendem sem esconder o preço? Clique no link na bio e aprenda de forma 100% gratuita.

@@ -1,7 +1,7 @@
 <!-- modo: auto -->
 # Motion — Estilo M1 Agência Vermelho
 
-> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
+> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/counter/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
 
 ## Prompt curto do estilo
 **M1 Agência Vermelho:** "Estilo M1. Vertical 1080x1920, 30 fps, 45 a 80 s. Preto `#101010` e branco `#EDEDED` alternando, acento vermelho `#E10600`. Tipografia: grotesca bold em caixa-alta tight + itálico leve menor; palavra-chave em caixa vermelha que varre. Heróis: celular que se monta, card vermelho com gráfico e contador, duotone vermelho, figura 3D branca, ícones em quadrados brancos. Lista numerada #1 a #N com numeral cromado. Folhas escuras desfocadas e dólares passando ao fundo. CTA: comente a palavra. Assinatura com botão FOLLOW e logo."
