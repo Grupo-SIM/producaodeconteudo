@@ -1077,7 +1077,7 @@ function carregaBasesAgentes() {
     if (!one('SELECT 1 x FROM agents WHERE id=?', ag)) continue; let fs2 = []; try { fs2 = fs.readdirSync(path.join(raiz, ag)).filter(f => /\.md$/i.test(f)).sort(); } catch { continue; }
     fs2.forEach((f, i) => {
       let txt = ''; try { txt = fs.readFileSync(path.join(raiz, ag, f), 'utf8'); } catch { return; }
-      const fm = txt.match(/<!--\s*modo:\s*formato\s+([a-z_,\s]+?)\s*-->/i), modo = fm ? 'fmt:' + fm[1].replace(/\s+/g, '') : /<!--\s*modo:\s*auto\s*-->/i.test(txt) ? 'auto' : 'sempre';   // formato: entra só nas peças daquele formato ou tipo (feed, carrossel, stories, video, noticia...) txt = txt.replace(/^<!--.*?-->\s*/s, '').trim(); if (txt.length < 40) return;
+      const fm = txt.match(/<!--\s*modo:\s*formato\s+([a-z_,\s]+?)\s*-->/i), modo = fm ? 'fmt:' + fm[1].replace(/\s+/g, '') : /<!--\s*modo:\s*auto\s*-->/i.test(txt) ? 'auto' : 'sempre'; txt = txt.replace(/^<!--.*?-->\s*/s, '').trim(); if (txt.length < 40) return;   // formato: entra só nas peças daquele formato ou tipo (feed, carrossel, stories, video, noticia...)
       const titulo = ((txt.match(/^#\s+(.+)$/m) || [])[1] || f.replace(/\.md$/i, '')).trim().slice(0, 160), ja = one('SELECT * FROM agent_docs WHERE agent=? AND titulo=?', ag, titulo);
       if (!ja) run("INSERT INTO agent_docs(agent,titulo,conteudo,original,modo,ordem,origem,created_at,updated_at) VALUES(?,?,?,?,?,?,'casa',?,?)", ag, titulo, txt, txt, modo, i + 1, T(), T());
       else if (ja.original !== txt) { if (ja.editado) run('UPDATE agent_docs SET original=?, updated_at=? WHERE id=?', txt, T(), ja.id); else run('UPDATE agent_docs SET conteudo=?, original=?, updated_at=? WHERE id=?', txt, txt, T(), ja.id); }
