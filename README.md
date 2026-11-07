@@ -1474,3 +1474,8 @@ Configurações › Sistema › **Levar tudo para outro painel**:
 - Só administrador. Quem importa entra com a senha do painel de origem (as senhas de usuários vão no banco; a senha do dono vem do `.env` de cada painel).
 - Isso é separado do GitHub: o repositório leva só o código.
 - Reinício: o `iniciar-windows.bat` religa sozinho; no Docker o `restart: unless-stopped` religa.
+
+## Build 2026-11-06.223 — Notícia: manchete e foto da contracapa
+- A manchete da capa herdava `nowrap` do layout e saía numa linha só, espremida; agora quebra em várias linhas e usa o maior tamanho que couber (`layoutNoticiaTexto`).
+- A contracapa nunca repete a foto da capa: além do endereço/tamanho, compara a imagem pela impressão visual (dHash 9x8 via ffmpeg, `fotosParecidas`) em `radarGarantiFoto2`, `radarFotoBusca` e `contracapaNoticia`. Sem outra foto, fica o fundo da marca.
+- Ao iniciar, artes de notícia já feitas (últimas 60) com manchete em linha única ou foto repetida são corrigidas e renderizadas de novo.

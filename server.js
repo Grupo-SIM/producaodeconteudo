@@ -49,7 +49,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const als = new AsyncLocalStorage();
 class DryRun extends Error { constructor(p) { super('dry'); this.prompt = p; } }
-const BUILD = '2026-11-06.222'; // tem de ser igual ao UI_BUILD do public/index.html
+const BUILD = '2026-11-06.223'; // tem de ser igual ao UI_BUILD do public/index.html
 // Um erro solto numa tarefa de fundo não pode derrubar o painel (era isso que dava "Failed to fetch" no navegador): registra e segue
 process.on('uncaughtException', e => { try { console.error('[erro não tratado]', e && e.stack || e); } catch { } });
 process.on('unhandledRejection', e => { try { console.error('[promessa rejeitada]', e && e.stack || e); } catch { } });
@@ -4576,20 +4576,33 @@ function radarLayoutsDaMarca(brand) {
 }
 // Contracapa da notícia: foto (a 2ª melhor) com o cartão de post do X. O texto sai da legenda que o copy escreveu (2 primeiras frases) + chamada para comentar e seguir
 // Garante uma 2ª foto (diferente da capa) para a contracapa: busca de novo na internet se a primeira busca não trouxe
+// Impressão visual (dHash 9x8) da foto: pega a MESMA imagem vinda de outra URL/resolução, que a comparação por endereço e tamanho não pega
+function hashFoto(buf) {
+  try { const g = execFileSync('ffmpeg', ['-loglevel', 'error', '-i', 'pipe:0', '-frames:v', '1', '-vf', 'scale=9:8:flags=area,format=gray', '-f', 'rawvideo', '-'], { input: buf, timeout: 20000, maxBuffer: 1e5 }); if (g.length < 72) return null;
+    let h = 0n; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) h = (h << 1n) | (g[y * 9 + x] > g[y * 9 + x + 1] ? 1n : 0n); return h; } catch { return null; }
+}
+function fotosParecidas(a, b) {   // a, b: buffers; true quando são visualmente a mesma foto (também recortada/redimensionada)
+  if (!a || !b) return false; const ha = hashFoto(a), hb = hashFoto(b); if (ha === null || hb === null) return false;
+  let x = ha ^ hb, d = 0; while (x) { d += Number(x & 1n); x >>= 1n; } return d <= 14;
+}
+function bufDoAsset(a) { try { return a ? fs.readFileSync(path.join(ASSET_DIR, a.id + '.' + a.ext)) : null; } catch { return null; } }
 async function radarGarantiFoto2(c) {   // REGRA: puxa 5-6 imagens do assunto, escolhe as 2 melhores (capa + contracapa); a contracapa SEMPRE leva uma foto relacionada à notícia
   try {
     const it = one('SELECT * FROM radar_items WHERE content_id=?', c.id); if (!it || !it.foto_asset || als.getStore()?.dry) return;
-    if (it.foto2_asset && assetDaMarca(c.brand, it.foto2_asset) && it.foto2_asset !== it.foto_asset) return;
-    const ents = radarEntidades(it.titulo), a1 = assetDaMarca(c.brand, it.foto_asset), usada = u => (a1?.note || '').includes(u);
+    const a1 = assetDaMarca(c.brand, it.foto_asset), b1 = bufDoAsset(a1), a2 = it.foto2_asset ? assetDaMarca(c.brand, it.foto2_asset) : null;
+    if (a2 && it.foto2_asset !== it.foto_asset && !(b1 && bufDoAsset(a2) && fotosParecidas(b1, bufDoAsset(a2)))) return;
+    if (a2) run("UPDATE radar_items SET foto2_asset='' WHERE id=?", it.id);   // 2ª foto igual à capa: descarta e procura outra
+    const ents = radarEntidades(it.titulo), usada = u => (a1?.note || '').includes(u);
     let lista = []; try { lista = (await radarImagensWeb(it)).lista || []; } catch { /* segue para a matéria */ }
     if (lista.length < 6) { try { const real = await radarLinkReal(it.url || ''); if (real) { const pg = await webGetSeguro(real, { max: 3e6 }); lista = lista.concat(radarImagensDaPagina(pg.buf.toString('utf8'), pg.url).filter(u => /^https:\/\//.test(u)).map(u => ({ u }))); } } catch { /* sem a matéria */ } }
     const vistos = new Set(), filtra = l => l.filter(x => x.u && !usada(x.u) && !vistos.has(x.u) && vistos.add(x.u));
-    lista = filtra(lista); let r = lista.length ? await radarEscolheImagem(lista, '', ents, 6, [1000, 560]) : null;
-    if (!r?.buf || r.buf.length === a1?.size) {   // 2ª tentativa com outra busca (assunto + "notícia", ou as primeiras palavras da manchete)
+    const outraQue = r0 => { if (!r0?.buf) return null; for (const x of [r0, ...(r0.outras || [])]) if (x.buf && x.buf.length !== a1?.size && !(b1 && fotosParecidas(b1, x.buf))) return x; return null; };
+    lista = filtra(lista); let r = lista.length ? outraQue(await radarEscolheImagem(lista, '', ents, 6, [1000, 560])) : null;
+    if (!r?.buf) {   // 2ª tentativa com outra busca (assunto + "notícia", ou as primeiras palavras da manchete)
       const q2 = (ents.length ? ents.slice(0, 2).join(' ') + ' notícia' : String(it.titulo || '').split(/\s+/).slice(0, 5).join(' ')); let l2 = []; try { l2 = filtra((await radarImagensWeb({ ...it, titulo: q2 })).lista || []); } catch { /* sem 2ª busca */ }
-      r = l2.length ? await radarEscolheImagem(l2, '', ents, 6, [1000, 560]) : null;
+      r = l2.length ? outraQue(await radarEscolheImagem(l2, '', ents, 6, [1000, 560])) : null;
     }
-    if (!r?.buf || r.buf.length === a1?.size) return;
+    if (!r?.buf) return;
     const p = salvaFotoRadar(it, r, 'busca na internet', '', '-2'); run('UPDATE radar_items SET foto2_asset=? WHERE id=?', p.name, it.id);
   } catch { /* sem 2ª foto: a contracapa usa o fundo da marca */ }
 }
@@ -4619,7 +4632,7 @@ function confereNoticia(cap, cc, foto1) {
 }
 function contracapaNoticia(c, foto1) {
   try {
-    const it = one('SELECT * FROM radar_items WHERE content_id=?', c.id) || {}, f2 = it.foto2_asset && assetDaMarca(c.brand, it.foto2_asset) ? it.foto2_asset : '', foto = f2 && f2 !== foto1 ? f2 : '';   // REGRA: a contracapa NUNCA repete a foto da capa; sem 2ª foto, fica o fundo escuro da marca
+    const it = one('SELECT * FROM radar_items WHERE content_id=?', c.id) || {}, f2 = it.foto2_asset && assetDaMarca(c.brand, it.foto2_asset) ? it.foto2_asset : '', foto = f2 && f2 !== foto1 && !(foto1 && fotosParecidas(bufDoAsset(assetDaMarca(c.brand, foto1)), bufDoAsset(assetDaMarca(c.brand, f2)))) ? f2 : '';   // REGRA: a contracapa NUNCA repete a foto da capa; sem 2ª foto, fica o fundo escuro da marca
     const r = compoeModelos({ slides: [{ modelo: 'post-card', dados: { titulo: textoContracapa(c), x: true, ...(foto ? { foto } : {}) } }] }, 'carrossel', c.brand, null);
     return r?.slides?.[0] || null;
   } catch (e) { console.error('contracapa:', e.message); return null; }
@@ -4671,7 +4684,7 @@ function migraTodosEstilosNoticia() {   // TODO estilo de notícia (de qualquer 
 }
 // "Leia a legenda" sempre pequeno e fino (Inter 300, caixa normal) em qualquer capa de notícia já guardada, inclusive as editadas à mão
 function afinaLegendaSpec(sp) {
-  let n = 0; const fix = t => { if (!t || !/^leia a legenda$/i.test(String(t.value || '').trim())) return; if (t.weight === 300 && (t.size || 0) <= 24 && t.caixa === 'normal') return; t.weight = 300; t.size = Math.min(t.size || 23, 23); t.caixa = 'normal'; t.upper = false; t.italic = false; t.opacity = 0.85; t.color = '#ffffff'; t.ls = 0.02; n++; };
+  let n = 0; const fix = t => { if (!t || !/^leia a legenda$/i.test(String(t.value || '').trim())) return; if (t.weight === 300 && (t.size || 0) <= 32 && t.caixa === 'normal') return; t.weight = 300; t.size = Math.min(t.size || 30, 30); t.caixa = 'normal'; t.upper = false; t.italic = false; t.opacity = 0.85; t.color = '#ffffff'; t.ls = 0.02; n++; };
   for (const sl of sp?.slides || []) for (const t of sl.texts || []) fix(t);
   return n;
 }
@@ -4738,9 +4751,27 @@ function restauraEstilosApagados() {
     if (back.length) { log('designer', `Estilo(s) salvo(s) que tinham sido apagados junto com um estilo da casa voltaram: ${back.join(', ')}`); changed(); }
   } catch (e) { console.error('restauro de estilos:', e.message); }
 }
+function consertaManchetesUmaLinha() {   // artes de notícia já feitas: (1) manchete presa numa linha só (nowrap herdado do layout) volta a quebrar em várias linhas; (2) contracapa com a MESMA foto da capa troca para o fundo da marca
+  let n = 0;
+  try {
+    for (const r of all("SELECT id, format, art_spec FROM contents WHERE kind='noticia' AND art_spec<>'' AND IFNULL(teste,0)=0 ORDER BY id DESC LIMIT 60")) {
+      const sp = jparse(r.art_spec, null), sl = sp?.slides?.[0]; if (!sl) continue; let mud = false;
+      const main = (sl.texts || []).filter(t => !/^leia a legenda$/i.test(String(t.value || '').trim())).sort((a, b) => (b.size || 0) - (a.size || 0))[0];
+      const lg = (sl.texts || []).find(t => /^leia a legenda$/i.test(String(t.value || '').trim()));
+      if (['noticia', 'manchete-foto', 'citacao', undefined].includes(sl.modelo) && main && (main.nowrap === true || (lg && (lg.size || 0) < 28)) && String(main.value || '').length >= 30 && (sl.shapes || []).some(x => x.kind === 'line')) {
+        layoutNoticiaTexto(sl, main, sp.accent, String(main.value).replace(/[*|]+/g, ' ').replace(/\s+/g, ' ').trim(), r.format === 'stories' ? 1920 : 1350); mud = true; }
+      const c = getContent(r.id), f1 = sl.bg?.asset || '', f2 = sp.slides[1]?.bg?.asset || sp.slides[1]?.dados?.foto || '';
+      if (c && f1 && f2 && (f1 === f2 || fotosParecidas(bufDoAsset(assetDaMarca(c.brand, f1)), bufDoAsset(assetDaMarca(c.brand, f2))))) { const cc = contracapaNoticia(c, f1); if (cc) { sp.slides[1] = cc; mud = true; } }
+      if (!mud) continue;
+      const j = JSON.stringify(sp); setContent(r.id, { art_spec: j, art_spec_base: j }); n++; renderArte(r.id).catch(() => {});
+    }
+    if (n) { log('designer', `Artes de notícia corrigidas (manchete em linha única / foto repetida na contracapa): ${n}`); changed(); }
+  } catch (e) { console.error('conserto de notícias:', e.message); }
+}
 function migraNoticiaTemplates() {
   try {
     saneiaEstilosNoticia(); migraTodosEstilosNoticia(); afinaLegendasNoticia();
+    consertaManchetesUmaLinha();
     for (const [brand, m] of Object.entries(radarCfg().marcas)) {
       const id = m.estilo || '', mt = id.match(/^layout-(\d+)$/);
       try { if (mt) migraLayoutNoticia(+mt[1]); else if (/^dono-\d+$/.test(id)) migraTemplateNoticia(id, brand); } catch (e) { console.error('migração de notícia (' + brand + '):', e.message); }
@@ -4750,15 +4781,16 @@ function migraNoticiaTemplates() {
 }
 // Manchete encolhe para caber entre a linha e a legenda; "LEIA A LEGENDA" fica fixa embaixo, com os espaços da regra (linha 3,2% · manchete→legenda 5% · legenda→borda 4,5%)
 function layoutNoticiaTexto(s, main, accent, tit, H) {
-  const W = 1080, lgSz = Math.round(W * 0.021);
+  const W = 1080, lgSz = Math.round(W * 0.028);
   { const lin = (s.shapes || []).filter(x => x.kind === 'line').sort((a, b) => b.y - a.y)[0], liny = lin ? lin.y : 0.55, lh = main.lh || 1, bw = Math.max(main.w || 0.8, 0.9) * W, bot = H * 0.955, lgTop = bot - lgSz * 1.2, fim = lgTop - H * 0.03;
     const outros = (s.texts || []).filter(t => t !== main && !/^leia a legenda$/i.test(String(t.value || '').trim()) && (t.y || 0) < liny).map(t => t.y || 0), limite = outros.length ? Math.max(...outros) + 0.05 : 0.3, subir = Math.max(0, Math.min(H * 0.14, (liny - limite) * H));   // até onde a linha pode subir sem bater no selo/perfil
-    const top0 = liny * H + H * 0.032, linhas = (sz) => { let n = 1, cur = 0; for (const w of tit.toUpperCase().split(' ')) { const wl = w.length * sz * 0.53, esp = sz * 0.24; if (cur && cur + esp + wl > bw) { n++; cur = wl; } else cur += (cur ? esp : 0) + wl; } return n; };
-    const alt = (sz) => linhas(sz) * sz * lh * 1.2; let sz = Math.max(main.size || 0, Math.round(W * 0.15));
-    while (sz > 40 && (linhas(sz) > 5 || alt(sz) > fim - top0 + subir)) sz -= 2;   // manchete o MAIOR que couber (até 5 linhas), subindo a linha e a logo quando o texto é longo
-    const falta = Math.max(0, Math.ceil(alt(sz) - (fim - top0))), mov = Math.min(subir, falta) / H;
-    if (mov > 0) { for (const x of s.shapes || []) if (x.kind === 'line') x.y = Math.round((x.y - mov) * 1000) / 1000; for (const it of s.items || []) if (Math.abs((it.y || 0) - liny) < 0.07) it.y = Math.round((it.y - mov) * 1000) / 1000; }
-    const top = (liny - mov) * H + H * 0.032; main.size = sz; main.w = bw / W; main.y = Math.round(((top + fim) / 2) / H * 1000) / 1000;
+    const cwk = /impact|bebas|anton|oswald|league/i.test(String(main.font || '')) ? 0.47 : 0.53, top0 = liny * H + H * 0.032, linhas = (sz) => { let n = 1, cur = 0; for (const w of tit.toUpperCase().split(' ')) { const wl = w.length * sz * cwk, esp = sz * 0.24; if (cur && cur + esp + wl > bw) { n++; cur = wl; } else cur += (cur ? esp : 0) + wl; } return n; };
+    const g1 = H * 0.02, g2 = H * 0.024, alt = (sz) => linhas(sz) * sz * lh, lgTopMin = bot - lgSz * 1.2, disp = lgTopMin - g2 - (liny * H + g1);   // grupo compacto: logo+linha, manchete e legenda juntos (sem vazios), colado embaixo
+    let sz = Math.max(main.size || 0, Math.round(W * 0.15));
+    while (sz > 40 && (linhas(sz) > 5 || alt(sz) > disp + subir)) sz -= 2;
+    const hT = alt(sz), linyNova = (lgTopMin - g2 - hT - g1) / H, mov = liny - linyNova;   // mov > 0 sobe, < 0 desce
+    if (Math.abs(mov) > 0.0005) { for (const x of s.shapes || []) if (x.kind === 'line') x.y = Math.round((x.y - mov) * 1000) / 1000; for (const it of s.items || []) if (Math.abs((it.y || 0) - liny) < 0.07) it.y = Math.round((it.y - mov) * 1000) / 1000; }
+    main.size = sz; main.w = bw / W; main.reflow = true; main.nowrap = false; main.align = 'center'; main.x = 0.5; main.y = Math.round((lgTopMin - g2 - hT / 2) / H * 1000) / 1000;
     s.texts = (s.texts || []).filter(t => !/^leia a legenda$/i.test(String(t.value || '').trim()));
     s.texts.push({ ...main, value: 'Leia a legenda', role: 'label', x: 0.5, y: Math.round((lgTop + lgSz * 0.6) / H * 1000) / 1000, size: lgSz, w: 0.8, color: '#ffffff', opacity: 0.85, font: 'inter', weight: 300, upper: false, caixa: 'normal', italic: false, ls: 0.02, lh: 1, nowrap: true, reflow: false, hl: undefined }); }
 }
@@ -4960,8 +4992,8 @@ async function radarFotoBusca(it, contentId) {
     }
     if (!melhor) return info(`Sem foto: ${motivo}. Envie a foto na aba Arte.`);
     // segunda foto (contracapa): a próxima melhor do mesmo grupo; se não houver, busca na internet outra diferente da primeira
-    let seg = (melhor.outras || []).find(o => o.u !== melhor.u && !(o.d.w === melhor.d.w && o.d.h === melhor.d.h && o.buf.length === melhor.buf.length)) || null, origem2 = origem;
-    if (!seg) { try { const w2 = await radarImagensWeb(it); const r2 = w2.lista.length ? await radarEscolheImagem(w2.lista.filter(x => x.u !== melhor.u), '', ents, 4, [1200, 630]) : null; if (r2?.buf) { seg = r2; origem2 = 'busca na internet'; } } catch { /* sem segunda foto: a contracapa usa a primeira */ } }
+    let seg = (melhor.outras || []).find(o => o.u !== melhor.u && !(o.d.w === melhor.d.w && o.d.h === melhor.d.h && o.buf.length === melhor.buf.length) && !fotosParecidas(melhor.buf, o.buf)) || null, origem2 = origem;
+    if (!seg) { try { const w2 = await radarImagensWeb(it); const r2 = w2.lista.length ? await radarEscolheImagem(w2.lista.filter(x => x.u !== melhor.u), '', ents, 4, [1200, 630]) : null, r2ok = r2?.buf ? [r2, ...(r2.outras || [])].find(x => x.buf && !fotosParecidas(melhor.buf, x.buf)) : null; if (r2ok) { seg = r2ok; origem2 = 'busca na internet'; } } catch { /* sem segunda foto: a contracapa usa a primeira */ } }
     const p1 = salvaFotoRadar(it, melhor, origem, real, ''), name = p1.name, credito = p1.credito, p2 = seg ? salvaFotoRadar(it, seg, origem2, real, '-2') : null;
     run('UPDATE radar_items SET foto_asset=?, foto2_asset=?, foto_info=? WHERE id=?', name, p2?.name || '', `${melhor.d.w}x${melhor.d.h} · ${origem === 'matéria' ? '' : 'busca na internet · '}${credito}${p2 ? ' | contracapa: ' + seg.d.w + 'x' + seg.d.h : ''}${melhor.porque ? ' | por que esta: ' + melhor.porque : ''}`.slice(0, 480), it.id);
     if (contentId) run('UPDATE contents SET brief = brief || ? WHERE id=?', `\nFOTO DA NOTÍCIA (já está na Biblioteca como "${name}", ${melhor.d.w}x${melhor.d.h}, ${origem}): use esta foto na capa. NUNCA use mascote nem imagem gerada em notícia. ${credito}. Cite o crédito da foto na legenda.`, contentId);
