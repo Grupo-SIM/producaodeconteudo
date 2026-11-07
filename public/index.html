@@ -928,7 +928,7 @@ function renderNav() {
     manual() ? h('div', null, h('span', { class: 'dot ' + (st.waiting.length ? 'warn' : '') }), st.waiting.length ? st.waiting.length + ' pedido(s) para o chat' : 'Nenhum pedido pendente') : h('div', null, h('span', { class: 'dot ' + (working ? 'warn' : '') }), working ? working + ' agente(s) trabalhando' : 'Equipe ociosa'));
 }
 document.getElementById('logoSide').src = '/logo-agentes-sim.png';
-const UI_BUILD = '2026-11-07.225';
+const UI_BUILD = '2026-11-07.226';
 async function renderView() {
   const tk = ++S.token, main = $('#main'), fn = VIEWS[S.view];
   try {

@@ -49,7 +49,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const als = new AsyncLocalStorage();
 class DryRun extends Error { constructor(p) { super('dry'); this.prompt = p; } }
-const BUILD = '2026-11-07.225'; // tem de ser igual ao UI_BUILD do public/index.html
+const BUILD = '2026-11-07.226'; // tem de ser igual ao UI_BUILD do public/index.html
 // Um erro solto numa tarefa de fundo não pode derrubar o painel (era isso que dava "Failed to fetch" no navegador): registra e segue
 process.on('uncaughtException', e => { try { console.error('[erro não tratado]', e && e.stack || e); } catch { } });
 process.on('unhandledRejection', e => { try { console.error('[promessa rejeitada]', e && e.stack || e); } catch { } });
@@ -5133,7 +5133,7 @@ function copyLint(c, script) {
 const MATERIA_RE = /^[ \t]*#{0,3}[ \t]*(?:\*\*)?MAT[ÉE]RIA(?:[ \t]+COMPLETA)?(?:\*\*)?[ \t]*:?[ \t]*$/im;
 const separaMateria = t => { const m = String(t || '').match(MATERIA_RE); return m ? [t.slice(0, m.index).trim(), t.slice(m.index + m[0].length).trim()] : [String(t || ''), '']; };
 const jornalDaMarca = brand => { const m = radarCfg().marcas[brand] || {}; return (m.jornal || '') + (m.secoes ? '\nSeções (editorias) do jornal: ' + m.secoes + '\nEscolha UMA dessas seções para a matéria, a que corresponde ao assunto, e escreva-a na linha "Seção:". Se nenhuma servir, não invente: abra PEDIDO AO GERENTE.' : ''); };
-const MAX_SEO = 2;
+const MAX_SEO = MANUAL ? 1 : 2;   // no modo chat, 1 devolução da matéria por SEO (cada volta é um ciclo de copiar/colar)
 function depoisDaCopy(c, materia = c.materia) {   // notícia com matéria passa pelo Agente de SEO antes do Revisor
   if (c.kind === 'noticia' && materia && agenteLigado('seo') && (jparse(c.seo_review, {})?.rodadas || 0) < MAX_SEO + 1 && !(jparse(c.seo_review, {})?.fim)) enqueue(c.id, 'seo', 'seo');
   else enqueue(c.id, 'gerente', 'revisao');
@@ -5184,7 +5184,8 @@ const HANDLERS = {
     { const le = copyLint(c, post), volta = +input.lint || 0;
       if (le.length && MANUAL) log('roteirista', `Conferência do painel: ${le.length} ponto(s) fora dos limites (${le.join(' | ').slice(0, 300)}). No modo chat segue para a revisão sem pedir de novo.`, c.id);
       if (le.length && volta < 2 && !MANUAL) { log('roteirista', `Conferência do painel achou ${le.length} erro(s) mecânico(s): volta ao Roteirista sem gastar o Revisor`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: 'CONFERÊNCIA DO PAINEL (limites objetivos, corrija todos e mude só isso):\n- ' + le.join('\n- '), lint: volta + 1 }); return r; } }
-    if (copyRevOn()) enqueue(c.id, 'revisorcopy', 'revcopy'); else depoisDaCopy(c, materia || c.materia);
+    const deSeo = /^LAUDO DO AGENTE DE SEO/.test(String(input.feedback || ''));   // ajuste só da matéria a pedido do SEO: não repete a revisão de copy do post, volta direto ao SEO
+    if (copyRevOn() && !deSeo) enqueue(c.id, 'revisorcopy', 'revcopy'); else depoisDaCopy(c, materia || c.materia);
     return r;
   },
 
