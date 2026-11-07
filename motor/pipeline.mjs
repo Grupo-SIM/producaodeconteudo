@@ -30,9 +30,12 @@ if (!has('--skip-objetos')) {
   run(process.execPath, [path.join(here, 'fal-objetos.mjs'), spec, '--out', 'objetos']);
   spec = 'objetos/spec.objetos.json';
 }
-let voice = opt('--voice-file');   // narração já gravada (biblioteca): não gera voz e não mexe nos tempos
-if (voice) step('2/4 narração própria: ' + path.basename(voice));
-else if (!has('--skip-voz')) {
+let voice = opt('--voice-file');   // narração já gravada (biblioteca): sincroniza o texto com faster-whisper, se instalado
+if (voice) {
+  step('2/4 narração própria: ' + path.basename(voice));
+  try { execFileSync(process.execPath, [path.join(here, 'whisper-sync.mjs'), spec, voice, '--out', 'voz'], { stdio: 'inherit' }); spec = 'voz/spec.sync.json'; }
+  catch { console.log('Sem sincronia por palavra: o texto segue os tempos do spec.'); }
+} else if (!has('--skip-voz')) {
   const prov = opt('--voz', process.env.VOZ_PROVIDER || (process.env.ELEVENLABS_API_KEY ? 'elevenlabs' : process.env.MURF_API_KEY ? 'murf' : 'elevenlabs'));
   const murf = prov === 'murf';
   const voiceId = opt('--voice-id', murf ? process.env.MURF_VOICE_ID : process.env.ELEVENLABS_VOICE_ID);

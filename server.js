@@ -1842,7 +1842,7 @@ ${looks}
 - Transições ("in"): cut, fade, dim, zoom, whip, circle.
 - Decoração ("decor"): grid, dots, scan, stripes, blobs, bars, barcode, badge, curve:s|left|right|arc, none.
 - Texto: "mode" stack (blocos), ticker (palavras deslizando) ou word (uma palavra por vez); tamanho em px (40 a 240); palavra-chave marcada com *asteriscos*.
-- Objetos (NUNCA emoji): img (arquivo da biblioteca), orb (esfera 3D), ring (anel), chart (gráfico), card (lista com ícone numérico), profile, gradientWord, figure, circle; entrada pop, fade, slideL, slideR, slideB, slideT, drop, zoom; movimento parado float, spin, sway, drift, none.
+- Objetos (NUNCA emoji): img (arquivo da biblioteca), orb (esfera 3D), ring (anel), chart (gráfico), card (lista com ícone numérico), profile, gradientWord, counter (número que sobe), figure, circle; entrada pop, fade, slideL, slideR, slideB, slideT, drop, zoom; movimento parado float, spin, sway, drift, none.
 - Câmera por cena: "cam":{"from":1,"to":1.1,"rotTo":-3}.
 
 Devolva SOMENTE um bloco \`\`\`json válido (sem comentários) com estas chaves:
@@ -1932,10 +1932,10 @@ Formato:
    "decor":["grid","dots","scan","stripes","blobs","bars","barcode","badge","curve:s|left|right|arc","scatter:🤡","none"],
    "narration":"frase falada nesta cena",
    "text":{"value":"Você tem as | *ideias* e | *conteúdo*","y":0.42,"size":66,"align":"center|left|right","x":0.42,"mode":"stack|ticker|word"},
-   "items":[{"type":"img|orb|ring|chart|card|profile|gradientWord|figure|circle","asset":"nome-exato (se img)","gen":"opcional, em inglês","color":"#hex opcional (orb, ring, chart)","x":0.5,"y":0.5,"size":420,"rot":0,"at":0,"enter":"pop|fade|slideL|slideR|slideB|slideT|drop|zoom","idle":"float|spin|sway|drift|none"}]}]}
+   "items":[{"type":"img|orb|ring|chart|card|profile|gradientWord|counter|figure|circle","asset":"nome-exato (se img)","gen":"opcional, em inglês","color":"#hex opcional (orb, ring, chart)","x":0.5,"y":0.5,"size":420,"rot":0,"at":0,"enter":"pop|fade|slideL|slideR|slideB|slideT|drop|zoom","idle":"float|spin|sway|drift|none"}]}]}
 - "look" define o visual inteiro (paleta, tipografia, brilho e câmera) e vem da receita do estilo; "mode":"word" mostra uma palavra por vez. x e y são frações da tela (0 a 1) e size é em px. A primeira cena não tem "in". "text" também aceita uma lista de blocos.
 - NUNCA use emoji em objetos nem em ícones. orb = esfera 3D brilhante, ring = anel 3D, chart = gráfico de barras em alta, todos coloridos pelo accent (ou "color"). Em card, "icon" é um número curto ("1", "2") ou vazio (vira um visto).
-- card: "title" e "items":[{"icon":"1","text":"sem alcance"}]. gradientWord: "text". profile: "handle","name","posts","followers","following","bio":[].
+- card: "title" e "items":[{"icon":"1","text":"sem alcance"}]. gradientWord: "text". counter: "from","to","decimals" (casas),"prefix","suffix","dur" (s da contagem); use para número de resultado, ex. {"from":1.2,"to":3.4,"decimals":1,"prefix":"R$ ","suffix":" mi"}. profile: "handle","name","posts","followers","following","bio":[].
 - Se um bloco de texto passa de 4 palavras por linha, reduza "size". Nada de texto sobreposto ao objeto.`;
 
 const LOOKS_VALIDOS = ['editorial', 'neon', 'minimal', 'impacto', 'gradiente', 'cinema', 'cinetico'];

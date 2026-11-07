@@ -1,7 +1,7 @@
 <!-- modo: auto -->
 # Motion — Estilo M5 Storytelling Retrô CRT
 
-> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
+> Observação do sistema Agentes SIM: o motor de vídeo renderiza sempre em 30 fps e só entende o vocabulário do guia de SPEC (look, decor, in, items orb/ring/chart/card/profile/gradientWord/counter/img, text mode stack/ticker/word). Campos marcados com ★ não existem no motor: use o que existe e traduza o resto em imagem da biblioteca Motion. O herói visual de cada cena vem da biblioteca (img pelo nome exato).
 
 ## Prompt curto do estilo
 **M5 Storytelling Retrô CRT:** "Estilo M5. Vertical 1080x1920, 30 fps, 20 a 40 s. Scanlines horizontais e RGB split em tudo, papel cinza `#CFCFCB`, serifa minúscula pequena (texto 2 a 4 palavras). Ilustração IA de época original (P&B → cor). Cenas de respiro com 1 palavra. Troca de objeto com seta circular azul (moeda, cartão, nota, celular). Mãos, ícones 3D macios, parede de código verde. Plano médio menor que 1,2 s. Final com cursor clicando e site digitado."
