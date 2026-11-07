@@ -1465,3 +1465,12 @@ Na .217 as prévias dos estilos só são desenhadas quando o card aparece na tel
 ## Build 2026-11-06.221 — salvar fecha o editor
 
 Depois de salvar um layout ou template pelo editor, o editor fecha e volta para a vitrine da marca. Assim não fica uma cópia velha aberta que possa gerar conflito. "Salvar estilo" já fechava.
+
+## Build 2026-11-06.222 — levar tudo para outro painel (local ↔ online)
+
+Configurações › Sistema › **Levar tudo para outro painel**:
+- **Baixar pacote de dados**: um `.tar.gz` com o banco (marcas, base de conhecimento, layouts, estilos, artes, Cérebro, usuários), os arquivos (logos, mascotes, fontes, layouts, poses) e a chave do painel.
+- **Importar pacote de dados**: envia o pacote; o painel reinicia e passa a usar esses dados. O que existia antes fica numa pasta `_antes_importar_*` dentro da pasta de dados.
+- Só administrador. Quem importa entra com a senha do painel de origem (as senhas de usuários vão no banco; a senha do dono vem do `.env` de cada painel).
+- Isso é separado do GitHub: o repositório leva só o código.
+- Reinício: o `iniciar-windows.bat` religa sozinho; no Docker o `restart: unless-stopped` religa.

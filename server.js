@@ -49,7 +49,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const als = new AsyncLocalStorage();
 class DryRun extends Error { constructor(p) { super('dry'); this.prompt = p; } }
-const BUILD = '2026-11-06.221'; // tem de ser igual ao UI_BUILD do public/index.html
+const BUILD = '2026-11-06.222'; // tem de ser igual ao UI_BUILD do public/index.html
 // Um erro solto numa tarefa de fundo não pode derrubar o painel (era isso que dava "Failed to fetch" no navegador): registra e segue
 process.on('uncaughtException', e => { try { console.error('[erro não tratado]', e && e.stack || e); } catch { } });
 process.on('unhandledRejection', e => { try { console.error('[promessa rejeitada]', e && e.stack || e); } catch { } });
@@ -60,6 +60,48 @@ if (ADMIN_PASSWORD.length < 8) {
   process.exit(1);
 }
 fs.mkdirSync(DATA_DIR, { recursive: true });
+
+// ───────────── Levar tudo para outro painel: pacote .tar.gz (banco + arquivos), exportado num painel e importado no outro ─────────────
+const BK_PASTAS = ['assets', 'layouts', 'poses'], BK_PENDENTE = path.join(DATA_DIR, '_importar.tar.gz');
+const tarOctal = (n, len) => Buffer.from(n.toString(8).padStart(len - 1, '0') + '\0', 'latin1');
+function tarCabecalho(nome, tam, mtime) {
+  const h = Buffer.alloc(512); let pre = '', nm = nome;
+  if (Buffer.byteLength(nm) > 100) { const i = nm.lastIndexOf('/', 155); if (i > 0) { pre = nm.slice(0, i); nm = nm.slice(i + 1); } }
+  h.write(nm, 0, 100, 'utf8'); tarOctal(0o644, 8).copy(h, 100); tarOctal(0, 8).copy(h, 108); tarOctal(0, 8).copy(h, 116); tarOctal(tam, 12).copy(h, 124); tarOctal(Math.floor(mtime / 1000), 12).copy(h, 136);
+  h.fill(0x20, 148, 156); h.write('0', 156); h.write('ustar\0', 257, 'latin1'); h.write('00', 263, 'latin1'); if (pre) h.write(pre, 345, 155, 'utf8');
+  let soma = 0; for (const b of h) soma += b; h.write(soma.toString(8).padStart(6, '0') + '\0 ', 148, 'latin1'); return h;
+}
+function tarLer(buf) {   // devolve [{ nome, dados }] (só arquivos comuns)
+  const out = []; let o = 0;
+  while (o + 512 <= buf.length) {
+    const h = buf.subarray(o, o + 512); if (h.every(b => b === 0)) break;
+    const str = (a, b) => h.toString('utf8', a, b).replace(/\0.*$/s, ''), tam = parseInt(str(124, 136).trim() || '0', 8), tipo = String.fromCharCode(h[156] || 48), pre = str(345, 500), nome = (pre ? pre + '/' : '') + str(0, 100);
+    if (!Number.isFinite(tam) || tam < 0 || o + 512 + tam > buf.length) throw new Error('pacote corrompido');
+    if (tipo === '0' || tipo === '\0') out.push({ nome, dados: buf.subarray(o + 512, o + 512 + tam) });
+    o += 512 + Math.ceil(tam / 512) * 512;
+  }
+  return out;
+}
+const bkNomeOk = n => n === 'studio.db' || n === 'secret.key' || n === 'manifesto.json' || new RegExp('^(' + BK_PASTAS.join('|') + ')/[A-Za-z0-9._ -]{1,120}$').test(n);
+function bkValida(buf) {
+  const arqs = tarLer(zlib.gunzipSync(buf)).filter(a => bkNomeOk(a.nome));
+  if (!arqs.some(a => a.nome === 'studio.db' && a.dados.subarray(0, 15).toString('latin1') === 'SQLite format 3')) throw new Error('Este arquivo não é um pacote deste painel (falta o banco de dados).');
+  return arqs;
+}
+(function aplicaImportacao() {   // roda ANTES de abrir o banco: o pacote enviado substitui os dados, e os dados antigos ficam guardados numa pasta _antes_importar_*
+  if (!fs.existsSync(BK_PENDENTE)) return;
+  const antes = path.join(DATA_DIR, '_antes_importar_' + new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14)), movidos = [];
+  try {
+    const arqs = bkValida(fs.readFileSync(BK_PENDENTE)); fs.mkdirSync(antes, { recursive: true });
+    for (const n of ['studio.db', 'studio.db-wal', 'studio.db-shm', 'secret.key', ...BK_PASTAS]) { const f = path.join(DATA_DIR, n); if (fs.existsSync(f)) { fs.renameSync(f, path.join(antes, n)); movidos.push(n); } }
+    for (const a of arqs) { if (a.nome === 'manifesto.json') continue; const f = path.join(DATA_DIR, a.nome); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, a.dados); }
+    fs.unlinkSync(BK_PENDENTE); console.log(`✔ Pacote importado (${arqs.length} arquivos). Os dados de antes ficaram em ${antes}`);
+  } catch (e) {
+    console.error('✖ Importação do pacote falhou, voltando os dados de antes:', e.message);
+    for (const n of [...movidos, 'studio.db', 'secret.key', ...BK_PASTAS]) { try { const o = path.join(antes, n), d = path.join(DATA_DIR, n); if (movidos.includes(n)) { fs.rmSync(d, { recursive: true, force: true }); fs.renameSync(o, d); } } catch { /* segue */ } }
+    try { fs.unlinkSync(BK_PENDENTE); } catch { /* já removido */ }
+  }
+})();
 
 let SECRET;
 const secretFile = path.join(DATA_DIR, 'secret.key');
@@ -5754,6 +5796,7 @@ const AREA_RULES = [   // [rota, áreas que podem ler, áreas que podem escrever
   [/^\/api\/imagens/, ['media', 'video', 'arte', 'pipeline'], ['media', 'video', 'arte']],
   [/^\/api\/(assets|poses)/, ['media', 'video', 'knowledge', 'products', 'pipeline', 'agents', 'arte'], ['media', 'video', 'knowledge', 'products', 'arte']],
   [/^\/api\/manuais/, ['knowledge', 'agents', 'pipeline', 'brain', 'dashboard'], ['knowledge']],
+  [/^\/api\/backup/, ['settings'], ['settings']],
   [/^\/api\/pacote/, ['knowledge', 'agents', 'settings'], ['agents', 'settings']],
   [/^\/api\/evolucao/, ['brain', 'dashboard', 'metrics'], ['brain']],
   [/^\/api\/knowledge/, ['knowledge', 'products', 'media', 'video', 'agents', 'arte'], ['knowledge']],   // os documentos da marca não vão para quem só vê o pipeline
@@ -6501,6 +6544,34 @@ async function api(req, res, url) {
     for (const c of all("SELECT score, manager, updated_at FROM contents WHERE teste=0 AND updated_at>=?", ini)) { let n = null; try { n = c.manager ? JSON.parse(c.manager).nota : null; } catch { } n = n ?? c.score; if (n != null && isFinite(+n)) notas[wk(c.updated_at)].push(+n); }
     const primeira = all("SELECT c.id FROM contents c WHERE c.teste=0 AND c.status IN ('approved','posted') AND c.updated_at>=?", ini).length, comAjuste = one("SELECT COUNT(DISTINCT content_id) n FROM brain_events WHERE kind='ajuste_dono' AND ts>=?", ini).n;
     return send(res, 200, { semanas: sem, agentes: Object.values(A).filter(x => x.ok.some(Boolean) || x.bad.some(Boolean)), notas: notas.map(v => v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length * 10) / 10 : null), aprovadas: primeira, com_ajuste: comAjuste });
+  }
+  if (p === '/api/backup/exportar' && m === 'GET') {   // baixa o pacote com tudo (banco + arquivos + chave)
+    if (!(user.owner || user.admin)) throw fail(403, 'Só administrador pode exportar os dados.');
+    const tmpDb = path.join(DATA_DIR, '_export.db'); try { fs.unlinkSync(tmpDb); } catch { /* não existia */ }
+    db.exec("VACUUM INTO '" + tmpDb.replace(/'/g, "''") + "'");
+    const lista = [{ nome: 'studio.db', f: tmpDb }, ...(fs.existsSync(secretFile) ? [{ nome: 'secret.key', f: secretFile }] : [])];
+    for (const d of BK_PASTAS) { const dir = path.join(DATA_DIR, d); try { for (const n of fs.readdirSync(dir)) if (bkNomeOk(d + '/' + n) && fs.statSync(path.join(dir, n)).isFile()) lista.push({ nome: d + '/' + n, f: path.join(dir, n) }); } catch { /* pasta não existe */ } }
+    const manifesto = Buffer.from(JSON.stringify({ build: BUILD, criado_em: T(), arquivos: lista.length }));
+    async function* gera() {
+      yield tarCabecalho('manifesto.json', manifesto.length, Date.now()); yield manifesto; if (manifesto.length % 512) yield Buffer.alloc(512 - manifesto.length % 512);
+      for (const a of lista) {
+        const st = fs.statSync(a.f); yield tarCabecalho(a.nome, st.size, st.mtimeMs); for await (const c of fs.createReadStream(a.f)) yield c; if (st.size % 512) yield Buffer.alloc(512 - st.size % 512);
+      }
+      yield Buffer.alloc(1024);
+    }
+    res.writeHead(200, { 'content-type': 'application/gzip', 'content-disposition': `attachment; filename="agentes-sim-dados-${new Date().toISOString().slice(0, 10)}.tar.gz"`, 'cache-control': 'no-store' });
+    log(null, `Pacote de dados exportado (${lista.length} arquivos)`);
+    await new Promise(ok => { const gz = zlib.createGzip({ level: 6 }); gz.on('error', ok); res.on('close', ok); gz.pipe(res); (async () => { try { for await (const c of gera()) if (!gz.write(c)) await new Promise(r => gz.once('drain', r)); gz.end(); } catch (e) { console.error('exportação:', e.message); gz.destroy(); } })(); });
+    try { fs.unlinkSync(tmpDb); } catch { /* já removido */ }
+    return;
+  }
+  if (p === '/api/backup/importar' && m === 'POST') {   // recebe o pacote; a troca dos dados acontece na reinicialização
+    if (!(user.owner || user.admin)) throw fail(403, 'Só administrador pode importar os dados.');
+    const tmp = BK_PENDENTE + '.up'; const max = 2e9;
+    await new Promise((ok, no) => { let n = 0; const ws = fs.createWriteStream(tmp); req.on('data', c => { n += c.length; if (n > max) { ws.destroy(); req.destroy(); no(fail(413, 'Pacote grande demais')); } }); req.on('error', no); ws.on('error', no); ws.on('finish', ok); req.pipe(ws); }).catch(e => { try { fs.unlinkSync(tmp); } catch { /* removido */ } throw e; });
+    let n = 0; try { n = bkValida(fs.readFileSync(tmp)).length; } catch (e) { try { fs.unlinkSync(tmp); } catch { /* removido */ } throw fail(400, e.message); }
+    fs.renameSync(tmp, BK_PENDENTE); log(null, `Pacote de dados recebido (${n} arquivos): o painel reinicia para aplicar`);
+    send(res, 200, { ok: true, arquivos: n }); setTimeout(() => { try { server.close(); db.close(); } catch { /* ok */ } process.exit(3); }, 800); return;
   }
   if (p === '/api/pacote' && m === 'GET') return send(res, 200, pacoteStatus());
   if (p === '/api/pacote' && m === 'POST') { const b = await readBody(req, 3e6); const r = importaPacote(b.texto); log(null, `Pacote do Roteirista importado: prompts do Roteirista e do Revisor de Copy + ${r.manuais} manuais`); changed(); return send(res, 200, { ok: true, ...r, status: pacoteStatus() }); }
