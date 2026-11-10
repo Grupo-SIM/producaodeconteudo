@@ -410,7 +410,7 @@ const COMPOR = {
   heroi(d, ctx) {
     const { W, H, mx, T } = ctx, foto = genOuAsset(d.foto), obj = !foto && genOuAsset(d.objeto), s = base(ctx, ctx.paper), mol = moldura(ctx, d, ctx.paper);
     const larga = !foto && !obj && String(d.titulo || '').split(/\s+/).length > 5;   // sem imagem e título longo: o texto ocupa a largura e o ladrilho fica só no fundo
-    const colW = (foto && d.recorte !== false ? .54 : obj ? .8 : larga ? .86 : .56) * W;
+    const colW = (foto && d.recorte !== false ? .5 : obj ? .8 : larga ? .86 : .56) * W;   // com personagem recortado a coluna do texto para antes da mão/ombro dele (.54 encostava no dedo do mascote)
     if (foto && d.recorte !== false) {   // padrão de agência: ambiente desfocado + personagem recortado + partículas + texto (camadas)
       s.bg = { gen: promptAmbiente(ctx, d), color: ctx.paper, blur: 4 }; s.shade = .82; s.shade_dir = 'left';
       s.items.push(...particulas(ctx, d.particulas).filter(p => !p.front), pessoaItem(ctx, foto, .8, .98), ...particulas(ctx, d.particulas).filter(p => p.front));
