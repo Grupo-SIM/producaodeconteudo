@@ -2599,6 +2599,8 @@ const botaoDaChamada = ch => {
   const vb = fr.match(/^(mande|envie|compartilhe|encaminhe|marque|indique)\b/i);   // "Mande para quem diz que...": botão completo, nunca cortado no meio
   if (vb) return vb[1][0].toUpperCase() + vb[1].slice(1).toLowerCase() + ' para quem precisa';
   const PEND = /^(para|pra|de|da|do|das|dos|a|o|as|os|e|em|no|na|que|quem|com|por|um|uma|se)$/i;
+  { const seg = fr.match(/^(siga|segue|seguir)\s+(@[\w.]+)/i); if (seg) return seg[1][0].toUpperCase() + seg[1].slice(1).toLowerCase() + ' ' + seg[2]; }   // "Siga @perfil para receber…": o botão é só o convite
+  { const ic = pal.findIndex((w, i) => i >= 2 && /^(para|pra|e|que)$/i.test(w)); if (ic >= 2 && ic <= 4) return pal.slice(0, ic).join(' '); }   // corta antes do conector, nunca no meio de uma ideia
   let k = Math.min(4, pal.length); while (k > 1 && PEND.test(pal[k - 1])) k--;
   return pal.slice(0, k).join(' ');
 };
@@ -2610,6 +2612,8 @@ const poseIaLigada = () => settings().art_gen === '1' && !!falKey() && (+setting
 const ambienteLimpo = v => { const f = String(v || '').split(/(?<=[.;!?])\s+/).filter(x => x && !/(t[íi]tulo|caixa alta|linhas?\b|faixa|fonte|tipografia|\btexto|bot[ãa]o|\bcta\b|recortad|lado (esquerdo|direito)|\blogo|slide|p[áa]gina|negrito|\bpose\b|sentad|em p[ée]|mascote|personagem|\bcor (do|da|de)\b)/i.test(x)).join(' ').replace(/[,;\s]+$/, '').trim(); return f.split(/\s+/).length >= 3 ? f : ''; };
 function paginasDoRoteiro(script, format, brand = '') {
   const L = lerRoteiroModelo(script); if (!L.length || (format !== 'feed' && L.length < 2)) return null;
+  const semBarra = v => String(v ?? '').replace(/\s*\|\s*/g, ' • ');   // "|" é a marca interna de quebra de linha da arte: no roteiro é parte do texto (ex.: uma bio) e não pode sumir
+  for (const p of L) { for (const c of p.campos || []) c.v = semBarra(c.v); for (const it of p.itens || []) { it.t = semBarra(it.t); it.d = semBarra(it.d); } p.notas = (p.notas || []).map(semBarra); }
   const pegar = (p, re) => (p.campos.find(c => re.test(c.r)) || {}).v || '';
   const PAD = /^(t[íi]tulo|manchete|headline|subt[íi]tulo|subtexto|texto|visual|imagem|chamada|cta|bot[ãa]o|texto do card|apoio|legenda|nota)/i;
   const masc = mascotesDe(brand), podePose = poseIaLigada(); let mk = 0;
@@ -2652,7 +2656,7 @@ function paginasDoRoteiro(script, format, brand = '') {
     }
     const d = {};
     if (p.itens.length >= 2) Object.assign(d, { titulo: destaqueAuto(corta((titulo || nome).replace(/:\s*$/, ''), 90)), itens: p.itens.slice(0, 4).map(x => ({ t: corta(x.t, 60), d: corta(x.d, 130) })), fundo: (claro = !claro) ? 'claro' : 'escuro' }), out.push({ modelo: 'lista', dados: d });
-    else if (livres.length >= 2) out.push({ modelo: 'lista', dados: { titulo: corta(nome || titulo, 70).replace(/\*/g, ''), itens: livres.slice(0, 4).map(c => ({ t: corta(c.r, 60), d: corta(c.v.replace(/^["“](.*)["”]$/, '$1'), 150) })), contraste: true, fundo: (claro = !claro) ? 'claro' : 'escuro' } });
+    else if (livres.length >= 2) out.push({ modelo: 'lista', dados: { titulo: corta(titulo || nome, 70).replace(/\*/g, ''), itens: livres.slice(0, 4).map(c => ({ t: corta(c.r, 60), d: corta(c.v.replace(/^["“](.*)["”]$/, '$1'), 150) })), contraste: true, fundo: (claro = !claro) ? 'claro' : 'escuro' } });
     else {
       let tit = titulo || (livres[0] ? livres[0].v : ''), tx = texto || (titulo && livres[0] ? livres[0].v : '');
       if (!tit && tx) {   // página de fala corrida (só "Texto:"): a primeira frase vira o destaque e o resto o apoio; frase curta vira página de frase
@@ -2662,7 +2666,7 @@ function paginasDoRoteiro(script, format, brand = '') {
       if (!tit) tit = nome;
       if (!tx && tit.split(/\s+/).length <= 16) out.push({ modelo: 'frase', dados: { titulo: destaqueAuto(corta(tit, 120)) } });
       else {
-        claro = !claro; Object.assign(d, { kicker: corta(nome, 40) || undefined, titulo: destaqueAuto(corta(tit, 110)), texto: corta(tx, 230) || undefined, fundo: claro ? undefined : 'claro' });
+        claro = !claro; Object.assign(d, { kicker: semAc(tit).startsWith(semAc(nome)) ? undefined : (corta(nome, 40) || undefined), titulo: destaqueAuto(corta(tit, 110)), texto: corta(tx, 230) || undefined, fundo: claro ? undefined : 'claro' });
         if (p.mascote && masc.length) d.objeto = poseDe(p.mascote);
         else if (visual && comMidia < 2) { d.foto = corta(visual, 300); comMidia++; } else if (i % 2 === 1 && masc.length) d.objeto = mascote();
         out.push({ modelo: 'texto', dados: d });
