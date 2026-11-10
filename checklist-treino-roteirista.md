@@ -1,6 +1,6 @@
-# Checklist: treino do agente de copy (Roteirista)
+# Checklist: time de copy (Roteirista, Revisor de Copy e SEO)
 
-Atualizado em 10/11/2026. Só o agente de copy: o resto do sistema fica para depois.
+Atualizado em 10/11/2026. Só o que é copy: o resto do sistema fica para depois.
 Ordem: primeiro os formatos de arte, depois os de vídeo e, por último, os textos longos dos sites.
 Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 
@@ -12,42 +12,35 @@ Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 - [x] CTAs da casa: bio "100% gratuita" sem citar produto pago, debate que desafia quem discorda, contracapa seguir/bio
 - [x] Conteúdo educativo que prepara a venda dos SaaS, sem parecer publi
 - [x] Revisor de Copy cobrando todas as correções do dono
-- [x] Gerente equilibrando as abordagens por marca
 - [x] Esportes: só notícias e opinião
+- [x] Stories de venda: base própria, 16 a 20 telas em caixinha, quebra de padrão, CTA só no link por enquanto
+- [x] Stories de venda aprovados: ÁreaFlix (marketing), Atlas (tecnologia), SimIntPay (empreendedorismo e finanças)
 
-## Formatos de arte (próximos)
-- [x] 1a. Painel: cada marca escolhe em um clique o tipo de stories (venda ou serviço)
-- [x] 1b. Stories de venda: base própria (roteirista/10), checklist do Revisor (revisorcopy/07) e fundo do Designer (designer/08). 16 a 20 telas, caixinha, quebra de padrão, CTA só no link por enquanto
-- [x] 1b. 3 sequências aprovadas: ÁreaFlix (marketing), Atlas (tecnologia), SimIntPay (empreendedorismo e finanças)
-- [ ] 1b. Continuar testando stories de venda: humor (ponto mais fraco; mandar referência), páginas de redes sociais e PagaTG, Teron, Controle de Motorista e Patrimonial
-- [ ] 1b. Confirmar se pode usar "mais de 90% de aprovação" da SimIntPay
-- [ ] 1c. Stories de serviço (depois de fechar o de venda)
-- [ ] 1d. Automatizar a postagem dos stories (por enquanto vai escrito para o social media)
-- [ ] 2. Post de venda com produto cadastrado
-- [ ] 3. Hashtags: quantas usar, quais e se vale usar
+## Stories
+- [ ] 1. Continuar testando stories de venda: humor (ponto mais fraco; mandar referência) e os produtos que ainda não apareceram (PagaTG, Teron, Controle de Motorista, Controle Patrimonial, EbookSIM), incluindo a página de redes sociais
+- [ ] 2. Stories de serviço (depois de fechar o de venda)
+
+## Formatos de arte
+- [ ] 3. Post de venda com produto cadastrado
+- [ ] 4. Hashtags: quantas usar, quais e se vale usar
 
 ## Nichos e tom
-- [ ] 4. Educativo para os SaaS que ainda não apareceram: SimIntPay, PagaTG (venda direta), ÁreaFlix, EbookSIM e Controle de Motorista
-- [ ] 5. Separar a base 05 entre "técnica universal" e "regras de marketing digital"
-- [ ] 6. Página densa × página simples de marketing (você diz quais marcas são)
-- [ ] 7. Notícia esportiva (testar o formato jornalístico no nicho)
+- [ ] 5. Educativo para os SaaS que ainda não apareceram: PagaTG (venda direta), EbookSIM e Controle de Motorista
+- [ ] 6. Separar a base 05 entre "técnica universal" e "regras de marketing digital"
+- [ ] 7. Página densa × página simples de marketing (você diz quais marcas são)
+- [ ] 8. Notícia esportiva (testar o formato jornalístico no nicho)
 
 ## Formatos de vídeo
-- [ ] 8. Reels / vídeo vertical
-- [ ] 9. Vídeo horizontal (YouTube), se for usar
+- [ ] 9. Reels / vídeo vertical
+- [ ] 10. Vídeo horizontal (YouTube), se for usar
 
 ## Textos longos (por último)
-- [ ] 10. Matéria completa do jornal (refazer o treino: a primeira não ficou boa)
-- [ ] 11. Conteúdo de blog: aulas, tutoriais e artigos, sempre com solução gratuita real primeiro (passo a passo no Excel ou Google Sheets) e depois o produto como opção profissional
-- [ ] 12. Decidir a ordem: post primeiro ou matéria primeiro
-
-## Antes de usar em produção
-- [ ] Deploy e reinício do servidor
-- [ ] Teste no painel com a IA real (Roteirista, Revisor de Copy, SEO e Gerente)
-- [ ] Cadastrar os produtos e vincular às marcas
-- [ ] Confirmar em fonte primária os fatos das histórias reais aprovadas
+- [ ] 11. Matéria completa do jornal (refazer o treino: a primeira não ficou boa)
+- [ ] 12. Conteúdo de blog: aulas, tutoriais e artigos, sempre com solução gratuita real primeiro (passo a passo no Excel ou Google Sheets) e depois o produto como opção profissional
+- [ ] 13. Decidir a ordem: post primeiro ou matéria primeiro
+- [ ] 14. Confirmar em fonte primária os fatos das histórias reais aprovadas
 
 ## Para alimentar o treino (você, quando puder)
+- [ ] Referência de humor para os stories
 - [ ] Novas referências de roteiro e de perfil
 - [ ] Outros CTAs de contracapa
-- [ ] Aviso quando a roleta da isca digital estiver no ar
