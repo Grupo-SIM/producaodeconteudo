@@ -21,6 +21,7 @@ export function createOffice3D(cfg) {
   const canvas = renderer.domElement; canvas.className = 'ocv';
   const scene = new THREE.Scene();
   const aspect = W / H;
+  const GX = RW - 14.2;   // a sala foi alargada: a sala de vidro do Gerente acompanha a parede da direita
 
   // ───────── câmera isométrica (ortográfica), enquadrando a sala inteira ─────────
   const CEN = new THREE.Vector3(RW / 2, 0.6, RD / 2), EL = 36 * Math.PI / 180, AZ = 45 * Math.PI / 180;
@@ -29,7 +30,7 @@ export function createOffice3D(cfg) {
   cam.position.copy(CEN).addScaledVector(dir, 60); cam.lookAt(CEN); cam.updateMatrixWorld(true);
   { const inv = cam.matrixWorldInverse; let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
     for (const [x, y, z] of [[0, 0, 0], [RW, 0, 0], [0, 0, RD], [RW, 0, RD], [0, 3.3, 0], [RW, 3.3, 0], [0, 3.3, RD], [RW, 0.4, RD]]) { const v = new THREE.Vector3(x, y, z).applyMatrix4(inv); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
-    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hh = Math.max((y1 - y0) * 1.1, (x1 - x0) * 1.06 / aspect) / 2, ww = hh * aspect;
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hh = Math.max((y1 - y0) * 1.04, (x1 - x0) * 1.03 / aspect) / 2, ww = hh * aspect;
     cam.left = cx - ww; cam.right = cx + ww; cam.top = cy + hh + 0.15; cam.bottom = cy - hh + 0.15; cam.updateProjectionMatrix(); }
 
   // ───────── materiais e ajudantes de forma ─────────
@@ -47,13 +48,13 @@ export function createOffice3D(cfg) {
   const sun = new THREE.DirectionalLight(0xfff1d6, 2.1); sun.position.set(RW / 2 + 9, 14, RD / 2 + 6); sun.target.position.set(RW / 2, 0, RD / 2);
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); { const s = sun.shadow.camera; s.left = -13; s.right = 13; s.top = 11; s.bottom = -11; s.near = 1; s.far = 45; } sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03; sun.shadow.radius = 3;
   scene.add(sun, sun.target);
-  const lamps = [[3.8, 3.1, 2.1], [9.0, 3.1, 2.1], [4.8, 3.1, 5.9], [11.6, 3.0, 6.2]].map(([x, y, z]) => { const l = new THREE.PointLight(0xffd9a0, 0, 9, 1.6); l.position.set(x, y, z); scene.add(l); return l; });
+  const lamps = [[3.8, 3.1, 2.1], [9.0, 3.1, 2.1], [4.8, 3.1, 5.9], [11.6 + GX, 3.0, 6.2]].map(([x, y, z]) => { const l = new THREE.PointLight(0xffd9a0, 0, 9, 1.6); l.position.set(x, y, z); scene.add(l); return l; });
 
   // ───────── chão externo (grama de baixa poligonagem) e árvores ─────────
   const root = new THREE.Group(); scene.add(root);
   { const g = new THREE.PlaneGeometry(120, 120, 48, 48); g.rotateX(-Math.PI / 2); const pos = g.attributes.position;
-    for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), z = pos.getZ(i), inRoom = x > -1.5 && x < RW + 1.5 && z > -1.5 && z < RD + 1.5; if (!inRoom) pos.setY(i, (hash01(i * 1.7) - .5) * .35 + Math.max(0, (Math.hypot(x - RW / 2, z - RD / 2) - 22)) * .06); }
-    const ng = g.toNonIndexed(), cols = [], p2 = ng.attributes.position, A = new THREE.Color('#79c64a'), B = new THREE.Color('#5fae3c'), C = new THREE.Color('#9ad65a'), c = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), z = pos.getZ(i), inRoom = x > -1.5 && x < RW + 1.5 && z > -1.5 && z < RD + 1.5; if (!inRoom) pos.setY(i, 0); }
+    const ng = g.toNonIndexed(), cols = [], p2 = ng.attributes.position, A = new THREE.Color('#161a24'), B = new THREE.Color('#141822'), C = new THREE.Color('#191e29'), c = new THREE.Color();
     for (let i = 0; i < p2.count; i += 3) { const h = hash01(Math.floor(p2.getX(i) * 3.1) * 13 + Math.floor(p2.getZ(i) * 3.1) * 7 + i); c.copy(h < .35 ? B : h < .75 ? A : C); for (let k = 0; k < 3; k++) cols.push(c.r, c.g, c.b); }
     ng.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3)); ng.computeVertexNormals();
     const m = new THREE.Mesh(ng, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })); m.position.y = -0.36; m.receiveShadow = true; root.add(m); }
@@ -63,7 +64,7 @@ export function createOffice3D(cfg) {
     if (pine) { cyl(g, .14, .2, 1, 6, 0, 0, 0, tc); const gc = hash01(k + 5) < .5 ? '#3f8f3a' : '#2f7a46'; for (let i = 0; i < 4; i++) cyl(g, .05, 1.25 - i * .27, 1.1, 7, 0, 0.9 + i * .62, 0, gc); }
     else { cyl(g, .13, .2, 1.5, 6, 0, 0, 0, tc); const fc = FOLHAS[Math.floor(hash01(k + 1) * FOLHAS.length)]; const f1 = new THREE.Mesh(new THREE.IcosahedronGeometry(.95, 0), mat(fc)); add(g, f1, 0, 2.1, 0); const f2 = new THREE.Mesh(new THREE.IcosahedronGeometry(.62, 0), mat(FOLHAS[Math.floor(hash01(k + 2) * FOLHAS.length)])); add(g, f2, .5, 1.75, .25); const f3 = new THREE.Mesh(new THREE.IcosahedronGeometry(.55, 0), mat(fc)); add(g, f3, -.45, 1.85, -.2); }
     root.add(g); };
-  { let k = 1; const spots = [];
+  if (false) { let k = 1; const spots = [];   // árvores, arbustos e pedras desligados: o fundo limpo deixa a sala em destaque
     for (let i = 0; i < 70; i++) { const a = hash01(i * 3.3) * 6.283, r = 6 + hash01(i * 5.1) * 17, x = RW / 2 + Math.cos(a) * r * 1.25, z = RD / 2 + Math.sin(a) * r * .95; if (x > -2.4 && x < RW + 2.6 && z > -2.4 && z < RD + 2.6) continue; spots.push([x, z]); }
     for (const [x, z] of spots) treeAt(x, z, k++, 1.05);
     // arbustos, pedras e canteiros
@@ -75,7 +76,7 @@ export function createOffice3D(cfg) {
   { const wood = colorTex(512, 512, (c, w, h) => { const rows = 8, ph = h / rows; for (let r = 0; r < rows; r++) { let x = -((r * 97) % 190); while (x < w) { const ln = 150 + hash01(r * 7 + x) * 110, v = 196 + Math.floor(hash01(r * 31 + x * .13) * 26); c.fillStyle = `rgb(${v},${Math.floor(v * .72)},${Math.floor(v * .44)})`; c.fillRect(x, r * ph, ln, ph); c.fillStyle = 'rgba(70,40,15,.28)'; c.fillRect(x, r * ph, ln, 1.6); c.fillRect(x, r * ph, 1.6, ph); x += ln; } } });
     wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(RW / 3.2, RD / 3.2);
     const fl = new THREE.Mesh(new THREE.PlaneGeometry(RW, RD), new THREE.MeshStandardMaterial({ map: wood, roughness: .6 })); fl.rotation.x = -Math.PI / 2; fl.position.set(RW / 2, 0.001, RD / 2); fl.receiveShadow = true; root.add(fl); }
-  for (const [x0, z0, w, d, c] of [[0.6, 3.2, RW - 1.2, 1.7, '#4e5870'], [0.35, 3.2, 1.7, 4.8, '#4e5870'], [10.55, 4.95, RW - 10.55, RD - 4.95, '#8a6a2e']]) box(root, w, .02, d, x0 + w / 2, 0, z0 + d / 2, c, { cast: false });
+  for (const [x0, z0, w, d, c] of [[0.6, 3.2, RW - 1.2, 1.7, '#4e5870'], [0.35, 3.2, 1.7, 4.8, '#4e5870'], [10.55 + GX, 4.95, RW - 10.55 - GX, RD - 4.95, '#8a6a2e']]) box(root, w, .02, d, x0 + w / 2, 0, z0 + d / 2, c, { cast: false });
 
   // ───────── paredes dos fundos com janelas, logo, quadros ─────────
   const WH = 3.2, glass = new THREE.MeshStandardMaterial({ color: 0xcfeaff, transparent: true, opacity: .16, roughness: .05, metalness: .1, side: THREE.DoubleSide, depthWrite: false });
@@ -83,7 +84,7 @@ export function createOffice3D(cfg) {
   function wallBackZ() {   // parede z=0 (de x=0 a RW)
     const g = new THREE.Group(); root.add(g);
     box(g, RW + .3, .95, .24, RW / 2 - .15, 0, -0.12, wallC); box(g, RW + .3, .55, .24, RW / 2 - .15, WH - .55, -0.12, wallC);
-    const wins = [[.6, 2.6], [3.5, 1.2], [10.6, 1.8], [12.7, 1.4]]; { let cur = -0.25; for (const [x0, w] of [...wins, [RW + .3, 0]]) { if (x0 > cur) box(g, x0 - cur, 1.7, .24, (cur + x0) / 2, .95, -0.12, wallC); cur = x0 + w; } }
+    const wins = [[.6, 2.6], [3.5, 1.2], [10.6, 1.8], [13.2, 1.4], [15.4, 1.0]]; { let cur = -0.25; for (const [x0, w] of [...wins, [RW + .3, 0]]) { if (x0 > cur) box(g, x0 - cur, 1.7, .24, (cur + x0) / 2, .95, -0.12, wallC); cur = x0 + w; } }
     for (const [x0, w] of wins) { box(g, w, 1.7, .05, x0 + w / 2, .95, -0.12, null, { m: glass, cast: false }); for (let k = 0; k <= 1; k++) box(g, .08, 1.7, .12, x0 + k * w, .95, -0.1, frameC); box(g, w, .08, .12, x0 + w / 2, .95, -0.1, frameC); box(g, w, .08, .12, x0 + w / 2, 2.57, -0.1, frameC); box(g, .05, 1.7, .1, x0 + w / 2, .95, -0.1, frameC); }
     box(g, 5.5, 1.55, .05, 7.6, 1.03, .025, '#0b1424', { cast: false }); box(g, 5.62, .06, .07, 7.6, 1.0, .03, '#facc15', { cast: false }); box(g, 5.62, .06, .07, 7.6, 2.55, .03, '#facc15', { cast: false });
 
@@ -117,7 +118,7 @@ export function createOffice3D(cfg) {
 
   // ───────── objetos de apoio: planta, bebedouro, sofá, rack do cérebro ─────────
   const plant = (x, z, s = 1) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); root.add(g); cyl(g, .26, .2, .42, 8, 0, 0, 0, '#f2f4f8'); cyl(g, .24, .24, .04, 8, 0, .4, 0, '#4a3322'); for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283, l = new THREE.Mesh(new THREE.ConeGeometry(.12, .8 + hash01(i + x) * .3, 4), mat(i % 2 ? '#3f9e45' : '#52b653')); add(g, l, Math.cos(a) * .12, .85, Math.sin(a) * .12); l.rotation.z = Math.cos(a) * .5; l.rotation.x = -Math.sin(a) * .5; } return g; };
-  [[13.6, .7, 1.2], [.7, 8.1, 1.1], [10.0, 8.2, 1.0], [.7, 3.3, 1.0], [13.7, 4.4, .9]].forEach(([x, z, s]) => plant(x, z, s));
+  [[RW - .6, .7, 1.2], [.7, 8.1, 1.1]].forEach(([x, z, s]) => plant(x, z, s));
   // rack do Cérebro
   const brain = new THREE.Group(); brain.position.set(1.15, 0, .75); root.add(brain);
   box(brain, .95, 2.1, .85, 0, 0, 0, '#1b2030'); const leds = []; for (let r = 0; r < 9; r++) for (let c = 0; c < 3; c++) { const m = emis('#34d399', .0); const l = new THREE.Mesh(new THREE.BoxGeometry(.07, .07, .03), m); add(brain, l, -.3 + c * .28, .25 + r * .2, .44, false, false); leds.push(m); }
@@ -127,8 +128,8 @@ export function createOffice3D(cfg) {
   // bebedouro e copa
   { const g = new THREE.Group(); g.position.set(2.2, 0, .6); root.add(g); box(g, .5, .95, .5, 0, 0, 0, '#e8edf3'); cyl(g, .2, .2, .55, 10, 0, .95, 0, '#6cc4ff', { mo: { transparent: true, opacity: .75 } }); }
   // jardineira de madeira na frente da sala
-  { const g = new THREE.Group(); g.position.set(3.2, -0.34, RD + .8); root.add(g); box(g, 3.2, .6, .6, 0, 0, 0, '#a2713f'); for (let i = 0; i < 7; i++) sph(g, .26 + hash01(i) * .1, -1.35 + i * .45, .72, 0, ['#4f9d3a', '#e8743b', '#f2b134', '#6fb544'][i % 4], { ws: 6, hs: 5 }); }
-  { const g = new THREE.Group(); g.position.set(RW + .9, -0.34, 3.2); root.add(g); box(g, .6, .6, 3.0, 0, 0, 0, '#a2713f'); for (let i = 0; i < 6; i++) sph(g, .26, 0, .72, -1.2 + i * .48, ['#6fb544', '#e25d7a', '#f2b134'][i % 3], { ws: 6, hs: 5 }); }
+  if (false) { const g = new THREE.Group(); g.position.set(3.2, -0.34, RD + .8); root.add(g); box(g, 3.2, .6, .6, 0, 0, 0, '#a2713f'); for (let i = 0; i < 7; i++) sph(g, .26 + hash01(i) * .1, -1.35 + i * .45, .72, 0, ['#4f9d3a', '#e8743b', '#f2b134', '#6fb544'][i % 4], { ws: 6, hs: 5 }); }
+  if (false) { const g = new THREE.Group(); g.position.set(RW + .9, -0.34, 3.2); root.add(g); box(g, .6, .6, 3.0, 0, 0, 0, '#a2713f'); for (let i = 0; i < 6; i++) sph(g, .26, 0, .72, -1.2 + i * .48, ['#6fb544', '#e25d7a', '#f2b134'][i % 3], { ws: 6, hs: 5 }); }
 
   // ───────── pessoa (low-poly) ─────────
   function makeHuman({ id, shirt, skin = '#e2b48a', hair = '#2b2118', acc = '', boss = false, scale = 1 }) {
@@ -235,13 +236,13 @@ export function createOffice3D(cfg) {
   // tapete e plaquinha de cada baia
   for (const id of Object.keys(POS)) { if (id === 'chefe') continue; const [cx, cy] = POS[id]; box(root, 2.5, .018, 2.1, cx, 0, cy + .0, '#2b3142', { cast: false }); }
   // sala de vidro do Gerente
-  { const gl = (x, z, w, d, h = 2.6) => box(root, w, h, d, x, 0, z, null, { m: glass, cast: false }); const gold = '#facc15', fx = 10.55, fz = 4.95;
-    gl(fx + .02, (fz + RD) / 2, .04, RD - fz); gl((fx + 13.0) / 2, fz, 13.0 - fx, .04); gl(13.95, fz, .5, .04);
-    box(root, .1, 2.65, .1, fx, 0, fz, gold); box(root, .1, 2.65, .1, fx, 0, RD, gold); box(root, .1, 2.65, .1, 13.0, 0, fz, gold); box(root, .1, 2.65, .1, 13.7, 0, fz, gold);
-    box(root, .06, .08, RD - fz, fx, 2.6, (fz + RD) / 2, gold); box(root, fx + 3.5 - fx, .08, .06, (fx + 14.05) / 2, 2.6, fz, gold); box(root, .06, .85, RD - fz, fx, 0, (fz + RD) / 2, '#ffffff'); box(root, 13.0 - fx, .85, .06, (fx + 13.0) / 2, 0, fz, '#ffffff'); box(root, .5, .85, .06, 13.95, 0, fz, '#ffffff');
+  { const gl = (x, z, w, d, h = 2.6) => box(root, w, h, d, x, 0, z, null, { m: glass, cast: false }); const gold = '#facc15', fx = 10.55 + GX, fz = 4.95, D0 = 13.0 + GX, D1 = 13.7 + GX;
+    gl(fx + .02, (fz + RD) / 2, .04, RD - fz); gl((fx + D0) / 2, fz, D0 - fx, .04); gl(13.95 + GX, fz, .5, .04);
+    box(root, .1, 2.65, .1, fx, 0, fz, gold); box(root, .1, 2.65, .1, fx, 0, RD, gold); box(root, .1, 2.65, .1, D0, 0, fz, gold); box(root, .1, 2.65, .1, D1, 0, fz, gold);
+    box(root, .06, .08, RD - fz, fx, 2.6, (fz + RD) / 2, gold); box(root, 3.5, .08, .06, (fx + 14.05 + GX) / 2, 2.6, fz, gold); box(root, .06, .85, RD - fz, fx, 0, (fz + RD) / 2, '#ffffff'); box(root, D0 - fx, .85, .06, (fx + D0) / 2, 0, fz, '#ffffff'); box(root, .5, .85, .06, 13.95 + GX, 0, fz, '#ffffff');
     // estante e bandeira do Gerente
     box(root, .5, 1.6, 1.6, RW - .3, 0, 7.4, '#5a3d1e'); for (let r = 0; r < 4; r++) for (let i = 0; i < 6; i++) box(root, .25, .26 + hash01(r * 7 + i) * .08, .1, RW - .3, .12 + r * .38, 6.8 + i * .2, ['#8b5cf6', '#f472b6', '#22d3ee', '#facc15', '#fb923c', '#34d399'][(i + r) % 6], { cast: false });
-    cyl(root, .015, .015, 1.5, 5, 11.0 + .3, 0, 8.2, '#999'); box(root, .02, .4, .6, 11.3, 1.1, 8.15, '#facc15', { cast: false }); }
+    cyl(root, .015, .015, 1.5, 5, 11.3 + GX, 0, 8.2, '#999'); box(root, .02, .4, .6, 11.3 + GX, 1.1, 8.15, '#facc15', { cast: false }); }
   for (const id of Object.keys(POS)) stations[id] = buildStation(id, OFC[id] || '#d4d4d8');
 
   // ───────── mensageiros que andam (com papel/pendrive/HD) e o Gerente com o chicote ─────────
@@ -255,7 +256,7 @@ export function createOffice3D(cfg) {
   const seat3 = id => { const S = stations[id]; return [S.cx + S.chair.position.x, S.cy + S.chair.position.z]; };
 
   let phaseKey = '', logoOk = false, tvAt = 0, frameInfo = { head: {}, walkers: [] };
-  function applyPhase(ph) { const P = PHASES[ph] || PHASES.dia; scene.background = new THREE.Color(P.sky); scene.fog = new THREE.Fog(P.sky, 55, 120); hemi.intensity = P.hemi; hemi.color.set(ph === 'noite' ? 0x4a5f9a : 0xbfe3ff); sun.color.set(P.sun); sun.intensity = P.si; for (const l of lamps) l.intensity = P.night * 9; renderer.toneMappingExposure = ph === 'noite' ? 1.25 : 1.05; }
+  function applyPhase(ph) { const P = PHASES[ph] || PHASES.dia; scene.background = new THREE.Color('#0a0c11'); scene.fog = null; hemi.intensity = P.hemi; hemi.color.set(ph === 'noite' ? 0x4a5f9a : 0xbfe3ff); sun.color.set(P.sun); sun.intensity = P.si; for (const l of lamps) l.intensity = P.night * 9; renderer.toneMappingExposure = ph === 'noite' ? 1.25 : 1.05; }
 
   function render(M, cour, ST, t, extra = {}) {
     const ph = skyPhase(); if (ph !== phaseKey) { phaseKey = ph; applyPhase(ph); }
