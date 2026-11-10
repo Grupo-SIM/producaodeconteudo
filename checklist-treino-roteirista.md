@@ -1,6 +1,6 @@
 # Checklist: treino do agente de copy (Roteirista)
 
-Atualizado em 09/11/2026. Só o agente de copy: o resto do sistema fica para depois.
+Atualizado em 10/11/2026. Só o agente de copy: o resto do sistema fica para depois.
 Ordem: primeiro os formatos de arte, depois os de vídeo e, por último, os textos longos dos sites.
 Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 
@@ -16,7 +16,13 @@ Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 - [x] Esportes: só notícias e opinião
 
 ## Formatos de arte (próximos)
-- [ ] 1. Stories: sequência de telas, enquete e caixinha
+- [x] 1a. Painel: cada marca escolhe em um clique o tipo de stories (venda ou serviço)
+- [x] 1b. Stories de venda: base própria (roteirista/10), checklist do Revisor (revisorcopy/07) e fundo do Designer (designer/08). 16 a 20 telas, caixinha, quebra de padrão, CTA só no link por enquanto
+- [x] 1b. 3 sequências aprovadas: ÁreaFlix (marketing), Atlas (tecnologia), SimIntPay (empreendedorismo e finanças)
+- [ ] 1b. Continuar testando stories de venda: humor (ponto mais fraco; mandar referência), páginas de redes sociais e PagaTG, Teron, Controle de Motorista e Patrimonial
+- [ ] 1b. Confirmar se pode usar "mais de 90% de aprovação" da SimIntPay
+- [ ] 1c. Stories de serviço (depois de fechar o de venda)
+- [ ] 1d. Automatizar a postagem dos stories (por enquanto vai escrito para o social media)
 - [ ] 2. Post de venda com produto cadastrado
 - [ ] 3. Hashtags: quantas usar, quais e se vale usar
 

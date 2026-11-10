@@ -1101,6 +1101,7 @@ function agentDocsBlock(agentId, query = '') {
   let rows; try { rows = all('SELECT titulo, conteudo, modo FROM agent_docs WHERE agent=? ORDER BY ordem, id', agentId); } catch { return ''; } if (!rows.length) return '';
   const q = palavrasDoc(query), score = r => { if (!q.size) return 0; const tw = palavrasDoc(r.titulo); let n = 0; for (const w of tw) if (q.has(w)) n += 3; const cw = palavrasDoc(String(r.conteudo).slice(0, 4000)); for (const w of q) if (cw.has(w)) n++; return n; };
   const st = als.getStore() || {}, tags = new Set([st.fmt, ...String(st.ctx || '').toLowerCase().split(/[^a-z0-9_]+/)].filter(Boolean)), doFmt = r => r.modo.slice(4).split(',').some(x => tags.has(x));
+  if (tags.has('stories_venda') || tags.has('stories_servico')) tags.delete('stories');   // conhecimento de stories de venda/serviço não se mistura com o de stories genérico
   const sempre = rows.filter(r => r.modo === 'sempre' || (String(r.modo).startsWith('fmt:') && doFmt(r))), auto = rows.filter(r => r.modo === 'auto').map(r => ({ r, s: score(r) })).filter(x => x.s >= 4).sort((a, b) => b.s - a.s).map(x => x.r);
   let left = AGDOC_BUDGET; const out = [];
   for (const r of [...sempre, ...auto]) { if (left < 400) break; let tx = String(r.conteudo).trim(); if (!/^#/.test(tx)) tx = `## ${r.titulo}\n${tx}`; if (tx.length > left) tx = tx.slice(0, left) + '\n[...cortado pelo limite]'; out.push(tx); left -= tx.length; }
@@ -1142,7 +1143,9 @@ function ruleImpacto(r) {
 }
 // Lembrança seletiva: com muitas regras, o agente recebe as que mais importam para ESTA tarefa (peso, relevância ao pedido, regras suas e da marca)
 const BRAIN_MAX_REGRAS = 24;
-const ctxDe = c => c ? [c.title, c.brief, c.format, c.kind, c.platform, c.brand].filter(Boolean).join(' ').slice(0, 3000) : '';
+// Stories de venda e de serviço têm bases próprias (modo: formato stories_venda / stories_servico); a marca escolhe o tipo no painel
+const storiesTipo = brand => radarCfg().marcas[brand]?.stories || '';
+const ctxDe = c => c ? [c.title, c.brief, c.format === 'stories' && storiesTipo(c.brand) ? 'stories_' + storiesTipo(c.brand) : c.format, c.kind, c.platform, c.brand].filter(Boolean).join(' ').slice(0, 3000) : '';
 function brainEscolhe(rows, query) {
   if (rows.length <= BRAIN_MAX_REGRAS) return rows;
   const q = String(query || '');
@@ -4379,7 +4382,7 @@ function gerenteResposta(texto) {
 // ── Manuais do Roteirista: o painel carrega só o que o pedido usa
 const VENDA_KINDS = ['venda', 'historia_vende', 'carta_vendas'];
 function manuaisCodes(c, { devolvida = false, revisao = false } = {}) {
-  const set = new Set(revisao ? ['M00', 'M04', 'M06', 'M15', 'M16'] : ['M00', 'M15', 'M16', 'M04']), add = (...a) => a.forEach(x => set.add(x)), f = c.format, fato = ['noticia', 'historia_real'].includes(c.kind), venda = c.goal === 'produto' || VENDA_KINDS.includes(c.kind);
+  const set = new Set(revisao ? ['M00', 'M04', 'M06', 'M15', 'M16'] : ['M00', 'M15', 'M16', 'M04']), add = (...a) => a.forEach(x => set.add(x)), f = c.format, fato = ['noticia', 'historia_real'].includes(c.kind), venda = c.goal === 'produto' || VENDA_KINDS.includes(c.kind) || (f === 'stories' && storiesTipo(c.brand) === 'venda');
   if (revisao) { if (fato) add('M12'); if (venda) add('M08'); return [...set]; }
   if (f === 'video_vertical') add('M01', 'M03', 'M05', 'M06'); else if (f === 'video_horizontal') add('M03', 'M05', 'M07'); else add('M01', 'M03', 'M05');
   if (fato) add('M12', 'M13');
@@ -4451,8 +4454,8 @@ const RADAR_FONTES = [
 const RADAR_NICHO_IDS = Object.keys(RADAR_NICHOS);
 function radarCfg() {
   const c = jparse(one("SELECT value FROM settings WHERE key='radar_cfg'")?.value, {}) || {}, marcas = {};
-  for (const [b, m] of Object.entries(c.marcas && typeof c.marcas === 'object' ? c.marcas : {})) marcas[b] = { ativo: !!m?.ativo, termos: String(m?.termos || '').slice(0, 400), max: Math.max(1, Math.min(6, +m?.max || 2)), formato: RADAR_FMTS.includes(m?.formato) ? m.formato : 'carrossel', estilo: String(m?.estilo || '').slice(0, 80), cta: String(m?.cta || '').replace(/\s+/g, ' ').trim().slice(0, 140), nicho: RADAR_NICHO_IDS.includes(m?.nicho) ? m.nicho : '', jornal: String(m?.jornal || '').replace(/\s+/g, ' ').trim().slice(0, 200), secoes: String(m?.secoes || '').replace(/\s+/g, ' ').trim().slice(0, 400) };
-  for (const b of all('SELECT name FROM brands').map(x => x.name)) if (!marcas[b]) marcas[b] = { ativo: true, termos: '', max: 2, formato: 'carrossel', estilo: '', cta: '', nicho: '', jornal: '', secoes: '' };   // marca sem ajuste próprio: ligada, usa a base de conhecimento dela
+  for (const [b, m] of Object.entries(c.marcas && typeof c.marcas === 'object' ? c.marcas : {})) marcas[b] = { ativo: !!m?.ativo, termos: String(m?.termos || '').slice(0, 400), max: Math.max(1, Math.min(6, +m?.max || 2)), formato: RADAR_FMTS.includes(m?.formato) ? m.formato : 'carrossel', estilo: String(m?.estilo || '').slice(0, 80), cta: String(m?.cta || '').replace(/\s+/g, ' ').trim().slice(0, 140), nicho: RADAR_NICHO_IDS.includes(m?.nicho) ? m.nicho : '', stories: ['venda', 'servico'].includes(m?.stories) ? m.stories : '', jornal: String(m?.jornal || '').replace(/\s+/g, ' ').trim().slice(0, 200), secoes: String(m?.secoes || '').replace(/\s+/g, ' ').trim().slice(0, 400) };
+  for (const b of all('SELECT name FROM brands').map(x => x.name)) if (!marcas[b]) marcas[b] = { ativo: true, termos: '', max: 2, formato: 'carrossel', estilo: '', cta: '', nicho: '', stories: '', jornal: '', secoes: '' };   // marca sem ajuste próprio: ligada, usa a base de conhecimento dela
   const fontes = RADAR_FONTES.map(f => ({ ...f, ativo: c.fontes && f.id in c.fontes ? !!c.fontes[f.id] : true })), extras = String(c.extras || '').split(/[\n,;]+/).map(x => x.trim()).filter(x => /^https:\/\//.test(x)).slice(0, 8);
   return { fontes, extras: extras.join('\n'), auto: c.auto == null ? true : !!c.auto, hora: Math.max(0, Math.min(23, +c.hora >= 0 && c.hora !== '' && c.hora != null ? +c.hora : 7)), geo: /^[A-Z]{2}$/.test(String(c.geo || '').toUpperCase()) ? String(c.geo).toUpperCase() : 'BR', marcas };
 }
@@ -5172,7 +5175,8 @@ const HANDLERS = {
     const s = settings();
     const input = JSON.parse(job.input || '{}');
     let user = `# PEDIDO\n${brief(c, true)}${c.goal ? '\n\n' + METODO_HISTORIAS : ''}\n\n# GUIA DO FORMATO\n${FORMAT_GUIDE[c.format]}\n\n# GUIA DO TIPO DE CONTEÚDO\n${KIND_GUIDE[c.kind]}`;
-    { const nsl = c.format === 'carrossel' ? +s.carousel_slides : c.format === 'stories' ? +s.stories_slides : 0;
+    { const stv = c.format === 'stories' && storiesTipo(c.brand) === 'venda', nsl = c.format === 'carrossel' ? +s.carousel_slides : stv ? 0 : c.format === 'stories' ? +s.stories_slides : 0;
+      if (stv) user += `\n\n# STORIES DE VENDA\nEsta marca usa stories 100% voltados para a venda. Siga só a sua base "Stories de venda": sequência diária de 16 a 20 telas (use mais quando a explicação pedir), em formato de caixinha de perguntas (você escreve a pergunta e a resposta de cada tela).`;
       if (nsl) user += `\n\n# ESPECIFICAÇÃO DO DONO\nQuantidade de slides: EXATAMENTE ${nsl} (contando a capa e o slide final de CTA).`;
       if (String(c.format).startsWith('video') && +s.video_secs) user += `\n\n# ESPECIFICAÇÃO DO DONO\nDuração alvo do vídeo: cerca de ${s.video_secs} segundos.`; }
     const mas = all("SELECT name,tags FROM assets WHERE kind='mascote' AND (brand='' OR brand=? COLLATE NOCASE)", c.brand || '');
