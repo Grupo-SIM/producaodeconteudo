@@ -1089,7 +1089,7 @@ function carregaBasesAgentes() {
   }
 }
 try { carregaBasesAgentes(); } catch (e) { console.error('bases dos agentes:', e.message); }
-const AGDOC_BUDGET = 52000;   // cabe a base completa de cada formato do Roteirista (carrossel ~44k, notícia ~47k)
+const AGDOC_BUDGET = 72000;   // cabe a base completa da combinação mais pesada do Roteirista (carrossel de notícia, ~63k)
 // Manuais do pacote que também servem às outras etapas (o Roteirista e o Revisor de Copy recebem os deles pela seleção por formato)
 const MANUAIS_AGENTE = { designer: ['M04', 'M16'], editor: ['M16', 'M07'], gerente: ['M00', 'M17'], publicador: ['M05'] };
 const palavrasDoc = t => new Set(String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 4));
@@ -5474,6 +5474,8 @@ const HANDLERS = {
     if (input.tema) L.push(`# FOCO PEDIDO PELO DONO (opcional)\n${String(input.tema).slice(0, 1500)}`);
     L.push(`# TEMAS/DIRETRIZES DE PAUTA DO DONO\n${s.themes || '(livre, dentro do que a base permite)'}`);
     L.push(`# PAUTAS JÁ PRODUZIDAS (não repita)\n${titles.join('\n') || '(nenhuma)'}`);
+    { const mix = all("SELECT brand, kind, goal, COUNT(*) n FROM (SELECT brand, kind, goal FROM contents WHERE teste=0 ORDER BY id DESC LIMIT 60) GROUP BY brand, kind, goal ORDER BY brand, n DESC");
+      if (mix.length) L.push(`# MIX RECENTE (últimas 60 peças: marca | tipo | objetivo | quantidade)\n${mix.map(x => [x.brand || '(sem marca)', x.kind || '-', x.goal || 'marca', x.n].join(' | ')).join('\n')}`); }
     L.push(`# ÚLTIMA ANÁLISE DE DESEMPENHO\n${rep ? rep.body.slice(0, 4000) : '(ainda sem análise)'}`);
     if (metr.length) L.push(`# MÉTRICAS RECENTES (plataforma | título | formato/tipo | views | curtidas | comentários | compartilhamentos | salvamentos)\n${metr.map(m => [m.platform, m.post_title, `${m.format || '-'}/${m.kind || '-'}`, m.views, m.likes, m.comments, m.shares, m.saves].join(' | ')).join('\n')}`);
     L.push(`# SAÍDA\nSOMENTE um array JSON (sem texto antes ou depois; sem aspas duplas retas dentro dos textos): [{"titulo":"...","objetivo":"produto|conteudo|marca","marca":"","produto_id":0,"formato":"${allowF.join('|')}","tipo":"${allowK.join('|')}","plataforma":"Instagram|TikTok|YouTube|...","angulo":"o ângulo escolhido e por quê (1-2 frases)","briefing":"público, objetivo e os fatos que o roteirista pode usar, em 2-4 frases"}]\nNunca proponha pautas sobre fatos ou notícias que você não possa sustentar com a base; para notícias, descreva o tema e peça verificação de fonte no briefing. Não invente números, resultados ou depoimentos.`);

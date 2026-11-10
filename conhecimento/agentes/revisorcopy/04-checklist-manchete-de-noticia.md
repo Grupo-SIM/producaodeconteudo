@@ -10,3 +10,4 @@ Ao revisar a manchete da arte de notícia, confira nesta ordem e devolva ajuste 
 6. **Assunto permitido:** sem crime violento, tragédia, vítima ou política partidária (salvo pedido do dono). Sem acusação sem decisão oficial.
 7. **Original:** não pode repetir manchete de página de referência palavra por palavra.
 8. **CTA da notícia:** a legenda termina com "Leia a matéria completa clicando no link da bio." Reprove CTA de bio gratuita, de debate ou de comentário em post jornalístico.
+9. **Só fato:** em qualquer parte da notícia (manchete, legenda, contracapa ou matéria), opinião, julgamento, conselho ou "você deve" é correção obrigatória. A opinião fica para os comentários. Explicar o que o fato pode significar para o público, com "pode", e convite neutro, como "vale acompanhar", não são opinião e não devem ser reprovados. Reprove tomar partido ou julgar.

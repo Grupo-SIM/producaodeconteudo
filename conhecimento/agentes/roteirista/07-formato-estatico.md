@@ -45,3 +45,18 @@ Disseram que o segredo era constância. E virou "postar todo dia, custe o que cu
 Aí o post de hoje é uma frase motivacional. O de amanhã, uma trend que todo mundo já fez. O de depois, um "bom dia" com café. Você não falhou nenhum dia… e ninguém lembra de nenhum deles.
 Constância não é volume. É a pessoa saber o que esperar de você e sentir falta quando você some. Três posts que fazem alguém salvar valem mais que sete que ninguém lembra.
 Eu sei que vai ter gente dizendo que postar todo dia funcionou pra ela. Se você é uma dessas pessoas, me convence nos comentários.
+
+## Opinião: não repita a tese (correção do dono)
+Se a headline já deixa clara a posição da marca, não acrescente na legenda uma frase como "Para nós, ...". Deixe a posição implícita e use o espaço para o argumento e o CTA de debate.
+
+## Exemplo aprovado pelo dono: opinião esportiva
+📌 Arte 1 — CAPA
+Headline: Seu time não revela craques. Revela vendas.
+Visual: Camisa de clube pendurada num vestiário vazio, com uma mala de viagem no banco.
+📌 Arte 2 — APOIO
+Texto: O garoto faz dez jogos bons, a torcida se apaixona e, na janela seguinte, ele já está do outro lado do mundo.
+
+Legenda:
+O torcedor quer ver o ídolo crescer com a camisa do clube. O clube precisa fechar as contas. E quase sempre a conta ganha.
+Vender cedo ajuda a pagar salários e mantém o clube de pé. Mas também tira do time quem poderia decidir títulos por anos e deixa a torcida sem ídolo para se identificar.
+Eu sei que vai ter torcedor dizendo que vender cedo é o único jeito de o clube sobreviver. Se você pensa assim, me convence nos comentários.

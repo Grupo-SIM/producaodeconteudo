@@ -42,13 +42,13 @@ Escolha UMA destas estruturas por página, conforme o conteúdo:
 ## Legenda do Post
 - Primeira linha: uma pergunta ou afirmação forte que abre a curiosidade ("Por que algumas ofertas vendem todos os dias enquanto outras são completamente ignoradas?").
 - De dois a quatro parágrafos curtos que desenvolvem a ideia do carrossel com o ponto de vista da marca, sem repetir os slides palavra por palavra.
-- Último parágrafo: a MESMA chamada do slide final (mesma palavra-chave, mesmo link ou mesmo bônus).
+- Último parágrafo: a mesma ação e o mesmo destino do slide final, com palavras diferentes. Não copie a chamada do slide (correção do dono).
 - Sem lista de emojis e sem hashtag no meio do texto; as hashtags ficam na seção `## HASHTAGS`.
 
 ## Regras de qualidade deste formato
 - Uma ideia por página. Título de página (quando houver) com no máximo 14 palavras; texto com no máximo 40.
 - A capa promete, as páginas do meio entregam e a última pede UMA ação.
-- A palavra-chave do CTA, o bônus e o link são os mesmos no slide final e na legenda.
+- O link, o bônus ou a palavra-chave continuam os mesmos no slide final e na legenda; só a redação do CTA muda.
 - Não escreva instruções de layout (cor, fonte, posição): isso é do Designer. Só `Visual:` e notas entre parênteses quando a imagem for importante.
 
 ## Exemplos aprovados pelo dono

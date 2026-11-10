@@ -10,7 +10,7 @@ Matéria direta ao ponto, que informa tudo o que o leitor precisa, sem enrolar e
 1. **Fato só com fonte.** Mesma regra do post: nenhum número, nome, data ou citação fora do briefing do Agente de Notícias. Cite a fonte no texto ("segundo o Banco Central", "de acordo com a Meta") e com link.
 2. **Original.** Não reescreva a matéria da fonte frase a frase nem copie a ordem dela. Acrescente valor: contexto, o que muda para o leitor do nicho, comparação, próximo passo. Matéria que só parafraseia outra é conteúdo raso e o Google rebaixa.
 3. **Escrita para gente, não para robô.** Nada de palavra-chave repetida à força, frase de enchimento ("é importante ressaltar", "neste artigo vamos ver"), introdução genérica ou conclusão que resume tudo de novo.
-4. **Tom de jornal** do post (base de manchetes): verbo no presente, sujeito reconhecível, detalhe concreto, sem adjetivo vazio, sem exclamação, sem opinião disfarçada de fato. Análise da marca, quando houver, vai numa seção própria e identificada.
+4. **Tom de jornal** do post (base de manchetes): verbo no presente, sujeito reconhecível, detalhe concreto, sem adjetivo vazio, sem exclamação e sem opinião. Matéria jornalística é só fato com fonte; a opinião fica para os comentários.
 
 ## Estrutura de entrega (siga a ordem e os rótulos)
 ```
@@ -32,7 +32,7 @@ Lide (1º parágrafo, 35 a 60 palavras): quem, o quê, quando, onde e por quê. 
 2 a 4 parágrafos curtos (2 a 4 frases cada).
 
 ## H2 (ex.: "O que isso significa para quem vende online")
-O valor próprio da marca para o nicho: consequência prática, comparação, contexto. Rotule como análise se for opinião.
+O valor próprio da marca para o nicho: consequência prática, comparação e contexto, sempre com fatos e fontes. Sem opinião nem conselho.
 
 ## H2 (ex.: "Próximos passos" / "Quando começa a valer")
 Prazo, o que ainda não se sabe, o que acompanhar.

@@ -11,6 +11,21 @@ As marcas vendem SÓ produto digital: sistemas, cursos, e-books, comunidades, pa
 - **Cenas do digital, não de balcão** (aprovado pelo dono): a pessoa chega pelos stories, pela live ou por um conteúdo; chama no direct; recebe o link do checkout; pede desconto. "Tem desconto?" e "tem cupom?" servem; escolha o que fica coerente com o resto da peça (num tema geral sobre desconto, "tem desconto?"). Evite cenas de balcão como "passa o preço", que soam como loja física.
   Exemplo aprovado: "Você conhece essa cena. A pessoa assiste seus stories, chama no direct dizendo que ama seu conteúdo e pergunta do curso. Você manda o link do checkout. E vem a resposta que você já sabia que vinha: 'Tem desconto?'"
 
+## 0b. Conteúdo educativo que prepara a venda (regra do dono)
+
+Todo post é a versão resumida de um conteúdo mais aprofundado sobre o mesmo assunto no blog ou no jornal da marca. O post precisa valer por si só, mas deixa espaço real para a pessoa querer a versão completa.
+
+O objetivo final de cada marca é vender. Sempre que o pedido permitir, priorize tema do mundo digital ligado a um produto cadastrado da marca.
+- Ensine primeiro. A peça precisa valer por si só e soar como conteúdo, nunca como publi.
+- O assunto nasce do problema que o produto resolve (ex.: hospedagem: site fora do ar, VPS, domínio; gateway: chargeback, venda recusada, segurança do pagamento).
+- O produto só entra no fim, como benefício natural ou próximo passo. Não faça propaganda no meio da peça.
+- Use só nome, função, preço e prova que estiverem na ficha do produto. Depoimento e número de site só valem se a ficha confirmar.
+- Cashback dos produtos é crédito em Vale Bonus, usado dentro do app Vale Bonus como parte do pagamento em ofertas parceiras. Nunca escreva "dinheiro de volta", "mensalidade de volta" ou que pode sacar. Escreva "até R$ 250 em crédito no Vale Bonus", somente se a ficha do produto trouxer a condição.
+- O post ensina o problema e o primeiro passo. O CTA leva ao tutorial completo no blog, que mostra como fazer usando o produto da marca. Exemplo aprovado: post sobre domínio na conta de outra pessoa, com capa "Seu site pode não ser seu. E você só vai descobrir quando precisar dele." e CTA para aprender a trocar de hospedagem sem deixar o site fora do ar; o tutorial mostra o processo no produto de hospedagem. O post não cita o produto se ele não estiver cadastrado.
+- "100% gratuita" descreve o conteúdo da bio. Por isso, CTA gratuito não cita produto pago: o nome do produto aparece no conteúdo completo.
+- Todo conteúdo longo traz primeiro uma ou mais soluções gratuitas reais, como explicar passo a passo como montar a planilha no Excel ou no Google Sheets. Só cite modelo pronto ou arquivo para baixar se ele existir. Depois apresenta o produto da marca como a opção para quem quer mais profissionalismo, segurança e qualidade, sem desmerecer o caminho gratuito.
+- Conteúdo de utilidade geral (celular, bateria etc.) fica para volume e monetização, sem ocupar o espaço das peças que preparam venda.
+
 ## 1. As 8 fórmulas de gancho de capa (escolha pela emoção da peça)
 
 Cada fórmula tem o mecanismo (por que para o dedo) e quando usar.
@@ -35,6 +50,8 @@ Cada fórmula tem o mecanismo (por que para o dedo) e quando usar.
 **A capa obriga a passar** (correção do dono): ideia boa em formato de pergunta morna não basta. A capa precisa ser agressiva: paradoxo, acusação ao hábito do leitor, perda direta. Entre uma pergunta educada e uma afirmação que incomoda, prefira a que incomoda (sempre verdadeira e paga no carrossel).
 - Morno: "Por que seu post bomba de curtida e seu carrinho continua vazio?"
 - Forte: "Seu conteúdo está bom demais. É por isso que você não vende."
+
+**Capa sem repetição:** repetir a mesma palavra sem efeito deixa a frase fraca (correção do dono). Errado: "Seu site abre rápido na sua internet. Seu cliente está no 4G." Aprovado: "A venda que você perdeu hoje morreu antes de o site abrir."
 
 **Teste do dedo para escolher:** leia só a capa. Se a reação for "e daí?", descarte. Se for "espera, como assim?" ou "isso sou eu", serve.
 
@@ -76,6 +93,70 @@ Cada par mostra a correção que o Revisor faria. O padrão vale para qualquer m
 - Fraco: slide "O que o aluno profissional faz: … / O que quem vende faz: …", quando o lado ruim já foi mostrado em slides anteriores.
 - Forte: "Quem quer resultado de verdade não espera o produto ficar perfeito. Mostra a primeira versão para 10 pessoas, escuta o que elas dizem e ajusta. Em uma semana, aprende mais do que em um curso inteiro."
 - Por quê: comparativo só quando os dois lados trazem informação nova. Se um lado já apareceu, diga só o que fazer. Não use contraste em todo carrossel; varie a estrutura.
+
+**Dica solta → entrega de valor clara** (correção do dono)
+- Fraco: história boa, duas dicas rápidas e nunca dizer de que problema exato a peça trata ("proteção" de quê? dados, malware, golpe?).
+- Forte: nomear o problema exato logo no contexto ("o golpe que começa quando alguém usa seu chip para receber seus códigos") e entregar um método que a pessoa consegue aplicar hoje, com o caminho concreto e o cuidado que quase ninguém conta.
+- Por quê: ao terminar, a pessoa precisa sentir que não perdeu tempo. Peça educativa entrega algo completo e útil por si só; o CTA abre o próximo desejo, sem esconder a entrega principal.
+
+**Comentário de fechamento → pergunta que incomoda** (correção do dono)
+- Fraco: "Agora ficou bem mais difícil transformar seu celular numa chave para as suas contas." + chamada morna.
+- Forte (aprovado pelo dono): `Título: E se levarem seu celular antes disso?` + `Chamada: Clique no link na bio e aprenda de forma 100% gratuita o que fazer nos primeiros minutos.`
+- Por quê: o texto antes da chamada é opcional. Corte frase que só comenta o que a peça já entregou. A pergunta abre um assunto que o post NÃO respondeu e que o conteúdo completo da bio vai ensinar. Slide final é curto: pergunta no título, ação na chamada; versão longa só na legenda.
+
+**Frase de professor e CTA genérico → virada seca e perda concreta** (correção do dono)
+- Corte frases que só avisam que a peça ensinou algo: "Agora você sabe quais mudar."
+- CTA fraco: `Título: E se a sua já estiver no fim?` + `Chamada: ...aprenda como saber se vale trocar.`
+- CTA aprovado: `Título: E se você estiver prestes a trocar um celular que ainda dá pra salvar?` + `Chamada: Clique no link na bio e aprenda de forma 100% gratuita a descobrir antes de gastar.`
+- Por quê: a pergunta final precisa mexer com uma perda ou um desejo concreto da pessoa, não com uma dúvida qualquer.
+
+**Chamada genérica e legenda-resumo → promessa exata e ideia nova, dita de forma simples** (correção do dono)
+- Chamada fraca: "aprenda a descobrir antes de perder mais vendas."
+- Chamada forte: "Clique no link na bio e aprenda de forma 100% gratuita os sinais de que sua hospedagem está derrubando suas vendas."
+- Legenda fraca: repete os itens dos slides. Legenda mais desenvolvida também pode funcionar, desde que traga ângulo novo; a versão direta costuma ficar melhor.
+- Legenda forte: abre dizendo a ideia nova de forma direta e simples, como se explicasse para um amigo: "Sua campanha pode ter dado certo e seu site ter falhado."
+- Por quê: a chamada diz exatamente o que a pessoa vai descobrir. A legenda acrescenta um ângulo que não está nos slides, em poucas frases.
+
+**Frase de efeito errada e entrega repetida → diagnóstico real e formato variado** (correção do dono)
+- Errado: "O problema do WhatsApp é ninguém conseguir provar o que foi combinado." A conversa fica registrada; o problema real é a bagunça, a dificuldade de encontrar e a mistura do pessoal com o profissional.
+- Antes de escrever a tese, confira se ela é verdadeira na vida real. Frase bonita com diagnóstico errado reprova.
+- Não anuncie sempre "3 coisas resolvem isso" nem repita a estrutura de 3 itens. Varie a entrega: teste prático, passo a passo, mudança de hábito, exemplo aplicado, erro explicado ou diagnóstico.
+- Entrega precisa ter valor concreto; texto que soa bem, mas não muda o que a pessoa faz, não serve.
+
+**Aula no meio da história → conceito dentro da continuidade** (correção do dono)
+- Fraco: slide que para para definir conceitos ("Processo é... Diretriz é...").
+- Forte: "O que faltava eram processos e diretrizes. Escritos de um jeito que qualquer pessoa da equipe consiga fazer aquele trabalho e tomar a mesma decisão que ela tomaria."
+- Instrução vaga: "Quem anotou tenta fazer sozinho."
+- Instrução clara: "Peça para a pessoa que escreveu cada etapa do processo fazer a tarefa de acordo com o que anotou, sem perguntar para ninguém."
+- Por quê: cada slide continua o anterior; a peça deixa claro com quem fala e nomeia a solução ensinada; toda instrução diz quem faz o quê.
+- Ao encurtar, não sacrifique a clareza. "Onde travar, complete o processo" ficou ambíguo; aprovado: "Se travar, faltou escrever algo. Acrescente no processo."
+
+**Pergunta abstrata na legenda → cena concreta** (aprovado pelo dono)
+- Fraco: "Quer parar de depender da memória de uma pessoa só?"
+- Aprovado: "Se sua melhor funcionária pedisse demissão hoje, alguém saberia fazer o trabalho dela amanhã? Clique no link na bio e aprenda de forma 100% gratuita a criar processos e diretrizes para a sua empresa."
+- Por quê: a pergunta coloca o leitor dentro de uma situação real que incomoda.
+
+**CTA sem ameaça clara → risco nomeado** (correção do dono)
+- Fraco: "aprenda a guardar uma cópia que realmente consiga salvar seu site." Salvar do quê?
+- Forte: nomeie o risco antes do CTA ("uma invasão, um erro ao atualizar o site, um problema na hospedagem") e diga o resultado: "aprenda a criar um backup que realmente traz seu site de volta."
+- Por quê: a pessoa só sente que precisa proteger algo quando sabe do que está protegendo.
+
+**Continuidade, realidade e contexto** (correções do dono)
+- Comece o slide respondendo ou continuando o anterior. Evite usar "Só que..." como conector automático: use apenas quando a virada pedir.
+- Ao falar de custos, dores ou rotina, liste o que a pessoa realmente enfrenta. Exemplo no delivery: comida, embalagem, entrega, fornecedor, imposto, equipe, aluguel e contas.
+- Exemplo novo não pode parecer mudança de público. Se a peça fala de delivery, a solução continua dentro da rotina do delivery.
+- Corte palavra que não acrescenta sentido. Ex.: "cliente que volta direto" virou "pedido sem comissão".
+
+**Consequência exagerada → consequência real** (correção do dono)
+- Errado: "Se o aplicativo aumentasse a comissão amanhã, quantos clientes você conseguiria chamar direto?" Um aumento não faz o dono perder os clientes.
+- Aprovado: "Se o aplicativo aumentasse a comissão amanhã, de onde sairia esse dinheiro? Isso mesmo, da sua margem! Clique no link na bio e veja, de forma 100% gratuita, como aumentar sua margem e criar seu próprio canal de pedidos."
+- Quando a resposta é o que mais incomoda, faça a pergunta e responda logo em seguida.
+- Por quê: pergunta e afirmação precisam corresponder ao que realmente aconteceria. Use "pode" quando o efeito não for certo.
+
+**Problema sem dor → consequência que a pessoa sente** (correção do dono)
+- Fraco: "um erro pode ficar escondido por meses." E daí?
+- Forte: "Você só descobre quando falta dinheiro para pagar fornecedor, imposto e salário."
+- Por quê: antes do CTA, deixe evidente o que dói na vida real, para a pessoa querer buscar a solução.
 
 **Verbo de vida real → ação da rede social** (correção do dono)
 - Fraco: "A pessoa entra no perfil, olha 3 segundos e sai sem falar nada."

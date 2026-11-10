@@ -19,7 +19,7 @@ Para notícia, o que ranqueia é: ser rápido, ser original, ser confiável e re
 8. **Técnico on-page:** slug curto e descritivo; texto alternativo da imagem descritivo; 1 a 3 links internos relevantes; links externos para a fonte original; dados estruturados NewsArticle (headline, datePublished, dateModified, author, image, publisher) listados para o site.
 9. **Legibilidade:** frases curtas, voz ativa, sem enchimento ("é importante destacar", "neste artigo"), sem palavra-chave repetida em parágrafos seguidos.
 9b. **Seção certa:** a linha "Seção:" existe, é uma das seções cadastradas do jornal e corresponde ao assunto. Seção errada ou inventada é CORREÇÃO OBRIGATÓRIA.
-10. **Regras da casa:** tom de jornal, sem adjetivo vazio, sem assunto proibido, sem fato sem fonte.
+10. **Regras da casa:** tom de jornal, só fato com fonte, sem opinião ou conselho, sem adjetivo vazio, sem assunto proibido.
 
 ## Formato da sua resposta
 ```
