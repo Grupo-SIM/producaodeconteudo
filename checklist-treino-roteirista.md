@@ -32,7 +32,7 @@ Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 - [x] 8. Notícia esportiva: formato jornalístico aprovado no nicho
 
 ## Formatos de vídeo
-- [ ] 9. Reels / vídeo vertical (voz de IA; educativo, institucional, história real e opinião aprovados; faltam mais um teste de opinião e o de venda; sem notícia)
+- [ ] 9. Reels / vídeo vertical (voz de IA; educativo, institucional, história real e opinião aprovados; falta o de venda; sem notícia)
 - [ ] 9c. Institucional das outras marcas (SimIntPay aprovado com 3 vídeos)
 - [ ] 9a. Reels institucional para clientes terceiros (depois das nossas marcas)
 - [ ] 9b. Reels narrados por pessoa real (quando houver social media)

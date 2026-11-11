@@ -97,3 +97,5 @@ Estas regras vêm de correções diretas do dono. Cada item que falhar é CORRE�
 **Opinião:** a tese precisa dividir grupos reais e mexer com algo pessoal. Se todo mundo concordaria, peça ajuste.
 
 **Legenda × peça:** a pergunta e o CTA da legenda não podem ser iguais aos do slide final ou do vídeo.
+
+**Depoimentos:** número dito por cliente não vira promessa. Reprove "100% de aprovação" na SimIntPay; o correto é acima de 90%.

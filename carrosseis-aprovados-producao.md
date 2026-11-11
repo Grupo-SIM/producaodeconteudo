@@ -337,11 +337,9 @@ Todo CTA leva ao link da tela. Sem emoji.
 8. **R$ 69,90 por mês.** E todo mês você recebe o valor integral da mensalidade em crédito no Vale Bonus.
 9. **Quanto da sua empresa está parado sem você saber?** Clique no link na bio e conheça o Controle Patrimonial.
 
-Legenda: Empresa não perde dinheiro só no que vende mal. Perde também no que compra duas vezes, no equipamento que quebrou e ninguém registrou, no bem que saiu e nunca voltou. O problema é que esse tipo de perda não tem data nem aviso. Ela só aparece quando você precisa do item e ele não está lá. Se hoje alguém te pedisse a lista de tudo o que a sua empresa tem, em quanto tempo você entregaria? Clique no link na bio e conheça o Controle Patrimonial.
+Legenda: Empresa não perde dinheiro só no que vende mal. Perde também no que compra duas vezes, no equipamento que quebrou e ninguém registrou, no bem que saiu e nunca voltou. O problema é que esse tipo de perda não tem data nem aviso. Ela só aparece quando você precisa do item e ele não está lá. Se hoje alguém te pedisse a lista de tudo o que a sua empresa tem, em quanto tempo você entregaria? O caminho pra ter essa lista na mão está no link da bio.
 
 ### 22. Marketing Raiz: SimIntPay (carrossel)
-Antes de publicar: confirmar quem paga o cashback, o vendedor ou a SimIntPay.
-
 1. Capa. Título: Mesmo curso. Mesmo preço. Só um deles dá até R$ 250 em crédito pro cliente.
 2. Imagina a pessoa em dúvida entre o seu curso e o de outro produtor. Abre os dois checkouts. Preço parecido, promessa parecida. Só que num deles aparece: "compre e receba até R$ 250 em crédito no Vale Bonus". **Qual dos dois ela fecha?**
 3. Pra ganhar essa disputa, a maioria faz a mesma coisa: baixa o preço. Solta cupom. Faz "só hoje" toda semana. **E ensina o cliente a nunca mais pagar o valor cheio.**
@@ -351,7 +349,7 @@ Antes de publicar: confirmar quem paga o cashback, o vendedor ou a SimIntPay.
 7. Saque rápido, pro dinheiro não ficar parado. E um painel com vendas e transações em tempo real, pra você saber o que entrou sem caçar comprovante.
 8. **Quanto você já deu de desconto este ano só pra fechar venda?** Clique no link na bio e conheça a SimIntPay.
 
-Legenda: Desconto é a forma mais cara de convencer alguém, porque sai direto da sua margem e ainda treina o cliente a esperar a próxima promoção. Quem vende produto digital costuma gastar energia no anúncio e na página, e esquece que a decisão final acontece no checkout. É ali que a pessoa compara, hesita ou tem o cartão recusado. Se o seu checkout desse um motivo a mais pra pessoa comprar, quantas vendas você deixaria de perder? Clique no link na bio e conheça a SimIntPay.
+Legenda: Desconto é a forma mais cara de convencer alguém, porque sai direto da sua margem e ainda treina o cliente a esperar a próxima promoção. Quem vende produto digital costuma gastar energia no anúncio e na página, e esquece que a decisão final acontece no checkout. É ali que a pessoa compara, hesita ou tem o cartão recusado. Se o seu checkout desse um motivo a mais pra pessoa comprar, quantas vendas você deixaria de perder? A SimIntPay está no link da bio. Vale dar uma olhada.
 
 ## Educativos aprovados depois
 
@@ -366,7 +364,7 @@ Legenda: Desconto é a forma mais cara de convencer alguém, porque sai direto d
 8. Escolha um dia fixo da semana pra repetir isso. Com 120 pessoas dá trabalho, mas funciona. O importante é parar de depender da sua memória.
 9. **E quando forem 500 pessoas?** Clique no link na bio e aprenda de forma 100% gratuita a automatizar a cobrança e o acesso do seu grupo no Telegram.
 
-Legenda: Grupo pago não quebra por falta de gente querendo entrar. Quebra quando quem criou vira cobrador em tempo integral e para de produzir o que fazia as pessoas pagarem. Toda hora gasta conferindo comprovante é uma hora a menos de conteúdo. E, quando o conteúdo cai, quem pagava em dia começa a cancelar. Quanto tempo da sua semana vai só em cobrar gente? Clique no link na bio e aprenda de forma 100% gratuita a automatizar a cobrança e o acesso do seu grupo no Telegram.
+Legenda: Grupo pago não quebra por falta de gente querendo entrar. Quebra quando quem criou vira cobrador em tempo integral e para de produzir o que fazia as pessoas pagarem. Toda hora gasta conferindo comprovante é uma hora a menos de conteúdo. E, quando o conteúdo cai, quem pagava em dia começa a cancelar. Quanto tempo da sua semana vai só em cobrar gente? Clique no link na bio e veja, de forma 100% gratuita, como fazer a cobrança e a liberação de acesso rodarem sozinhas.
 
 ### 24. Seguidores em Alta: audiência real
 1. Capa. Título: Você tem milhares de seguidores. Quase nenhum deles é seu.
@@ -379,7 +377,7 @@ Legenda: Grupo pago não quebra por falta de gente querendo entrar. Quebra quand
 8. Publique lá o que não existe no perfil: bastidor, número real, opinião que você não falaria em público. Se o canal for cópia do Instagram, a pessoa não tem por que ficar.
 9. **E se essas 300 pessoas pagassem R$ 20 por mês?** Clique no link na bio e aprenda de forma 100% gratuita a transformar seu canal em um grupo pago.
 
-Legenda: Perfil grande impressiona. Mas perfil é terreno alugado: a regra muda, o alcance cai e a conta pode ser bloqueada sem você ter feito nada. Quem vive de internet há mais tempo aprendeu a usar a rede social para atrair e um canal próprio para se relacionar. Uma coisa não substitui a outra. Se seu perfil sumisse amanhã, por onde você falaria com quem te acompanha? Clique no link na bio e aprenda de forma 100% gratuita a transformar seu canal em um grupo pago.
+Legenda: Perfil grande impressiona. Mas perfil é terreno alugado: a regra muda, o alcance cai e a conta pode ser bloqueada sem você ter feito nada. Quem vive de internet há mais tempo aprendeu a usar a rede social para atrair e um canal próprio para se relacionar. Uma coisa não substitui a outra. Se seu perfil sumisse amanhã, por onde você falaria com quem te acompanha? Clique no link na bio e veja, de forma 100% gratuita, como começar a cobrar pelo acesso ao seu canal.
 
 ### 25. Marketing Raiz: título do e-book (prepara EbookSIM)
 1. Capa. Título: Seu e-book não tem problema de conteúdo. Tem problema de título.
@@ -391,7 +389,7 @@ Legenda: Perfil grande impressiona. Mas perfil é terreno alugado: a regra muda,
 7. Use o subtítulo pra tirar a objeção: "mesmo sem nunca ter aberto o Gerenciador de Anúncios". E mostre o sumário na página, com cada capítulo escrito como resultado. O sumário também vende.
 8. **Quantas pessoas já saíram da sua página por causa de cinco palavras?** Clique no link na bio e aprenda de forma 100% gratuita a montar a página de venda do seu e-book.
 
-Legenda: Autor de primeira viagem costuma tratar o título como a última etapa, aquilo que se escolhe depois que o livro está pronto. Quem vende bem faz o contrário: testa a promessa antes de escrever a primeira página. Se ninguém clica na promessa, você descobre isso em dois dias, e não depois de três meses escrevendo. Se você tivesse que vender seu e-book só com o título, ele venderia? Clique no link na bio e aprenda de forma 100% gratuita a montar a página de venda do seu e-book.
+Legenda: Autor de primeira viagem costuma tratar o título como a última etapa, aquilo que se escolhe depois que o livro está pronto. Quem vende bem faz o contrário: testa a promessa antes de escrever a primeira página. Se ninguém clica na promessa, você descobre isso em dois dias, e não depois de três meses escrevendo. Se você tivesse que vender seu e-book só com o título, ele venderia? Clique no link na bio e veja, de forma 100% gratuita, como criar uma página que faça seu e-book vender.
 
 ### 26. Corte dos Ricos: quilometragem da frota (prepara Controle de Motorista)
 1. Capa. Título: Tem carro da sua empresa indo pra onde você nunca mandou.
@@ -403,7 +401,7 @@ Legenda: Autor de primeira viagem costuma tratar o título como a última etapa,
 7. Antes de cobrar, pergunte. Às vezes teve motivo. Mas repara numa coisa: quando a equipe sabe que a quilometragem é conferida, o uso muda sem você precisar brigar com ninguém.
 8. **Quantos quilômetros sua empresa pagou este mês sem saber pra onde foram?** Clique no link na bio e aprenda de forma 100% gratuita a encontrar onde o dinheiro da gasolina está indo embora.
 
-Legenda: Dono de empresa costuma olhar o combustível como um custo que só sobe. Quase nunca olha como um registro de tudo o que os veículos fizeram no mês. E o constrangimento pesa: ninguém gosta de desconfiar de quem trabalha com a gente. Por isso, regra clara para todo mundo funciona melhor do que chamar uma pessoa para conversar. Se você abrisse hoje a quilometragem de cada veículo, encontraria alguma surpresa? Clique no link na bio e aprenda de forma 100% gratuita a encontrar onde o dinheiro da gasolina está indo embora.
+Legenda: Dono de empresa costuma olhar o combustível como um custo que só sobe. Quase nunca olha como um registro de tudo o que os veículos fizeram no mês. E o constrangimento pesa: ninguém gosta de desconfiar de quem trabalha com a gente. Por isso, regra clara para todo mundo funciona melhor do que chamar uma pessoa para conversar. Se você abrisse hoje a quilometragem de cada veículo, encontraria alguma surpresa? Clique no link na bio e veja, de forma 100% gratuita, como descobrir para onde vai o combustível da sua empresa.
 
 ## Reels
 
@@ -487,6 +485,18 @@ Quem cobra só pelo esforço já perdeu. Só não recebeu o aviso ainda.
 CTA. Se o seu cliente descobrisse que você fez com IA, você cobraria o mesmo preço?
 
 Legenda: Tem muita gente entregando trabalho feito com IA e cobrando como se tivesse passado a semana nele. Tem outro tanto que ainda faz tudo na mão e se orgulha disso. Os dois lados têm um ponto. Se o resultado é o mesmo, importa como foi feito? E, se importa, por que quase ninguém avisa o cliente que usou IA? E você, avisa?
+
+### 33. Corte dos Ricos: carteira assinada (opinião, voz de IA)
+Gancho. Carteira assinada não é segurança. É ter um cliente só.
+Pensa comigo: toda a sua renda depende de uma empresa. Basta uma decisão, numa sala onde você nem está. E acabou.
+"Mas eu tenho meus direitos." Tem. Multa, FGTS, seguro-desemprego. Isso segura alguns meses. É colchão, não é renda.
+Quem empreende morre de medo de perder um cliente. Só que, se perde um, ainda sobram os outros.
+Quem é CLT não perde um cliente. Perde todos no mesmo dia.
+Empreender é fácil? Não. Tem mês que não entra quase nada, e muita gente quebra.
+Mas esse risco você enxerga. O da carteira assinada ninguém chama de risco, porque vem com crachá.
+CTA. Você trocaria seu salário fixo por ganhar o dobro, sem nenhuma garantia?
+
+Legenda: Quem é CLT costuma achar que quem empreende é louco. Quem empreende costuma achar que quem é CLT está dormindo. Os dois têm boletos para pagar e os dois têm medo, só que de coisas diferentes. Um tem medo do mês sem venda. O outro, da reunião marcada de última hora com o RH. De quantas fontes de renda você depende hoje?
 
 ## Não incluídos ainda
 - WhatsApp no sistema da empresa: ficou aguardando sua correção.
