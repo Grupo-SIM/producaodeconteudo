@@ -254,7 +254,7 @@ const productsOfBrand = b => all('SELECT p.* FROM products p JOIN product_brands
 
 // ───────────────────────── Constantes de domínio ─────────────────────────
 const FORMATS = ['carrossel', 'feed', 'stories', 'video_vertical', 'video_horizontal'];
-const KINDS = ['educativo', 'historia_real', 'noticia', 'ficcao', 'venda', 'bastidores', 'opiniao', 'historia_vende', 'serie_episodio', 'texto', 'carta_vendas'];
+const KINDS = ['educativo', 'historia_real', 'noticia', 'ficcao', 'venda', 'bastidores', 'opiniao', 'historia_vende', 'serie_episodio', 'texto', 'carta_vendas', 'institucional'];
 const GOALS = ['', 'produto', 'conteudo'];
 const PRODUCT_TYPES = ['ebook', 'curso', 'mentoria', 'servico', 'software', 'fisico', 'outro'];
 const CATEGORIES = ['marca', 'tom_de_voz', 'produtos', 'historias', 'noticias', 'exemplos', 'outros'];
@@ -270,10 +270,10 @@ const MANUAL = !API_KEY;
 const STAGE_LABEL = { seo: 'Agente de SEO revisando a matéria', radar: 'Agente de Notícias pesquisando', estilo: 'Designer aprendendo o estilo de arte', roteiro: 'Roteirista escrevendo', revisao: 'Revisor revisando o roteiro', arte: 'Designer criando a arte', video: 'Editor montando a decupagem', pacote: 'Social Media montando o pacote', gerencia: 'Revisor revisando a entrega', pautas: 'Gerente definindo as pautas', relatorio: 'Gerente lendo as métricas', cerebro: 'Cérebro consolidando o aprendizado', chat: 'Gerente respondendo a você', teste: 'Teste de agente pedido por você' };
 
 const FORMAT_GUIDE = {
-  video_vertical: 'Vídeo vertical 9:16 (Reels, TikTok, Shorts), 20–60 s. Seções: ## GANCHO (primeiros 3 s: fala + texto na tela), ## ROTEIRO (cena a cena, com tempo, fala/narração e ação visual), ## CTA, ## LEGENDA (texto pronto para postar, primeira linha forte), ## HASHTAGS.',
+  video_vertical: 'Vídeo vertical 9:16 (Reels, TikTok, Shorts), 20–60 s. Seções: ## GANCHO (primeiros 3 s: fala + texto na tela), ## ROTEIRO (cena a cena, com tempo, fala/narração e ação visual), ## CTA, ## LEGENDA (texto pronto para postar, primeira linha forte).',
   video_horizontal: 'Vídeo horizontal 16:9 (YouTube e similares), em geral 5–15 min. Seções: ## GANCHO, ## ABERTURA, ## BLOCOS (cada bloco com objetivo, falas e retenção), ## CTA, ## TÍTULOS (5 opções), ## DESCRIÇÃO (texto pronto para o YouTube), ## LEGENDA (chamada curta de divulgação).',
-  carrossel: 'Carrossel de 4 a 10 slides (o que o conteúdo pedir). Seções: ## SLIDES (no modelo do dono: cada slide abre com "📌 Slide N — NOME" e traz uma informação por linha no formato "Rótulo: texto" — Slide 1 = CAPA com Título/Manchete Principal, Subtexto e Visual; meio com Título + Texto, lista numerada "1. Item: explicação" ou contraste "Como o amador faz: / Como a marca forte faz:"; último = CTA com Texto e Chamada; uma ideia por slide, título até 8 palavras sem ponto final (capa até 12) e texto de apoio até 25 palavras, UMA versão só de cada), ## LEGENDA (no estilo "Legenda do Post"), ## HASHTAGS.',
-  feed: 'Post estático de feed (uma imagem). Seções: ## TEXTO DA ARTE (no modelo do dono: "📌 Arte — CAPA" e as linhas Título, Subtexto, Visual e Chamada), ## LEGENDA (texto pronto, primeira linha forte), ## HASHTAGS.',
+  carrossel: 'Carrossel de 4 a 10 slides (o que o conteúdo pedir). Seções: ## SLIDES (no modelo do dono: cada slide abre com "📌 Slide N — NOME" e traz uma informação por linha no formato "Rótulo: texto" — Slide 1 = CAPA com Título/Manchete Principal, Subtexto e Visual; meio com Título + Texto, lista numerada "1. Item: explicação" ou contraste "Como o amador faz: / Como a marca forte faz:"; último = CTA com Texto e Chamada; uma ideia por slide, título até 8 palavras sem ponto final (capa até 12) e texto de apoio até 25 palavras, UMA versão só de cada), ## LEGENDA (no estilo "Legenda do Post").',
+  feed: 'Post estático de feed (uma imagem). Seções: ## TEXTO DA ARTE (no modelo do dono: "📌 Arte — CAPA" e as linhas Título, Subtexto, Visual e Chamada), ## LEGENDA (texto pronto, primeira linha forte).',
   stories: 'Sequência de Stories verticais (3 a 7 telas de 9:16). Seções: ## TELAS (no modelo do dono: cada tela abre com "📌 Tela N — NOME" e traz Título, Texto e Visual em linhas "Rótulo: texto"; no máximo ~15 palavras na tela), ## INTERAÇÃO (enquete, caixinha, quiz ou botão de link a usar e em que tela), ## CTA (última tela), ## LEGENDA (texto de apoio, se houver).'
 };
 const ARTE_GUIA = {
@@ -289,9 +289,10 @@ const KIND_GUIDE = {
   noticia: 'Conteúdo baseado em notícia/evento real: use apenas fatos do briefing, da base ou de fontes encontradas; cite fonte e data; separe claramente fato de opinião.',
   ficcao: 'História criada por você (ficção): deixe explícito no texto que é uma história fictícia. Nunca a apresente como fato.',
   venda: 'Conteúdo de venda: foco em um produto/oferta da base, benefício concreto, objeção principal, CTA único. Sem promessas que a base não sustente.',
+  institucional: 'Vídeo institucional para ficar fixado no perfil da marca: responde o que quem abre o perfil pela primeira vez quer saber e gera desejo, segurança e credibilidade. Siga a sua base de Reels.',
   bastidores: 'Conteúdo de bastidores: humano, específico, com detalhes reais fornecidos no briefing ou na base.',
   opiniao: 'Conteúdo de opinião: posição clara e defensável, com argumentos; deixe claro que é um ponto de vista.',
-  historia_vende: 'HISTÓRIA QUE VENDE (VSL narrada, venda natural). O produto nunca aparece como corte para “compre agora”: ele surge como consequência da história. Seções: ## GANCHO (3 primeiros segundos), ## LEAD (abertura com personagem específico, desejo e obstáculo), ## MUNDO E CONFLITO (escalada), ## DESCOBERTA (a virada em que o personagem entende o problema por trás; use apenas o que o produto de fato entrega), ## PROVA (somente a que existir na base ou no produto), ## CONVITE (CTA único, suave e ligado ao entregável real), ## NOTAS (lacunas de informação). Se houver conflito com o guia do formato, siga as seções deste guia e acrescente ## LEGENDA e ## HASHTAGS quando o formato pedir.',
+  historia_vende: 'HISTÓRIA QUE VENDE (VSL narrada, venda natural). O produto nunca aparece como corte para “compre agora”: ele surge como consequência da história. Seções: ## GANCHO (3 primeiros segundos), ## LEAD (abertura com personagem específico, desejo e obstáculo), ## MUNDO E CONFLITO (escalada), ## DESCOBERTA (a virada em que o personagem entende o problema por trás; use apenas o que o produto de fato entrega), ## PROVA (somente a que existir na base ou no produto), ## CONVITE (CTA único, suave e ligado ao entregável real), ## NOTAS (lacunas de informação). Se houver conflito com o guia do formato, siga as seções deste guia e acrescente ## LEGENDA quando o formato pedir.',
   texto: 'TEXTO (artigo, história ou newsletter). Entregue o texto completo e pronto para publicar, com: ## TÍTULO, ## TEXTO (abertura forte, desenvolvimento com ritmo, fecho com CTA único) e ## LEGENDA (chamada curta para divulgar o texto no formato escolhido). Se o formato for de vídeo, escreva como texto falado, em frases curtas. Adapte o tamanho ao formato; se o formato for feed, carrossel ou stories, divida o texto em peças que caibam nele.',
   carta_vendas: 'CARTA DE VENDAS completa. Seções: ## HEADLINE (3 opções), ## SUBHEADLINE, ## ABERTURA (história ou problema), ## AGITAÇÃO, ## SOLUÇÃO, ## MECANISMO, ## PROVA (somente a que existir na base — nunca invente depoimentos, números ou resultados), ## OFERTA, ## GARANTIA (somente se existir na base), ## OBJEÇÕES (FAQ), ## CTA, ## P.S., ## LEGENDA (chamada curta para divulgar a carta). Se o formato for de vídeo, escreva como VSL narrada; se for feed, carrossel ou stories, entregue a carta completa como texto e a LEGENDA/telas como chamada para ela.',
   serie_episodio: 'EPISÓDIO DE SÉRIE / NOVELA para reter audiência. Seções: ## BÍBLIA (só no episódio 1 ou se o briefing pedir: premissa, personagens, arco da temporada, tom), ## TEASER (gancho), ## ATO 1, ## ATO 2 (escalada), ## ATO 3, ## CLIFFHANGER, ## PRÓXIMO EPISÓDIO (gancho para voltar), ## RETENÇÃO (loops abertos e onde fecham), ## TÍTULOS (5 opções), ## LEGENDA. Se for ficção, deixe isso claro no episódio.'
@@ -408,7 +409,7 @@ Princípios: (1) responda com dados reais do sistema e diga "não sei" quando n�
 
 Regras:
 1. Use a legenda do roteiro como base; ajuste apenas o necessário para a plataforma (tamanho, primeira linha forte, um único CTA).
-2. Hashtags: 5 a 12, de nicho e relevantes, sem repetir termos genéricos demais.
+2. Não use hashtags (decisão do dono). Escreva na legenda, de forma natural, as palavras que o público pesquisaria.
 3. Sugira o melhor horário com base nas métricas fornecidas; se não houver dados suficientes, diga isso em "observacoes".
 4. Nunca altere fatos, números ou promessas do conteúdo aprovado.
 5. Responda SOMENTE com JSON válido, sem texto fora do JSON.`
@@ -565,13 +566,13 @@ ${MOTION_V2_AVOID}` },
 2. Corpo fácil de escanear: frases curtas, quebras de linha e a ideia principal em até 3 linhas.
 3. Uma única chamada para ação, a mesma do roteiro aprovado; quando o objetivo é retenção, a chamada nasce do conteúdo (pergunta de opinião, dilema, "salve para…", "envie para quem…").
 4. Ajustar a legenda à plataforma: Instagram com quebras e sem link clicável, TikTok mais curta, YouTube com título e descrição buscáveis.
-5. Hashtags de nicho e relevantes (3 a 8 no Instagram, 3 a 5 no TikTok), alinhadas à marca e ao tema; nada genérico.
+5. Não usar hashtags (decisão do dono): as palavras de busca entram naturalmente na legenda.
 6. Sugerir horário com base nas métricas da marca; sem dados suficientes, dizer isso em observações.
 7. Indicar quando a peça tem imagem, voz ou cena sintética realista, para marcar o rótulo de conteúdo feito com IA.
 8. Responder só com o JSON pedido.`,
     avoid: `1. Nunca alterar fatos, números, promessas, preço ou link do conteúdo aprovado.
 2. Nunca usar mais de uma chamada para ação nem pedir engajamento vazio ("comente SIM", "marque 3 amigos").
-3. Nunca usar hashtags genéricas demais, repetidas ou sem relação com o tema.
+3. Nunca usar hashtags.
 4. Nunca escrever texto fora do JSON.` }
 };
 // Onde cada agente se encaixa no fluxo do sistema (vai em todo pedido; não fica salvo no banco, então sempre reflete o fluxo atual)
@@ -584,7 +585,7 @@ const AGENT_STAGE = {
   seo: 'Sua etapa: só nas notícias com matéria completa para o site de jornal, depois do Revisor de Copy. Você revisa a matéria (SEO de notícias, Google Notícias/Discover, busca por IA) e devolve um laudo. Com pendências a matéria volta ao Roteirista; aprovada (ou esgotadas as rodadas) segue para o Revisor.',
   chefe: 'Sua etapa: fora da linha de produção. Você é o braço direito do dono: conversa com ele, comanda os agentes, define pautas, lê métricas, consolida o Cérebro e executa as ordens.',
   gerente: 'Sua etapa: revisar e aprovar as etapas depois da copy já conferida pelo Revisor de Copy (e pelo Agente de SEO nas notícias). Você revisa o roteiro (reprovado volta ao Roteirista) e, depois, a entrega de arte e/ou vídeo (reprovado volta ao Designer e/ou ao Editor, com ajustes). Aprovada a entrega, ela segue para o Social Media e depois para o dono. Pautas, métricas e Cérebro são do Gerente (chefe), não seus.',
-  publicador: 'Sua etapa: pacote de postagem. Você recebe o conteúdo já aprovado pelo dono. Você entrega legenda final, hashtags e horário; o envio ao Make/n8n/Zapier (webhook) ou a postagem manual é feita depois, não por você.'
+  publicador: 'Sua etapa: pacote de postagem. Você recebe o conteúdo já aprovado pelo dono. Você entrega legenda final e horário; o envio ao Make/n8n/Zapier (webhook) ou a postagem manual é feita depois, não por você.'
 };
 const SISTEMA_CONTEXTO = `# COMO O SISTEMA FUNCIONA (você é uma etapa de uma linha de produção)
 Fluxo: o pedido entra (ou o Agente de Notícias traz a pauta do que está em alta) → Roteirista escreve a copy → Revisor de Copy confere verdade, políticas, originalidade e ofício (reprovado volta ao Roteirista) → só nas notícias com matéria para o site, o Agente de SEO revisa a matéria (reprovado volta ao Roteirista) → Revisor revisa o roteiro (reprovado volta ao Roteirista) → Designer cria a direção de arte e/ou Editor monta a decupagem e o spec de vídeo → Revisor revisa a entrega (reprovado volta a quem fez) → dono aprova no final → Social Media monta o pacote de postagem. O Gerente (chefe) conversa com o dono, manda nos agentes, define pautas, lê métricas e consolida o aprendizado do Cérebro. O Cérebro registra o que dá certo e errado e devolve como regras.
@@ -611,7 +612,7 @@ const KNOWLEDGE_SEED = [{
 - Nenhuma afirmação factual, número, resultado ou depoimento sem fonte na base ou no briefing.
 - Histórias criadas devem ser identificadas como ficção; histórias reais só com fatos verificáveis.
 - Linguagem natural, direta e em português do Brasil; sem clichês de marketing e sem exageros.
-- Legenda com primeira linha forte, corpo escaneável e hashtags de nicho.`
+- Legenda com primeira linha forte, corpo escaneável e palavras de busca, sem hashtags.`
 }];
 
 const SETTINGS_DEFAULTS = {
@@ -1720,8 +1721,7 @@ async function enviarWebhook(c, pack) {
 // Pacote de postagem montado direto do roteiro aprovado (sem nova rodada de IA)
 function montarPacote(c) {
   const legenda = c.caption || parseCaption(c.script);
-  const txtTags = secao(c.script, 'HASHTAGS') || legenda;
-  const hashtags = [...new Set((txtTags.match(/#[\p{L}\p{N}_]+/gu) || []))].slice(0, 30);
+  const hashtags = [];   // decisão do dono: sem hashtags
   const video = isVideo(c.format);
   const checklist = textoPuro(c)
     ? ['Ler o texto final em voz alta', 'Conferir links e dados citados', 'Publicar e acompanhar as respostas']
@@ -4229,7 +4229,7 @@ Ações (todos os campos entre aspas; "id" de peça é número):
 - {"acao":"ensinar_agente","agente":"…","tipo":"aprender|evitar","regra":"instrução direta, até 300 caracteres"}  → acrescenta ao treinamento do agente (fica numa versão que dá para desfazer).
 - {"acao":"ajustar_prompt","agente":"…","prompt":"texto COMPLETO do novo prompt"}  → só quando o dono pedir para reescrever o treinamento; preserve o que funciona.
 - {"acao":"desfazer","versao":N}
-- {"acao":"criar_conteudo","titulo":"","formato":"carrossel|feed|stories|video_vertical|video_horizontal","tipo":"educativo|historia_real|noticia|ficcao|venda|bastidores|opiniao|historia_vende|serie_episodio|texto|carta_vendas","marca":"","plataforma":"","briefing":"","produto":"nome de um produto cadastrado (opcional)"}
+- {"acao":"criar_conteudo","titulo":"","formato":"carrossel|feed|stories|video_vertical|video_horizontal","tipo":"educativo|historia_real|noticia|ficcao|venda|bastidores|opiniao|historia_vende|serie_episodio|texto|carta_vendas|institucional","marca":"","plataforma":"","briefing":"","produto":"nome de um produto cadastrado (opcional)"}
 - {"acao":"gerar_pautas","quantidade":3,"marca":"","tema":""}
 - {"acao":"ajustar_peca","id":N,"alvo":"roteirista|designer|editor","ajustes":"o que mudar"}
 - {"acao":"aprovar_roteiro","id":N} · {"acao":"aprovar_final","id":N} · {"acao":"reprocessar","id":N}
@@ -5439,7 +5439,7 @@ const HANDLERS = {
   },
   async pacote(job, c) {
     const m = all('SELECT date,platform,post_title,views,likes,comments,shares,saves FROM metrics ORDER BY date DESC, id DESC LIMIT 30');
-    const user = `# TAREFA\nMonte o pacote de postagem final.\n\n# PEÇA\n${brief(c)}\n\n# LEGENDA ATUAL\n${c.caption || '(sem legenda no roteiro — crie a partir do conteúdo)'}\n\n# CONTEÚDO\n${c.script.slice(0, 6000)}\n\n# MÉTRICAS RECENTES (para sugerir horário)\n${m.length ? m.map(x => Object.values(x).join(' | ')).join('\n') : '(sem métricas ainda)'}\n\n# SAÍDA\nSOMENTE JSON: {"legenda_final":"...","hashtags":["#..."],"primeiro_comentario":"...","horario_sugerido":"...","checklist":["..."],"observacoes":"..."}`;
+    const user = `# TAREFA\nMonte o pacote de postagem final.\n\n# PEÇA\n${brief(c)}\n\n# LEGENDA ATUAL\n${c.caption || '(sem legenda no roteiro — crie a partir do conteúdo)'}\n\n# CONTEÚDO\n${c.script.slice(0, 6000)}\n\n# MÉTRICAS RECENTES (para sugerir horário)\n${m.length ? m.map(x => Object.values(x).join(' | ')).join('\n') : '(sem métricas ainda)'}\n\n# SAÍDA\nSOMENTE JSON: {"legenda_final":"...","primeiro_comentario":"...","horario_sugerido":"...","checklist":["..."],"observacoes":"..."}`;
     const r = await callClaude({ agent: agentRow('publicador'), user, maxTokens: 2000 });
     let pack;
     try { pack = extractJson(r.text, '{'); } catch { throw new Error('O Social Media não devolveu um JSON válido'); }
@@ -5488,6 +5488,8 @@ const HANDLERS = {
     L.push(`# PAUTAS JÁ PRODUZIDAS (não repita)\n${titles.join('\n') || '(nenhuma)'}`);
     { const mix = all("SELECT brand, kind, goal, COUNT(*) n FROM (SELECT brand, kind, goal FROM contents WHERE teste=0 ORDER BY id DESC LIMIT 60) GROUP BY brand, kind, goal ORDER BY brand, n DESC");
       if (mix.length) L.push(`# MIX RECENTE (últimas 60 peças: marca | tipo | objetivo | quantidade)\n${mix.map(x => [x.brand || '(sem marca)', x.kind || '-', x.goal || 'marca', x.n].join(' | ')).join('\n')}`); }
+    { const inst = all("SELECT brand, title, status FROM contents WHERE teste=0 AND kind='institucional' ORDER BY brand, id"), lista = (b, f) => inst.filter(x => x.brand === b && f(x)).map(x => x.title).join('; ') || '(nenhum)';
+      L.push(`# VÍDEOS INSTITUCIONAIS POR MARCA (veja sua base de equilíbrio; não repita o que já existe)\n${brands.map(b => `${b} | postados: ${lista(b, x => x.status === 'posted')} | em produção: ${lista(b, x => x.status !== 'posted')}`).join('\n')}`); }
     L.push(`# ÚLTIMA ANÁLISE DE DESEMPENHO\n${rep ? rep.body.slice(0, 4000) : '(ainda sem análise)'}`);
     if (metr.length) L.push(`# MÉTRICAS RECENTES (plataforma | título | formato/tipo | views | curtidas | comentários | compartilhamentos | salvamentos)\n${metr.map(m => [m.platform, m.post_title, `${m.format || '-'}/${m.kind || '-'}`, m.views, m.likes, m.comments, m.shares, m.saves].join(' | ')).join('\n')}`);
     L.push(`# SAÍDA\nSOMENTE um array JSON (sem texto antes ou depois; sem aspas duplas retas dentro dos textos): [{"titulo":"...","objetivo":"produto|conteudo|marca","marca":"","produto_id":0,"formato":"${allowF.join('|')}","tipo":"${allowK.join('|')}","plataforma":"Instagram|TikTok|YouTube|...","angulo":"o ângulo escolhido e por quê (1-2 frases)","briefing":"público, objetivo e os fatos que o roteirista pode usar, em 2-4 frases"}]\nNunca proponha pautas sobre fatos ou notícias que você não possa sustentar com a base; para notícias, descreva o tema e peça verificação de fonte no briefing. Não invente números, resultados ou depoimentos.`);

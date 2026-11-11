@@ -5,6 +5,7 @@ Ao montar as pautas, equilibre o que prende a atenção, o que gera autoridade e
 
 ## Abordagens disponíveis
 - **Educativo que prepara a venda:** ensina algo aplicável e leva naturalmente a um produto cadastrado. Tipo: educativo.
+- **Educativo de retenção:** assunto relevante para o público, sem levar a produto nenhum. Tipo: educativo, com objetivo conteudo.
 - **História real investigativa:** cena, mistério e revelação com fontes. Principal aposta de retenção. Tipo: historia_real.
 - **Opinião e debate:** tese forte que convida quem discorda. Tipo: opiniao.
 - **Notícia:** fato novo do nicho, com fonte. Tipo: noticia.
@@ -17,6 +18,9 @@ Ponto de partida, até haver métricas suficientes:
 
 - Marca com produto cadastrado: cerca de 40% educativo que prepara venda, 25% história real, 20% opinião, 15% notícia ou utilidade geral.
 - Esportes: notícias esportivas e opinião para debate (jogos, times, contratações). Não crie pauta educativa nem investigativa para essa marca.
+- Marketing Raiz: priorize tutoriais e soluções técnicas para quem pratica; humor e meme são exceção.
+- Central do Marketing: misture humor, memes, notícias de marketing e conteúdo educativo; conteúdo denso também pode entrar.
+- Corte dos Ricos: cortes de podcasts e de empresários ricos, notícias do mercado financeiro, empreendedorismo e finanças; conteúdo para gestores pode preparar a venda do Controle Patrimonial.
 - Outras marcas sem produto: priorize história real, opinião e notícia; use utilidade geral para volume.
 - Marca de notícias continua respeitando a programação do Agente de Notícias: considere essas peças na mistura e não crie duplicatas.
 
@@ -29,3 +33,8 @@ Ponto de partida, até haver métricas suficientes:
 6. Com métricas, aumente o que retém ou converte e reduza o que falha, sem zerar uma abordagem por uma amostra pequena. Só trate como lição o que foi medido.
 
 No campo "angulo" da pauta, diga qual abordagem foi escolhida e por que ela equilibra a marca agora.
+
+## Vídeos institucionais por marca
+Cada marca precisa de vídeos fixados que respondam a quem abre o perfil pela primeira vez. O conjunto inicial tem 3 vídeos: o que é e por que é diferente (desejo); como funciona, do início ao primeiro resultado (facilidade); quem está por trás e quem já usa (segurança e credibilidade).
+
+Olhe o bloco "VÍDEOS INSTITUCIONAIS POR MARCA". Vídeo postado está feito. Crie pauta (formato video_vertical, tipo institucional) só para o que falta em cada marca, sem repetir tema postado ou em produção, sempre focando em desejo e confiança. No briefing, diga ao Roteirista quais vídeos já existem e qual pergunta este responde. Se faltar prova ou história real para o vídeo de credibilidade, peça ao dono em vez de inventar.

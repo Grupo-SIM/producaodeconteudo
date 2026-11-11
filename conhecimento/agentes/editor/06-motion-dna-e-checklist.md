@@ -32,3 +32,6 @@
 - [ ] Mix -14 LUFS, pico ≤ -1 dBTP; voz clara; SFX só nos momentos fortes.
 - [ ] Duração do vídeo = duração da voz (±0,2 s).
 - [ ] Stills e sheet do MP4 conferidos.
+
+## Texto na tela (regra do dono)
+Em motion, o texto na tela é o mesmo que está sendo dito na narração. Não mostre frase diferente da fala.

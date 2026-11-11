@@ -4,7 +4,7 @@
 Estas regras vêm de correções diretas do dono. Cada item que falhar é CORREÇÃO OBRIGATÓRIA, com regra, trecho e correção exata. O detalhe e os exemplos estão na base do Roteirista "Repertório do especialista".
 
 ## Universo do negócio
-1. As marcas vendem só produto digital. Reprove frete, estoque, entrega, troca, embalagem, loja física, fornecedor ou dropshipping.
+1. Em todas as marcas, reprove cena ou exemplo que não conecte com algo que vendemos ou não atraia o público que compra de nós. Exceção: assunto ligado a um produto nosso, como delivery próprio. Nas marcas de marketing, o universo é só produto digital: reprove frete, estoque, entrega, troca, embalagem, loja física, fornecedor ou dropshipping.
 2. As cenas são do digital (stories, live, direct, link do checkout, área de membros, Pix, garantia), nunca de balcão ("passa o preço", "faz mais barato?" em cena de loja).
 
 ## Capa / headline
@@ -77,3 +77,23 @@ Estas regras vêm de correções diretas do dono. Cada item que falhar é CORRE�
 - Toda correção nova do dono vira critério nas próximas revisões, sem precisar ser repetida.
 - Pergunta do dono não é ordem: se a peça já está boa, não invente correção.
 - Não reprove por gosto pessoal fora destas regras e das regras do seu prompt.
+
+**Hashtags:** nenhuma peça usa hashtag (decisão do dono). Se aparecer, peça para retirar.
+
+**Tom por marca de marketing:** Marketing Raiz é técnico e aplicável, para quem pratica. Central do Marketing é mais ampla e pode ter humor, memes e notícias. Peça ajuste quando a peça não combinar com a marca.
+
+**Post de venda:** o produto entra depois da dor, só com recursos confirmados, e o CTA é "Clique no link na bio e conheça [produto].", sem "100% gratuita".
+
+**Educativo sem produto:** não reprove educativo por não preparar venda. Ele pode ser só de retenção. Post de venda, sim, sempre liga a um produto.
+
+**Realidade atual:** reprove rotina que o público já não vive hoje (ex.: semanas escrevendo um e-book, numa época em que se usa IA) e frase sem sentido lógico ou físico.
+
+**Reels:** em motion, o texto na tela é igual à fala. Institucional precisa gerar desejo, segurança e credibilidade, sem prova que a ficha não confirme.
+
+**Força do CTA:** o CTA para a bio precisa de uma dor concreta e de um resultado direto, que valham sair da rede social. Dor fraca pede ajuste.
+
+**CTA de debate:** a posição desafiada precisa ser defendida por gente real. Se ninguém a defenderia, peça ajuste.
+
+**Opinião:** a tese precisa dividir grupos reais e mexer com algo pessoal. Se todo mundo concordaria, peça ajuste.
+
+**Legenda × peça:** a pergunta e o CTA da legenda não podem ser iguais aos do slide final ou do vídeo.

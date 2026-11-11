@@ -782,7 +782,7 @@ const ICON = {
 };
 const FORMAT = { carrossel: 'Carrossel', feed: 'Feed', stories: 'Stories', video_vertical: 'Vídeo vertical', video_horizontal: 'Vídeo horizontal' };
 const isVideoF = f => f === 'video_vertical' || f === 'video_horizontal';
-const KIND = { educativo: 'Educativo', historia_real: 'História real', noticia: 'Notícia / evento', ficcao: 'História criada (ficção)', venda: 'Venda', bastidores: 'Bastidores', opiniao: 'Opinião', historia_vende: 'História que vende (VSL)', serie_episodio: 'Série / novela (episódio)', texto: 'Texto', carta_vendas: 'Carta de vendas' };
+const KIND = { educativo: 'Educativo', historia_real: 'História real', noticia: 'Notícia / evento', ficcao: 'História criada (ficção)', venda: 'Venda', bastidores: 'Bastidores', institucional: 'Institucional', opiniao: 'Opinião', historia_vende: 'História que vende (VSL)', serie_episodio: 'Série / novela (episódio)', texto: 'Texto', carta_vendas: 'Carta de vendas' };
 const GOAL_UI = { produto: '💰 Vender produto', conteudo: '📺 Monetizar conteúdo' };
 const PTYPE = { ebook: 'E-book', curso: 'Curso', mentoria: 'Mentoria', servico: 'Serviço', software: 'Software / app', fisico: 'Produto físico', outro: 'Outro' };
 const STATUS = { producing: ['Em produção', 'acc'], awaiting_script: ['Aprovar roteiro', 'warn'], awaiting_approval: ['Aprovar final', 'warn'], approved: ['Pronto p/ postar', 'ok'], posted: ['Postado', ''], blocked: ['Precisa de atenção', 'bad'] };
@@ -1588,7 +1588,7 @@ function drawDrawer() {
   const pend = manual() ? d.jobs.filter(j => j.status === 'queued') : [];
   const gate = d.status === 'awaiting_script' ? ['Sua aprovação do roteiro', `O Revisor aprovou (nota ${d.score != null ? d.score.toFixed(1) : '—'}). Leia o roteiro abaixo. Se estiver bom, aprove e a equipe cria ${isVideoF(d.format) ? 'a arte e a decupagem do vídeo' : 'a arte'}. Nada é produzido antes da sua aprovação. Se não gostar, use “Pedir ajustes”.`]
     : d.status === 'awaiting_approval' ? ['Sua aprovação final', `O Revisor já revisou o roteiro e a entrega e o Social Media montou o pacote. Confira o resumo e os arquivos desta aba; ao aprovar, está liberado para postar.`]
-    : d.status === 'approved' ? ['Pronto para postar', 'Abra a aba “Legenda e pacote”, copie legenda e hashtags, publique e depois clique em “Marcar como postado”.'] : null;
+    : d.status === 'approved' ? ['Pronto para postar', 'Abra a aba “Legenda e pacote”, copie a legenda, publique e depois clique em “Marcar como postado”.'] : null;
   const body = h('div', { class: 'body' }, gate && !pend.length ? h('div', { class: 'banner info' }, h('b', null, gate[0] + ': '), gate[1]) : null, d.manager && d.status === 'awaiting_approval' ? h('div', { class: 'banner ' + (d.manager.veredito === 'aprovar' ? 'info' : 'warn'), style: { cursor: 'pointer' }, onclick: () => { D.tab = 'review'; drawDrawer(); } }, h('b', null, 'Revisor: '), (d.manager.veredito === 'aprovar' ? 'aprovou a entrega' : 'recomenda ajustes') + ' (nota ' + Number(d.manager.nota).toFixed(1) + '). ', d.manager.resumo ? ' ' + d.manager.resumo : '', ' · Ver revisão →') : null, pend.length ? h('div', { class: 'banner info', style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' } }, h('div', { class: 'sp' }, h('b', null, 'Próximo passo: '), STAGE_LABEL_UI[pend[0].kind] || pend[0].kind, h('div', { class: 'small' }, 'Copie o pedido, cole no chat com o Claude e traga a resposta de volta.')), h('button', { class: 'btn primary', onclick: () => openJob(pend[0].id) }, 'Abrir pedido')) : null, drawerTab(d, D));
   const acts = [];
   const travadoSemProducao = d.status === 'blocked' && d.script && !(isVideoF(d.format) ? d.video : d.art);   // roteiro que travou na revisão: aprovar manda produzir
@@ -1814,7 +1814,7 @@ function drawerTab(d, D) {
         p.horario_sugerido ? h('div', null, h('div', { class: 'small mut' }, 'Melhor horário sugerido'), h('div', null, p.horario_sugerido)) : null,
         p.checklist?.length ? h('div', null, h('div', { class: 'small mut' }, 'Checklist antes de postar'), h('ul', { style: { margin: '6px 0', paddingLeft: '20px' } }, p.checklist.map(x => h('li', null, x)))) : null,
         p.observacoes ? h('div', { class: 'small mut' }, p.observacoes) : null)
-        : h('div', { class: 'empty' }, 'O pacote de postagem (legenda, hashtags e checklist) é montado pelo Social Media assim que o Revisor aprova a entrega.'));
+        : h('div', { class: 'empty' }, 'O pacote de postagem (legenda e checklist) é montado pelo Social Media assim que o Revisor aprova a entrega.'));
   }
   if (D.tab === 'review') {
     const m = d.manager, mgr = m ? h('div', { class: 'card stack', style: { borderColor: 'rgba(251,146,60,.45)' } }, h('div', { class: 'row' }, h('span', { class: 'tag', style: { background: '#fb923c' } }, 'Revisor'), h('b', null, 'Revisão da entrega'), h('div', { class: 'sp' }), badge('Nota ' + Number(m.nota).toFixed(1), m.nota >= +S.st.settings.score_min ? 'ok' : 'warn'), badge(m.veredito === 'aprovar' ? 'Pode aprovar' : 'Recomenda ajustes', m.veredito === 'aprovar' ? 'ok' : 'warn')),
@@ -3791,7 +3791,7 @@ function viewSettings() {
       h('div', { class: 'fgrid' }, fld('Nota mínima para aprovar (0–10)', inp('score_min', 'number', { min: 0, max: 10, step: 0.1 })), fld('Revisões automáticas máximas', inp('max_revisions', 'number', { min: 0, max: 5 }))),
       h('div', { class: 'small mut' }, 'O Revisor revisa o roteiro e depois a entrega (arte, feita pelo Designer, ou vídeo, feito pelo Editor). Se reprovar, a peça volta para quem fez, com ajustes, até esse limite; depois disso vai para “Precisa de atenção” e espera por você. Nada é publicado sem a sua aprovação final.'),
       sw('web_search', 'Busca na web para notícias e histórias reais', 'O Roteirista pesquisa fontes atuais nesses tipos de conteúdo (usa a ferramenta de busca da API; pode ter custo extra).'),
-      sw('pacote_ia', 'Social Media com IA no pacote de postagem', 'Desligado (mais rápido): legenda, hashtags e checklist saem do roteiro na hora. Ligado: o Social Media também sugere primeiro comentário e horário, com uma etapa a mais.')]],
+      sw('pacote_ia', 'Social Media com IA no pacote de postagem', 'Desligado (mais rápido): legenda e checklist saem do roteiro na hora. Ligado: o Social Media também sugere primeiro comentário e horário, com uma etapa a mais.')]],
     ['ia', 'cog', 'IA e custo', 'Modelo, paralelismo e limite de gasto', () => [
       h('div', { class: 'small mut' }, 'Motor atual: ', h('b', null, manual() ? 'Modo chat (você cola as respostas do Claude, sem API)' : 'API do Claude conectada')),
       h('div', { class: 'fgrid' }, fld('Modelo padrão', inp('model')), fld('Tarefas em paralelo', inp('concurrency', 'number', { min: 1, max: 4 })), fld('Limite de tarefas por dia', inp('max_jobs_day', 'number', { min: 1 })), fld('Orçamento da base (caracteres)', inp('kb_budget', 'number', { min: 5000 }))),

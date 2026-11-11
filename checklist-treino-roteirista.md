@@ -21,24 +21,32 @@ Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 - [ ] 2. Stories de serviço (depois de fechar o de venda)
 
 ## Formatos de arte
-- [ ] 3. Post de venda com produto cadastrado
-- [ ] 4. Hashtags: quantas usar, quais e se vale usar
+- [x] 3. Post de venda: 2 carrosséis aprovados (Controle Patrimonial e SimIntPay)
+- [x] 4. Hashtags: descartadas; a legenda usa as palavras de busca
 
 ## Nichos e tom
-- [ ] 5. Educativo para os SaaS que ainda não apareceram: PagaTG (venda direta), EbookSIM e Controle de Motorista
-- [ ] 6. Separar a base 05 entre "técnica universal" e "regras de marketing digital"
-- [ ] 7. Página densa × página simples de marketing (você diz quais marcas são)
-- [ ] 8. Notícia esportiva (testar o formato jornalístico no nicho)
+- [x] 5a. Educativo para o PagaTG: 2 carrosséis aprovados (Seguidores em Alta)
+- [x] 5b. Educativo para EbookSIM e Controle de Motorista: aprovados
+- [x] 6. Base 05 separada: técnica universal na 05, regras de marketing digital na 11
+- [x] 7. Tom definido: Marketing Raiz (densa) e Central do Marketing (mais simples)
+- [x] 8. Notícia esportiva: formato jornalístico aprovado no nicho
 
 ## Formatos de vídeo
-- [ ] 9. Reels / vídeo vertical
+- [ ] 9. Reels / vídeo vertical (voz de IA; educativo, institucional, história real e opinião aprovados; faltam mais um teste de opinião e o de venda; sem notícia)
+- [ ] 9c. Institucional das outras marcas (SimIntPay aprovado com 3 vídeos)
+- [ ] 9a. Reels institucional para clientes terceiros (depois das nossas marcas)
+- [ ] 9b. Reels narrados por pessoa real (quando houver social media)
 - [ ] 10. Vídeo horizontal (YouTube), se for usar
 
 ## Textos longos (por último)
 - [ ] 11. Matéria completa do jornal (refazer o treino: a primeira não ficou boa)
 - [ ] 12. Conteúdo de blog: aulas, tutoriais e artigos, sempre com solução gratuita real primeiro (passo a passo no Excel ou Google Sheets) e depois o produto como opção profissional
-- [ ] 13. Decidir a ordem: post primeiro ou matéria primeiro
-- [ ] 14. Confirmar em fonte primária os fatos das histórias reais aprovadas
+- [x] 13. Ordem: matéria primeiro, seguindo os padrões aprovados de cada formato
+- [ ] 14. Histórias reais: ajustes aplicados; antes de publicar, checar o que segue sem confirmação (Toy Story 2, Hoover e Barings, anotado em cada peça)
+
+## Ao colocar o sistema para rodar
+- [ ] Narração de Reels: o roteiro sai com números em algarismos para a tela, e o motor de vídeo converte para extenso antes de mandar à voz de IA
+- [ ] Quando o Designer pedir roteiro, usar primeiro todas as peças de `carrosseis-aprovados-producao.md`, respeitando marca e formato, e só depois gerar roteiros novos
 
 ## Para alimentar o treino (você, quando puder)
 - [ ] Referência de humor para os stories

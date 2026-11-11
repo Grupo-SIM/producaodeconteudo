@@ -3,19 +3,22 @@
 
 Este documento é repertório. Os manuais ensinam o princípio; aqui estão os moldes que o especialista usa para escrever rápido e forte. Use os moldes como ponto de partida, nunca como frase pronta: todo gancho precisa ser específico do assunto e da marca do pedido.
 
-## 0. Universo do negócio (regra do dono)
+## 0. Público e produtos (regra do dono, todas as marcas)
 
-As marcas vendem SÓ produto digital: sistemas, cursos, e-books, comunidades, packs, serviços. Não existe produto físico, por enquanto.
-- Nunca use exemplo de frete, estoque, entrega, troca, embalagem, loja física, fornecedor ou dropshipping. Isso atrai outro público.
-- Use o mundo do digital: acesso, login, área de membros, checkout, garantia de 7 dias, Pix, assinatura, aula, módulo, suporte, atualização.
-- **Cenas do digital, não de balcão** (aprovado pelo dono): a pessoa chega pelos stories, pela live ou por um conteúdo; chama no direct; recebe o link do checkout; pede desconto. "Tem desconto?" e "tem cupom?" servem; escolha o que fica coerente com o resto da peça (num tema geral sobre desconto, "tem desconto?"). Evite cenas de balcão como "passa o preço", que soam como loja física.
-  Exemplo aprovado: "Você conhece essa cena. A pessoa assiste seus stories, chama no direct dizendo que ama seu conteúdo e pergunta do curso. Você manda o link do checkout. E vem a resposta que você já sabia que vinha: 'Tem desconto?'"
+Não trabalhamos com produto físico. Só use cena, exemplo ou assunto que conecte com algo que vendemos ou que atraia o público que compra de nós.
+- Frete, estoque, embalagem, loja física e dropshipping ficam de fora quando não têm relação com um produto nosso.
+- Exceção: quando a peça conversa com quem usa um produto nosso. Exemplo: delivery próprio pode falar de comida, embalagem, entrega e fornecedor, porque vendemos o sistema para esse dono de negócio.
+- O mesmo vale para o Controle Patrimonial: conteúdo para empresários e gestores que precisam organizar o negócio e controlar o que a empresa tem pode falar de estoque, inventário, equipamentos e bens.
+- Controle de Motorista só entra na Corte dos Ricos. A dor real é o dono lidando com colaboradores que usam demais os veículos da empresa (carro, moto, caminhão): uso pessoal, paradinha no caminho, rota mais longa. O sistema controla a quilometragem para achar os gargalos que fazem sair tanto dinheiro em combustível.
+- **Realidade atual e skin in the game.** Antes de descrever a rotina do público, pergunte se ele vive isso hoje. Ex.: com IA, quase ninguém passa semanas escrevendo um e-book. E a frase precisa fazer sentido físico: "abastecer mais do que roda" é impossível.
+- Antes de usar um exemplo, pergunte: isso traz gente que compraria algo nosso? Se não, troque.
 
 ## 0b. Conteúdo educativo que prepara a venda (regra do dono)
 
 Todo post é a versão resumida de um conteúdo mais aprofundado sobre o mesmo assunto no blog ou no jornal da marca. O post precisa valer por si só, mas deixa espaço real para a pessoa querer a versão completa.
 
 O objetivo final de cada marca é vender. Sempre que o pedido permitir, priorize tema do mundo digital ligado a um produto cadastrado da marca.
+- **Educativo não precisa levar a produto** (regra do dono). Pode preparar a venda ou ser só relevante, pensado para retenção, sem ligação com produto nenhum. Quem sempre liga a um produto é o post de venda.
 - Ensine primeiro. A peça precisa valer por si só e soar como conteúdo, nunca como publi.
 - O assunto nasce do problema que o produto resolve (ex.: hospedagem: site fora do ar, VPS, domínio; gateway: chargeback, venda recusada, segurança do pagamento).
 - O produto só entra no fim, como benefício natural ou próximo passo. Não faça propaganda no meio da peça.
@@ -147,6 +150,14 @@ Cada par mostra a correção que o Revisor faria. O padrão vale para qualquer m
 - Exemplo novo não pode parecer mudança de público. Se a peça fala de delivery, a solução continua dentro da rotina do delivery.
 - Corte palavra que não acrescenta sentido. Ex.: "cliente que volta direto" virou "pedido sem comissão".
 
+**CTA com dor fraca → dor que tira a pessoa da rede social** (correção do dono)
+- Fraco: "aprenda a descobrir quais alertas do seu site você não pode ignorar."
+- Forte: mostre antes uma perda concreta e real, e prometa um resultado direto ("descobrir em nome de quem está o seu domínio e colocar ele no seu nome").
+- Teste de realidade: a situação acontece mesmo? Quem gasta com campanha não passa 3 dias sem olhar. E não prometa ensinar o que já é nativo, como receber notificação. Prefira problema que a pessoa não sabe que tem. Ex.: domínio registrado no nome do freelancer antigo, com os avisos de vencimento indo para o e-mail dele.
+- CTA aprovado: "Se o seu domínio não está no seu nome, seu site não é seu. Clique no link na bio e aprenda de forma 100% gratuita a tomar ele de volta antes que seja tarde."
+- Melhor ainda (aprovado): dor que quase todo mundo já viveu e que dá para checar em 1 minuto. Ex.: o e-mail "novo login detectado" que a pessoa apagou; CTA "Pode ter alguém logado na sua conta agora. Clique no link na bio e aprenda de forma 100% gratuita a ver quem está conectado e expulsar quem não devia estar."
+- Por quê: sair da rede social para ler algo custa esforço. A dor precisa valer esse esforço. Teste: alguém largaria o feed por isso?
+
 **Consequência exagerada → consequência real** (correção do dono)
 - Errado: "Se o aplicativo aumentasse a comissão amanhã, quantos clientes você conseguiria chamar direto?" Um aumento não faz o dono perder os clientes.
 - Aprovado: "Se o aplicativo aumentasse a comissão amanhã, de onde sairia esse dinheiro? Isso mesmo, da sua margem! Clique no link na bio e veja, de forma 100% gratuita, como aumentar sua margem e criar seu próprio canal de pedidos."
@@ -175,7 +186,7 @@ Cada par mostra a correção que o Revisor faria. O padrão vale para qualquer m
 
 **Legenda que repete os slides → legenda que dá o ponto de vista**
 - Fraco: listar de novo os 4 itens.
-- Forte: abrir com a tese da marca ("Desconto não resolve perfil que passa insegurança"), dar um argumento que não está nos slides, fechar com a mesma chamada do último slide.
+- Forte: abrir com a tese da marca ("Desconto não resolve perfil que passa insegurança"), dar um argumento que não está nos slides, fechar com a mesma ação do último slide, em palavras diferentes.
 
 ## 3. Ritmo de carrossel que segura até o fim
 
@@ -193,7 +204,7 @@ Regra do dono: **o carrossel é uma conversa entre a marca e o leitor**, não um
 
 O último slide e a legenda pedem UMA destas duas ações, escolhida pelo que a peça contou:
 
-1. **Comentar.** Uma pergunta que nasce do conteúdo e que a pessoa quer responder ("Qual é a frase que você mais recebe no direct antes de vender?"). A pergunta tem de ser fácil de responder com o que a pessoa JÁ viveu ou já pensa (experiência, opinião, situação dela). Nunca pergunte sobre o que a peça acabou de ensinar ou sobre algo que ela ainda não sabe: ninguém comenta prova (correção do dono). Errado: "Qual é a primeira coisa que alguém lê quando entra no seu perfil?" (ela não sabe, acabou de aprender). Certo: "Você já entrou num perfil e saiu sem entender o que a pessoa vendia?" **Comentário nasce de debate** (regra do dono): só use CTA de comentário quando a peça tem opinião, polêmica ou um lado a tomar (crença contrariada, "você concorda?", "qual dos dois você é?"). Peça educativa ou de passo a passo não gera debate: use o CTA da bio. **O CTA de debate desafia quem discorda** (aprovado pelo dono): a marca já tomou posição na peça; o CTA convida o outro lado a defender o dele. Morno (reprova): "E você, prefere X ou Y? Fala aqui o que você acha." Aprovado: "Eu sei que vai ter gente dizendo que postar todo dia funcionou pra ela. Se você é uma dessas pessoas, me convence nos comentários." Só estimule a ação. **Nunca prometa que a marca vai responder, mandar algo ou dar retorno** ("comenta que a gente responde", "receba no direct").
+1. **Comentar.** Uma pergunta que nasce do conteúdo e que a pessoa quer responder ("Qual é a frase que você mais recebe no direct antes de vender?"). A pergunta tem de ser fácil de responder com o que a pessoa JÁ viveu ou já pensa (experiência, opinião, situação dela). Nunca pergunte sobre o que a peça acabou de ensinar ou sobre algo que ela ainda não sabe: ninguém comenta prova (correção do dono). Errado: "Qual é a primeira coisa que alguém lê quando entra no seu perfil?" (ela não sabe, acabou de aprender). Certo: "Você já entrou num perfil e saiu sem entender o que a pessoa vendia?" **Comentário nasce de debate** (regra do dono): só use CTA de comentário quando a peça tem opinião, polêmica ou um lado a tomar (crença contrariada, "você concorda?", "qual dos dois você é?"). Peça educativa ou de passo a passo não gera debate: use o CTA da bio. **O CTA de debate desafia quem discorda** (aprovado pelo dono): a marca já tomou posição na peça; o CTA convida o outro lado a defender o dele. Morno (reprova): "E você, prefere X ou Y? Fala aqui o que você acha." Aprovado: "Eu sei que vai ter gente dizendo que postar todo dia funcionou pra ela. Se você é uma dessas pessoas, me convence nos comentários." **O outro lado precisa existir** (correção do dono): se a posição desafiada é impossível ou indefensável, a frase vira retórica e ninguém comenta. Desafie uma posição que gente real defende. Só estimule a ação. **Nunca prometa que a marca vai responder, mandar algo ou dar retorno** ("comenta que a gente responde", "receba no direct").
 2. **Clicar no link da bio para saber mais sobre o assunto da peça.** É o CTA padrão quando não houver motivo forte para o comentário. Ligue a chamada ao tema ("Tem mais sobre moldura de preço no link da bio."), nunca um "link na bio" solto.
 
 O que existe na bio (use só para dar motivo ao clique, sem prometer o que ainda não está no ar):

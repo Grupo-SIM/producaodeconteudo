@@ -2,6 +2,8 @@
 
 Lista de peças aprovadas no treino do Roteirista. Ao publicar, confirme produto cadastrado, CTA disponível na bio e, em histórias reais, as fontes.
 
+As aprovações valem para a copy. Indicações visuais serão ajustadas com o Designer e o Editor.
+
 ## Educativo
 
 ### 1. Marketing: moldura de preço
@@ -164,7 +166,7 @@ Legenda: Equipamento sem responsável costuma ser o último a receber conserto. 
 ## História real investigativa
 
 ### 11. Tecnologia: Toy Story 2 quase apagado
-Antes de publicar: confirmar em fonte primária os detalhes da falha do backup e dos cobertores. Sem usar imagem dos personagens. Escolher a frase final do slide 2.
+Conferência 10/11/2026: comando, backup com falha e cópia da Galyn Susman batem em várias fontes secundárias. Sem confirmação independente: "a cópia não estava completa" e "perdeu alguns dias" (cobertores em fonte única). Livro de Catmull não consultado. Sem usar imagem dos personagens. Escolher a frase final do slide 2.
 
 Capa: Um comando errado começou a apagar Toy Story 2. Na frente da equipe inteira.
 2. **Não era falha na tela. O filme estava realmente sendo apagado.** (opção: O trabalho de toda a equipe estava sumindo na frente deles.)
@@ -182,9 +184,9 @@ Legenda: Ter backup e conseguir recuperar são duas coisas diferentes. Muita emp
 Fontes: SlashFilm (2021), com base no livro de Ed Catmull; Techspot.
 
 ### 12. Marketing: a promoção da Hoover
-Antes de publicar: confirmar em fonte primária os números, "destruiu a marca" e "outros ficaram sem nada".
+Conferência 10/11/2026: 100 libras, 600 libras, 50 mil, 300 mil, três executivos, processos até 1998 e reunião de acionistas batem. Ajustes aplicados na capa e no slide 10. Ainda sem confirmação: venda em 1995 e quebra da agência.
 
-Capa: Compre um aspirador e ganhe duas passagens de avião. A promoção destruiu a marca.
+Capa: Compre um aspirador e ganhe duas passagens de avião. A promoção virou um desastre de milhões.
 2. **Não era golpe. Era a Hoover, com selo de fornecedora da família real britânica.**
 3. Reino Unido, 1992. Em plena crise, a Hoover precisava vender produtos parados. Quem gastasse 100 libras ganhava duas passagens que valiam cerca de 600. **Parecia bom demais para ser verdade.**
 4. A empresa contava que pouca gente fosse até o fim. Por isso criou prazos curtos, formulários e o direito de recusar datas e aeroportos escolhidos pelo cliente. **A previsão era de 50 mil pedidos.**
@@ -193,7 +195,7 @@ Capa: Compre um aspirador e ganhe duas passagens de avião. A promoção destrui
 7. O processo ficou ainda mais difícil. Quem conseguia avançar podia receber datas e aeroportos ruins. Outros ficaram sem nada. **O caso foi parar nos jornais.**
 8. A empresa cancelou a promoção quando milhares de clientes já tinham comprado e enviado os formulários. **Foi aí que os clientes se organizaram.**
 9. Um grupo comprou ações da dona da Hoover só para ter direito de entrar na reunião de acionistas, nos Estados Unidos, e cobrar o presidente na frente de todos. **Os processos duraram até 1998.**
-10. Três executivos caíram. A divisão europeia foi vendida em 1995. **Anos depois, até o selo da família real foi embora.**
+10. Três executivos caíram. A divisão europeia foi vendida em 1995. **A conta chegou a dezenas de milhões de libras.**
 11. **Eles fizeram a conta para quase ninguém aceitar. Nunca para dar certo.**
 12. **Quem vende online comete o mesmo erro.** O bônus de mentoria individual. O suporte ilimitado. O cupom sem limite de uso. Funciona com 20 vendas. E com 600?
 13. **Se sua oferta vendesse 6 vezes mais amanhã, você conseguiria entregar tudo o que prometeu?** Clique no link na bio e aprenda de forma 100% gratuita a calcular sua oferta antes que ela vire prejuízo.
@@ -203,18 +205,18 @@ Legenda: A promoção mais perigosa é aquela que você só consegue cumprir se 
 Fontes: Wikipedia; BBC News (2004).
 
 ### 13. Redes sociais: Fyre Festival
-Antes de publicar: confirmar valores e decisões judiciais em fonte primária, porque a peça cita pessoas reais.
+Conferência 10/11/2026: seis anos de McFarland, 275 mil e acordo de 90 mil batem. Ajustes aplicados: acordo sem admitir culpa, sanduíche como foto divulgada e corte dos detalhes sem confirmação.
 
 Capa: Um quadrado laranja no Instagram vendeu uma festa que nunca aconteceu.
 2. **Não era um post qualquer. Era Kendall Jenner, Emily Ratajkowski e outras famosas no mesmo dia.**
-3. Dezembro de 2016. O vídeo mostrava modelos numa praia paradisíaca e prometia um festival de luxo nas Bahamas. Pacotes chegavam a 12 mil dólares, com avião e hospedagem. **Cerca de 5 mil ingressos foram vendidos.**
+3. Dezembro de 2016. O vídeo mostrava modelos numa praia paradisíaca e prometia um festival de luxo nas Bahamas. Pacotes chegavam a 12 mil dólares, com avião e hospedagem. **E as pessoas compraram.**
 4. Só Kendall Jenner recebeu 275 mil dólares pelo post. **O problema era o que existia fora do Instagram.**
 5. Um consultor alertou que fazer aquele evento custaria uma fortuna. Duas semanas antes, a verba da comida caiu de 6 milhões para 1 milhão de dólares. **Mesmo assim, o festival seguiu em frente.**
-6. Abril de 2017. No lugar das casas de luxo, os convidados encontraram barracas de emergência e colchões molhados pela chuva. **O jantar veio em caixa de isopor: sanduíche de queijo.**
-7. Faltava água corrente, luz e sinal de celular. Uma das principais atrações desistiu no mesmo dia. **Todo mundo queria ir embora.**
-8. O primeiro voo de volta foi cancelado. Passageiros ficaram trancados no terminal, sem comida, água ou ar-condicionado. **Quem tinha pago pelo paraíso agora só queria sair dali.**
+6. Abril de 2017. No lugar das casas de luxo, os convidados encontraram barracas de emergência e colchões molhados pela chuva. **A foto que rodou o mundo mostrava uma caixa de isopor com sanduíche de queijo.**
+7. Faltava água corrente, luz e sinal de celular. **Todo mundo queria ir embora.**
+8. Os convidados ficaram presos na ilha, tentando conseguir um voo de volta. **Quem tinha pago pelo paraíso agora só queria sair dali.**
 9. Até quem trabalhou para montar o evento e alimentar a equipe ficou sem receber. **Foi quando a Justiça entrou na história.**
-10. O organizador, Billy McFarland, confessou fraude e foi condenado a seis anos de prisão. Kendall Jenner pagou 90 mil dólares em um acordo. **E o post já tinha feito o estrago.**
+10. O organizador, Billy McFarland, confessou fraude e foi condenado a seis anos de prisão. Kendall Jenner pagou 90 mil dólares em um acordo, sem admitir culpa. **E o post já tinha feito o estrago.**
 11. **As pessoas não compraram um festival. Compraram a confiança em quem postou.**
 12. **Isso ainda acontece em qualquer publi.** O curso que você indicou. O cupom que divulgou. A plataforma que recomendou nos stories. Se der errado, é o seu nome que o público cobra.
 13. **Se um produto que você indicou desse errado amanhã, seu público ainda confiaria em você?** Clique no link na bio e aprenda de forma 100% gratuita a avaliar uma publi antes de colocar sua reputação nela.
@@ -224,7 +226,7 @@ Legenda: Entre tantas famosas divulgando o festival, segundo relatos, só uma av
 Fonte: Wikipedia.
 
 ### 16. Empreendedorismo e finanças: a conta 88888 do Barings
-Antes de publicar: confirmar valores e datas em fonte primária, porque a peça cita uma pessoa real.
+Conferência 10/11/2026: conta 88888, 827 milhões, venda por 1 libra e falta de separação de funções batem em fontes secundárias. O relatório do Banco da Inglaterra não foi consultado. 20 mil libras em fonte única; data da falência varia entre 26 e 27 de fevereiro.
 
 Capa: Um banco de 233 anos quebrou por causa de uma conta que quase ninguém olhava.
 2. **Não era um banco pequeno. Era o Barings, um dos mais antigos da Inglaterra.**
@@ -321,6 +323,170 @@ Todo CTA leva ao link da tela. Sem emoji.
 17. Indireta. Pergunta: cliente comprou uma vez e sumiu, como faço ele voltar? Resposta: Dê um motivo pra ele voltar. Pode ser conteúdo depois da compra, atendimento que ele lembra, uma oferta só pra quem já é cliente, ou um benefício que ele só usa comprando de novo, como um cashback. Quem já comprou de você é muito mais fácil de convencer do que um desconhecido.
 18. Valor. Pergunta: o que eu faço hj pra organizar as finanças do negócio? Resposta: Comece separando as contas, pessoal de um lado e empresa do outro. Depois, defina um pró-labore, um valor fixo que você tira por mês, em vez de pegar dinheiro quando precisa. Só isso já mostra se o negócio se paga.
 19. CTA. Pergunta: tô começando a vender agora, preciso de gateway de pagamento? Resposta: Se você vai vender online, precisa. Sem ele você fica só no Pix e perde todo mundo que só compra parcelado no cartão. Vou te recomendar o que eu uso, tá no link abaixo.
+
+## Posts de venda
+
+### 21. Corte dos Ricos: Controle Patrimonial (carrossel)
+1. Capa. Título: Sua empresa está pagando por coisas que ela já tem.
+2. Você conhece essa cena. Alguém precisa de um notebook. Ninguém acha aquele que estava sobrando. Aí a solução é comprar outro. Três meses depois, o antigo aparece numa gaveta.
+3. Agora troca o notebook por cadeira, ferramenta, equipamento, peça. Ninguém sabe direito o que a empresa tem, onde está ou em que estado. **Isso não aparece no seu extrato. Mas sai do seu caixa.**
+4. Aí você monta uma planilha. Funciona bem por umas semanas. Até alguém esquecer de atualizar, outro salvar uma cópia, e você ter três versões que não batem com o que está na sala.
+5. **Você não precisa de mais uma planilha. Precisa saber o que é seu.** Foi pra isso que existe o Controle Patrimonial: cada item da sua empresa registrado com localização, preço, categoria e nota fiscal.
+6. Cada item tem um localizador único. Você vê o histórico de movimentações, o que está com defeito e o que está parado. E o cadastro é simples, pra qualquer pessoa da equipe conseguir usar.
+7. **Antes de comprar de novo, você olha.** Filtra a data, abre o relatório e decide com o número na frente. Sem depender da memória de ninguém.
+8. **R$ 69,90 por mês.** E todo mês você recebe o valor integral da mensalidade em crédito no Vale Bonus.
+9. **Quanto da sua empresa está parado sem você saber?** Clique no link na bio e conheça o Controle Patrimonial.
+
+Legenda: Empresa não perde dinheiro só no que vende mal. Perde também no que compra duas vezes, no equipamento que quebrou e ninguém registrou, no bem que saiu e nunca voltou. O problema é que esse tipo de perda não tem data nem aviso. Ela só aparece quando você precisa do item e ele não está lá. Se hoje alguém te pedisse a lista de tudo o que a sua empresa tem, em quanto tempo você entregaria? Clique no link na bio e conheça o Controle Patrimonial.
+
+### 22. Marketing Raiz: SimIntPay (carrossel)
+Antes de publicar: confirmar quem paga o cashback, o vendedor ou a SimIntPay.
+
+1. Capa. Título: Mesmo curso. Mesmo preço. Só um deles dá até R$ 250 em crédito pro cliente.
+2. Imagina a pessoa em dúvida entre o seu curso e o de outro produtor. Abre os dois checkouts. Preço parecido, promessa parecida. Só que num deles aparece: "compre e receba até R$ 250 em crédito no Vale Bonus". **Qual dos dois ela fecha?**
+3. Pra ganhar essa disputa, a maioria faz a mesma coisa: baixa o preço. Solta cupom. Faz "só hoje" toda semana. **E ensina o cliente a nunca mais pagar o valor cheio.**
+4. **Dá pra oferecer mais sem mexer no preço do seu produto.** Na SimIntPay, cada compra pode gerar até R$ 250 de cashback instantâneo em crédito no Vale Bonus. Seu cliente sente que ganhou. E tem um motivo pra comprar de novo.
+5. Agora pensa no cliente que já decidiu, digitou o cartão e viu "pagamento recusado". Ele não desistiu de você. O pagamento desistiu dele. **Na SimIntPay, a aprovação passa de 90%.**
+6. Você escolhe o que oferecer: crédito, débito, Pix e boleto. E ainda configura order bump e upsell, pra aumentar o valor de cada venda sem precisar de cliente novo.
+7. Saque rápido, pro dinheiro não ficar parado. E um painel com vendas e transações em tempo real, pra você saber o que entrou sem caçar comprovante.
+8. **Quanto você já deu de desconto este ano só pra fechar venda?** Clique no link na bio e conheça a SimIntPay.
+
+Legenda: Desconto é a forma mais cara de convencer alguém, porque sai direto da sua margem e ainda treina o cliente a esperar a próxima promoção. Quem vende produto digital costuma gastar energia no anúncio e na página, e esquece que a decisão final acontece no checkout. É ali que a pessoa compara, hesita ou tem o cartão recusado. Se o seu checkout desse um motivo a mais pra pessoa comprar, quantas vendas você deixaria de perder? Clique no link na bio e conheça a SimIntPay.
+
+## Educativos aprovados depois
+
+### 23. Seguidores em Alta: cobrança de grupo no Telegram
+1. Capa. Título: Seu grupo VIP no Telegram tem gente que parou de pagar faz meses.
+2. No começo foi fácil, né? Vinte pessoas. Cada uma mandava o Pix, você conferia e colocava no grupo. Dava até orgulho.
+3. Aí virou 120. Agora sua noite é conferir comprovante, cobrar quem atrasou e tentar lembrar quem pagou em março. **E quem não pagou continua lá dentro, vendo tudo.**
+4. Você não deixou de tirar por bondade. Só não teve tempo. Mas cada pessoa que fica sem pagar é uma mensalidade que não entrou, e quem paga em dia está bancando quem não paga.
+5. **Monte uma lista com 3 colunas.** Nome do membro, data do último pagamento e data do vencimento. Pode ser no Excel ou no Google Sheets. Preencha com o que você tem no extrato.
+6. Filtre quem já venceu e multiplique pelo valor da mensalidade. Esse é o dinheiro que está escapando todo mês. Costuma doer.
+7. Não remova todo mundo de uma vez. Mande antes: "Sua assinatura venceu. Renove até sexta pra manter o acesso." Quem renovar, ótimo. Quem não renovar, sai na sexta, sem discussão.
+8. Escolha um dia fixo da semana pra repetir isso. Com 120 pessoas dá trabalho, mas funciona. O importante é parar de depender da sua memória.
+9. **E quando forem 500 pessoas?** Clique no link na bio e aprenda de forma 100% gratuita a automatizar a cobrança e o acesso do seu grupo no Telegram.
+
+Legenda: Grupo pago não quebra por falta de gente querendo entrar. Quebra quando quem criou vira cobrador em tempo integral e para de produzir o que fazia as pessoas pagarem. Toda hora gasta conferindo comprovante é uma hora a menos de conteúdo. E, quando o conteúdo cai, quem pagava em dia começa a cancelar. Quanto tempo da sua semana vai só em cobrar gente? Clique no link na bio e aprenda de forma 100% gratuita a automatizar a cobrança e o acesso do seu grupo no Telegram.
+
+### 24. Seguidores em Alta: audiência real
+1. Capa. Título: Você tem milhares de seguidores. Quase nenhum deles é seu.
+2. Fala a verdade: você já caprichou num post, ficou feliz com o resultado, publicou… e ele morreu com meia dúzia de curtidas. Aí você olha o número de seguidores lá em cima e não entende.
+3. **Seguir não garante ver.** Seu post disputa espaço com tudo o que a pessoa acompanha. E quem escolhe o que aparece primeiro não é você. É o algoritmo.
+4. **Descubra sua audiência real em 2 minutos.** Abra seus últimos 5 stories e anote as visualizações de cada um. Tire a média e divida pelo número de seguidores. Esse percentual é o tamanho de quem realmente te vê hoje.
+5. Exemplo: 10 mil seguidores e 300 visualizações por story. São 3%. Parece pouco, e é mesmo. Mas essas 300 pessoas são ouro: elas te procuram. **E você ainda depende do Instagram pra falar com elas.**
+6. Leve essas pessoas pra um lugar onde você avisa e a mensagem chega. Um canal gratuito no Telegram resolve isso. A pessoa pode até silenciar, mas aí a decisão é dela, não do algoritmo.
+7. "Entra no meu canal" não convence ninguém. Dê um motivo: "Lá eu posto o que não posto aqui." Coloque o link nos stories por 3 dias seguidos, cada dia mostrando um pedaço do que a pessoa está perdendo.
+8. Publique lá o que não existe no perfil: bastidor, número real, opinião que você não falaria em público. Se o canal for cópia do Instagram, a pessoa não tem por que ficar.
+9. **E se essas 300 pessoas pagassem R$ 20 por mês?** Clique no link na bio e aprenda de forma 100% gratuita a transformar seu canal em um grupo pago.
+
+Legenda: Perfil grande impressiona. Mas perfil é terreno alugado: a regra muda, o alcance cai e a conta pode ser bloqueada sem você ter feito nada. Quem vive de internet há mais tempo aprendeu a usar a rede social para atrair e um canal próprio para se relacionar. Uma coisa não substitui a outra. Se seu perfil sumisse amanhã, por onde você falaria com quem te acompanha? Clique no link na bio e aprenda de forma 100% gratuita a transformar seu canal em um grupo pago.
+
+### 25. Marketing Raiz: título do e-book (prepara EbookSIM)
+1. Capa. Título: Seu e-book não tem problema de conteúdo. Tem problema de título.
+2. Você montou o e-book com IA em uma tarde. Capa bonita, 80 páginas, checkout no ar. A página recebe visita, e nada de venda. Aí você pede pra IA reescrever o capítulo 3.
+3. **Ninguém leu o capítulo 3.** A pessoa decide antes de abrir. Tudo o que ela viu foi o título, a promessa e o preço.
+4. Título que descreve o assunto não vende: "Guia completo de tráfego pago". Título que diz o resultado, sim: "Sua primeira campanha no ar gastando R$ 20 por dia". O primeiro é sobre o livro. O segundo é sobre quem vai comprar.
+5. Escreva 5 títulos. Cada um precisa ter pelo menos um destes: o resultado, o público ou o prazo. Se o título servir pra qualquer livro do tema, jogue fora.
+6. Não pergunte "gostou?". Todo mundo vai dizer que sim. Coloque dois títulos numa enquete: "Qual desses você compraria?". Melhor ainda: rode o mesmo anúncio, com a mesma verba, pras duas versões, e compare os cliques.
+7. Use o subtítulo pra tirar a objeção: "mesmo sem nunca ter aberto o Gerenciador de Anúncios". E mostre o sumário na página, com cada capítulo escrito como resultado. O sumário também vende.
+8. **Quantas pessoas já saíram da sua página por causa de cinco palavras?** Clique no link na bio e aprenda de forma 100% gratuita a montar a página de venda do seu e-book.
+
+Legenda: Autor de primeira viagem costuma tratar o título como a última etapa, aquilo que se escolhe depois que o livro está pronto. Quem vende bem faz o contrário: testa a promessa antes de escrever a primeira página. Se ninguém clica na promessa, você descobre isso em dois dias, e não depois de três meses escrevendo. Se você tivesse que vender seu e-book só com o título, ele venderia? Clique no link na bio e aprenda de forma 100% gratuita a montar a página de venda do seu e-book.
+
+### 26. Corte dos Ricos: quilometragem da frota (prepara Controle de Motorista)
+1. Capa. Título: Tem carro da sua empresa indo pra onde você nunca mandou.
+2. Fim do mês, chega a conta do combustível. Subiu de novo. Você culpa o preço do posto, paga e segue a vida.
+3. O carro que ia só na entrega fez uma paradinha no caminho. A moto da empresa passou o fim de semana na casa do colaborador. O caminhão pegou a rota mais longa. **Ninguém te avisou. Mas o tanque te cobrou.**
+4. **Compare o que foi pedido com o que foi rodado.** Pegue as saídas de uma semana. Veja no mapa quantos quilômetros cada rota deveria ter. Depois compare com o painel do veículo, na saída e na volta.
+5. Rota de 40 km que voltou com 62? Tem 22 km pra explicar. Pode ter sido desvio por causa de trânsito. Pode ter sido paradinha. O número não acusa ninguém, só mostra onde olhar.
+6. Combine uma regra simples: foto do painel na saída e na volta, em toda viagem. Leva menos de um minuto, e você passa a ter dado em vez de achismo.
+7. Antes de cobrar, pergunte. Às vezes teve motivo. Mas repara numa coisa: quando a equipe sabe que a quilometragem é conferida, o uso muda sem você precisar brigar com ninguém.
+8. **Quantos quilômetros sua empresa pagou este mês sem saber pra onde foram?** Clique no link na bio e aprenda de forma 100% gratuita a encontrar onde o dinheiro da gasolina está indo embora.
+
+Legenda: Dono de empresa costuma olhar o combustível como um custo que só sobe. Quase nunca olha como um registro de tudo o que os veículos fizeram no mês. E o constrangimento pesa: ninguém gosta de desconfiar de quem trabalha com a gente. Por isso, regra clara para todo mundo funciona melhor do que chamar uma pessoa para conversar. Se você abrisse hoje a quilometragem de cada veículo, encontraria alguma surpresa? Clique no link na bio e aprenda de forma 100% gratuita a encontrar onde o dinheiro da gasolina está indo embora.
+
+## Reels
+
+### 27. Marketing Raiz: efeito isca (educativo, voz de IA, cerca de 50 s)
+Gancho (0–3 s). Fala: Por que a pipoca média custa quase o mesmo que a grande? Tela: MÉDIA R$ 28 / GRANDE R$ 30
+3–8 s. Não foi erro de quem montou a tabela. A média foi feita pra quase ninguém comprar.
+8–14 s. Isso tem nome: efeito isca. Você coloca uma opção ruim só pra fazer a outra parecer ótima. Tela: EFEITO ISCA
+14–22 s. Pequena, R$ 20. Média, R$ 28. Grande, R$ 30. Por R$ 2 a mais, você leva o balde. Parece até que você ganhou.
+22–26 s. Só que o balde era o que eles queriam te vender desde o começo. Tela: VOCÊ ESCOLHEU O QUE ELES QUERIAM
+26–37 s. Agora olha a sua página. Curso, R$ 197. Curso com suporte, R$ 297. Curso, suporte e comunidade, R$ 327. Por R$ 30 a mais, a pessoa leva tudo.
+37–42 s. Repara: ninguém baixou preço. Só mudou o que está do lado. Tela: O PREÇO NÃO MUDOU. A COMPARAÇÃO, SIM.
+42–47 s. E a pipoca média? Continua lá, no cardápio. Quase ninguém compra. Ela nunca esteve ali pra isso.
+CTA (47–53 s). Se a sua página só tem um preço, com o que a pessoa está comparando? Clique no link na bio e aprenda de forma 100% gratuita a montar sua tabela de planos. Tela: LINK NA BIO
+
+Legenda: Quase ninguém decide se um preço é caro olhando só para ele. A pessoa compara com o que está por perto. Por isso, quem vende com um preço só deixa essa comparação na mão do cliente, e ele vai comparar com o concorrente, com o parcelamento do mês ou com qualquer outra conta. Na sua página, qual opção você quer que a pessoa escolha, e o que está ao lado dela? Clique no link na bio e aprenda de forma 100% gratuita a montar sua tabela de planos.
+
+### 28. SimIntPay: institucional, vídeo 1 (voz de IA, cerca de 40 s)
+Texto na tela igual à fala. Indicações visuais ainda serão definidas com o Editor.
+
+Gancho. Receber pagamento, todo mundo recebe. A pergunta é o que acontece depois.
+Seu cliente paga, recebe o que comprou e vai embora. E você volta a gastar pra conseguir o próximo.
+A SimIntPay foi criada pra mudar essa conta. Somos uma plataforma de pagamentos feita pra você vender mais e fazer o cliente voltar.
+A cada compra, seu cliente pode ganhar até R$ 250 em crédito no Vale Bonus. Na hora. É um motivo real pra ele comprar de você de novo.
+Você aceita crédito, débito, Pix e boleto. Com mais de 90% de aprovação, saque rápido e tudo acompanhado em tempo real, num painel só.
+E, quando você precisa de ajuda, a gente acompanha de perto, até resolver.
+CTA. Receber é só o começo. Conheça a SimIntPay no link da bio.
+
+Legenda: A SimIntPay é uma plataforma de pagamentos para quem quer mais do que receber: quer vender mais e ver o cliente voltar. Crédito, débito, Pix e boleto, alta taxa de aprovação, saque rápido, painel completo e até R$ 250 em crédito no Vale Bonus a cada compra do seu cliente. Conheça no link da bio.
+
+### 29. SimIntPay: institucional, vídeo 2, como funciona (voz de IA, cerca de 30 s)
+Gancho. Quanto tempo falta pra sua próxima venda cair na sua conta?
+Começar na SimIntPay é simples. Você cria sua conta em poucos minutos.
+A nossa equipe valida a sua operação. E aí você já pode vender.
+Você escolhe como quer receber: crédito, débito, Pix ou boleto. E acompanha cada venda em tempo real, num painel só.
+O saque cai no dia seguinte. O dinheiro não fica parado.
+E cada compra do seu cliente pode gerar até R$ 250 em crédito no Vale Bonus.
+CTA. Quem cuida do seu dinheiro precisa estar do seu lado. Vem vender com a gente. O link tá na bio.
+
+### 30. SimIntPay: institucional, vídeo 3, quem está por trás (voz de IA, cerca de 35 s)
+Gancho. A SimIntPay nasceu de uma raiva.
+Durante anos, a gente usou os gateways e os sistemas do mercado nos nossos próprios negócios. E sentiu na pele cada venda travada, cada resposta que não vinha.
+Até que a gente decidiu parar de reclamar e construir o nosso.
+Por trás da SimIntPay está a SIM Intermediações, uma empresa 100% digital, com mais de 10 colaboradores, que desenvolve sistemas e cuida de marketing pra negócios de todo tipo.
+A gente usa o que vende. Por isso, quando você tem um problema, do outro lado tem gente que já passou por ele.
+CTA. Feita por quem vende, pra quem vende. Conheça no link da bio.
+
+### 31. 007 Spyhacker: Knight Capital (história real, voz de IA)
+Fontes: comunicado da SEC de 16/10/2013; PR Newswire e Wikipedia para o resgate e a fusão.
+
+Gancho. O sistema avisou 97 vezes. Ninguém olhou. A conta passou de US$ 460 milhões.
+A Knight Capital era uma empresa americana que comprava e vendia ações pros clientes.
+1º de agosto de 2012. Antes de a bolsa abrir, o sistema dela manda 97 e-mails pra equipe. Todos apontando um erro.
+Ninguém faz nada.
+A bolsa abre. Os clientes tinham feito 212 pedidos.
+O sistema envia mais de 4 milhões.
+Ele não percebia que o pedido já tinha sido atendido. É como apertar o botão de comprar sem parar, sem ver que a compra já passou.
+E cada clique era dinheiro de verdade.
+45 minutos depois, a empresa tinha perdido mais de US$ 460 milhões.
+E o aviso estava lá. Desde antes de tudo começar. Em 97 e-mails.
+Em poucos dias, a empresa precisou ser salva. Um grupo de investidores colocou US$ 400 milhões. Em troca, ficou com 73% da Knight.
+Menos de um ano depois, ela se fundiu com outra empresa. E o nome Knight Capital acabou.
+Uma empresa inteira, entregue por causa de uma manhã. E de 97 e-mails sem resposta.
+Não faltou alerta. Faltou alguém olhando.
+Você também já recebeu um aviso desses.
+"Novo login detectado na sua conta." Um aparelho que você não conhece. Uma cidade onde você nunca foi.
+Você achou que era spam. Apagou. Seguiu o dia.
+Só que quem entra não costuma fazer barulho no primeiro dia. Fica olhando. Lê suas mensagens. Vê qual cartão está salvo.
+Até o dia em que você abre o Instagram e a senha não funciona mais. E o cartão da empresa está pagando anúncio de golpe.
+CTA. Pode ter alguém logado na sua conta agora. Clique no link na bio e aprenda de forma 100% gratuita a ver quem está conectado e expulsar quem não devia estar.
+
+Legenda: A Knight Capital recebeu 97 avisos e não agiu. Você provavelmente recebeu pelo menos um e apagou. Quase ninguém olha a lista de aparelhos conectados nas próprias contas. Tem celular antigo, computador de trabalho que você já devolveu, sessão aberta na casa de alguém. Cada um deles é uma porta. Quando foi a última vez que você conferiu quem está logado no seu Instagram? Clique no link na bio e veja, de forma 100% gratuita, como descobrir quais aparelhos entram na sua conta e tirar os que não deviam estar lá.
+
+### 32. Central do Marketing: IA e preço (opinião, voz de IA)
+Gancho. Se a IA faz em 10 segundos o que você cobra R$ 2 mil pra fazer, o problema não é a IA.
+Todo mundo conhece alguém que fala: "dá pra ver que foi IA".
+Só dá pra ver quando foi mal feito. O que foi bem feito, o cliente leu, aprovou, pagou e nem percebeu.
+Falaram a mesma coisa do Photoshop. "Isso não é fotografia de verdade."
+Hoje ninguém pergunta se a foto foi editada. Pergunta se ficou boa.
+O cliente nunca pagou pelas horas que você passou digitando. Pagou porque você sabe o que escrever pra vender.
+Quem cobra só pelo esforço já perdeu. Só não recebeu o aviso ainda.
+CTA. Se o seu cliente descobrisse que você fez com IA, você cobraria o mesmo preço?
+
+Legenda: Tem muita gente entregando trabalho feito com IA e cobrando como se tivesse passado a semana nele. Tem outro tanto que ainda faz tudo na mão e se orgulha disso. Os dois lados têm um ponto. Se o resultado é o mesmo, importa como foi feito? E, se importa, por que quase ninguém avisa o cliente que usou IA? E você, avisa?
 
 ## Não incluídos ainda
 - WhatsApp no sistema da empresa: ficou aguardando sua correção.

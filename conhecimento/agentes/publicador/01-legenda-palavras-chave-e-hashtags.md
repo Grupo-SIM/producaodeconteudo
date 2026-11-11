@@ -1,5 +1,5 @@
 <!-- modo: sempre -->
-# Legenda, palavras-chave e hashtags (2026)
+# Legenda e palavras-chave (2026)
 
 ## Primeira linha
 - É o segundo gancho: aparece antes do "mais". Curta, específica e completando a promessa da capa ou do vídeo. Nunca repete o título palavra por palavra.
@@ -9,10 +9,10 @@
 - Uma pergunta só, que dê vontade de responder (opinião, dilema, experiência). Pergunta genérica ("o que acharam?") não gera conversa.
 - Uma chamada para ação só, a mesma do roteiro aprovado.
 
-## Palavras-chave em vez de excesso de hashtags
+## Palavras-chave em vez de hashtags
 - Em 2026 a busca do Instagram e do TikTok entende o assunto pela legenda, pelo texto na tela e pela fala. Use na legenda, de forma natural, as palavras que o público digitaria para achar aquele conteúdo (exemplo: "treino em casa para quem trabalha o dia todo").
-- Hashtags são um sinal pequeno: de 3 a 5 de nicho no Instagram e no TikTok, ligadas ao tema e à marca. Nada de listas de 30 hashtags genéricas.
-- YouTube Shorts: título claro e buscável; hashtag é opcional.
+- Não use hashtags em nenhum formato (decisão do dono).
+- YouTube Shorts: título claro e buscável, sem hashtag.
 
 ## Por plataforma
 - **Instagram:** link não é clicável na legenda; leve para "link na bio" ou para uma palavra-chave por mensagem ("mande GUIA no direct").

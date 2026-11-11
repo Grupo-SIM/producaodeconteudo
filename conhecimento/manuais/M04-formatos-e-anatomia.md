@@ -99,4 +99,4 @@ Duração: o necessário para a pessoa entender e sentir, normalmente 6 a 14 min
 
 ## 9. Legenda (todas as redes)
 
-Primeira linha é o gancho (aparece antes do "mais"). Corpo curto, em blocos de 1 a 3 linhas. **Um único CTA com o motivo**, escrito na voz da marca. Palavras-chave naturais (a busca das plataformas lê a legenda). Poucas hashtags de nicho, que hoje pesam menos do que a palavra-chave dentro do texto.
+Primeira linha é o gancho (aparece antes do "mais"). Corpo curto, em blocos de 1 a 3 linhas. **Um único CTA com o motivo**, escrito na voz da marca. Palavras-chave naturais (a busca das plataformas lê a legenda). Sem hashtags.

@@ -43,7 +43,7 @@ Escolha UMA destas estruturas por página, conforme o conteúdo:
 - Primeira linha: uma pergunta ou afirmação forte que abre a curiosidade ("Por que algumas ofertas vendem todos os dias enquanto outras são completamente ignoradas?").
 - De dois a quatro parágrafos curtos que desenvolvem a ideia do carrossel com o ponto de vista da marca, sem repetir os slides palavra por palavra.
 - Último parágrafo: a mesma ação e o mesmo destino do slide final, com palavras diferentes. Não copie a chamada do slide (correção do dono).
-- Sem lista de emojis e sem hashtag no meio do texto; as hashtags ficam na seção `## HASHTAGS`.
+- Sem lista de emojis e sem hashtags, em nenhum formato (decisão do dono). Use na legenda, de forma natural, as palavras que o público pesquisaria.
 
 ## Regras de qualidade deste formato
 - Uma ideia por página. Título de página (quando houver) com no máximo 14 palavras; texto com no máximo 40.

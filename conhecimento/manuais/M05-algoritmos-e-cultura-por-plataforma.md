@@ -29,7 +29,7 @@ Nenhuma plataforma publica os pesos exatos do algoritmo. Quem diz que sabe a fó
 - Gancho de 0 a 2 s, falado e visual. Nada de intro.
 - Uma virada visual a cada 2 a 4 s.
 - Uma ideia só. Fecho com **loop** (a última frase reconecta com a primeira) ou pergunta real.
-- Texto na tela e fala usando as palavras que a pessoa buscaria. Legenda curta com palavras-chave. 3 a 5 hashtags de nicho.
+- Texto na tela e fala usando as palavras que a pessoa buscaria. Legenda curta com palavras-chave. 
 - Comentário fixado com uma pergunta de verdade, para abrir a conversa.
 - **Música:** só biblioteca comercial (conta de negócio) ou trilha livre. Nada de som em alta com direitos.
 
