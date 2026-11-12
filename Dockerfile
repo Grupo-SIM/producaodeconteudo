@@ -8,6 +8,13 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends nodejs \
  && rm -rf /var/lib/apt/lists/*
 
+# Claude Code: roda os agentes pela assinatura do Claude (login em Configurações; fica em /data/claude).
+# Versão fixada: o painel lê o stream-json e o texto do login, que mudam entre versões (mesma do claude-worker do Atlas).
+ARG CLAUDE_CODE_VERSION=2.1.266
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} && npm cache clean --force
+# Teto de permissões do `claude -p`: nenhuma ferramenta que mexa no servidor (só a busca na web, quando o pedido pede)
+COPY claude-managed-settings.json /etc/claude-code/managed-settings.json
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev

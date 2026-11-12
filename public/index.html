@@ -923,7 +923,7 @@ function renderNav() {
   $('#nav').replaceChildren(...NAV.filter(n => canSee(n[0]) && !(n[0] === 'agents' && canSee('settings')) && !(n[0] === 'chefe' && canSee('office')) && n[0] !== 'radar').map(([id, label, ic]) => h('button', { class: 'nav' + (S.view === id ? ' on' : ''), onclick: () => go(id) }, svg(ICON[ic]), label, id === 'pipeline' && wait ? h('span', { class: 'badge' }, wait) : id === 'brain' && st.brainProposals ? h('span', { class: 'badge' }, st.brainProposals) : null)));
   const working = st.agents.filter(a => a.working).length;
   $('#miniStatus').replaceChildren(
-    h('div', null, h('span', { class: 'dot ok' }), manual() ? 'Modo chat (sem API)' : 'Claude conectado (API)'),
+    h('div', null, h('span', { class: 'dot ok' }), manual() ? 'Modo chat (sem API)' : S.st?.api?.provider === 'assinatura' ? 'Claude conectado (assinatura)' : 'Claude conectado (API)'),
     h('div', null, h('span', { class: 'dot ' + (st.settings.autopilot === '1' ? 'ok' : '') }), st.settings.autopilot === '1' ? 'Modo autônomo ligado' : 'Modo autônomo desligado'),
     manual() ? h('div', null, h('span', { class: 'dot ' + (st.waiting.length ? 'warn' : '') }), st.waiting.length ? st.waiting.length + ' pedido(s) para o chat' : 'Nenhum pedido pendente') : h('div', null, h('span', { class: 'dot ' + (working ? 'warn' : '') }), working ? working + ' agente(s) trabalhando' : 'Equipe ociosa'));
 }
@@ -3820,7 +3820,28 @@ function viewSettings() {
   const panes = secs.map(([id, ic, nm, sub, body]) => h('div', { class: 'card stack setpane', id: 'sp-' + id, style: { display: id === cur ? '' : 'none' } }, h('div', null, h('h2', { class: 'row', style: { margin: 0, gap: '10px' } }, svg(ICO[ic], 20), nm), h('div', { class: 'small mut' }, sub)), ...body()));
   const navs = secs.map(([id, ic, nm]) => h('button', { class: 'kbi' + (id === cur ? ' on' : ''), onclick: e => { S.setSec = id; panes.forEach(p => p.style.display = p.id === 'sp-' + id ? '' : 'none'); e.currentTarget.parentNode.querySelectorAll('.kbi').forEach(b => b.classList.toggle('on', b === e.currentTarget)); } }, h('i', { class: 'kdot', style: { background: 'rgba(255,255,255,.08)', display: 'grid', placeItems: 'center' } }, svg(ICO[ic], 14)), h('span', { class: 'kbn' }, nm)));
   return h('div', null, header('Configurações', 'Tudo do sistema em um só lugar. Ajuste e clique em Salvar.', h('button', { class: 'btn primary', onclick: save }, 'Salvar configurações')),
-    h('div', { class: 'klay' }, h('div', { class: 'kside' }, h('div', { class: 'kbh' }, 'Seções'), navs), h('div', { class: 'kmain stack' }, panes)));
+    assinaturaCard(), h('div', { class: 'klay' }, h('div', { class: 'kside' }, h('div', { class: 'kbh' }, 'Seções'), navs), h('div', { class: 'kmain stack' }, panes)));
+}
+
+
+/* ───────── Assinatura do Claude: os agentes rodam sozinhos com o login claude.ai, sem chave de API ───────── */
+function assinaturaCard() {
+  const box = h('div', { class: 'card', style: { marginBottom: '14px' } });
+  const pintar = (st, passo) => {
+    box.replaceChildren(h('b', null, 'Assinatura do Claude'));
+    if (st.api) return box.append(h('div', { class: 'small mut' }, 'O painel está usando chave de API (ANTHROPIC_API_KEY no .env).'));
+    if (st.connected) return box.append(h('div', { class: 'small', style: { margin: '6px 0' } }, `Conectada${st.email ? ': ' + st.email : ''}${st.plan ? ' (plano ' + st.plan + ')' : ''}. Os agentes rodam sozinhos pela sua assinatura.`),
+      h('button', { class: 'btn sm', onclick: async () => { if (!confirm('Desconectar a assinatura? Os agentes voltam ao modo chat.')) return; pintar(await api('/assinatura', 'DELETE'), null); } }, 'Desconectar'));
+    box.append(h('div', { class: 'small mut', style: { margin: '6px 0' } }, 'Desconectada: os agentes estão no modo chat (você cola os pedidos). Conecte a sua assinatura do Claude para eles rodarem sozinhos.'));
+    if (!passo) return box.append(h('button', { class: 'btn primary sm', onclick: async () => { try { const r = await api('/assinatura/login', 'POST'); pintar(st, r.url); } catch (e) { toast(e.message, 'err'); } } }, 'Conectar assinatura'));
+    const code = h('input', { placeholder: 'Cole aqui o código que o Claude mostrar', style: { width: '100%', margin: '6px 0' } });
+    box.append(h('div', { class: 'small' }, '1. Abra o link, entre na sua conta do Claude e autorize. ', h('a', { href: passo, target: '_blank', rel: 'noopener' }, 'Abrir login do Claude')),
+      h('div', { class: 'small', style: { marginTop: '6px' } }, '2. Copie o código que aparecer e cole abaixo:'), code,
+      h('button', { class: 'btn primary sm', onclick: async () => { try { const r = await api('/assinatura/codigo', 'POST', { code: code.value }); if (!r.connected) toast('Não conectou. Gere um link novo e tente de novo.', 'err'); pintar(r, null); } catch (e) { toast(e.message, 'err'); } } }, 'Confirmar'));
+  };
+  box.append(h('b', null, 'Assinatura do Claude'), h('div', { class: 'small mut' }, 'Verificando…'));
+  api('/assinatura').then(st => pintar(st, null)).catch(() => {});
+  return box;
 }
 
 

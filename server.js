@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import zlib from 'node:zlib';
+import os from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import dns from 'node:dns';
@@ -266,7 +267,71 @@ const isVideo = f => f === 'video_vertical' || f === 'video_horizontal';
 const textoPuro = c => c.format === 'feed' && KINDS_TEXTO.includes(c.kind);   // texto/carta de vendas no feed = só o texto, sem arte
 const agenteLigado = id => !!one('SELECT 1 x FROM agents WHERE id=? AND enabled=1', id);
 const producaoDe = c => textoPuro(c) ? [] : (PRODUCTION[c.format] || []).filter(agenteLigado);   // agente desativado não recebe tarefa (ficaria parada na fila)
-const MANUAL = !API_KEY;
+let MANUAL = !API_KEY;   // sem chave de API e sem assinatura conectada: modo chat (pedido colado à mão)
+
+// ── Assinatura do Claude (Claude Code com login claude.ai, igual ao claude-worker do Atlas): roda os agentes sem chave de API
+const CLAUDE_DIR = path.join(DATA_DIR, 'claude');   // login fica no volume /data (sobrevive a deploy)
+const API_ENV = ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_BASE_URL', 'CLAUDE_CODE_USE_BEDROCK', 'CLAUDE_CODE_USE_VERTEX', 'CLAUDE_CODE_OAUTH_TOKEN'];
+const claudeEnv = () => { const e = { ...process.env, CLAUDE_CONFIG_DIR: CLAUDE_DIR }; for (const k of API_ENV) delete e[k]; return e; };   // credencial de API venceria o login e cobraria por token
+let ASSINATURA = { connected: false };
+async function assinaturaStatus() {
+  if (API_KEY) return ASSINATURA = { connected: false };
+  try {
+    const out = await new Promise((ok, ko) => execFile('claude', ['auth', 'status', '--json'], { env: claudeEnv(), timeout: 20000 }, (e, so) => e ? ko(e) : ok(so)));
+    const r = JSON.parse(out);
+    ASSINATURA = r.loggedIn === true && r.authMethod === 'claude.ai' ? { connected: true, email: r.email || '', plan: r.subscriptionType || '' } : { connected: false };
+  } catch { ASSINATURA = { connected: false }; }   // sem login (ou sem o CLI) o comando sai com erro: é "desconectado"
+  MANUAL = !API_KEY && !ASSINATURA.connected;
+  return ASSINATURA;
+}
+let loginPendente = null;   // { proc, at }
+function assinaturaLoginInicia() {
+  if (loginPendente?.proc.exitCode === null) loginPendente.proc.kill('SIGTERM');
+  fs.mkdirSync(CLAUDE_DIR, { recursive: true, mode: 0o700 });
+  const proc = spawn('claude', ['auth', 'login'], { env: claudeEnv() }); proc.stderr.resume();
+  loginPendente = { proc, at: Date.now() };
+  return new Promise((ok, ko) => {
+    let buf = '', fim = false; const done = (e, u) => { if (fim) return; fim = true; clearTimeout(t); e ? ko(e) : ok(u); };
+    const t = setTimeout(() => done(new Error('O Claude não devolveu o link de login a tempo.')), 20000);
+    proc.stdout.on('data', ch => { buf = (buf + ch).slice(-16384); const mm = /https:\/\/\S+oauth\/authorize\S*/.exec(buf); if (mm) done(null, mm[0]); });
+    proc.on('error', () => done(new Error('Não encontrei o Claude Code instalado no servidor.')));
+    proc.on('exit', () => done(new Error('O login terminou antes de gerar o link.')));
+  });
+}
+async function assinaturaLoginConclui(code) {
+  const lp = loginPendente; if (!lp || Date.now() - lp.at > 600000) throw new Error('Login expirado. Clique em Conectar de novo.');
+  const saiu = lp.proc.exitCode !== null ? Promise.resolve() : new Promise(r => lp.proc.once('exit', r));
+  lp.proc.stdin.write(String(code).trim() + '\n'); lp.proc.stdin.end();
+  await Promise.race([saiu, sleep(30000)]); loginPendente = null;
+  return assinaturaStatus();   // o código de saída não prova nada: vale o "auth status"
+}
+// Um pedido: `claude -p` sem nenhuma ferramenta (só busca na web quando o pedido pede), com o prompt do agente no lugar do prompt do Claude Code
+async function callAssinatura({ system, content, images = [], model, search }) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdc-turno-')), sys = path.join(dir, 'system.md');
+  fs.writeFileSync(sys, system);
+  const args = ['-p', '--input-format', 'stream-json', '--output-format', 'stream-json', '--verbose', '--model', /opus/i.test(model) ? 'opus' : /haiku/i.test(model) ? 'haiku' : 'sonnet',   // apelido: o CLI resolve para o modelo atual da assinatura
+    '--tools', search ? 'WebSearch' : '', '--strict-mcp-config', '--permission-mode', 'bypassPermissions', '--system-prompt-file', sys];
+  try {
+    return await new Promise((ok, ko) => {
+      const ch = spawn('claude', args, { cwd: dir, env: claudeEnv() }); let err = '', res = null, buf = '';
+      const t = setTimeout(() => ch.kill('SIGTERM'), 600000);
+      ch.stderr.on('data', d => { err = (err + d).slice(-3000); });
+      ch.stdout.on('data', d => { buf += d; let i; while ((i = buf.indexOf('\n')) >= 0) { const ln = buf.slice(0, i); buf = buf.slice(i + 1); try { const ev = JSON.parse(ln); if (ev.type === 'result') res = ev; } catch { /* linha parcial */ } } });
+      ch.on('error', () => { clearTimeout(t); ko(new Error('Não encontrei o Claude Code instalado no servidor.')); });
+      ch.on('exit', code => {
+        clearTimeout(t);
+        if (res && !res.is_error && String(res.result || '').trim()) return ok({ text: String(res.result).trim(), tin: res.usage?.input_tokens || 0, tout: res.usage?.output_tokens || 0 });
+        const st = res?.api_error_status;
+        if (st === 401 || /not logged in/i.test(res?.result || '')) { assinaturaStatus(); return ko(new Error('A conexão com a assinatura do Claude expirou. Reconecte em Configurações.')); }
+        if (st === 429) return ko(Object.assign(new Error('Limite de uso da assinatura do Claude atingido. Tente de novo mais tarde.'), { limite: true }));
+        ko(new Error(`O Claude encerrou sem resposta (código ${code}). ${(res?.result || err).replace(/sk-ant-[\w-]+/g, '[removido]').slice(-300)}`.trim()));
+      });
+      const img = images.map(im => ({ type: 'image', source: { type: 'base64', media_type: im.type || 'image/jpeg', data: im.data || im } }));
+      ch.stdin.write(JSON.stringify({ type: 'user', message: { role: 'user', content: [...img, { type: 'text', text: content }] } }) + '\n'); ch.stdin.end();
+    });
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+}
+if (!API_KEY) assinaturaStatus().then(a => { if (a.connected) console.log(`Assinatura do Claude conectada (${a.email || 'conta'}): agentes rodam sozinhos.`); });
 const STAGE_LABEL = { seo: 'Agente de SEO revisando a matéria', radar: 'Agente de Notícias pesquisando', estilo: 'Designer aprendendo o estilo de arte', roteiro: 'Roteirista escrevendo', revisao: 'Revisor revisando o roteiro', arte: 'Designer criando a arte', video: 'Editor montando a decupagem', pacote: 'Social Media montando o pacote', gerencia: 'Revisor revisando a entrega', pautas: 'Gerente definindo as pautas', relatorio: 'Gerente lendo as métricas', cerebro: 'Cérebro consolidando o aprendizado', chat: 'Gerente respondendo a você', teste: 'Teste de agente pedido por você' };
 
 const FORMAT_GUIDE = {
@@ -921,7 +986,7 @@ async function callClaude({ agent, user, maxTokens = 4096, search = false, image
   const kb = buildKnowledge(user, ctx?.brand || '', !!ctx?.scoped);
   if (ctx?.dry) throw new DryRun({ agent, core: kb.core, extra: kb.extra, user, sys: agentPrompt(agent, ctx?.brand || '', user) }); // só monta o pedido
   if (ctx?.text != null) return { text: ctx.text, tin: 0, tout: 0 }; // resposta colada pelo usuário (modo chat)
-  if (!API_KEY) throw new Error('Modo chat: este pedido espera a resposta colada no painel');
+  if (!API_KEY && !ASSINATURA.connected) throw new Error('Modo chat: este pedido espera a resposta colada no painel');
   const model = agent.model || s.model;
   const system = [
     { type: 'text', text: agentPrompt(agent, ctx?.brand || '', user) },
@@ -930,6 +995,7 @@ async function callClaude({ agent, user, maxTokens = 4096, search = false, image
   const content = (kb.extra ? `# CONHECIMENTO RELEVANTE PARA ESTE PEDIDO\n${kb.extra}\n\n---\n\n` : '') + user;
   const body = { model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: images.length ? [...images.map(im => ({ type: 'image', source: { type: 'base64', media_type: im.type || 'image/jpeg', data: im.data || im } })), { type: 'text', text: content }] : content }] };
   if (search) body.tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }];
+  if (!API_KEY) return callAssinatura({ system: system.map(b => b.text).join('\n\n'), content, images, model, search });
 
   let lastErr;
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -5767,7 +5833,7 @@ async function pumpRadarLocal() {
   finally { radarLocalRodando = false; }
 }
 function pump() {
-  if (!API_KEY) { pumpRadarLocal().catch(e => console.error('radar:', e.message)); pumpLocal().catch(e => console.error('arte pelo roteiro:', e.message)); return; }
+  if (MANUAL) { pumpRadarLocal().catch(e => console.error('radar:', e.message)); pumpLocal().catch(e => console.error('arte pelo roteiro:', e.message)); return; }
   const s = settings();
   const day = today();
   const used = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", day).n;
@@ -6264,7 +6330,7 @@ function stateSnapshot() {
   const counts = Object.fromEntries(all('SELECT status, COUNT(*) n FROM contents WHERE teste=0 GROUP BY status').map(r => [r.status, r.n]));
   const avg = one('SELECT AVG(score) a FROM contents WHERE score IS NOT NULL').a;
   return {
-    api: { configured: true, provider: MANUAL ? 'manual' : 'api', model: s.model },
+    api: { configured: true, provider: MANUAL ? 'manual' : API_KEY ? 'api' : 'assinatura', model: s.model, assinatura: ASSINATURA },
     waiting: MANUAL ? all("SELECT j.id,j.agent,j.kind,j.content_id,j.error,j.created_at,c.title,c.teste FROM jobs j LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='queued' AND (j.run_after IS NULL OR j.run_after<=?) ORDER BY j.id LIMIT 60", T()).map(w => ({ ...w, label: STAGE_LABEL[w.kind] })) : [],
     scheduled: all("SELECT j.id,j.agent,j.kind,j.content_id,j.run_after,c.title FROM jobs j LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='queued' AND j.run_after>? ORDER BY j.run_after LIMIT 40", T()).map(w => ({ ...w, label: STAGE_LABEL[w.kind] })),
     build: BUILD, brandColors: brandColors(), settings: s, agents, contents, counts, avgScore: avg, brainRules: one("SELECT COUNT(*) n FROM brain_rules WHERE status='ativa'").n, brainProps: one("SELECT COUNT(*) n FROM brain_rules WHERE status='proposta'").n, brainBase: one('SELECT COUNT(*) n FROM brain_base').n, brainProposals: one("SELECT COUNT(*) n FROM brain_rules WHERE status='proposta'").n,
@@ -7010,7 +7076,7 @@ async function api(req, res, url) {
     const itens = all("SELECT r.*, c.title ctitle, c.status cstatus FROM radar_items r LEFT JOIN contents c ON c.id=r.content_id ORDER BY r.id DESC LIMIT 120");
     const rodando = all("SELECT input FROM jobs WHERE kind='radar' AND status IN ('queued','running')").map(j => jparse(j.input, {})?.brand).filter(Boolean);
     const estilos = Object.fromEntries(marcas.map(b => [b, [...templatesDaMarca(b).filter(t => t.formatos.some(f => RADAR_FMTS.includes(f))).map(t => ({ id: t.id, nome: t.nome, formatos: t.formatos, tema: t.tema || '', casa: !!t.casa })), ...radarLayoutsDaMarca(b).map(l => ({ id: 'layout-' + l.id, nome: l.name + ' (layout salvo)', formatos: [l.format], tema: l.tema || '', casa: false }))]]));
-    return send(res, 200, { estilos, cfg, marcas, itens, rodando, ligado: agenteLigado('radar'), api: !!API_KEY, nichos: Object.entries(RADAR_NICHOS).map(([id, n]) => ({ id, nome: n.nome, termos: n.termos })) });
+    return send(res, 200, { estilos, cfg, marcas, itens, rodando, ligado: agenteLigado('radar'), api: !MANUAL, nichos: Object.entries(RADAR_NICHOS).map(([id, n]) => ({ id, nome: n.nome, termos: n.termos })) });
   }
   if (p === '/api/radar' && m === 'PUT') {
     const b = await readBody(req, 4e4), marcas = all('SELECT name FROM brands').map(x => x.name), cur = radarCfg(), nm = {};
@@ -7792,6 +7858,11 @@ async function api(req, res, url) {
   }
 
   // ── Configurações
+  // Assinatura do Claude: conectar, ver status e desconectar (só admin altera: rota sem área = GET para todos)
+  if (p === '/api/assinatura' && m === 'GET') return send(res, 200, { ...(await assinaturaStatus()), api: !!API_KEY });
+  if (p === '/api/assinatura/login' && m === 'POST') { if (API_KEY) throw fail(400, 'O painel usa chave de API (ANTHROPIC_API_KEY). Tire a chave do .env para usar a assinatura.'); try { return send(res, 200, { url: await assinaturaLoginInicia() }); } catch (e) { throw fail(500, e.message); } }
+  if (p === '/api/assinatura/codigo' && m === 'POST') { const b = await readBody(req); try { const st = await assinaturaLoginConclui(str(b.code, 400, 'Código')); changed(); return send(res, 200, st); } catch (e) { throw fail(400, e.message); } }
+  if (p === '/api/assinatura' && m === 'DELETE') { fs.rmSync(CLAUDE_DIR, { recursive: true, force: true }); await assinaturaStatus(); changed(); return send(res, 200, ASSINATURA); }
   if (p === '/api/settings' && m === 'PUT') {
     const b = await readBody(req);
     applySettings(b);
