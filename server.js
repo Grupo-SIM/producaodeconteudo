@@ -1094,7 +1094,7 @@ function carregaBasesAgentes() {
   }
 }
 try { carregaBasesAgentes(); } catch (e) { console.error('bases dos agentes:', e.message); }
-const AGDOC_BUDGET = 72000;   // cabe a base completa da combinação mais pesada do Roteirista (carrossel de notícia, ~63k)
+const AGDOC_BUDGET = 130000;   // cabe a base completa da combinação mais pesada do Roteirista (stories de venda, ~81k em 11/11/2026), com folga para o treino crescer
 // Manuais do pacote que também servem às outras etapas (o Roteirista e o Revisor de Copy recebem os deles pela seleção por formato)
 const MANUAIS_AGENTE = { designer: ['M04', 'M16'], editor: ['M16', 'M07'], gerente: ['M00', 'M17'], publicador: ['M05'] };
 const palavrasDoc = t => new Set(String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 4));
