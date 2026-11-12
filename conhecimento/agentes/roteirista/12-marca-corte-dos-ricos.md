@@ -9,5 +9,5 @@ Marca de empreendedorismo e finanças. Fala com donos de negócio, gestores e qu
 - Empreendedorismo, finanças e organização do negócio.
 
 ## Produtos que conectam
-- Controle Patrimonial: dinheiro parado ou perdido em bens que a empresa nem sabe que tem. Assinatura de R$ 69,90 por mês, com 100% da mensalidade em crédito no Vale Bonus, todo mês. Nunca escreva "mensalidade de volta" nem "dinheiro de volta".
+- Controle Patrimonial: dinheiro parado ou perdido em bens que a empresa nem sabe que tem. Assinatura de R$ 69,90 por mês, com 100% da mensalidade em crédito no Vale Bonus, todo mês. Nunca escreva "mensalidade de volta" nem "dinheiro de volta". Confirmado pelo dono: organiza todos os bens da empresa num lugar só, com onde cada um está e com quem.
 - Só cite produto cadastrado. Produto que ainda não foi lançado não entra na copy.

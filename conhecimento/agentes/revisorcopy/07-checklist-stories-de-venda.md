@@ -8,7 +8,7 @@ Peça "ajustes" quando faltar qualquer item:
 3. Há CTA em mais de uma tela, para a página de vendas; a DM só aparece como última instância.
 4. A linguagem é sempre no singular, falando com "você". Nada de "vocês", "pessoal" ou "galera".
 5. A pergunta soa como pessoa real e gera identificação (Sexy Canvas: público, desejo, dor e crença claros).
-6. A sequência gira em torno de um produto e de uma dor principal.
+6. Os CTAs podem ser de vários produtos da marca; nenhum produto ou tema (ex.: carro da empresa) se repete a ponto de ficar na cara.
 7. A polêmica contraria a maioria sem ofender ninguém.
 8. Nenhuma prova, número ou depoimento foi inventado.
 9. Não há dois CTAs seguidos sem conteúdo entre eles, exceto no fechamento.
@@ -35,3 +35,12 @@ Peça "ajustes" quando faltar qualquer item:
 30. CTA termina com fechamento natural ("Vou deixar o link aqui", "tá no link abaixo"), nunca só "tá no link".
 31. A tela de humor tem graça de verdade; identificação sem piada não conta como humor.
 32. Tela de valor não termina empurrando produto ou link quando a pergunta não pediu indicação.
+33. A maioria das telas ensina o assunto do perfil (ex.: algoritmo e crescimento num perfil de redes sociais); o produto aparece aqui e ali.
+34. Pergunta sem contexto recebe reação de pessoa real ("Que grupo?") antes da resposta.
+35. A resposta sobre por que algo dá errado traz o problema chave real, não um incômodo secundário.
+36. Tela sem caixinha só quando a anterior pede aprofundamento; se ela já respondeu, reprove a tela extra.
+37. Quebra de padrão gera identificação com o público-alvo; hábito incomum só com razão lógica; não repete quebra de outra sequência.
+38. Nenhum CTA soa como anúncio montado; indicação sempre natural, como quem conta o que usa.
+39. O perfil parece de alguém que sabe muito do nicho inteiro (na Corte dos Ricos: empresa, finanças pessoais, investimentos, bolsa, notícia com fonte), não só do produto.
+40. Toda pergunta é das que uma pessoa manda de verdade na caixinha; conceito técnico solto reprova.
+41. Nenhuma expressão de texto escrito; tudo como se fala.

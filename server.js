@@ -1103,6 +1103,8 @@ function agentDocsBlock(agentId, query = '') {
   const q = palavrasDoc(query), score = r => { if (!q.size) return 0; const tw = palavrasDoc(r.titulo); let n = 0; for (const w of tw) if (q.has(w)) n += 3; const cw = palavrasDoc(String(r.conteudo).slice(0, 4000)); for (const w of q) if (cw.has(w)) n++; return n; };
   const st = als.getStore() || {}, tags = new Set([st.fmt, ...String(st.ctx || '').toLowerCase().split(/[^a-z0-9_]+/)].filter(Boolean)), doFmt = r => r.modo.slice(4).split(',').some(x => tags.has(x));
   if (tags.has('stories_venda') || tags.has('stories_servico')) tags.delete('stories');   // conhecimento de stories de venda/serviço não se mistura com o de stories genérico
+  // Cliente de serviço x marcas próprias: o time de copy usa bases totalmente separadas (arquivo com "formato servico..." é só de cliente de serviço)
+  if (COPY_AGENTES.includes(agentId)) { const ehServ = r => String(r.modo).startsWith('fmt:') && r.modo.slice(4).split(',').some(x => x.includes('servico')), cli = st.brand && marcaServico(st.brand); if (cli) tags.add('servico'); rows = rows.filter(r => cli ? ehServ(r) : !ehServ(r)); }
   const sempre = rows.filter(r => r.modo === 'sempre' || (String(r.modo).startsWith('fmt:') && doFmt(r))), auto = rows.filter(r => r.modo === 'auto').map(r => ({ r, s: score(r) })).filter(x => x.s >= 4).sort((a, b) => b.s - a.s).map(x => x.r);
   let left = AGDOC_BUDGET; const out = [];
   for (const r of [...sempre, ...auto]) { if (left < 400) break; let tx = String(r.conteudo).trim(); if (!/^#/.test(tx)) tx = `## ${r.titulo}\n${tx}`; if (tx.length > left) tx = tx.slice(0, left) + '\n[...cortado pelo limite]'; out.push(tx); left -= tx.length; }
@@ -1146,6 +1148,8 @@ function ruleImpacto(r) {
 const BRAIN_MAX_REGRAS = 24;
 // Stories de venda e de serviço têm bases próprias (modo: formato stories_venda / stories_servico); a marca escolhe o tipo no painel
 const storiesTipo = brand => radarCfg().marcas[brand]?.stories || '';
+const marcaServico = brand => storiesTipo(brand) === 'servico';   // marca de cliente de serviço (escolhida no card da marca)
+const COPY_AGENTES = ['roteirista', 'revisorcopy', 'seo'];
 const ctxDe = c => c ? [c.title, c.brief, c.format === 'stories' && storiesTipo(c.brand) ? 'stories_' + storiesTipo(c.brand) : c.format, c.kind, c.platform, c.brand].filter(Boolean).join(' ').slice(0, 3000) : '';
 function brainEscolhe(rows, query) {
   if (rows.length <= BRAIN_MAX_REGRAS) return rows;
@@ -7817,6 +7821,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname.startsWith('/fonts/')) { const fn = path.basename(url.pathname); const fp = path.join(__dirname, 'public', 'fonts', fn); if (/^[a-z0-9-]+\.woff2$/.test(fn) && fs.existsSync(fp)) { res.writeHead(200, { 'content-type': 'font/woff2', 'cache-control': 'public, max-age=604800' }); return res.end(fs.readFileSync(fp)); } res.writeHead(404); return res.end(); }
     if (['/arte-modelos.js', '/arte-metricas.js', '/arte-icones.js', '/escritorio3d.js', '/three.module.min.js'].includes(url.pathname)) { res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-cache' }); return res.end(fs.readFileSync(path.join(__dirname, 'public', url.pathname.slice(1)))); }
     if (url.pathname === '/logo-agentes-sim.png') { try { const b = fs.readFileSync(path.join(__dirname, 'public', 'logo-agentes-sim.png')); res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'public, max-age=3600' }); return res.end(b); } catch { res.writeHead(404); return res.end(); } }
+    if (url.pathname === '/briefing-cliente-servico.docx') { try { const b = fs.readFileSync(path.join(__dirname, 'briefing-cliente-servico.docx')); res.writeHead(200, { 'content-type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'content-disposition': 'attachment; filename="briefing-cliente-servico.docx"', 'cache-control': 'no-cache' }); return res.end(b); } catch { res.writeHead(404); return res.end(); } }
     if (url.pathname === '/arte-slide.js') { res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-cache' }); return res.end(fs.readFileSync(path.join(__dirname, 'public', 'arte-slide.js'))); }
     if (url.pathname === '/' || url.pathname === '/index.html') return send(res, 200, fs.readFileSync(indexFile, 'utf8'));
     return send(res, 404, { error: 'Não encontrado' });

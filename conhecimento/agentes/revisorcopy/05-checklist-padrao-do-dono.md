@@ -99,3 +99,9 @@ Estas regras vêm de correções diretas do dono. Cada item que falhar é CORRE�
 **Legenda × peça:** a pergunta e o CTA da legenda não podem ser iguais aos do slide final ou do vídeo.
 
 **Depoimentos:** número dito por cliente não vira promessa. Reprove "100% de aprovação" na SimIntPay; o correto é acima de 90%.
+
+**Meme:** quando a peça usa ou ensina meme, o ideal é a referência sutil (easter egg), e não a imagem pronta colada. Conteúdo que ensina meme e não apresenta esse caminho volta para ajuste.
+
+**Cara de IA:** reprove frase poética ou que dá vida a coisa e que ninguém fala numa conversa (ex.: "o que sai quase nunca faz barulho"). Peça a versão direta, como uma pessoa contaria.
+
+**Vale Bonus:** toda citação deixa claro que o crédito vai para o cliente que compra (não para o vendedor) e explica em poucas palavras o que é: crédito no app Vale Bonus para pagar parte de compras em lojas, restaurantes e produtos parceiros. Nunca diga que vira dinheiro, saque ou Pix, e não cite validade.

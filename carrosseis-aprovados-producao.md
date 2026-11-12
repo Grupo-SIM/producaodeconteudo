@@ -324,6 +324,54 @@ Todo CTA leva ao link da tela. Sem emoji.
 18. Valor. Pergunta: o que eu faço hj pra organizar as finanças do negócio? Resposta: Comece separando as contas, pessoal de um lado e empresa do outro. Depois, defina um pró-labore, um valor fixo que você tira por mês, em vez de pegar dinheiro quando precisa. Só isso já mostra se o negócio se paga.
 19. CTA. Pergunta: tô começando a vender agora, preciso de gateway de pagamento? Resposta: Se você vai vender online, precisa. Sem ele você fica só no Pix e perde todo mundo que só compra parcelado no cartão. Vou te recomendar o que eu uso, tá no link abaixo.
 
+### 43. Redes sociais: PagaTG no Seguidores em Alta (20 telas, caixinha), aprovado em 11/11/2026
+Todo CTA leva ao link da tela. Sem emoji. A maioria das telas ensina redes sociais; o produto aparece no meio.
+
+1. Polêmica. Pergunta: precisa postar todo dia pra crescer? Resposta: Não. Postar todo dia um conteúdo fraco ensina o seu público a passar direto por você. Três posts por semana que a pessoa salva e manda pra alguém valem mais do que sete que ela ignora.
+2. Humor. Pergunta: qual a pior parte de postar todo dia? Resposta: Gastar duas horas no roteiro, uma na edição, postar e o vídeo que bomba é o que eu gravei em 30 segundos na fila do mercado.
+3. Autoridade. Pergunta: o que é taxa de engajamento? Resposta: É quanto do seu público interage com o que você posta: curtida, comentário, salvamento, compartilhamento. Quem segue números grandes esquece que 10 mil seguidores que comentam valem mais que 100 mil que só passam. Pra marca e pra quem quer vender, quem interage é quem compra.
+4. Valor. Pergunta: meus seguidores pedem mais conteúdo, o que eu faço? Resposta: Anota tudo que te pedem no direct e nos comentários. As perguntas que mais se repetem mostram o que o seu público quer aprender, e às vezes pagaria para ter de forma mais completa.
+5. Sem caixinha. Isso funciona porque quem te pergunta já confia em você. A pessoa não quer o assunto em geral, ela quer o seu jeito de explicar. É por isso que perfil pequeno consegue vender: não é o tamanho do público, é o quanto ele confia em você.
+6. Indireta. Pergunta: grupo pago no telegram ainda funciona? Resposta: Funciona. O que mata a maioria dos grupos não é o Telegram, é o dono. Ele abre empolgado, posta muito na primeira semana, e um mês depois o grupo virou deserto. Quem paga e não vê nada novo cancela. Antes de abrir, defina o que vai entrar toda semana e veja se você consegue manter.
+7. CTA. Pergunta: como vc controla quem pagou no seu grupo? Resposta: Que grupo? Kkk. Se você tá falando de grupo pago no Telegram, eu deixo isso com o PagaTG: a pessoa paga e entra, parou de pagar e sai, sem eu conferir nada. Vou deixar o link aqui.
+8. Quebra de padrão. Pergunta: série ou filme no fim de semana? Resposta: Série. Filme eu preciso decidir uma vez, e eu passo 40 minutos escolhendo. Série eu escolho uma vez e fico tranquilo pelos próximos três fins de semana.
+9. Humor. Pergunta: qual a proposta mais absurda que já te mandaram? Resposta: Uma loja me ofereceu parceria: eu divulgava os produtos deles e, em troca, eles me davam... um cupom de 10% pra eu comprar os produtos deles.
+10. Autoridade. Pergunta: o instagram mostra meu post pra todos os meus seguidores? Resposta: Não. Em geral, ele mostra primeiro para uma parte do público e mede a reação: se assistem até o fim, salvam, compartilham. Se a reação é boa, entrega para mais gente, inclusive para quem não te segue. Por isso, os primeiros minutos depois de postar pesam tanto.
+11. Valor. Pergunta: qual o melhor horário pra postar? Resposta: O do seu público, não o de uma tabela da internet. No Instagram, entre nos Insights, aba de Público, e veja os horários mais ativos dos seus seguidores. Poste um pouco antes do pico, pra pegar a entrega quando eles abrirem o app.
+12. Valor. Pergunta: quanto cobrar num grupo vip? Resposta: Depende do que você entrega e de quem te segue. Olhe três coisas: quanto tempo o conteúdo do grupo economiza da pessoa, quanto cobram perfis parecidos com o seu, e se o seu público é mais iniciante ou mais avançado. Comece num valor que você consegue sustentar entregando bem, e ajuste depois.
+13. Polêmica. Pergunta: não é feio cobrar dos seguidores? Resposta: Feio é cobrar e não entregar. Quem paga por um grupo não está te fazendo favor, está comprando acesso a algo que vale pra ela. Se o conteúdo resolve, cobrar é o que deixa você continuar fazendo, e fazer melhor.
+14. Autoridade. Pergunta: o que é renda recorrente? Resposta: É o dinheiro que entra todo mês da mesma fonte, tipo uma assinatura. A diferença pra uma venda única é que você não começa o mês do zero. Quem trabalha só com venda única precisa vender tudo de novo todo mês.
+15. Objeção. Pergunta: tenho pouco seguidor, dá pra ter grupo pago? Resposta: Dá. Ter muita gente assinando é ótimo, mas não precisa esperar chegar em milhares pra começar. Se 30 pessoas que confiam em você assinam, já é uma renda que você não tinha. O que importa é a pessoa sentir que o grupo entrega mais do que o perfil aberto.
+16. Valor. Pergunta: reels ou carrossel, o que faz crescer mais? Resposta: Fazem coisas diferentes. Reels costuma levar você pra quem ainda não te conhece. Carrossel faz quem já te segue salvar e voltar. Pra crescer de verdade, você precisa dos dois: um traz gente nova, o outro faz essa gente ficar.
+17. CTA. Pergunta: qual ferramenta pra montar grupo pago no telegram? Resposta: Eu uso o PagaTG e não troco. Eu só posto no grupo: quem paga entra, quem para de pagar sai, e eu nem preciso ficar de olho. E tem um detalhe que faz diferença pra quem assina: a pessoa recebe em crédito no Vale Bonus o valor que pagou, até R$ 250. Vou deixar o link aqui.
+18. Sem caixinha. E se você nunca ouviu falar do Vale Bonus: é um app de recompensas. O crédito fica guardado lá e a pessoa usa pra pagar parte de compras em lojas, restaurantes e produtos parceiros. Não vira dinheiro na conta, mas vira desconto de verdade em coisa que ela já ia comprar. Pra quem assina o seu grupo, é como se a assinatura saísse de graça.
+19. Quebra de padrão. Pergunta: qual a primeira coisa que vc faz quando acorda? Resposta: Pego o celular "só pra ver a hora". Vinte minutos depois, tô vendo vídeo de receita que eu nunca vou fazer na vida.
+20. Indireta. Pergunta: o que colocar dentro de um grupo vip? Resposta: O que não cabe no perfil aberto: conteúdo antes de todo mundo, bastidores, explicação completa e material exclusivo. A pessoa precisa sentir que entrou num lugar diferente, não que pagou pelo mesmo post.
+
+### 44. Empreendedorismo e finanças: Corte dos Ricos com Controle de Motorista e Controle Patrimonial (20 telas, caixinha), aprovado em 11/11/2026
+Modelo de naturalidade para todas as marcas: nicho inteiro (empresa, finanças pessoais, investimento, bolsa, notícia), produtos aparecendo no meio, CTAs de produtos diferentes.
+
+1. Polêmica. Pergunta: vc acha que todo mundo devia empreender? Resposta: Não. Empreender virou moda, mas não é pra todo mundo, e tá tudo bem. Tem gente que rende muito mais sendo um funcionário excelente, com salário certo e sem a conta da empresa na cabeça às 2h da manhã. Empreender é escolha, não obrigação pra dar certo na vida.
+2. Humor. Pergunta: qual a frase do contador que dá mais medo? Resposta: "Tá tudo certo, só tem um detalhezinho." O detalhezinho sempre tem quatro dígitos e vence na sexta.
+3. Autoridade. Pergunta: o que é margem de contribuição? Resposta: É o que sobra de cada venda depois de pagar o que aquela venda custou: produto, taxa, comissão, frete. É essa sobra que paga aluguel, salário e o resto. Se você não sabe a margem de cada produto, pode estar vendendo mais justamente o que menos te dá dinheiro.
+4. Valor. Pergunta: como separar meu dinheiro do da empresa? Resposta: Primeiro passo: abre uma conta só da empresa, hoje. Tudo que é da empresa entra e sai por ela. Depois, combina com você mesmo um salário fixo, o pró-labore, e transfere pra sua conta pessoal uma vez por mês. Pagou coisa sua no cartão da empresa? Anota como retirada. Em três meses você descobre se a empresa dá lucro ou se era você que bancava ela.
+5. Indireta. Pergunta: vendo bem mas o lucro nunca aparece, pq? Resposta: Pode ser várias coisas: custo pequeno que ninguém olha, cliente pagando atrasado, dinheiro pessoal misturado com o da empresa, combustível da frota subindo todo mês, entre outras. Quase nunca é uma coisa só. O primeiro passo é pegar o extrato de três meses e ver pra onde o dinheiro foi.
+6. CTA. Pergunta: vcs usam algum sistema pra controlar carro da empresa? Resposta: Eu uso o Controle de Motorista. Ele acompanha a quilometragem de cada veículo e mostra onde está o gargalo do combustível. Antes eu só via a conta subir. Agora eu sei de onde vem. Vou deixar o link aqui.
+7. Quebra de padrão. Pergunta: o que vc faz domingo à noite? Resposta: Juro que vou descansar. Aí abro o WhatsApp "só pra ver uma coisa" e, quando vejo, já respondi três clientes e montei a semana inteira de cabeça.
+8. Valor. Pergunta: como saber se meu preço tá certo? Resposta: Soma o custo do produto, a parte das despesas fixas que cada venda precisa cobrir e a margem que você quer ter. Se o preço que você cobra fica abaixo disso, você está pagando pra trabalhar. Depois, compara com o mercado pra ver se o cliente aceita.
+9. Humor. Pergunta: qual a maior mentira do empreendedorismo? Resposta: "Abre empresa que você faz o seu horário." Verdade. Eu escolhi trabalhar só meio período: das 7h às 19h, 7 dias por semana.
+10. Valor. Pergunta: ganho bem mas nunca sobra nada, oq eu faço? Resposta: Faz o teste de uma semana: anota tudo que gastar, até o cafezinho. A maioria descobre que o problema não é uma conta grande, é um monte de pequena: delivery, assinatura, compra por impulso. E separa uma parte assim que o salário cai, antes de gastar. Dinheiro que fica pro fim do mês quase nunca sobra.
+11. Valor. Pergunta: vale a pena começar a investir com pouco dinheiro? Resposta: Vale, pra criar o hábito. Mas antes, se você tem dívida no cartão ou no cheque especial, paga primeiro: nenhum investimento rende o que esses juros cobram. Depois começa por algo simples e que dá pra resgatar quando precisar, tipo Tesouro Selic ou CDB com liquidez diária. Bolsa vem depois, com estudo.
+12. Indireta. Pergunta: funcionário pode usar o carro da empresa pra almoçar? Resposta: Depende da regra que você combinou. O problema não é usar, é não ter regra: aí cada um faz do jeito que acha certo, e você só descobre na conta do combustível. Combina por escrito o que pode e o que não pode, e confere a quilometragem.
+13. Valor. Pergunta: como cobrar cliente atrasado sem perder ele? Resposta: Manda um lembrete gentil alguns dias antes do vencimento. Se atrasar, fala no mesmo dia, educado e direto. Se ele estiver apertado, oferece parcelar o que falta. Quem é cobrado com respeito costuma continuar comprando. Quem é esquecido, esquece de pagar.
+14. Objeção. Pergunta: tenho só dois carros, preciso de sistema? Resposta: Com dois, uma tabela com foto do painel na saída e na volta resolve. O sistema começa a valer quando conferir isso vira trabalho de horas, ou quando você percebe que parou de conferir.
+15. Autoridade. Pergunta: o que é DRE? Resposta: É o Demonstrativo do Resultado: um resumo que mostra quanto a empresa vendeu, quanto gastou e quanto sobrou num período. Funciona como um raio-x do mês. Pede pro seu contador te mandar todo mês e lê com calma: ali aparece o que passou batido no extrato.
+16. Quebra de padrão. Pergunta: qual o café da manhã de dono de empresa? Resposta: Café preto em pé, olhando o extrato do banco. Comida de verdade, só quando sobra tempo. Ou seja, no almoço das 15h.
+17. CTA. Pergunta: vc usa algum sistema pra controlar as coisas da sua empresa? Resposta: Uso o Controle Patrimonial. Tá tudo lá: cada notebook, máquina e celular, onde está e com quem. Antes eu só descobria que algo tinha sumido quando precisava dele. E tem um detalhe bom: a mensalidade inteira vira crédito no Vale Bonus, todo mês. É um app de recompensas pra pagar parte de compras em lojas e restaurantes parceiros. Vou deixar o link aqui.
+18. Valor. Pergunta: como reduzir custo sem demitir ninguém? Resposta: Começa pelo que ninguém olha: assinaturas que ninguém usa, fornecedor que não é renegociado faz tempo, combustível da frota, desperdício de material. Corte de gente costuma ser a última coisa, e muitas vezes nem precisa chegar nela.
+19. Polêmica. Pergunta: ação de empresa grande é investimento seguro? Resposta: Não necessariamente. Empresa famosa pode estar cara, endividada ou num setor que tá caindo. Conhecer a marca não é o mesmo que analisar a empresa. Muita gente perde dinheiro comprando o que conhece, não o que entende.
+20. Notícia (modelo). Pergunta natural sobre a notícia do dia, vinda do radar com fonte. Resposta: o fato em uma frase, com a fonte, e o que aquilo muda na vida de quem segue.
+
 ## Posts de venda
 
 ### 21. Corte dos Ricos: Controle Patrimonial (carrossel)
@@ -578,7 +626,365 @@ Lide: A Meta anunciou na segunda-feira (9) que vai usar inteligência artificial
 Fontes: Meta (09/11/2026); Engadget (09/11/2026); Fast Company Brasil (10/11/2026); Agência Senado (17/03/2026).
 Observação: matéria datada; texto completo na conversa de treino de 11/11/2026. Serve como modelo.
 
+## Posts de blog
+
+### 38. Marketing Raiz: post de blog (aula escrita), modelo aprovado em 11/11/2026
+Palavra-chave: como fazer gancho
+Título SEO: Como fazer um gancho que faz a pessoa parar no feed
+Meta description: Aprenda a fazer um gancho que faz a pessoa parar no feed: os 5 tipos que mais funcionam, com antes e depois, e um passo a passo para escrever o seu.
+URL: /como-fazer-gancho
+Ajuste de SEO: no primeiro parágrafo, incluir "gancho" (ex.: "...de repente o seu dedo para. Isso tem nome: gancho.").
+Título: Por que você para de rolar o feed (e como escrever um gancho que faz o mesmo com o seu público)
+
+Você está no celular, rolando o feed sem prestar atenção em nada. Um post passa, outro passa, mais um. E de repente o seu dedo para.
+
+Você nem decidiu parar. Quando percebeu, já estava lendo.
+
+O que aconteceu ali não foi sorte do post. Foi construção. E se você produz conteúdo, entender esse segundo vale mais do que qualquer ferramenta de edição.
+
+#### O que fez o seu dedo parar
+O feed tem um ritmo. Imagem, texto, rosto, propaganda, imagem de novo. Depois de alguns minutos, o seu cérebro entra no automático: reconhece o padrão e descarta antes de você ler.
+
+O post que te parou fez uma de duas coisas: quebrou esse padrão ou abriu uma pergunta que você quis ver respondida. Na maioria das vezes, as duas juntas.
+
+É isso que se chama gancho. E aqui vai a frase para guardar:
+
+O gancho não serve para chamar atenção. Ele serve para criar uma pergunta que só o seu conteúdo responde.
+
+Chamar atenção é fácil: um grito, uma cor estranha, uma palavra em caixa alta. Só que atenção sem pergunta dura um segundo. A pessoa olha, não vê motivo para ficar e continua rolando.
+
+#### Por que a maioria dos ganchos não funciona
+Pensa no último post que você fez. Como ele começava?
+
+Se começava com "Hoje vou falar sobre...", "Você sabia que...?" ou "5 dicas de...", ele provavelmente se perdeu no meio do feed. Não porque o conteúdo era ruim, mas porque a primeira frase não deu motivo nenhum para alguém parar.
+
+Os três erros mais comuns:
+1. Anunciar o assunto em vez de criar a pergunta. "Hoje vou falar de tráfego pago" informa o tema, mas não cria vontade de ler.
+2. Prometer o genérico. "Dicas para crescer no Instagram" é o que todo mundo promete. O cérebro já viu isso mil vezes e descarta.
+3. Entregar a resposta no gancho. Se a primeira frase já resolve tudo, não sobra motivo para continuar.
+
+#### Os 5 tipos de gancho que mais funcionam
+Cada um abre a pergunta de um jeito diferente. Repara no antes e depois.
+
+##### 1. A cena
+Coloca a pessoa dentro de um momento que ela reconhece.
+- Antes: "Vou te ensinar a responder clientes que pedem desconto."
+- Depois: "O cliente leu a proposta, sumiu dois dias e voltou com uma frase: 'consegue fazer um precinho melhor?'."
+Quem já passou por isso não consegue não ler.
+
+##### 2. A contradição
+Diz o contrário do que a pessoa acredita, e depois justifica.
+- Antes: "A importância de postar todo dia."
+- Depois: "Postar todo dia pode ser o motivo de o seu perfil não crescer."
+A pessoa para porque quer saber se você está certo. Só tem uma condição: a justificativa precisa existir e ser verdadeira. Contradição sem fundamento é só polêmica vazia, e o público percebe.
+
+##### 3. O erro que a pessoa comete sem saber
+Aponta um problema que ela tem e ainda não percebeu.
+- Antes: "Como melhorar a sua bio."
+- Depois: "A sua bio explica o que você faz. E é exatamente por isso que ninguém clica no link."
+
+##### 4. O bastidor
+Promete mostrar o que acontece por trás de algo que a pessoa vê todo dia.
+- Antes: "Como funcionam os anúncios."
+- Depois: "Por que aquele anúncio que você acabou de ver apareceu justo para você."
+
+##### 5. O resultado com o caminho escondido
+Mostra onde dá para chegar, mas guarda o como.
+- Antes: "Dicas para vender mais pelo Instagram."
+- Depois: "Mudei uma frase na página de vendas e as perguntas no direct pararam de ser sobre preço."
+Aqui vale a regra mais importante de todas: só use resultado que aconteceu de verdade. Gancho com resultado inventado até prende uma vez. Depois, destrói a confiança no perfil inteiro.
+
+#### Como escrever o seu gancho em 4 passos
+Passo 1. Escreva primeiro o conteúdo, depois o gancho. Parece ao contrário, mas não é. Você só sabe qual pergunta abrir quando sabe qual resposta vai entregar.
+
+Passo 2. Encontre a pergunta que o seu conteúdo responde. Escreva numa linha: "Depois de ler isso, a pessoa vai saber ___." Essa lacuna é a pergunta que o gancho precisa abrir.
+
+Passo 3. Escreva três versões com tipos diferentes. Uma cena, uma contradição, um erro. Não escolha a primeira que vier: a primeira costuma ser a mais óbvia.
+
+Passo 4. Faça o teste do feed. Leia cada versão e pergunte: "Se eu visse isso rolando rápido, eu pararia? E, parando, eu sentiria que preciso ler o resto?" Se a resposta for "talvez", reescreva.
+
+#### O gancho é só a porta
+Tem uma parte que quase ninguém fala: um gancho bom com um conteúdo fraco faz mais mal do que um gancho fraco.
+
+Quando você abre uma pergunta, faz uma promessa. Se o conteúdo não entrega, a pessoa sente que foi enganada. E da próxima vez que ela vir o seu nome no feed, ela rola, sem dar chance.
+
+Por isso a regra é simples: o gancho promete, o conteúdo paga. Sempre na mesma medida.
+
+#### Agora, olhe para o seu feed
+Lembra do momento em que o seu dedo parou?
+
+Da próxima vez que acontecer, não continue no automático. Pergunte: o que me fez parar aqui? Foi uma cena? Uma contradição? Um erro que eu cometo?
+
+Cada post que te prende é uma aula gratuita de gancho. Você só precisa começar a ler o feed como quem escreve, e não como quem rola.
+
+CTA (sem produto, vai para outro post do blog, como próximo episódio): "Agora você sabe fazer a pessoa parar no feed. Só que o gancho segura três segundos. O que decide se ela fica até o último slide é outra coisa, e é exatamente aí que quase todo mundo perde quem já tinha parado. É isso que eu te mostro no próximo post: [título do post, com link]."
+Observação: o exemplo do tipo 5 é ilustrativo; na publicação, vira caso real ou fica marcado como exemplo.
+
+### 39. Central do Marketing: post de blog, aprovado em 11/11/2026 (CTA leva ao blog da Marketing Raiz, item 38)
+Palavra-chave: meme no marketing
+Título SEO: Meme no marketing: como usar sem passar vergonha
+Meta description: Meme no marketing funciona, mas só quando a marca entende a piada. Veja quando usar, quando fugir e um passo a passo para acertar no seu próximo post.
+URL: /meme-no-marketing
+Título: Meme no marketing: como usar sem que a sua marca vire o meme
+
+Você abre o Instagram e encontra o post de uma marca usando aquele meme que bombou. Só que o meme já tinha morrido há três semanas, a legenda explica a piada e ainda termina com "aproveite 10% de desconto".
+
+Você não ri. Você sente vergonha. E nem é da sua marca.
+
+Meme no marketing funciona muito bem. Mas tem uma linha fina entre a marca que todo mundo marca o amigo e a marca que vira print no grupo com a legenda "olha isso kkkk".
+
+#### Por que meme funciona tão bem
+Meme é uma piada que as pessoas já conhecem. Quando você usa um, não precisa explicar o contexto: a pessoa bate o olho e entende.
+
+E tem mais um efeito: quem entende a piada sente que faz parte de um grupo. Quando uma marca acerta o meme, a mensagem que fica é "essa marca é das minhas".
+
+Guarda isso:
+
+Meme não é sobre ser engraçado. É sobre mostrar que você fala a mesma língua do seu público.
+
+É por isso que um meme dá certo numa marca e passa vergonha em outra. A piada é a mesma. O que muda é se aquela marca tinha direito de contar.
+
+#### O jeito mais esperto: citar o meme, não copiar
+O melhor uso de meme nem sempre é postar a imagem pronta. É fazer uma referência a ele, como um easter egg: uma frase do meme na legenda, um gesto na foto, um detalhe no vídeo que quem conhece reconhece na hora.
+
+Funciona porque traz o mesmo sentimento da piada, e ainda mostra duas coisas: que a sua marca está antenada no que está acontecendo e que é esperta o bastante para aproveitar o hype do jeito dela.
+
+Quem pega a referência sorri e sente que faz parte. Quem não pega lê o post normalmente, sem achar nada estranho. Ninguém sai perdendo.
+
+#### Os 3 jeitos mais comuns de errar
+1. Chegar atrasado. Meme tem prazo de validade, e na internet esse prazo é curto. Quando a sua tia manda no grupo da família, já passou da hora de a sua marca usar.
+2. Explicar a piada. "Igual naquele meme do cachorro em chamas, quando tudo está dando errado, mas você finge que está tudo bem!" Se precisou explicar, perdeu a graça. O meme existe justamente para dispensar explicação.
+3. Forçar o produto dentro da piada. O meme é sobre a segunda-feira, e de repente a legenda vira um anúncio. A pessoa sente o golpe e rola o feed.
+
+#### Quando usar e quando fugir
+Use meme quando:
+- o seu público já usa aquele meme no dia a dia;
+- a piada combina com uma dor ou com uma situação real de quem te segue;
+- a marca já tem um tom leve, ou está construindo esse tom.
+
+Fuja quando:
+- o meme nasceu de uma tragédia, de uma briga ou de alguém sendo humilhado;
+- você precisou pesquisar o que o meme quer dizer;
+- o assunto do post é sério, como dinheiro do cliente, saúde ou segurança.
+
+#### Passo a passo para acertar no seu próximo post
+Passo 1. Comece pela situação, não pelo meme. Liste três situações que o seu público vive toda semana. Pode ser o cliente que pede desconto, a reunião que podia ser um e-mail, o post que flopou.
+
+Passo 2. Procure o meme que conta essa situação. Agora, sim, procure um formato de meme que represente aquilo. Se nenhum encaixar com naturalidade, não force.
+
+Passo 3. Teste a piada sem a marca. Mostre para alguém do seu público sem dizer que é para a empresa. Se a pessoa rir, ótimo. Se perguntar "ué, o que isso quer dizer?", volte para o passo 2.
+
+Passo 4. Deixe o produto fora da imagem. O meme faz a pessoa parar e se identificar. Se fizer sentido, a legenda pode puxar para o seu assunto, com leveza e sem anúncio colado na piada.
+
+Passo 5. Publique rápido ou não publique. Se o meme está em alta hoje, o post sai hoje ou amanhã. Na semana que vem, ele já é o meme da tia.
+
+#### O teste final
+Lembra daquele post que te deu vergonha no começo?
+
+Ele não falhou porque usou meme. Falhou porque a marca quis parecer da turma sem conhecer a turma.
+
+Antes de postar o próximo, pergunta: o meu público mandaria isso para um amigo? Se a resposta for sim, posta. Se for "acho que sim", espera.
+
+CTA (próximo episódio, link para o blog da Marketing Raiz): "Agora você sabe fazer o meme trabalhar a favor da sua marca. Só que o meme é só um dos jeitos de fazer alguém parar no feed. Existem outros quatro, e um deles quase ninguém usa, mesmo sendo o que mais segura a atenção. É isso que eu te mostro no próximo post: Por que você para de rolar o feed (e como escrever um gancho que faz o mesmo com o seu público) [link]."
+
+### 40. Corte dos Ricos: post de blog, aprovado em 11/11/2026 (produtos dentro dos tópicos, CTA para outro post)
+Palavra-chave: dinheiro da empresa some
+Título SEO: Por que o dinheiro da empresa some no fim do mês
+Meta description: A empresa vende bem, mas o dinheiro some no fim do mês? Veja os 5 lugares onde ele costuma escapar e um método simples para encontrar cada um.
+URL: /dinheiro-da-empresa-some
+Título: A empresa vende bem, mas o dinheiro some: os 5 lugares onde ele escapa sem você ver
+
+O mês foi bom. Teve venda, teve cliente novo, o movimento esteve forte.
+
+Aí chega o dia 30, você abre a conta da empresa e o saldo não acompanha. Você refaz a conta de cabeça e não fecha. O dinheiro entrou, mas para onde foi?
+
+Se isso já aconteceu com você, o problema provavelmente não está na venda. Está no que acontece depois dela.
+
+#### Faturamento não é dinheiro no bolso
+Muito dono de empresa mede a saúde do negócio pelo faturamento. Vendeu mais, então está melhor.
+
+Só que o faturamento conta o que entra. O que define se sobra é o que sai, e o que sai ninguém fica olhando. São gastos pequenos, espalhados, que se repetem todo mês.
+
+Guarda isso:
+
+Empresa não quebra por falta de venda. Quebra por falta de saber para onde a venda vai.
+
+#### Os 5 lugares onde o dinheiro costuma escapar
+Não é uma causa só. Na maioria das empresas são várias ao mesmo tempo, cada uma pequena demais para chamar atenção sozinha.
+
+##### 1. O dinheiro do dono misturado com o da empresa
+O mercado de casa passa no cartão da empresa. A conta da empresa paga a escola das crianças "só este mês". No fim, você não sabe quanto a empresa lucrou nem quanto você tirou dela.
+O que fazer: defina um valor fixo de retirada por mês, o pró-labore, e pare de pagar contas pessoais pela empresa. Se precisar de mais, faça uma retirada registrada, com valor e data.
+
+##### 2. As assinaturas que ninguém usa mais
+O sistema que foi testado e nunca cancelado. A ferramenta que um funcionário pediu e saiu da empresa. Cada uma custa pouco, por isso ninguém repara.
+O que fazer: pegue o extrato dos últimos três meses e liste tudo que é cobrado todo mês. Para cada item, pergunte: alguém usou isso nos últimos 30 dias?
+
+##### 3. Os bens que a empresa nem lembra que tem
+Notebook guardado no armário, equipamento parado no depósito, celular que ficou com um ex-funcionário. Dinheiro investido que não trabalha, ou que simplesmente sumiu.
+O que fazer: faça uma lista de tudo que a empresa comprou e que custou mais do que um valor que você decidir, por exemplo R$ 500. Ao lado, anote onde está e quem usa.
+Se a lista ficar grande, o Controle Patrimonial [link] organiza todos os bens da empresa num lugar só, com onde cada um está e com quem.
+
+##### 4. A frota que roda mais do que deveria
+Se a sua empresa tem carro, moto ou caminhão, o combustível costuma ser tratado como um custo que só sobe. Mas cada litro corresponde a quilômetros, e cada quilômetro foi para algum lugar: a entrega, uma paradinha no caminho, uma rota mais longa, um veículo que passou o fim de semana fora. Também pode ser pneu descalibrado ou manutenção atrasada.
+O que fazer: peça uma foto do painel na saída e na volta de cada viagem e compare com a distância que a rota deveria ter. Com poucos veículos, uma tabela resolve.
+Quando a frota cresce, conferir foto por foto vira trabalho de horas. Para isso existe o Controle de Motorista [motorista.simintermediacoes.com]: ele acompanha a quilometragem de cada veículo e mostra onde está o gargalo que faz sair tanto dinheiro em combustível. Você para de montar tabela e só olha o que precisa de atenção.
+
+##### 5. O cliente que compra e paga atrasado
+A venda entrou no relatório, mas o dinheiro ainda não entrou na conta. Enquanto isso, você paga fornecedor, salário e imposto com dinheiro que ainda não tem.
+O que fazer: separe o que foi vendido do que foi recebido. Se a diferença entre os dois cresce todo mês, o problema é de prazo e de cobrança, não de venda.
+
+#### O método de 1 hora para encontrar o seu vazamento
+Você não precisa resolver os cinco de uma vez. Precisa descobrir qual pesa mais na sua empresa.
+Passo 1. Imprima ou exporte o extrato dos últimos três meses.
+Passo 2. Marque com uma cor tudo que é pessoal, com outra tudo que é assinatura e com outra tudo que é combustível ou veículo.
+Passo 3. Some cada cor.
+Passo 4. Olhe qual soma te surpreendeu. Comece por ela.
+Uma hora de extrato costuma mostrar mais do que meses de "esse mês foi atípico".
+
+#### O próximo dia 30
+Lembra do saldo que não acompanhou o mês bom?
+
+No próximo dia 30, ele vai aparecer de novo. A diferença é que você pode abrir o extrato sabendo onde olhar.
+
+O dinheiro da sua empresa não some. Ele vai para algum lugar. Seu trabalho é só descobrir qual.
+
+CTA (próximo post): "Agora você sabe onde procurar o dinheiro que escapa da sua empresa. Só que encontrar é metade do trabalho. A outra metade é não deixar ele voltar a escapar no mês seguinte, e é aí que quase todo dono escorrega: arruma tudo uma vez e, três meses depois, está no mesmo lugar. Existe um hábito simples, de uma vez por semana, que resolve isso. É isso que eu te mostro no próximo post: [como fazer o fechamento financeiro semanal da empresa, com link]."
+
+### 41. 007 Spyhacker: post de blog, aprovado em 11/11/2026 (Atlas dentro do tópico, CTA para outro post)
+Palavra-chave: como saber se minha conta foi invadida
+Título SEO: Como saber se sua conta foi invadida (e o que fazer)
+Meta description: Notificação estranha, senha que não funciona, mensagem que você não mandou? Veja como saber se sua conta foi invadida e o que fazer nos primeiros minutos.
+URL: /como-saber-se-conta-foi-invadida
+Título: Como saber se alguém entrou na sua conta, antes que você descubra do pior jeito
+
+Um amigo te manda mensagem: "Você me pediu um Pix?". Você não pediu nada.
+
+Ou chega um e-mail avisando de um login em outra cidade, de um aparelho que você nunca teve. Ou a sua senha, que funcionou ontem, hoje não funciona mais.
+
+A maioria das pessoas só descobre que a conta foi invadida quando o estrago já aconteceu. Mas quase sempre tinha sinal antes. Só que ninguém tinha mostrado onde olhar.
+
+#### Invasão quase nunca acontece do jeito que aparece nos filmes
+Quando se fala em hacker, a imagem é de alguém digitando rápido numa tela preta, quebrando um sistema. Na vida real, a maior parte das invasões de conta é bem mais simples: alguém conseguiu a sua senha.
+
+Pode ter sido um site onde você se cadastrou e que vazou os dados. Pode ter sido um link falso que pedia login. Pode ter sido a mesma senha usada em todo lugar.
+
+Guarda isso:
+
+Na maioria das vezes, ninguém quebra a porta. A pessoa entra com a chave que você deixou cair.
+
+E isso é uma notícia boa: dá para descobrir e dá para trancar.
+
+#### Os sinais de que alguém entrou na sua conta
+Nenhum sinal sozinho prova invasão. Mas, se aparecer mais de um, vale investigar:
+- Aviso de login que você não fez, principalmente de outra cidade ou de outro aparelho.
+- Mensagem enviada que você não mandou, no WhatsApp, no direct ou no e-mail.
+- Senha que parou de funcionar sem você ter trocado.
+- E-mail de troca de senha ou de verificação que você não pediu.
+- Publicação, seguidor ou curtida que você não fez.
+
+#### Onde olhar, conta por conta
+Todos os serviços grandes mostram onde a sua conta está conectada. O nome do menu muda com as atualizações, mas o caminho costuma ser parecido.
+
+WhatsApp. Em Configurações, abra Dispositivos conectados. Se aparecer um computador ou navegador que não é seu, desconecte na hora.
+
+Instagram e Facebook. Na Central de Contas, entre em Senha e segurança e depois em Onde você está conectado. A lista mostra os aparelhos e os locais aproximados.
+
+Google (Gmail, YouTube, Android). Na sua Conta Google, abra a aba Segurança. Ali aparecem a atividade recente e Seus dispositivos.
+
+O que procurar em todas: aparelho que você não reconhece, cidade onde você não esteve e horário em que você estava dormindo.
+
+#### Descubra se a sua senha já vazou
+Existe um jeito de saber se o seu e-mail apareceu em algum vazamento de dados conhecido: o site Have I Been Pwned (haveibeenpwned.com). Você digita o e-mail e ele mostra em quais vazamentos públicos ele apareceu.
+
+Se o seu e-mail estiver lá, não entre em pânico. Isso não quer dizer que alguém usou a sua conta. Quer dizer que uma senha que você usou naquele site pode estar circulando. Se você usa essa mesma senha em outro lugar, é hora de trocar.
+
+O Gerenciador de Senhas do Google também tem uma Verificação de senha, que avisa quando uma senha salva aparece em vazamento.
+
+#### O que fazer nos primeiros minutos
+Se encontrou um sinal, siga esta ordem:
+1. Troque a senha da conta, começando pelo e-mail. Quem controla o seu e-mail consegue recuperar quase todas as outras contas.
+2. Desconecte todos os aparelhos. Quase todo serviço tem a opção de sair de todas as sessões. Use.
+3. Ative a verificação em duas etapas. Assim, mesmo com a senha, a pessoa precisa de um código que só chega no seu celular. Se puder, prefira um aplicativo autenticador em vez de SMS.
+4. Avise quem pode receber golpe no seu nome. Uma mensagem no status ou no grupo da família evita que alguém mande Pix para o invasor.
+5. Confira se trocaram o seu e-mail ou telefone de recuperação. É a primeira coisa que um invasor muda, para você não conseguir voltar.
+
+#### Se você tem um site, ele também é uma porta
+Muita gente cuida do celular e esquece do site da empresa, da loja ou do curso. Ele também tem senha, painel de acesso e dados de clientes.
+
+As mesmas regras valem: senha forte e única no painel, verificação em duas etapas quando existir e atualização em dia. E a hospedagem conta: é ela que segura o site quando alguém tenta entrar. O Atlas Hosting [link] trabalha com servidores de alta velocidade e segurança avançada, justamente para o seu site não ser o ponto fraco.
+
+#### A mensagem do Pix
+Lembra da mensagem do amigo perguntando se você pediu um Pix?
+
+Com o que você viu aqui, essa história pode acabar antes de começar. Uma olhada nos dispositivos conectados, uma senha trocada e a verificação em duas etapas ligada.
+
+Três passos simples, e a porta fica trancada.
+
+CTA (próximo post): "Agora você sabe descobrir se alguém entrou na sua conta e como trancar a porta. Só que tem um detalhe: a maioria das invasões começa antes do login, numa mensagem ou num link que parece totalmente normal. Saber reconhecer esse link é o que impede a senha de cair na mão errada. É isso que eu te mostro no próximo post: [como identificar um link falso antes de clicar, com link]."
+Observação: a frase final sem fonte ("A maioria das contas invadidas não tinha nenhuma dessas três coisas") foi trocada por "Três passos simples, e a porta fica trancada." Conferir os nomes dos menus nos apps antes de publicar.
+
+### 42. Seguidores em Alta: post de blog, aprovado em 11/11/2026 (PagaTG e ÁreaFlix dentro dos tópicos, CTA para outro post)
+Palavra-chave: como ganhar dinheiro com seguidores
+Título SEO: Como ganhar dinheiro com seguidores sem ser famoso
+Meta description: Seu perfil tem seguidores, mas não paga nenhuma conta? Veja 4 jeitos reais de ganhar dinheiro com seguidores, mesmo sem ser famoso, e como escolher o seu.
+URL: /como-ganhar-dinheiro-com-seguidores
+Título: Como ganhar dinheiro com seus seguidores, mesmo sem ser famoso: 4 jeitos que funcionam
+
+Você posta, responde comentário, acompanha o número de seguidores subir. Tem gente que te pergunta coisas no direct, que salva o seu conteúdo, que manda para os amigos.
+
+E aí alguém pergunta: "Mas você ganha alguma coisa com isso?". Você não sabe bem o que responder.
+
+Ter seguidores e ganhar dinheiro com eles são duas coisas diferentes. A boa notícia é que a distância entre uma e outra é menor do que parece.
+
+#### Seguidor não é dinheiro. Confiança é.
+Muita gente acha que precisa chegar a 100 mil seguidores para começar a ganhar. Espera o número certo, e esse número nunca chega.
+
+Só que quem paga não é o número. É a pessoa que confia no que você fala. Um perfil pequeno em que as pessoas confiam pode render mais do que um perfil enorme que ninguém leva a sério.
+
+Guarda isso:
+
+Ninguém paga por seguir você. As pessoas pagam pelo que você resolve para elas.
+
+Então a pergunta não é "quantos seguidores eu tenho?". É "o que as pessoas vêm buscar no meu perfil?".
+
+#### Os 4 jeitos de ganhar dinheiro com seguidores
+Cada um funciona melhor para um tipo de perfil. Você não precisa fazer todos.
+
+##### 1. Publi: marcas pagando para aparecer no seu perfil
+É o jeito mais conhecido. Uma marca paga para você mostrar um produto para o seu público.
+Para quem funciona: perfil com nicho claro. Uma marca de produto para pets quer um perfil de pets, não um perfil que fala de tudo.
+Como começar: monte um resumo simples do seu perfil, com o assunto, quem te segue e a média de alcance dos seus posts, e mande para marcas pequenas do seu nicho. Marcas pequenas costumam responder mais do que as grandes.
+
+##### 2. Afiliado: comissão por cada venda que você indica
+Você indica um produto de outra pessoa ou empresa e ganha uma parte de cada venda feita pelo seu link.
+Para quem funciona: perfil que já recomenda coisas e cujo público pergunta "onde você comprou?".
+Cuidado: só indique o que você usaria. Uma indicação ruim custa mais seguidores do que dez indicações boas trazem.
+
+##### 3. Grupo VIP pago: conteúdo exclusivo para quem assina
+Você cria um grupo fechado, com um conteúdo que não vai para o perfil aberto: dicas antes de todo mundo, bastidores, análises mais completas. Quem quer entrar paga uma assinatura.
+Para quem funciona: perfil em que o público quer mais do que você posta. Se te pedem "faz mais conteúdo assim", esse é o sinal.
+Como começar: o mais trabalhoso é controlar quem pagou e quem pode entrar. O PagaTG [link] faz isso por você em grupos do Telegram: ele cuida da cobrança e do acesso de quem assina, e você só cuida do conteúdo.
+
+##### 4. Seu próprio curso ou conteúdo gravado
+Você pega o que mais te perguntam e transforma num conteúdo organizado, em aulas, que a pessoa compra uma vez e assiste quando quiser.
+Para quem funciona: perfil que ensina alguma coisa. Se as perguntas no direct se repetem, já existe um curso esperando para ser gravado.
+Como começar: grave primeiro uma versão curta, com o essencial. Para hospedar as aulas, o ÁreaFlix [link] monta uma área de membros com cara de streaming, fácil de usar, e você sobe os vídeos de um jeito simples.
+
+#### Como escolher o seu primeiro jeito
+Não tente começar pelos quatro ao mesmo tempo. Responda três perguntas:
+1. O que mais me perguntam no direct? Se é "onde comprou?", comece pelo afiliado. Se é "como faz?", comece pelo curso.
+2. Meu público quer mais do que eu posto? Se sim, o grupo VIP faz sentido.
+3. Meu nicho é claro para uma marca? Se alguém olha o seu perfil por 10 segundos e entende sobre o que ele é, você já pode procurar publi.
+Escolha o jeito com a resposta mais forte e teste por um mês antes de mudar.
+
+#### A pergunta que você não soube responder
+Lembra de quando te perguntaram se você ganhava alguma coisa com o perfil?
+
+Da próxima vez, a resposta pode ser outra. Não porque você ficou famoso, mas porque entendeu o que o seu público já estava disposto a pagar.
+
+CTA (próximo post): "Agora você sabe os jeitos de transformar seguidores em renda. Só que tem uma coisa que decide se qualquer um deles funciona: o seu público precisa ver você como alguém que entende do assunto, e não como mais um perfil no feed. Tem perfis com poucos seguidores que vendem bem justamente por isso. É isso que eu te mostro no próximo post: [como virar referência no seu nicho, com link]."
+
 ## Não incluídos ainda
-- Blog, teste 1: inventário de bens da empresa (Corte dos Ricos, prepara o Controle Patrimonial). Escrito em 11/11/2026, aguardando correção do dono. Pendências: existe modelo de planilha para baixar? Trocar "volta como crédito" por "você recebe o valor integral da mensalidade em crédito no Vale Bonus".
 - WhatsApp no sistema da empresa: ficou aguardando sua correção.
 - GitLab: teve ajustes, mas não recebeu aprovação final.

@@ -112,7 +112,7 @@ Gerar venda todos os dias. Toda a sequência existe para levar a pessoa à pági
 ## Organização
 - A ordem é livre. Ter mais de uma tela de cada tipo é o ideal.
 - CTA sempre em mais de uma tela.
-- Um produto cadastrado e uma dor principal por dia, para a sequência ser coerente.
+- **Vários produtos por sequência (regra do dono, substitui a de um produto por dia).** Os CTAs podem ser de produtos diferentes da marca. Não faça 3 CTAs do mesmo produto nem volte ao mesmo tema (ex.: carro da empresa) tela após tela: fica na cara e perde credibilidade.
 - Complementos: quebra de objeção (preço, "funciona pra mim?", "não sei usar") e prova (resultado, depoimento ou número reais). Prova só entra se existir; nunca invente.
 - Não ponha dois CTAs seguidos sem conteúdo entre eles, exceto no fechamento.
 - Temas, piadas e polêmicas não se repetem em dias seguidos na mesma marca.
@@ -123,3 +123,22 @@ Para cada tela:
 Pergunta: texto da caixinha
 Resposta: texto da tela
 Visual: o que a imagem de fundo precisa mostrar (relacionado ao que a tela diz)
+
+## Correções do dono (teste PagaTG, Seguidores em Alta)
+- **Mesma premissa do blog.** A sequência prende a atenção em todas as telas com o assunto do perfil, e o produto aparece aqui e ali, no meio. Se não vendeu no dia, faltou conexão, credibilidade e confiança, não CTA.
+- **O assunto é o do perfil, não só o do produto.** Perfil de redes sociais fala de algoritmo, crescimento, formatos, horários e o básico das redes, mesmo que o produto do dia seja de Telegram. A maioria das telas ensina sobre o nicho.
+- **Pergunta aleatória é aleatória.** Quem pergunta não sabe o que você tem. Se a pergunta não traz contexto ("como vc controla quem pagou no seu grupo?"), a resposta reage como pessoa real ("Que grupo? Kkk") e depois responde.
+- **Ache o problema chave real.** Antes de responder por que algo dá errado, pergunte qual é o motivo principal na vida real, e não só um incômodo. Ex.: grupo pago não morre por causa da cobrança; morre quando o dono para de alimentar e quem paga não vê nada novo.
+- **Tela sem caixinha só quando precisa.** Use só se o conteúdo for extenso ou pedir resposta mais completa. Se a tela anterior já respondeu bem, não acrescente.
+- **Frase sem generalizar errado.** "Ninguém precisa de milhares" soa falso para quem busca milhares. Diga o que quer dizer: não precisa esperar ter milhares para começar.
+- **Indicação natural.** O CTA de produto soa como alguém contando o que usa, não como lista de recursos.
+- **Quebra de padrão gera identificação.** Use coisas que o público-alvo faz de verdade, e, se for reclamar de algo, reclame do que ele também não gosta. Hábito incomum (caminhar sem fone) só entra com razão lógica ou estudo que explique. Não repita quebra de padrão de outra sequência (ex.: celular no "não perturbe").
+- **Seja direto nos itens.** "Material exclusivo" em vez de "material pra baixar" ou "resposta mais próxima".
+- **CTA final que não parece anúncio.** Não feche a sequência com pergunta montada para vender ("tô pensando em começar meu grupo pago, por onde começo?" respondida com o produto). Cada story é visto solto no Instagram; o produto entra quando a pergunta pede indicação.
+
+## Correções do dono (teste Controle de Motorista, Corte dos Ricos)
+- **Perfil de quem sabe muito do nicho (vale para todas as marcas).** O Instagram precisa parecer ter alguém por trás que entende do nicho inteiro e da marca. A sequência aprovada da Corte dos Ricos (item 44 das peças aprovadas) é o modelo de naturalidade para todas. Na Corte dos Ricos: empresa, finanças pessoais, investimentos e bolsa, comentário de notícia do mercado (só com notícia do radar ou do briefing, com fonte), não só o tema do produto.
+- **Pergunta que um humano manda na caixinha.** Conceito técnico solto ("o que é capital de giro?", "faturamento alto é sinal de empresa saudável?") quase ninguém pergunta. Prefira a dúvida do jeito que a pessoa vive: "ganho bem mas nunca sobra nada, oq eu faço?".
+- **Pergunta bem formulada.** Leia a pergunta como se fosse um seguidor de verdade: se soa montada ou estranha, reescreva.
+- **Natural sempre.** Troque expressão de texto ("aparece o que o extrato esconde") pelo jeito de falar ("aparece o que passou batido no extrato").
+- **Humor tem que fazer rir.** Situação que só incomoda ("chefe, tem um minutinho?") não basta.

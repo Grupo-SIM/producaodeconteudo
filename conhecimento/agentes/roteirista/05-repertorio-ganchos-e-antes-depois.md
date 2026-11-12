@@ -9,7 +9,7 @@ Não trabalhamos com produto físico. Só use cena, exemplo ou assunto que conec
 - Frete, estoque, embalagem, loja física e dropshipping ficam de fora quando não têm relação com um produto nosso.
 - Exceção: quando a peça conversa com quem usa um produto nosso. Exemplo: delivery próprio pode falar de comida, embalagem, entrega e fornecedor, porque vendemos o sistema para esse dono de negócio.
 - O mesmo vale para o Controle Patrimonial: conteúdo para empresários e gestores que precisam organizar o negócio e controlar o que a empresa tem pode falar de estoque, inventário, equipamentos e bens.
-- Controle de Motorista só entra na Corte dos Ricos. A dor real é o dono lidando com colaboradores que usam demais os veículos da empresa (carro, moto, caminhão): uso pessoal, paradinha no caminho, rota mais longa. O sistema controla a quilometragem para achar os gargalos que fazem sair tanto dinheiro em combustível.
+- Controle de Motorista encaixa melhor na Corte dos Ricos. A dor real é o dono lidando com colaboradores que usam demais os veículos da empresa (carro, moto, caminhão): uso pessoal, paradinha no caminho, rota mais longa. O sistema controla a quilometragem para achar os gargalos que fazem sair tanto dinheiro em combustível.
 - **Realidade atual e skin in the game.** Antes de descrever a rotina do público, pergunte se ele vive isso hoje. Ex.: com IA, quase ninguém passa semanas escrevendo um e-book. E a frase precisa fazer sentido físico: "abastecer mais do que roda" é impossível.
 - Atlas é masculino: "o Atlas", "no Atlas", "conheça o Atlas".
 - Atlas Hosting: não tem suporte pelo WhatsApp (o site será corrigido). Não fale em "trocar de empresa" ou "sem trocar de empresa" ao falar de upgrade.
@@ -274,3 +274,34 @@ Alcance não é o seu problema. O seu problema é o que as pessoas veem depois d
 Quase todo criador digital faz conteúdo que entretém e espera que a venda aconteça sozinha. Só que ninguém compra porque se divertiu: compra porque acreditou que você resolve.
 Na próxima semana, troca um post de trend por um post que mostra o seu produto funcionando na vida de alguém.
 Qual foi o post seu que mais teve curtida e menos te trouxe venda? Conta aqui nos comentários.
+
+## Fale como pessoa, não como IA (regra do dono)
+O texto precisa soar como uma pessoa contando. Evite frase poética ou que dá vida a coisa, do tipo que ninguém fala numa conversa: "o que sai quase nunca faz barulho", "o dinheiro some em silêncio", "o custo que mora no detalhe". Diga do jeito direto que uma pessoa diria: "o que sai ninguém fica olhando".
+
+- PagaTG (confirmado pelo dono): cuida da cobrança e do acesso de quem assina nos grupos pagos do Telegram, controlando a entrada e a saída de quem paga.
+
+## Vale Bonus: explique sempre (regra do dono)
+Muita gente não sabe o que é o Vale Bonus. Toda vez que citar o crédito, deixe claro quem recebe e explique em poucas palavras o que é.
+- Quem recebe: o cliente que compra o produto (ex.: no PagaTG, o assinante do grupo; na SimIntPay, quem compra do lojista). Não é o vendedor.
+- Quanto: 100% do valor pago em crédito, até R$ 250 por transação (texto da SIM: "100% de cashback até R$250,00 por transação", simintermediacoes.com).
+- O que é (valebonus.com.br): uma moeda digital do programa de recompensas do grupo CRMBonus. O crédito fica no app Vale Bonus e é usado para pagar parte de compras em lojas, restaurantes e produtos parceiros, dentro do app. Não vira dinheiro, não pode ser sacado nem transferido por Pix.
+- Não cite validade: o próprio site da Vale Bonus traz respostas que se contradizem.
+
+## Teron (teron.app, lido em 11/11/2026)
+- O que é: plataforma de trabalho em equipe para empresas de todos os setores. Junta comunicação, organização e gestão num lugar só.
+- Recursos confirmados no site: tarefas (responsáveis, prazos e prioridades), agenda, documentos, chat e grupos, presença (quem está online), projetos, salas de videochamada, notificações. Integra com GitHub, e-mail, Telegram e outras ferramentas.
+- Diferenciais no site: informações privadas, acessíveis só por quem a empresa autorizar; espaço personalizável; preço por usuário, com usuários adicionados ou removidos quando precisar.
+- Preço: plano Empresas R$ 9,99 por usuário por mês (confirmado pelo dono). Plano grátis com 30 dias para experimentar, com todos os recursos e sem cobrança.
+- Cashback: crédito no Vale Bonus de até R$ 250 por transação, igual aos outros produtos (confirmado pelo dono).
+- Marcas: encaixa melhor na Corte dos Ricos (gestão de equipe) e no 007 Spyhacker (tecnologia); também em marketing quando o texto falar de empresa digital.
+- Suporte: tem botão de WhatsApp no site.
+- NÃO tem ainda: IA e automação. O site diz que "serão incorporados", então não cite como recurso atual.
+
+## EbookSIM (confirmado pelo dono em 11/11/2026)
+- O que é: marketplace de livros digitais (ebooks) de terceiros.
+- Para quem compra: fácil e intuitivo; recebe o ebook na hora, depois da compra, na biblioteca e no e-mail. Toda compra dá ao cliente crédito no Vale Bonus de até R$ 250.
+- Diferencial: nenhum marketplace de livros digitais no Brasil dá cashback no Vale Bonus para os clientes (afirmação do dono).
+- Para quem vende: taxa de 14,99% + R$ 4 por venda, que aparece depois de criar a conta de vendedor. É mais cara de propósito: o serviço é premium. Nunca venda o EbookSIM como "taxa baixa"; o argumento para o vendedor é o cliente dele ganhar o crédito e a experiência premium.
+
+## Produto encaixa pelo contexto, não pela marca (regra do dono, vale para todos os produtos)
+Cada produto tem as marcas onde encaixa melhor, mas isso não é limite. Se o assunto de um texto, de qualquer marca, abre espaço natural para um produto nosso, cite. A única condição é fazer sentido com o contexto.

@@ -25,3 +25,6 @@ As marcas de marketing falam com quem vende SÓ produto digital: sistemas, curso
 
 ## Público principal do digital (regra do dono)
 Foque em quem vive de recorrência: assinatura, comunidade, área de membros, acesso mensal, SaaS e venda todo dia. Quem faz lançamento é minoria e chega naturalmente; não construa a peça em cima de datas raras, como dia de lançamento, "grande promoção" ou Black Friday. Falar em perder venda pode; prefira momentos do dia a dia, como um post que bomba ou uma oferta mandada para a lista.
+
+## Meme no marketing (regra do dono)
+O ideal é a marca citar o meme como referência, como um easter egg: uma frase, um gesto ou um detalhe que lembra o meme, sem colar a imagem pronta. Traz o mesmo sentimento de quem entende a piada, mostra que a marca está antenada e atenta, e aproveita o hype de forma esperta. Ao ensinar ou usar meme, sempre apresente esse caminho.
