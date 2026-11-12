@@ -15,7 +15,7 @@ Para notícia, o que ranqueia é: ser rápido, ser original, ser confiável e re
 4. **Estrutura:** um H1; H2 claros (de preferência como pergunta ou tema buscado); parágrafos curtos; sem seção que repete outra.
 5. **Valor próprio (E-E-A-T):** há contexto, consequência para o leitor do nicho ou informação que a fonte não deu? Se é só paráfrase da fonte, reprove.
 6. **Confiança:** fontes citadas no texto e listadas com link e data; autor e data de publicação; "atualizado em" quando houver mudança; fato separado de análise.
-7. **Pronta para IA (GEO):** frases autossuficientes e citáveis (sujeito explícito, número, data); entidades nomeadas por extenso na primeira menção; respostas diretas no começo de cada seção; FAQ só com perguntas reais.
+7. **Pronta para IA (GEO):** frases autossuficientes e citáveis (sujeito explícito, número, data); entidades nomeadas por extenso na primeira menção; respostas diretas no começo de cada seção; sem seção de FAQ (site de jornal não usa).
 8. **Técnico on-page:** slug curto e descritivo; texto alternativo da imagem descritivo; 1 a 3 links internos relevantes; links externos para a fonte original; dados estruturados NewsArticle (headline, datePublished, dateModified, author, image, publisher) listados para o site.
 9. **Legibilidade:** frases curtas, voz ativa, sem enchimento ("é importante destacar", "neste artigo"), sem palavra-chave repetida em parágrafos seguidos.
 9b. **Seção certa:** a linha "Seção:" existe, é uma das seções cadastradas do jornal e corresponde ao assunto. Seção errada ou inventada é CORREÇÃO OBRIGATÓRIA.

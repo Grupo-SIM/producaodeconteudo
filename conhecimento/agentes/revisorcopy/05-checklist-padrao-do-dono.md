@@ -88,7 +88,7 @@ Estas regras vêm de correções diretas do dono. Cada item que falhar é CORRE�
 
 **Realidade atual:** reprove rotina que o público já não vive hoje (ex.: semanas escrevendo um e-book, numa época em que se usa IA) e frase sem sentido lógico ou físico.
 
-**Reels:** em motion, o texto na tela é igual à fala. Institucional precisa gerar desejo, segurança e credibilidade, sem prova que a ficha não confirme.
+**Reels:** em motion, o texto na tela é igual à fala. Institucional fala como marca grande: reprove se explicar o que é ou como funciona. Foco em confiança e credibilidade, sem prova que a ficha não confirme.
 
 **Força do CTA:** o CTA para a bio precisa de uma dor concreta e de um resultado direto, que valham sair da rede social. Dor fraca pede ajuste.
 

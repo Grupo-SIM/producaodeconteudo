@@ -73,3 +73,6 @@ Os buscadores de IA montam a resposta juntando trechos de páginas e citando a f
 8. Imagem com alt, links internos e externos, JSON-LD NewsArticle.
 9. Leitura leve, sem enchimento.
 10. Regras da casa (fato com fonte, tom de jornal, assunto permitido).
+
+## Regra do dono
+Matéria de jornal não leva seção de perguntas frequentes. Confira também se cada subtítulo é respondido pelos parágrafos abaixo dele. Todo bastidor precisa estar atribuído a uma pessoa ou veículo; sem atribuição, peça ajuste. Confira também se as aspas são trechos contínuos (ou com [...]) e se toda fonte citada aparece na lista de fontes.

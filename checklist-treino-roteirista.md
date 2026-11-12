@@ -32,23 +32,30 @@ Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 - [x] 8. Notícia esportiva: formato jornalístico aprovado no nicho
 
 ## Formatos de vídeo
-- [ ] 9. Reels / vídeo vertical (voz de IA; educativo, institucional, história real e opinião aprovados; falta o de venda; sem notícia)
-- [ ] 9c. Institucional das outras marcas (SimIntPay aprovado com 3 vídeos)
+- [x] 9. Reels / vídeo vertical (voz de IA): educativo, institucional, história real, opinião e venda aprovados; sem notícia
+- [x] 9c. Institucional como marca grande: manifesto, padrão, bastidor, momento, marco e obra definidos; Atlas com manifesto, manifesto 2 e bastidor aprovados
+- [ ] 9d. Institucional em série com nome fixo (em espera, até haver ritmo de postagem)
 - [ ] 9a. Reels institucional para clientes terceiros (depois das nossas marcas)
 - [ ] 9b. Reels narrados por pessoa real (quando houver social media)
 - [ ] 10. Vídeo horizontal (YouTube), se for usar
 
 ## Textos longos (por último)
-- [ ] 11. Matéria completa do jornal (refazer o treino: a primeira não ficou boa)
+- [x] 11. Matéria completa do jornal: modelo aprovado (Vitória/Rafael Lacerda), com bastidor atribuído, números, dados esportivos e sem FAQ
 - [ ] 12. Conteúdo de blog: aulas, tutoriais e artigos, sempre com solução gratuita real primeiro (passo a passo no Excel ou Google Sheets) e depois o produto como opção profissional
 - [x] 13. Ordem: matéria primeiro, seguindo os padrões aprovados de cada formato
-- [ ] 14. Histórias reais: ajustes aplicados; antes de publicar, checar o que segue sem confirmação (Toy Story 2, Hoover e Barings, anotado em cada peça)
+- [x] 14. Histórias reais: fatos conferidos de novo; o que não foi confirmado saiu das peças
 
 ## Ao colocar o sistema para rodar
 - [ ] Narração de Reels: o roteiro sai com números em algarismos para a tela, e o motor de vídeo converte para extenso antes de mandar à voz de IA
 - [ ] Quando o Designer pedir roteiro, usar primeiro todas as peças de `carrosseis-aprovados-producao.md`, respeitando marca e formato, e só depois gerar roteiros novos
 
+- [ ] Aprendizado pelo uso: métricas do Instagram entrando sozinhas pela API oficial (alcance, visualizações, tempo assistido, salvamentos, compartilhamentos)
+- [ ] Aprendizado pelo uso: link rastreável por post e medição no site (quem chegou e quem comprou), quando os sites novos estiverem prontos
+- [ ] Aprendizado pelo uso: teste A/B de capas e ganchos, com a versão vencedora virando regra, respeitando amostra mínima
+
 ## Para alimentar o treino (você, quando puder)
+- [ ] Casos reais para institucional (obra do cliente, ações da marca, números para marco)
+- [ ] Confirmar se o Atlas bloqueia tentativas de invasão (vídeo de padrão de segurança)
 - [ ] Referência de humor para os stories
 - [ ] Novas referências de roteiro e de perfil
 - [ ] Outros CTAs de contracapa

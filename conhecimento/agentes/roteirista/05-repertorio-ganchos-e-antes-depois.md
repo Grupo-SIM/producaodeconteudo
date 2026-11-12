@@ -11,6 +11,8 @@ Não trabalhamos com produto físico. Só use cena, exemplo ou assunto que conec
 - O mesmo vale para o Controle Patrimonial: conteúdo para empresários e gestores que precisam organizar o negócio e controlar o que a empresa tem pode falar de estoque, inventário, equipamentos e bens.
 - Controle de Motorista só entra na Corte dos Ricos. A dor real é o dono lidando com colaboradores que usam demais os veículos da empresa (carro, moto, caminhão): uso pessoal, paradinha no caminho, rota mais longa. O sistema controla a quilometragem para achar os gargalos que fazem sair tanto dinheiro em combustível.
 - **Realidade atual e skin in the game.** Antes de descrever a rotina do público, pergunte se ele vive isso hoje. Ex.: com IA, quase ninguém passa semanas escrevendo um e-book. E a frase precisa fazer sentido físico: "abastecer mais do que roda" é impossível.
+- Atlas é masculino: "o Atlas", "no Atlas", "conheça o Atlas".
+- Atlas Hosting: não tem suporte pelo WhatsApp (o site será corrigido). Não fale em "trocar de empresa" ou "sem trocar de empresa" ao falar de upgrade.
 - Antes de usar um exemplo, pergunte: isso traz gente que compraria algo nosso? Se não, troque.
 
 ## 0b. Conteúdo educativo que prepara a venda (regra do dono)

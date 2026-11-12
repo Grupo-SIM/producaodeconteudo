@@ -166,7 +166,7 @@ Legenda: Equipamento sem responsável costuma ser o último a receber conserto. 
 ## História real investigativa
 
 ### 11. Tecnologia: Toy Story 2 quase apagado
-Conferência 10/11/2026: comando, backup com falha e cópia da Galyn Susman batem em várias fontes secundárias. Sem confirmação independente: "a cópia não estava completa" e "perdeu alguns dias" (cobertores em fonte única). Livro de Catmull não consultado. Sem usar imagem dos personagens. Escolher a frase final do slide 2.
+Conferência 11/11/2026: comando, backup com falha, cópia da Galyn Susman e cópia incompleta confirmados em várias fontes. "Perdeu alguns dias" não foi encontrado e saiu do slide 8. Sem usar imagem dos personagens. Escolher a frase final do slide 2.
 
 Capa: Um comando errado começou a apagar Toy Story 2. Na frente da equipe inteira.
 2. **Não era falha na tela. O filme estava realmente sendo apagado.** (opção: O trabalho de toda a equipe estava sumindo na frente deles.)
@@ -175,7 +175,7 @@ Capa: Um comando errado começou a apagar Toy Story 2. Na frente da equipe intei
 5. Só restava uma esperança, e ela não estava na Pixar. **Estava na casa de uma funcionária com um bebê recém-nascido.**
 6. Galyn Susman, uma das responsáveis técnicas, trabalhava de casa para cuidar do bebê. Para isso, tinha uma cópia do filme no computador dela. **De repente, aquele computador virou a coisa mais importante da Pixar.**
 7. A máquina foi buscada e levada até a empresa enrolada em cobertores. **Só que a cópia não estava completa.**
-8. A equipe perdeu alguns dias de trabalho, mas recuperou o filme e manteve a data de estreia. **Toy Story 2 chegou a quase meio bilhão de dólares no mundo.**
+8. Parte do trabalho mais recente teve que ser refeita. Mas o filme foi recuperado e manteve a data de estreia. **Toy Story 2 chegou a quase meio bilhão de dólares no mundo.**
 9. **O filme foi salvo por uma cópia que não estava dentro da empresa.**
 10. **Se seu site sumisse hoje, onde estaria a sua cópia?** Clique no link na bio e aprenda de forma 100% gratuita a guardar uma cópia que realmente consiga salvar seu site.
 
@@ -184,14 +184,14 @@ Legenda: Ter backup e conseguir recuperar são duas coisas diferentes. Muita emp
 Fontes: SlashFilm (2021), com base no livro de Ed Catmull; Techspot.
 
 ### 12. Marketing: a promoção da Hoover
-Conferência 10/11/2026: 100 libras, 600 libras, 50 mil, 300 mil, três executivos, processos até 1998 e reunião de acionistas batem. Ajustes aplicados na capa e no slide 10. Ainda sem confirmação: venda em 1995 e quebra da agência.
+Conferência 11/11/2026: números, três executivos, processos até 1998 e reunião de acionistas batem. Venda da divisão europeia para a Candy em 1995 confirmada pela própria Candy. A quebra da agência de viagens não foi confirmada e saiu do slide 6, trocada pelo prejuízo de US$ 30 milhões registrado pela Maytag (UPI, 1993).
 
 Capa: Compre um aspirador e ganhe duas passagens de avião. A promoção virou um desastre de milhões.
 2. **Não era golpe. Era a Hoover, com selo de fornecedora da família real britânica.**
 3. Reino Unido, 1992. Em plena crise, a Hoover precisava vender produtos parados. Quem gastasse 100 libras ganhava duas passagens que valiam cerca de 600. **Parecia bom demais para ser verdade.**
 4. A empresa contava que pouca gente fosse até o fim. Por isso criou prazos curtos, formulários e o direito de recusar datas e aeroportos escolhidos pelo cliente. **A previsão era de 50 mil pedidos.**
 5. **Chegaram cerca de 300 mil.** Muita gente comprava o produto mais barato só para ganhar as passagens. Algumas pessoas nem voltavam para buscar o que tinham comprado.
-6. A Hoover teve que aumentar a produção e contratar gente para atender a procura. Até que a empresa de viagens parceira quebrou. **Agora, faltava quem cuidasse das passagens.**
+6. A Hoover teve que aumentar a produção e contratar gente para atender a procura. Só no primeiro balanço, a dona da marca registrou US$ 30 milhões de prejuízo com a promoção. **E ainda faltavam milhares de passagens.**
 7. O processo ficou ainda mais difícil. Quem conseguia avançar podia receber datas e aeroportos ruins. Outros ficaram sem nada. **O caso foi parar nos jornais.**
 8. A empresa cancelou a promoção quando milhares de clientes já tinham comprado e enviado os formulários. **Foi aí que os clientes se organizaram.**
 9. Um grupo comprou ações da dona da Hoover só para ter direito de entrar na reunião de acionistas, nos Estados Unidos, e cobrar o presidente na frente de todos. **Os processos duraram até 1998.**
@@ -226,12 +226,12 @@ Legenda: Entre tantas famosas divulgando o festival, segundo relatos, só uma av
 Fonte: Wikipedia.
 
 ### 16. Empreendedorismo e finanças: a conta 88888 do Barings
-Conferência 10/11/2026: conta 88888, 827 milhões, venda por 1 libra e falta de separação de funções batem em fontes secundárias. O relatório do Banco da Inglaterra não foi consultado. 20 mil libras em fonte única; data da falência varia entre 26 e 27 de fevereiro.
+Conferência 11/11/2026: conta 88888 aberta em julho de 1992, 827 milhões e venda por 1 libra confirmados. O relatório oficial (citado no Parlamento britânico) conclui que Leeson pretendia usar a conta 88888 para operações não autorizadas desde o início; a história das 20 mil libras é a versão do próprio Leeson e saiu do slide 4.
 
 Capa: Um banco de 233 anos quebrou por causa de uma conta que quase ninguém olhava.
 2. **Não era um banco pequeno. Era o Barings, um dos mais antigos da Inglaterra.**
 3. Nos anos 1990, Nick Leeson comandava as operações do banco em Singapura. Ele fazia as negociações e também cuidava da conferência delas. **Normalmente, seriam duas pessoas diferentes.**
-4. Um erro da equipe custou 20 mil libras. Em vez de aparecer, a perda foi escondida em uma conta usada para corrigir erros. **O número dela era 88888.**
+4. Em julho de 1992, ele abriu uma conta para registrar erros de operação. Segundo o relatório oficial do caso, desde o começo ela serviu para esconder operações que ninguém tinha autorizado. **O número dela era 88888.**
 5. Leeson alterou essa conta para Londres não receber os relatórios dela. Para a matriz, as perdas apareciam como ganhos. **E cada novo prejuízo ia para o mesmo lugar.**
 6. Ele fazia apostas cada vez maiores para tentar recuperar o dinheiro. No fim de 1994, o buraco já passava de 200 milhões de libras. **A boa reputação dele afastava as perguntas.**
 7. Algumas pessoas chegaram a levantar dúvidas sobre o que ele fazia. **Foram ignoradas.**
@@ -287,18 +287,18 @@ Todo CTA leva ao link da tela. Sem emoji.
 4. Valor. Pergunta: meu site tá lento, por onde eu começo? Resposta: Primeiro descubra onde está a lentidão. Rode o site no PageSpeed Insights do Google. Ele mostra se o problema são imagens pesadas, plugins demais, código ou o próprio servidor. Arrumar sem medir é trocar peça no escuro.
 5. Sem caixinha. E por que isso importa tanto? O Google já mostrou que, quanto mais o site demora pra carregar, maior a chance de a pessoa desistir antes de ver qualquer coisa. Ela nem chega a ver o seu produto. Você paga pelo anúncio, ela clica e vai embora olhando uma tela branca.
 6. Indireta. Pergunta: por que meu site cai justo quando eu faço promoção? Resposta: Pode ser vários motivos: o plano não aguenta tanta gente ao mesmo tempo, o servidor é dividido com muitos outros sites, um plugin pesado trava tudo, entre outras coisas. O pior é que isso acontece justo no dia em que você mais precisa vender. Antes de uma ação grande, vale saber quanto o seu plano aguenta.
-7. CTA. Pergunta: qual hospedagem vc usa? Resposta: Uso a Atlas Hosting e recomendo. Além de ser fácil de usar, ela te devolve todo mês até R$ 250 em crédito no Vale Bonus pra gastar em outras coisas. Hospedagem que te paga de volta eu nunca tinha visto. Vou deixar o link aqui.
+7. CTA. Pergunta: qual hospedagem vc usa? Resposta: Uso o Atlas Hosting e recomendo. Além de ser fácil de usar, ela te devolve todo mês até R$ 250 em crédito no Vale Bonus pra gastar em outras coisas. Hospedagem que te paga de volta eu nunca tinha visto. Vou deixar o link aqui.
 8. Humor. Pergunta: qual a maior mentira de quem mexe no próprio site? Resposta: "Só vou trocar uma cor rapidinho." Três horas depois, o menu sumiu, o rodapé foi parar no topo e eu já nem lembro qual era a cor original.
 9. Valor. Pergunta: preciso de backup se a hospedagem já faz? Resposta: Precisa. Backup da hospedagem é ótimo, mas fica no mesmo lugar do problema. A regra que quem é da área usa é ter cópias em lugares diferentes: uma na hospedagem e outra fora dela, num drive, por exemplo. No dia em que precisar, você agradece.
 10. Polêmica. Pergunta: site ainda vale a pena ou só Instagram resolve? Resposta: O Instagram é ótimo, mas não é seu. Uma mudança no algoritmo ou uma conta bloqueada e você perde tudo da noite pro dia. O site é o único endereço na internet que é seu de verdade.
 11. Quebra de padrão. Pergunta: café ou energético pra trabalhar? Resposta: Café. Energético eu tomei uma vez às 23h. Às 4 da manhã eu tinha reorganizado todas as pastas do computador por cor.
 12. Autoridade. Pergunta: qual a diferença de hospedagem compartilhada pra VPS? Resposta: Na compartilhada você divide o servidor com vários sites, tipo morar num prédio: se o vizinho faz festa, você escuta. Na VPS você tem um espaço reservado só seu, tipo uma casa. Custa mais, mas o barulho do vizinho não chega.
 13. Sem caixinha. Na prática, todo servidor tem memória e processamento, que é o que faz o seu site abrir. Na compartilhada, isso é dividido entre todos os sites do servidor. Se um deles recebe muita visita de repente, pode sobrar menos pra você, e o seu site fica lento sem você ter feito nada. Na VPS, uma parte da memória e do processamento é reservada só pra você. O que acontece nos outros sites não te atinge.
-14. CTA. Pergunta: vale pagar mais em hospedagem se meu site tem pouca visita? Resposta: Não precisa. Se o seu site recebe pouca visita, o plano mais barato da Atlas atende tranquilo. Quando começar a crescer, é só fazer o upgrade, pro site não cair justo quando as vendas aumentarem. Vou deixar o link aqui.
+14. CTA. Pergunta: vale pagar mais em hospedagem se meu site tem pouca visita? Resposta: Não precisa. Se o seu site recebe pouca visita, o plano mais barato do Atlas atende tranquilo. Quando começar a crescer, é só fazer o upgrade, pro site não cair justo quando as vendas aumentarem. Vou deixar o link aqui.
 15. Indireta. Pergunta: domínio e hospedagem são a mesma coisa? Resposta: Não. O domínio é o endereço, tipo o nome da rua. A hospedagem é o terreno onde a casa está. Dá pra ter os dois em lugares diferentes, mas quando estão juntos fica bem mais fácil resolver qualquer problema, porque você fala com um lugar só.
 16. Quebra de padrão. Pergunta: qual o melhor jeito de passar o domingo? Resposta: Celular no silencioso, sofá e uma série que eu já vi três vezes, só pra não precisar pensar em nada.
-17. CTA. Pergunta: onde vejo os planos da Atlas? Resposta: Estão todos na página. Clique no link.
-18. Valor. Pergunta: o que eu olho antes de contratar hospedagem? Resposta: Não olhe só o preço. Veja como é o suporte, se tem backup, quanto o plano aguenta de acesso e se dá pra crescer sem trocar de empresa. Hospedagem barata que te deixa sozinho no dia do problema sai cara.
+17. CTA. Pergunta: onde vejo os planos do Atlas? Resposta: Estão todos na página. Clique no link.
+18. Valor. Pergunta: o que eu olho antes de contratar hospedagem? Resposta: Não olhe só o preço. Veja como é o suporte, se tem backup, quanto o plano aguenta de acesso e se dá pra fazer upgrade quando o site crescer. Hospedagem barata que te deixa sozinho no dia do problema sai cara.
 19. CTA. Pergunta: tô criando meu primeiro site, já preciso de hospedagem boa? Resposta: Precisa. Trocar de hospedagem com o site no ar e cliente acessando dá muito mais trabalho do que começar certo. Vou te recomendar a que eu uso, tá no link abaixo.
 
 ### 20. Empreendedorismo e finanças: SimIntPay (19 telas, caixinha)
@@ -418,35 +418,31 @@ CTA (47–53 s). Se a sua página só tem um preço, com o que a pessoa está co
 
 Legenda: Quase ninguém decide se um preço é caro olhando só para ele. A pessoa compara com o que está por perto. Por isso, quem vende com um preço só deixa essa comparação na mão do cliente, e ele vai comparar com o concorrente, com o parcelamento do mês ou com qualquer outra conta. Na sua página, qual opção você quer que a pessoa escolha, e o que está ao lado dela? Clique no link na bio e aprenda de forma 100% gratuita a montar sua tabela de planos.
 
-### 28. SimIntPay: institucional, vídeo 1 (voz de IA, cerca de 40 s)
-Texto na tela igual à fala. Indicações visuais ainda serão definidas com o Editor.
+### 28. Atlas: institucional, manifesto (voz de IA, cerca de 25 s)
+Um site fora do ar não é um problema técnico.
+É um cliente que desistiu de comprar.
+Um aluno que não conseguiu assistir à aula.
+Uma assinatura que não vai ser renovada.
+Por isso a gente não trata hospedagem como espaço em servidor.
+Trata como o lugar onde o seu negócio acontece.
+Atlas Hosting.
 
-Gancho. Receber pagamento, todo mundo recebe. A pergunta é o que acontece depois.
-Seu cliente paga, recebe o que comprou e vai embora. E você volta a gastar pra conseguir o próximo.
-A SimIntPay foi criada pra mudar essa conta. Somos uma plataforma de pagamentos feita pra você vender mais e fazer o cliente voltar.
-A cada compra, seu cliente pode ganhar até R$ 250 em crédito no Vale Bonus. Na hora. É um motivo real pra ele comprar de você de novo.
-Você aceita crédito, débito, Pix e boleto. Com mais de 90% de aprovação, saque rápido e tudo acompanhado em tempo real, num painel só.
-E, quando você precisa de ajuda, a gente acompanha de perto, até resolver.
-CTA. Receber é só o começo. Conheça a SimIntPay no link da bio.
+### 28b. Atlas: institucional, manifesto 2 (voz de IA, cerca de 20 s)
+A gente não vende espaço em servidor.
+A gente cuida do lugar onde alguém decide confiar em você.
+Onde o cliente compra.
+Onde o aluno aprende.
+Onde a sua marca existe quando você está dormindo.
+Atlas Hosting.
 
-Legenda: A SimIntPay é uma plataforma de pagamentos para quem quer mais do que receber: quer vender mais e ver o cliente voltar. Crédito, débito, Pix e boleto, alta taxa de aprovação, saque rápido, painel completo e até R$ 250 em crédito no Vale Bonus a cada compra do seu cliente. Conheça no link da bio.
-
-### 29. SimIntPay: institucional, vídeo 2, como funciona (voz de IA, cerca de 30 s)
-Gancho. Quanto tempo falta pra sua próxima venda cair na sua conta?
-Começar na SimIntPay é simples. Você cria sua conta em poucos minutos.
-A nossa equipe valida a sua operação. E aí você já pode vender.
-Você escolhe como quer receber: crédito, débito, Pix ou boleto. E acompanha cada venda em tempo real, num painel só.
-O saque cai no dia seguinte. O dinheiro não fica parado.
-E cada compra do seu cliente pode gerar até R$ 250 em crédito no Vale Bonus.
-CTA. Quem cuida do seu dinheiro precisa estar do seu lado. Vem vender com a gente. O link tá na bio.
-
-### 30. SimIntPay: institucional, vídeo 3, quem está por trás (voz de IA, cerca de 35 s)
-Gancho. A SimIntPay nasceu de uma raiva.
-Durante anos, a gente usou os gateways e os sistemas do mercado nos nossos próprios negócios. E sentiu na pele cada venda travada, cada resposta que não vinha.
-Até que a gente decidiu parar de reclamar e construir o nosso.
-Por trás da SimIntPay está a SIM Intermediações, uma empresa 100% digital, com mais de 10 colaboradores, que desenvolve sistemas e cuida de marketing pra negócios de todo tipo.
-A gente usa o que vende. Por isso, quando você tem um problema, do outro lado tem gente que já passou por ele.
-CTA. Feita por quem vende, pra quem vende. Conheça no link da bio.
+### 28c. Atlas: institucional, bastidor (voz de IA, cerca de 25 s)
+Antes de existir o Atlas, a gente era cliente.
+De hospedagem lenta.
+De suporte que respondia no dia seguinte.
+De site fora do ar sem ninguém saber por quê.
+Um dia, a gente parou de reclamar.
+E construiu a hospedagem que sempre quis ter.
+Atlas Hosting.
 
 ### 31. 007 Spyhacker: Knight Capital (história real, voz de IA)
 Fontes: comunicado da SEC de 16/10/2013; PR Newswire e Wikipedia para o resgate e a fusão.
@@ -498,6 +494,91 @@ CTA. Você trocaria seu salário fixo por ganhar o dobro, sem nenhuma garantia?
 
 Legenda: Quem é CLT costuma achar que quem empreende é louco. Quem empreende costuma achar que quem é CLT está dormindo. Os dois têm boletos para pagar e os dois têm medo, só que de coisas diferentes. Um tem medo do mês sem venda. O outro, da reunião marcada de última hora com o RH. De quantas fontes de renda você depende hoje?
 
+### 34. 007 Spyhacker: Atlas, recorrência (venda, voz de IA)
+Gancho. Cliente que paga todo mês não reclama quando o seu site cai. Ele cancela.
+Quem vende assinatura, comunidade ou acesso mensal vive de uma coisa: a pessoa paga todo mês porque confia que vai estar tudo lá quando ela precisar.
+Aí, num dia qualquer, ela tenta entrar. E o site não abre.
+Ela tenta de novo à noite. Nada.
+Ela não te manda mensagem. Ela só pensa: eu tô pagando por isso?
+No mês seguinte, chega a cobrança. E ela cancela.
+Você nem fica sabendo o motivo.
+Hospedagem instável não te faz perder uma venda. Te faz perder várias vendas, todos os meses.
+O Atlas tem servidores de alta velocidade e segurança avançada, pra quem não pode ficar fora do ar.
+E todo mês, 100% da sua mensalidade, até R$ 250, vira crédito no Vale Bonus.
+Seu cliente paga todo mês. Seu site precisa estar lá todo dia.
+CTA. Conheça o Atlas no link da bio.
+
+Legenda: Em negócio de recorrência, o cancelamento quase nunca vem com explicação. O cliente simplesmente não renova, e você fica tentando adivinhar se foi o preço, o conteúdo ou a concorrência. Às vezes foi uma noite em que ele tentou entrar e não conseguiu. Quantas vezes o seu site saiu do ar no último mês sem você saber? Conheça o Atlas no link da bio e pare de perder cliente por causa de site fora do ar.
+
+### 35. 007 Spyhacker: Atlas, pico de acesso (venda, voz de IA)
+Gancho. O seu site vai cair justo quando mais gente entrar nele. E não vai ser coincidência.
+Pensa no que acontece quando um post seu bomba, ou quando você manda uma oferta pra sua lista. Todo mundo clica na mesma hora.
+Hospedagem barata divide o mesmo servidor com um monte de sites. Num dia normal, ela dá conta.
+Quando todo mundo entra ao mesmo tempo, ela não dá mais conta.
+E o pior nem é o site cair. É a pessoa que ia comprar ver a tela branca, fechar a aba e comprar em outro lugar.
+Aí você chama o suporte. E recebe um número de protocolo.
+Na Atlas, o seu site roda em servidores de alta velocidade, com segurança avançada.
+E ainda tem um detalhe: todo mês, 100% da sua mensalidade, até R$ 250, vira crédito no Vale Bonus.
+Porque o dia em que mais gente entra no seu site é justamente o dia em que ele não pode cair.
+CTA. Conheça o Atlas no link da bio.
+
+Legenda: Ninguém troca de hospedagem enquanto tudo funciona. A troca quase sempre vem depois do prejuízo: o site caiu justo quando mais gente estava entrando, e a venda foi para outro lugar. O melhor momento para resolver isso é antes de precisar. Vou deixar o Atlas no link da bio para você dar uma olhada com calma.
+
+## Matérias de jornal
+
+### 36. Vivendo de Bet: Rafael Lacerda no Vitória (matéria completa, dados de 11/11/2026)
+Palavra-chave principal: Rafael Lacerda Vitória
+Título SEO: Rafael Lacerda é o novo técnico do Vitória no Brasileirão
+Meta descrição: Rafael Lacerda deixa a Chapecoense, rebaixada, e assume o Vitória a um ponto da zona. Ele tem nove dias até a estreia, contra o Bragantino.
+Slug: rafael-lacerda-novo-tecnico-vitoria-brasileirao
+Manchete: Vitória contrata Rafael Lacerda, que deixa a Chapecoense já rebaixada, para fugir da queda com um ponto de vantagem
+Linha fina: Técnico de 42 anos assina até o fim de 2027 e terá nove dias para preparar o time antes da estreia, contra o Bragantino.
+
+O Vitória apresentou na terça-feira (10) Rafael Lacerda como novo técnico para a reta final do Brasileirão. Aos 42 anos, ele chega da Chapecoense e assina contrato até o fim de 2027. A missão é evitar o rebaixamento: o time baiano é o 15º colocado, com 38 pontos, apenas um acima da zona.
+
+## A saída de Jair Ventura
+Lacerda ocupa o lugar de Jair Ventura, que deixou o cargo em 2 de novembro, segundo o site Futebol Baiano. A saída veio depois da derrota por 2 a 0 para o Coritiba. No jogo seguinte, já sem Jair, o Vitória perdeu por 3 a 0 para o Fluminense, em casa. O time não vence há cinco partidas.
+
+## Como o Vitória chegou a Rafael Lacerda
+A busca não foi simples. Segundo o diretor de futebol Sérgio Papellin, em entrevista ao site Arena Rubro-Negra, o clube ouviu respostas negativas de outros técnicos antes de chegar a Lacerda. Sem opções disponíveis no mercado, passou a procurar treinadores que estavam empregados.
+"Foi rápido de resolver", disse Papellin sobre a negociação, que, segundo ele, partiu de um interesse dos dois lados.
+Em nota oficial, a Chapecoense informou que o técnico recebeu proposta de um clube da Série A e pediu o encerramento do contrato. Os auxiliares João Antônio e Mateus Bolivar saíram junto com ele.
+
+## Quem é Rafael Lacerda
+Ex-zagueiro, com passagens por Goiás e Paysandu, Lacerda começou a se destacar como técnico no Caxias, onde foi eleito o melhor treinador do Campeonato Gaúcho de 2020. Depois, comandou o Amazonas, com quem conquistou um acesso nacional e o título estadual, e o Vila Nova, campeão goiano depois de 20 anos.
+Também treinou Aimoré, ABC, Barra-SC e Atlético-GO antes de chegar à Chapecoense, em 30 de maio deste ano.
+
+## Rafael Lacerda vem de um rebaixamento com a Chapecoense
+Na Chapecoense, Lacerda comandou 20 partidas, com quatro vitórias, quatro empates e 12 derrotas, aproveitamento de 26,67%, segundo levantamento do ge.
+A última vitória do Vitória no Brasileirão foi justamente contra ele: 4 a 0 sobre a Chapecoense, em 7 de outubro, no Barradão.
+Na apresentação, segundo a imprensa baiana, Lacerda disse que encontrou a Chapecoense praticamente rebaixada, mas conseguiu resultados importantes, e chamou a chegada ao Vitória de o maior desafio da sua carreira.
+
+## O que o Vitória tem pela frente
+São quatro rodadas para decidir a permanência na Série A. A situação na parte de baixo da tabela, segundo o Sofascore: 15º Vitória, 38 pontos; 16º Internacional, 38; 17º Corinthians, 37; 18º Grêmio, 37.
+O problema está nos dois lados do campo. Com 35 gols, o Vitória tem o segundo pior ataque do campeonato, à frente só da Chapecoense. E, com 51 gols sofridos, tem a quarta pior defesa, ao lado do Coritiba. Os dados são do Sofascore.
+Os próximos jogos: 19/11, Vitória x Red Bull Bragantino, no Barradão; 23/11, Internacional x Vitória, confronto direto com o vizinho de tabela; 29/11, Vitória x Santos, no Barradão; 03/12, Vasco x Vitória.
+Entre a apresentação e a estreia, contra o Bragantino, Lacerda terá nove dias de trabalho com o elenco.
+
+Fontes: Chapecoense (nota oficial, 09/11/2026); Arena Rubro-Negra; Futebol Baiano; ge, via Game Over Drive; Sofascore; CNN Brasil; Itatiaia; Folha do Estado da Bahia.
+Observação: matéria datada. Serve como modelo de padrão; publicar só com os dados atualizados.
+
+### 37. Seguidores em Alta: IA do Instagram para adolescentes (post + matéria, dados de 11/11/2026)
+Post. Capa: Instagram passa a usar inteligência artificial no mundo todo para identificar adolescentes que informam idade de adulto e colocá-los em contas com restrições
+Contracapa: Segundo a Meta, milhões de adolescentes vão receber as proteções. No Brasil, a tecnologia já era usada. Chamada: Nos siga para receber mais conteúdo como esse
+Legenda: A Meta anunciou na segunda-feira (9) que vai usar inteligência artificial no mundo todo para identificar adolescentes no Instagram, mesmo quando eles informam uma idade de adulto no cadastro. Quem o sistema identificar como tendo entre 13 e 17 anos passa para uma Conta de Adolescente, com limites de contato, de conteúdo e de tempo de uso. Para quem cria conteúdo para o público jovem, a mudança pode mexer em quem consegue ver e falar com esse público. Leia a matéria completa clicando no link da bio.
+
+Matéria. Título SEO: Instagram usa IA para identificar adolescentes no mundo todo
+Linha fina: A Meta diz que milhões de adolescentes vão receber as proteções. No Brasil, onde a tecnologia já era usada, a lei exige verificação de idade desde março.
+Lide: A Meta anunciou na segunda-feira (9) que vai usar inteligência artificial no mundo todo para identificar adolescentes no Instagram, mesmo quando eles informam uma data de nascimento de adulto. Quem o sistema apontar como tendo entre 13 e 17 anos passa automaticamente para uma Conta de Adolescente, com proteções que limitam contato, conteúdo e tempo de uso.
+## O que muda para quem usa o Instagram: Contas de Adolescente limitam contato, conteúdo e tempo (Meta); impedem mensagens de desconhecidos, perfil e posts privados por padrão, limite diário e controle dos pais (Engadget). Citação do comunicado em tradução livre. O comunicado não explica como um adulto colocado por engano pode contestar.
+## No Brasil, a tecnologia já era usada: EUA, União Europeia e Brasil (Engadget); sem números de precisão (Fast Company Brasil).
+## No Brasil, a lei já exige verificação de idade: ECA Digital em vigor desde 17/03/2026; "mecanismos confiáveis de verificação de idade a cada acesso"; contas até 16 anos vinculadas a responsável; regulamentação pendente para lojas e sistemas; multa de até 10% do faturamento (Agência Senado).
+## Um acordo nos Estados Unidos por trás da mudança: acordo de agosto com 52 procuradores-gerais, até US$ 18 bilhões (Engadget); correção da Engadget sobre análise de fotos para menores de 13.
+## Apple, Facebook e Threads: os próximos passos: sinal de idade da Apple na Austrália; cobrança a TikTok e YouTube; Facebook em expansão; Threads ainda em 2026; vídeo para pais nos EUA.
+Fontes: Meta (09/11/2026); Engadget (09/11/2026); Fast Company Brasil (10/11/2026); Agência Senado (17/03/2026).
+Observação: matéria datada; texto completo na conversa de treino de 11/11/2026. Serve como modelo.
+
 ## Não incluídos ainda
+- Blog, teste 1: inventário de bens da empresa (Corte dos Ricos, prepara o Controle Patrimonial). Escrito em 11/11/2026, aguardando correção do dono. Pendências: existe modelo de planilha para baixar? Trocar "volta como crédito" por "você recebe o valor integral da mensalidade em crédito no Vale Bonus".
 - WhatsApp no sistema da empresa: ficou aguardando sua correção.
 - GitLab: teve ajustes, mas não recebeu aprovação final.
