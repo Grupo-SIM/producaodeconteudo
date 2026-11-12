@@ -3279,7 +3279,7 @@ async function viewAgents(embedded) {
   d.agents.sort((x, y) => { const o = id => ({ roteirista: 0, revisorcopy: 1, gerente: 2 })[id] ?? 9; return o(x.id) - o(y.id); });
   for (const a of d.agents) {   // cada agente é um quadrinho; ao clicar, abre os campos embaixo (o que você digita não se perde ao trocar)
     const l = live(a.id), has = (a.learn || '').trim() || (a.avoid || '').trim();
-    const ta = h('textarea', { class: 'mono', rows: 14, value: a.prompt }), learn = h('textarea', { rows: 9, value: a.learn || '', placeholder: '1. Sempre …\n2. Sempre …' }), avoid = h('textarea', { rows: 9, value: a.avoid || '', placeholder: '1. Nunca …\n2. Nunca …' }), model = h('input', { type: 'text', value: a.model || '', placeholder: 'Padrão: ' + S.st.settings.model }), en = h('input', { type: 'checkbox', checked: !!a.enabled });
+    const ta = h('textarea', { class: 'mono', rows: 14, value: a.prompt }), learn = h('textarea', { rows: 9, value: a.learn || '', placeholder: '1. Sempre …\n2. Sempre …' }), avoid = h('textarea', { rows: 9, value: a.avoid || '', placeholder: '1. Nunca …\n2. Nunca …' }), model = selModelo(a.model || '', true), en = h('input', { type: 'checkbox', checked: !!a.enabled });
     const nick = h('input', { value: a.nick || '', maxlength: 30, placeholder: a.base }), save = guard(async () => { await api('/agents/' + a.id, 'PUT', { nick: nick.value.trim(), prompt: ta.value, model: model.value, enabled: en.checked, learn: learn.value, avoid: avoid.value }); toast(a.name + ' atualizado', 'ok'); await refresh(); });
     boxes.append(h('div', { class: 'abox', 'data-id': a.id, style: { '--c': a.color }, hidden: S.agentOpen !== a.id },
       h('div', { class: 'row' }, avatar(a, 40), h('div', null, h('b', null, a.name), h('div', { class: 'small mut' }, a.role + (a.nick ? ' · ' + a.base : ''))), h('span', { class: 'sp' }), h('span', { class: 'small mut' }, a.id === 'gerente' ? 'Sempre ativo (revisa todas as etapas)' : a.id === 'chefe' ? 'Sempre ativo (cérebro do sistema)' : 'Agente ativo'), (a.id === 'gerente' || a.id === 'chefe') ? null : h('label', { class: 'switch' }, en, h('span')), h('button', { class: 'btn primary', onclick: save }, 'Salvar'), h('button', { class: 'btn', onclick: () => openAg(null) }, 'Fechar')),
@@ -3794,7 +3794,7 @@ function viewSettings() {
       sw('pacote_ia', 'Social Media com IA no pacote de postagem', 'Desligado (mais rápido): legenda e checklist saem do roteiro na hora. Ligado: o Social Media também sugere primeiro comentário e horário, com uma etapa a mais.')]],
     ['ia', 'cog', 'IA e custo', 'Modelo, paralelismo e limite de gasto', () => [
       h('div', { class: 'small mut' }, 'Motor atual: ', h('b', null, manual() ? 'Modo chat (você cola as respostas do Claude, sem API)' : 'API do Claude conectada')),
-      h('div', { class: 'fgrid' }, fld('Modelo padrão', inp('model')), fld('Tarefas em paralelo', inp('concurrency', 'number', { min: 1, max: 4 })), fld('Limite de tarefas por dia', inp('max_jobs_day', 'number', { min: 1 })), fld('Orçamento da base (caracteres)', inp('kb_budget', 'number', { min: 5000 }))),
+      h('div', { class: 'fgrid' }, fld('Modelo padrão', (F.model = selModelo(s.model, false)), 'Vale para todos os agentes que não têm modelo próprio (aba Agentes).'), fld('Tarefas em paralelo', inp('concurrency', 'number', { min: 1, max: 4 })), fld('Limite de tarefas por dia', inp('max_jobs_day', 'number', { min: 1 })), fld('Orçamento da base (caracteres)', inp('kb_budget', 'number', { min: 5000 }))),
       h('div', { class: 'small mut' }, 'O limite diário protege seu gasto: ao atingir, a fila pausa até o dia seguinte. O orçamento da base limita quanto da Base de Conhecimento entra em cada pedido.')]],
     ['brain', 'brain', 'Cérebro', 'Como ele aprende com o que você aprova', () => [
       sw('brain_daily', 'Aprender todo dia', 'Uma vez por dia, no horário abaixo, o Cérebro lê o que aconteceu e atualiza as regras. Só roda se houver novidade.'),
@@ -3824,6 +3824,8 @@ function viewSettings() {
 }
 
 
+const MODELOS = [['claude-opus-5-5', 'Opus 5.5 (mais forte, gasta mais da assinatura)'], ['claude-sonnet-5-5', 'Sonnet 5.5 (equilíbrio, recomendado)'], ['claude-haiku-5-5', 'Haiku 5.5 (mais rápido e leve)']];
+const selModelo = (val, padrao) => { const ops = padrao ? [['', 'Padrão das Configurações (' + (MODELOS.find(m => m[0] === S.st.settings.model)?.[1].split(' (')[0] || S.st.settings.model) + ')'], ...MODELOS] : [...MODELOS]; if (val && !ops.some(o => o[0] === val)) ops.push([val, val]); return h('select', null, ops.map(([v, l]) => h('option', { value: v, selected: (val || '') === v }, l))); };
 /* ───────── Assinatura do Claude: os agentes rodam sozinhos com o login claude.ai, sem chave de API ───────── */
 function assinaturaCard() {
   const box = h('div', { class: 'card', style: { marginBottom: '14px' } });
