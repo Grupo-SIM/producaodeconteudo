@@ -1,0 +1,132 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif}
+body{background:#1b1b1e;padding:40px;display:flex;gap:34px;width:2280px;align-items:flex-start}
+.ph{width:390px;height:844px;border-radius:48px;background:#0c0c0d;border:10px solid #2a2a2e;position:relative;overflow:hidden;flex:none;box-shadow:0 30px 60px #0008;color:#ececee}
+.cap{position:absolute;top:-34px;left:0;right:0;text-align:center;color:#8b8b90;font-size:14px}
+.wrapc{position:relative}
+.sb{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:600}
+.hd{padding:6px 18px 10px;display:flex;align-items:center;gap:10px}.hd h1{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.pill{font-size:12px;padding:6px 11px;border-radius:999px;background:#18181b;border:1px solid #26262a;color:#b5b5ba;white-space:nowrap}
+.pill.on{background:#f2f2f3;color:#0c0c0d;border-color:#f2f2f3}.pill.gd{background:linear-gradient(135deg,#e9d8a6,#a8864a);color:#141006;border:none;font-weight:600}
+.row{display:flex;gap:6px;padding:0 18px 10px;overflow:hidden}
+.scroll{position:absolute;top:44px;bottom:84px;left:0;right:0;overflow:hidden}
+.alert{margin:0 18px 10px;background:#1f1314;border:1px solid #3a2224;border-radius:12px;padding:9px 12px;font-size:12px;color:#f2c4c4;display:flex;gap:8px;align-items:center}.alert b{color:#ff7b7b}
+.ln{margin:0 18px 8px;background:#141416;border:1px solid #222225;border-radius:14px;padding:12px 14px}
+.ln .t{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}.ln .t:before{content:"";width:7px;height:7px;border-right:1.6px solid #a5a5aa;border-bottom:1.6px solid #a5a5aa;transform:rotate(-45deg)}
+.ln.open .t:before{transform:rotate(45deg)}
+.ln .m{margin-left:auto;font-size:11.5px;color:#8b8b90;font-weight:500}
+.chips{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}.chips span{font-size:11px;padding:3px 8px;border-radius:999px;background:#18181b;border:1px solid #26262a;color:#a5a5aa}.chips .y{color:#e9d29a;border-color:#3a3220}.chips .g{color:#9fd3b2}.chips .r{color:#ff9b9b;border-color:#3a2224}
+.steps{display:flex;gap:8px;margin-top:10px;overflow:hidden}
+.stp{min-width:150px;background:#0f0f10;border:1px solid #1c1c1f;border-radius:10px;padding:8px}.stp.me{background:#17140e;border-color:#3a3220}
+.stp h5{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#7b7b82;margin-bottom:6px}.stp.me h5{color:#d9c08a}
+.cd{background:#18181b;border:1px solid #26262a;border-radius:8px;padding:7px 9px;font-size:12px;box-shadow:inset 2px 0 0 #6fcf97}.cd.y{box-shadow:inset 2px 0 0 #d9c08a}.cd i{display:block;font-style:normal;font-size:10.5px;color:#7b7b82;margin-top:2px}
+.dots{display:flex;gap:4px;justify-content:center;margin-top:8px}.dots i{width:5px;height:5px;border-radius:50%;background:#333}.dots i.on{background:#d9c08a;width:14px;border-radius:3px}
+.tab{position:absolute;left:0;right:0;bottom:0;height:84px;background:#0f0f10;border-top:1px solid #1f1f22;display:flex;justify-content:space-around;padding-top:10px}
+.tab div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:#7b7b82;position:relative;width:62px}.tab div.on{color:#f2f2f3}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tab b{position:absolute;top:-4px;right:10px;font-size:9.5px;background:#2a2418;color:#e9d29a;border:1px solid #4a3f26;border-radius:8px;padding:0 5px}
+.fab{position:absolute;right:16px;bottom:96px;height:50px;padding:0 18px;border-radius:25px;background:linear-gradient(135deg,#e9d8a6,#a8864a);color:#141006;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 24px #0009}
+.mc{margin:0 18px 12px;background:#141416;border:1px solid #222225;border-radius:16px;overflow:hidden}
+.mc .pv{height:210px;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;background:radial-gradient(circle at 100% 0,#3a2f0a,#050505 62%);position:relative}
+.mc .pv b{font-size:20px;line-height:1.15;font-weight:800}
+.tag{position:absolute;top:12px;left:12px;font-size:11px;background:#000b;padding:4px 9px;border-radius:999px}.age{position:absolute;top:12px;right:12px;font-size:11px;background:#000b;padding:4px 9px;border-radius:999px;color:#e9d29a}
+.mc .in{padding:12px 14px}.mc .in b{font-size:15px;display:block}.mc .in span{font-size:12px;color:#8b8b90}
+.bt{display:flex;gap:8px;padding:0 14px 14px}.bt i{flex:1;text-align:center;font-style:normal;font-size:13px;font-weight:600;padding:11px;border-radius:11px;background:#1c1c1f;border:1px solid #2a2a2e}.bt i.ok{background:linear-gradient(135deg,#e9d8a6,#a8864a);color:#141006;border:none}
+.swipe{text-align:center;font-size:11px;color:#6b6b70;margin-top:4px}
+/* editor */
+.eh{padding:4px 18px 10px;display:flex;align-items:center;gap:10px}.eh b{font-size:16px}.eh span{font-size:11.5px;color:#8b8b90;display:block}
+.x{margin-left:auto;width:32px;height:32px;border-radius:50%;background:#1c1c1f;display:grid;place-items:center;color:#aaa}
+.art{margin:0 18px;height:430px;border-radius:14px;background:radial-gradient(circle at 100% 0,#5a470c,#0a0a0a 58%);padding:26px 22px;position:relative}
+.art .tt{font-size:27px;font-weight:900;line-height:1.08;outline:1.5px dashed #e9c46a;outline-offset:6px}.art .tt em{color:#e9d29a;font-style:normal}
+.art .lg{position:absolute;bottom:20px;left:22px;font-size:11px;font-weight:800;color:#e9d29a;letter-spacing:.06em}.art .pg{position:absolute;bottom:20px;right:22px;font-size:11px;color:#888}
+.tb{margin:12px 18px 0;display:flex;justify-content:space-between;background:#141416;border:1px solid #222225;border-radius:14px;padding:10px 14px;font-size:10.5px;color:#a5a5aa;text-align:center}
+.tb div{display:flex;flex-direction:column;gap:4px;align-items:center}.tb .ic{width:22px;height:22px;border-radius:6px;border:1.5px solid #8b8b90}
+.thumbs{display:flex;gap:6px;margin:10px 18px 0}.thumbs i{width:40px;height:50px;border-radius:6px;background:radial-gradient(circle at 100% 0,#3a2f0a,#050505 62%);border:1.5px solid transparent}.thumbs i.on{border-color:#e9c46a}
+.ebar{position:absolute;left:0;right:0;bottom:0;padding:12px 18px 28px;background:#0f0f10;border-top:1px solid #1f1f22;display:flex;gap:8px}
+.ebar i{font-style:normal;flex:1;text-align:center;font-weight:600;font-size:13px;padding:13px;border-radius:12px;background:#1c1c1f;border:1px solid #2a2a2e}.ebar i.ok{flex:2;background:linear-gradient(135deg,#e9d8a6,#a8864a);color:#141006;border:none}
+.ask{margin:10px 18px 0;background:#161618;border:1px solid #3a3220;border-radius:12px;padding:11px 13px;font-size:12.5px;color:#8b8b90}
+/* publicacao */
+.sec{padding:4px 18px 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7b7b82}
+.pq{margin:0 18px 8px;background:#141416;border:1px solid #222225;border-radius:14px;padding:10px;display:flex;gap:10px;align-items:center}
+.pq .th{width:52px;height:64px;border-radius:8px;background:radial-gradient(circle at 100% 0,#3a2f0a,#050505 62%);flex:none}
+.pq b{font-size:13.5px;display:block}.pq span{font-size:11.5px;color:#8b8b90}
+.pq .ok{margin-left:auto;font-size:12px;font-weight:700;padding:9px 11px;border-radius:10px;background:linear-gradient(135deg,#e9d8a6,#a8864a);color:#141006;white-space:nowrap}
+.nets{display:flex;gap:8px;padding:0 18px 12px}.nets i{width:44px;height:44px;border-radius:12px;opacity:.55;position:relative}.nets i:after{content:"em breve";position:absolute;bottom:-15px;left:-4px;font-size:8.5px;color:#7b7b82;font-style:normal;white-space:nowrap}
+.day{margin:0 18px 8px;display:flex;gap:10px;align-items:center;font-size:12.5px}.day b{width:44px;color:#d9c08a}.day span{flex:1;background:#141416;border:1px solid #222225;border-radius:10px;padding:9px 11px}
+/* cerebro */
+.brain{position:absolute;top:150px;left:0;right:0;height:470px}
+.sheet{position:absolute;left:0;right:0;bottom:84px;background:#141416;border-top:1px solid #2a2a2e;border-radius:22px 22px 0 0;padding:10px 18px 16px}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:#3a3a3f;margin:0 auto 10px}
+.sheet b{font-size:16px}.sheet .fl{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.sheet .fl span{font-size:11px;padding:4px 8px;border-radius:7px;background:#1c1c1f;color:#aeb6c6}.sheet .fl span.h{background:#3a3016;color:#f0d58a}
+</style></head><body>
+
+<!-- 1 FLUXO -->
+<div class="wrapc"><div class="cap">Fluxo</div><div class="ph"><div class="sb"><span>9:41</span><span>●●●</span></div>
+<div class="scroll">
+<div class="hd"><h1>Fluxo</h1><span style="margin-left:auto" class="pill">Todas as marcas ▾</span></div>
+<div class="row"><span class="pill on">Lista</span><span class="pill">Escritório</span></div>
+<div class="alert"><b>●</b>Editor de vídeo parado: assinatura saiu do login<span style="margin-left:auto;color:#fff;font-weight:600">Resolver</span></div>
+<div class="ln open"><div class="t">Carrossel<span class="m">2 de 4 hoje</span></div><div class="chips"><span class="g">3 trabalhando</span><span class="y">2 esperando você</span></div>
+<div class="steps"><div class="stp me"><h5>Aprovar roteiro</h5><div class="cd y">Aluno profissional<i>Central do Marketing</i></div></div><div class="stp"><h5>Arte · Designer</h5><div class="cd">Toy Story 2 quase apagado<i>007 Spyhacker · 6 de 10</i></div></div></div>
+<div class="dots"><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+<div class="ln"><div class="t">Estático<span class="m">0 de 1</span></div><div class="chips"><span class="y">1 esperando você</span></div></div>
+<div class="ln"><div class="t">Stories de venda<span class="m">1 de 1</span></div><div class="chips"><span class="g">1 trabalhando</span><span class="y">1 esperando você</span></div></div>
+<div class="ln"><div class="t">Reels<span class="m">1 de 2</span></div><div class="chips"><span class="r">1 parado</span><span class="y">1 esperando você</span></div></div>
+<div class="ln"><div class="t">Matéria de jornal<span class="m">1 de 3</span></div><div class="chips"><span class="g">2 trabalhando</span><span class="y">1 esperando você</span></div></div>
+</div>
+<div class="fab">Gerente</div>
+<div class="tab"><div class="on"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Fluxo<b>6</b></div><div><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4z"/><path d="M9 10l2 2 4-4"/></svg>Revisão<b>6</b></div><div><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6z"/></svg>Publicar<b>3</b></div><div><svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 006 0V6a2 2 0 00-3-2z"/><path d="M15 4a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-6 0"/></svg>Cérebro</div><div><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mais</div></div>
+</div></div>
+
+<!-- 2 MESA -->
+<div class="wrapc"><div class="cap">Mesa de revisão</div><div class="ph"><div class="sb"><span>9:41</span><span>●●●</span></div>
+<div class="scroll">
+<div class="hd"><h1>Revisão</h1><span style="margin-left:auto" class="pill">6 esperando</span></div>
+<div class="row"><span class="pill on">Tudo</span><span class="pill">Textos</span><span class="pill">Artes</span><span class="pill">Vídeos</span></div>
+<div class="mc"><div class="pv"><span class="tag">Arte · 9 slides</span><span class="age">há 6 min</span><b>Se você cortasse seu preço pela metade amanhã, quem ia parar de pedir desconto?</b></div>
+<div class="in"><b>Moldura de preço</b><span>Central do Marketing · Carrossel</span></div><div class="bt"><i>Editar</i><i class="ok">Aprovar</i></div></div>
+<div class="mc"><div class="pv" style="background:#050505;align-items:center;justify-content:center"><span class="tag">Vídeo · 0:50</span><span class="age">há 20 min</span><div style="width:54px;height:54px;border-radius:50%;background:#fff2;display:grid;place-items:center;font-size:20px">▶</div></div>
+<div class="in"><b>Efeito isca</b><span>Marketing Raiz · Reels</span></div></div>
+</div>
+<div class="fab">Gerente</div>
+<div class="tab"><div><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Fluxo<b>6</b></div><div class="on"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4z"/><path d="M9 10l2 2 4-4"/></svg>Revisão<b>6</b></div><div><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6z"/></svg>Publicar<b>3</b></div><div><svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 006 0V6a2 2 0 00-3-2z"/><path d="M15 4a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-6 0"/></svg>Cérebro</div><div><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mais</div></div>
+</div></div>
+
+<!-- 3 EDITOR -->
+<div class="wrapc"><div class="cap">Editar arte</div><div class="ph"><div class="sb"><span>9:41</span><span>●●●</span></div>
+<div class="eh"><div><b>Moldura de preço</b><span>Central do Marketing · slide 1 de 9</span></div><div class="x">✕</div></div>
+<div class="art"><div class="tt">Se você cortasse seu preço pela metade amanhã, quem ia parar de pedir <em>desconto</em>?</div><div class="lg">CENTRAL DO MARKETING</div><div class="pg">1/9</div></div>
+<div class="thumbs"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="tb"><div><span class="ic"></span>Texto</div><div><span class="ic"></span>Cor</div><div><span class="ic"></span>Imagem</div><div><span class="ic"></span>Fundo</div><div><span class="ic" style="border-radius:50%"></span>Desfazer</div></div>
+<div class="ask">Pedir ajuste ao gerente…</div>
+<div class="ebar"><i>Ajustar</i><i class="ok">Aprovar</i></div>
+</div></div>
+
+<!-- 4 PUBLICACAO -->
+<div class="wrapc"><div class="cap">Publicação</div><div class="ph"><div class="sb"><span>9:41</span><span>●●●</span></div>
+<div class="scroll">
+<div class="hd"><h1>Publicar</h1><span style="margin-left:auto" class="pill on">Manual</span></div>
+<div class="nets"><i style="background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af)"></i><i style="background:#1877f2"></i><i style="background:#111;border:1px solid #444"></i><i style="background:#ff0000"></i><i style="background:#e60023"></i><i style="background:#4a6ad6"></i></div>
+<div class="sec" style="margin-top:12px">Prontos para postar · hoje</div>
+<div class="pq"><div class="th"></div><div><b>Vitrine e decisão</b><span>Central · Instagram 12h</span></div><span class="ok">Postado</span></div>
+<div class="pq"><div class="th" style="background:#050505"></div><div><b>Rafael Lacerda no Vitória</b><span>Vivendo de Bet · site 9h</span></div><span class="ok">Publicado</span></div>
+<div class="pq"><div class="th"></div><div><b>Atlas Hosting</b><span>007 Spyhacker · stories 18h</span></div><span class="ok">Postado</span></div>
+<div class="sec" style="margin-top:8px">Agenda de amanhã</div>
+<div class="day"><b>09h</b><span>Matéria · Seguidores em Alta</span></div>
+<div class="day"><b>12h</b><span>Carrossel · 007 Spyhacker</span></div>
+<div class="day"><b>18h</b><span>Stories · 007 Spyhacker</span></div>
+</div>
+<div class="fab">Gerente</div>
+<div class="tab"><div><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Fluxo<b>6</b></div><div><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4z"/><path d="M9 10l2 2 4-4"/></svg>Revisão<b>6</b></div><div class="on"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6z"/></svg>Publicar<b>3</b></div><div><svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 006 0V6a2 2 0 00-3-2z"/><path d="M15 4a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-6 0"/></svg>Cérebro</div><div><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mais</div></div>
+</div></div>
+
+<!-- 5 CEREBRO -->
+<div class="wrapc"><div class="cap">Cérebro</div><div class="ph"><div class="sb"><span>9:41</span><span>●●●</span></div>
+<div class="hd"><h1>Cérebro</h1><span style="margin-left:auto" class="pill">Todas ▾</span></div>
+<div class="row"><span class="pill" style="flex:1;color:#8b8b90">Buscar no cérebro…</span></div>
+<div class="brain"><iframe src="brain-mini.html" style="width:390px;height:470px;border:0"></iframe></div>
+<div class="sheet"><div class="grab"></div><b>Roteirista</b> <span style="font-size:12px;color:#8b8b90">· 16 arquivos</span><div class="fl"><span>Carrossel</span><span>Narrativa</span><span>Ganchos</span><span class="h">Stories de venda</span><span>Reels</span><span>Blog</span><span>+10</span></div></div>
+<div class="fab" style="bottom:200px">Gerente</div>
+<div class="tab"><div><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Fluxo<b>6</b></div><div><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4z"/><path d="M9 10l2 2 4-4"/></svg>Revisão<b>6</b></div><div><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-6z"/></svg>Publicar<b>3</b></div><div class="on"><svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 006 0V6a2 2 0 00-3-2z"/><path d="M15 4a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-6 0"/></svg>Cérebro</div><div><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mais</div></div>
+</div></div>
+</body></html>

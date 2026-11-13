@@ -1,0 +1,11 @@
+<!doctype html><html><body style="margin:0;background:#0c0c0d"><canvas id="c" width="780" height="940" style="width:390px;height:470px"></canvas><script>
+const c=document.getElementById('c').getContext('2d');c.scale(2,2);const cx=195,cy=225;
+for(let i=0;i<2600;i++){let a=Math.random()*6.283,r=Math.sqrt(Math.random());let x=Math.cos(a)*r*175,y=Math.sin(a)*r*130;if(Math.abs(x)<6&&y<0)continue;y+=Math.sin(x/18)*6;const k=r>.8?.9:.35;const col=x<-40?'120,150,255':x>40?'190,110,230':'90,200,170';c.fillStyle=`rgba(${col},${k*Math.random()})`;c.fillRect(cx+x,cy+y,1.3,1.3)}
+c.strokeStyle='rgba(233,196,106,.2)';c.setLineDash([3,5]);[[85,48],[150,95]].forEach(([rx,ry])=>{c.beginPath();c.ellipse(cx,cy,rx,ry,0,0,7);c.stroke()});c.setLineDash([]);
+const A=[['Roteirista',0,1,'#5b7cff',1],['Designer',1.6,1,'#c056e0',1],['Revisor',3.1,0,'#9aa3bd',1],['Editor',4.4,1,'#e06a4d',0],['SEO',2.2,0,'#3aa0c8',0],['Publicador',5.6,0,'#7a8396',0],['Notícias',.9,0,'#2fb37a',0]];
+A.forEach(([n,a,r,col,hot])=>{const rx=r?150:85,ry=r?95:48;const x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry;c.strokeStyle=hot?'rgba(233,196,106,.8)':col+'88';c.lineWidth=hot?1.6:1;c.beginPath();c.moveTo(cx,cy);c.quadraticCurveTo((cx+x)/2,(cy+y)/2-20,x,y);c.stroke();
+ const g=c.createRadialGradient(x-3,y-3,1,x,y,10);g.addColorStop(0,'#fff');g.addColorStop(.4,col);g.addColorStop(1,'#000');c.fillStyle=g;c.beginPath();c.arc(x,y,9,0,7);c.fill();if(hot){c.strokeStyle='#e9c46a';c.lineWidth=2;c.beginPath();c.arc(x,y,12,0,7);c.stroke()}
+ c.fillStyle='#ececee';c.font='600 11px Inter,Arial';c.textAlign='center';c.fillText(n,x,y+24)});
+const g=c.createRadialGradient(cx,cy,2,cx,cy,40);g.addColorStop(0,'rgba(233,196,106,.9)');g.addColorStop(1,'rgba(233,196,106,0)');c.fillStyle=g;c.beginPath();c.arc(cx,cy,40,0,7);c.fill();
+c.fillStyle='#f1d892';c.beginPath();c.arc(cx,cy,17,0,7);c.fill();c.fillStyle='#fff';c.font='700 12px Inter,Arial';c.textAlign='center';c.fillText('Gerente',cx,cy+34);
+</script></body></html>
