@@ -4193,7 +4193,7 @@ function libDrawer(o) {
       h('div', { class: 'mut small', style: { gridColumn: '1/-1', padding: '6px 4px' } }, web.info)];
   };
   const paint = () => {
-    tabsB.replaceChildren(...[...o.kinds, ...(o.web ? [['web', 'Internet']] : [])].map(([k, l]) => h('button', { class: kind === k ? 'on' : '', onclick: () => { kind = k; search.placeholder = k === 'web' ? 'Buscar foto na internet e apertar Enter…' : 'Buscar pelo nome…'; paint(); } }, l)));
+    tabsB.replaceChildren(...[...o.kinds, ...(o.web ? [['web', '🔎 Buscar na internet']] : [])].map(([k, l]) => h('button', { class: kind === k ? 'on' : '', onclick: () => { kind = k; search.placeholder = k === 'web' ? 'Buscar foto na internet e apertar Enter…' : 'Buscar pelo nome…'; paint(); } }, l)));
     if (kind === 'web') { grid.replaceChildren(...paintWeb()); return; }
     const ls = o.list().filter(a => (kind === 'todos' || o.match(a, kind)) && (!q || a.name.includes(q.toLowerCase())));
     grid.replaceChildren(...(ls.length ? ls.map(a => {
@@ -4343,7 +4343,7 @@ async function arteEditor(id, onClose, opts = {}) {
     if (e.target !== overlay) return; e.preventDefault(); const r0 = stage.getBoundingClientRect(), sx = (e.clientX - r0.left) / E.k, sy = (e.clientY - r0.top) / E.k; let rect = null, moved = false; const add = e.shiftKey;
     const mv = ev => { const x = (ev.clientX - r0.left) / E.k, y = (ev.clientY - r0.top) / E.k; if (!moved && Math.hypot(x - sx, y - sy) < 4 / E.k) return; moved = true; if (!rect) { rect = h('div', { class: 'aemq' }); overlay.append(rect); } Object.assign(rect.style, { left: Math.min(x, sx) + 'px', top: Math.min(y, sy) + 'px', width: Math.abs(x - sx) + 'px', height: Math.abs(y - sy) + 'px' }); };
     const up = ev => {
-      removeEventListener('pointermove', mv); removeEventListener('pointerup', up); if (!moved) { if (!add) select(null); return; }
+      removeEventListener('pointermove', mv); removeEventListener('pointerup', up); if (!moved) { if (!add) selSys('bg'); return; }   // clique no fundo abre a edição do fundo (trocar a imagem, cor, filtro)
       const x = (ev.clientX - r0.left) / E.k, y = (ev.clientY - r0.top) / E.k, L = Math.min(x, sx), T = Math.min(y, sy), R = Math.max(x, sx), B = Math.max(y, sy);
       const hit = allRefs().filter(m => { const g = geom(m.kind, m.k); return g && g.bb.left < R && g.bb.right > L && g.bb.top < B && g.bb.bottom > T; }), keep = add ? selList() : [], all = [...keep, ...hit.filter(m => !keep.some(q => q.kind === m.kind && q.k === m.k))];
       if (all.length > 1) { E.multi = all; E.sel = all[all.length - 1]; } else { E.multi = null; E.sel = all[0] || null; } drawOverlay(); drawPanel();

@@ -344,6 +344,9 @@ let refreshT;
 async function refresh() {
   const q = S.marca ? '?marca=' + encodeURIComponent(S.marca) : '';
   S.fluxo = await api('/api/v2/fluxo' + q);
+  // erro antigo de configuração (já corrigido no servidor) não é problema seu: o item conta como na fila até rodar de novo
+  for (const i of S.fluxo.itens) if (i.estado === 'parado' && /dangerously-skip-permissions|root\/sudo/i.test(i.motivo || '')) Object.assign(i, { estado: 'fila', motivo: '' });
+  S.fluxo.avisos = S.fluxo.itens.filter(i => i.estado === 'parado').slice(0, 5).map(i => ({ id: i.id, titulo: i.titulo, motivo: i.motivo }));
   renderSide();
   if (!$('.ov') && ['fluxo', 'mesa', 'publicacao'].includes(S.view)) render();
 }
@@ -612,7 +615,7 @@ async function abrirEditor(id) {
         <h3 class="muted small" style="margin:12px 0 6px">Legenda</h3><textarea class="f" id="leg" rows="4"></textarea>
         <input class="f" id="porque" placeholder="Por que mudou? (opcional, ajuda o gerente a criar a regra)" style="margin-top:10px"></div>
       <div data-t="versoes" class="hidden">${versoesHtml(d) || '<p class="muted">Ainda sem edições.</p>'}</div></div>
-    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn" onclick="salvarEd()">Salvar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
+    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
   $('#doc').textContent = ED.orig[campo]; $('#leg').value = ED.orig.caption;
   $('#doc').addEventListener('input', () => { $('#learn').textContent = 'Você está editando: ao aprovar, o gerente transforma a mudança em regra.'; });
 }
