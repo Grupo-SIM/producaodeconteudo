@@ -206,6 +206,7 @@ img.av{object-fit:cover;padding:0}
 .eov{position:fixed;inset:0;z-index:95;background:#000c;display:flex;padding:36px 60px}.emod{flex:1;display:flex;flex-direction:column;background:#111113;border:1px solid var(--line2);border-radius:18px;overflow:hidden}
 .ehd{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}.ehd b{font-size:17px}.ehd>span{font-size:13px;color:var(--tx3)}.ehd .x{margin-left:auto;font-size:20px;color:var(--tx3)}
 .epills{display:flex;gap:6px;margin-left:16px}.epills em{font-style:normal;font-size:11.5px;padding:3px 9px;border-radius:999px;background:#18181b;color:var(--tx3)}.epills em.ok{color:#9fd3b2}.epills em.now{background:var(--goldbg);color:var(--gold2)}
+.eundo{display:flex;align-items:center;gap:6px;margin-left:8px}.eundo .ibtn{font-size:17px}
 .eask{display:flex;gap:10px;padding:12px 20px}.eask input{flex:1;background:#18181b;border:1px solid var(--line2);border-radius:10px;padding:11px 14px;outline:none}
 .emod iframe{flex:1;border:0;width:100%;background:#0c0c0d}
 .eft{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--line)}.eft .learn{margin-right:auto}
@@ -548,7 +549,7 @@ function publicarCel() {
 
 // ───────── Novo conteúdo
 // Formatos que já temos treinados: a base é o que o Roteirista (copy) sabe escrever; Designer e Editor dão vida a isso
-const NOVO = [
+let NOVO = [
   { id: 'carrossel', nome: 'Carrossel', desc: '4 a 10 slides. Roteirista escreve, Designer faz a arte.', format: 'carrossel', tipos: [['educativo', 'Educativo'], ['historia_real', 'História real (investigativa)'], ['noticia', 'Notícia'], ['venda', 'Post de venda']] },
   { id: 'estatico', nome: 'Feed estático', desc: '2 cards: o assunto e o CTA. Designer faz a arte.', format: 'feed', tipos: [['educativo', 'Educativo'], ['venda', 'Venda']] },
   { id: 'materia', nome: 'Feed jornalístico + matéria', desc: 'Matéria completa para o site e 2 cards de notícia (manchete e resumo).', format: 'feed', tipos: [['noticia', 'Notícia (fato com fonte)']] },
@@ -557,6 +558,7 @@ const NOVO = [
   { id: 'blog', nome: 'Post de blog', desc: 'Aula escrita para o site, sem arte.', format: 'feed', tipos: [['texto', 'Aula escrita']] }
 ];
 async function novoConteudo() {
+  try { const r = await api('/api/v2/novo-formatos'); if (r.formatos?.length) NOVO.splice(0, NOVO.length, ...r.formatos); } catch { /* usa a lista padrão */ }
   if (!S._prods) S._prods = (await api('/api/products').catch(() => ({ products: [] }))).products;
   S.nv = { marca: S.marca || '', f: 'carrossel', tipo: 'educativo', prod: S.prodPedido || '' };
   desenhaNovo();
@@ -565,8 +567,8 @@ function desenhaNovo() {
   const n = S.nv, F = NOVO.find(x => x.id === n.f), tipos = F.tipos; if (!tipos.some(t => t[0] === n.tipo)) n.tipo = tipos[0][0];
   const prods = S._prods.filter(p => !n.marca || !(p.brands || []).length || p.brands.includes(n.marca));
   modal(`<div class="hd"><h2>Novo conteúdo</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb novo">
-    <label class="lb">1. Marca</label><select class="f" onchange="S.nv.marca=this.value;desenhaNovo()"><option value="">Sem marca (estilo geral)</option>${S.brands.map(b => `<option ${b.name === n.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select>
-    ${n.marca ? '' : '<p class="small" style="color:var(--gold)">Sem marca, a arte sai no estilo geral da casa. Use o briefing para dizer o visual e o público.</p>'}
+    <label class="lb">1. Marca</label><select class="f" onchange="S.nv.marca=this.value;desenhaNovo()"><option value="">Avulso / serviço para terceiro (estilo geral)</option>${S.brands.map(b => `<option ${b.name === n.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select>
+    ${n.marca ? '' : '<p class="small" style="color:var(--gold)">Avulso ou serviço para terceiro: a arte sai no estilo geral da casa. Use o briefing para dizer o visual e o público.</p>'}
     <label class="lb">2. Formato</label><div class="nvf">${NOVO.map(x => `<button class="${x.id === n.f ? 'on' : ''}" onclick="S.nv.f='${x.id}';desenhaNovo()"><b>${x.nome}</b><span>${x.desc}</span></button>`).join('')}</div>
     <label class="lb">3. Tipo</label><div class="tabs" style="margin:0">${tipos.map(([k, l]) => `<button class="${k === n.tipo ? 'on' : ''}" onclick="S.nv.tipo='${k}';desenhaNovo()">${l}</button>`).join('')}</div>
     ${n.tipo === 'venda' ? `<label class="lb">Produto</label><select class="f" onchange="S.nv.prod=this.value"><option value="">Escolha o produto</option>${prods.map(p => `<option value="${p.id}" ${+n.prod === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>` : ''}
@@ -650,10 +652,10 @@ function abreEstudio(tipo, id) {
   const ex = tipo === 'video' ? '"a música está alta na parte da explicação, abaixa e refaz a legenda do final"' : '"no slide 7, destaca a resposta da marca forte em amarelo"';
   const d = document.createElement('div'); d.id = 'estudio'; d.className = 'eov';
   d.innerHTML = `<div class="emod"><div class="ehd"><b>${esc(i.titulo || '')}</b><span>${[i.marca, raia?.nome, quem, i.atualizado ? ha(i.atualizado) : ''].filter(Boolean).map(esc).join(' · ')}</span>
-    <div class="epills">${cols.map((c, k) => `<em class="${k < atual ? 'ok' : k === atual ? 'now' : ''}">${esc(c)}</em>`).join('')}</div><button class="x" onclick="fechaEstudio()">×</button></div>
+    <div class="eundo"><button class="ibtn" title="Desfazer (Ctrl+Z)" onclick="$('#estudio iframe').contentWindow.postMessage({acao:'desfazer'},location.origin)">↶</button><button class="ibtn" title="Refazer (Ctrl+Y)" onclick="$('#estudio iframe').contentWindow.postMessage({acao:'refazer'},location.origin)">↷</button><span class="small muted" id="eauto">salvo automaticamente</span></div><div class="epills">${cols.map((c, k) => `<em class="${k < atual ? 'ok' : k === atual ? 'now' : ''}">${esc(c)}</em>`).join('')}</div><button class="x" onclick="fechaEstudio()">×</button></div>
     <div class="eask"><input id="eajm" placeholder="Pedir ajuste ao gerente: ${esc(ex)}…" onkeydown="if(event.key==='Enter')ajusteEstudio(${id},'${alvo}')"><button class="btn bl" onclick="ajusteEstudio(${id},'${alvo}')">Mandar ajustar</button></div>
     <iframe src="/?embed=${tipo}&id=${id}"></iframe>
-    <div class="eft"><span class="learn">O gerente está observando suas edições. O que você mudar vira regra do ${quem} ao aprovar.</span><a class="btn" href="${tipo === 'video' ? `/api/contents/${id}/render/file` : `/api/contents/${id}/arte/zip`}" download title="Baixar para o computador (a versão salva)">⬇ Baixar</a><button class="btn" onclick="acao(${id},'descartar').then(fechaEstudio)">Descartar</button><button class="btn" onclick="salvaEstudio(${id})">Salvar e fechar</button><button class="btn ok" onclick="salvaEstudio(${id},true)">Aprovar e mandar para postagem</button></div></div>`;
+    <div class="eft"><span class="learn">O gerente está observando suas edições. O que você mudar vira regra do ${quem} ao aprovar.</span><a class="btn" href="${tipo === 'video' ? `/api/contents/${id}/render/file` : `/api/contents/${id}/arte/zip`}" download title="Baixar para o computador (a versão salva)">⬇ Baixar</a><button class="btn" onclick="acao(${id},'descartar').then(fechaEstudio)">Descartar</button><button class="btn" onclick="salvaEstudio(${id})">Fechar</button><button class="btn ok" onclick="salvaEstudio(${id},true)">Aprovar e mandar para postagem</button></div></div>`;
   document.body.appendChild(d);
 }
 function fechaEstudio() { $('#estudio')?.remove(); refresh(); }
@@ -661,6 +663,7 @@ async function ajusteEstudio(id, alvo) { const m = $('#eajm').value.trim(); if (
 function salvaEstudio(id, aprova) { S.estAprova = aprova ? id : null; $('#estudio iframe').contentWindow.postMessage({ acao: 'salvar' }, location.origin); toast('Salvando…'); }
 addEventListener('message', async e => { if (e.origin !== location.origin) return;
   if (e.data?.tipo === 'editor-salvo') { const id = e.data.id; if (S.estAprova === id) { await tryDo(() => api(`/api/v2/itens/${id}/aprovar`, { body: { forcar: true } }), 'Aprovado e enviado para postagem'); fecha(); } else toast('Salvo'); fechaEstudio(); return; }
+  if (e.data?.tipo === 'editor-auto') { const el = $('#eauto'); if (el) { el.textContent = 'salvando…'; setTimeout(() => { if ($('#eauto')) $('#eauto').textContent = 'salvo automaticamente'; }, 2500); } return; }
   if (e.data?.tipo !== 'editor-fechado') return; $('#estudio')?.remove(); const id = e.data.id; if (e.data.erro) toast(e.data.erro); refresh().then(() => { if (ED?.id === id) abrirEditor(id); }); });
 function edTab(t) { document.querySelectorAll('.mb [data-t]').forEach(e => e.classList.toggle('hidden', e.dataset.t !== t)); document.querySelectorAll('.mb .tabs button').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase().startsWith(t.slice(0, 4)))); }
 async function salvarEd(aprova) {

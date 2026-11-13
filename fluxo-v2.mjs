@@ -293,6 +293,7 @@ export function criarFluxoV2(ctx) {
   async function rota(req, res, p, m, user) {
     let mt;
     if (p === '/api/v2/fluxo' && m === 'GET') { const u = new URL(req.url, 'http://x'); return send(res, 200, fluxo({ marca: u.searchParams.get('marca') || '', incluirDescartados: u.searchParams.get('lixeira') === '1' })); }
+    if (p === '/api/v2/novo-formatos' && m === 'GET') { try { return send(res, 200, { formatos: JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'formatos-novo-conteudo.json'), 'utf8')) }); } catch { return send(res, 200, { formatos: [] }); } }
     if (p === '/api/v2/formatos' && m === 'GET') return send(res, 200, { formatos: formatos() });
     if ((mt = p.match(/^\/api\/v2\/formatos\/([a-z_]+)$/)) && m === 'PUT') {
       const f = one('SELECT * FROM formatos WHERE id=?', mt[1]); if (!f) throw fail(404, 'Formato não encontrado');
