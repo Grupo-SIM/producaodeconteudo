@@ -88,6 +88,12 @@ export function criarFluxoV2(ctx) {
       log(null, `Produto cadastrado a partir do treino: ${p.name}`);
     }
   } catch (e) { if (e.code !== 'ENOENT') console.error('produtos do treino:', e.message); }
+  // Itens parados pelo erro antigo de configuração (já corrigido no servidor): voltam sozinhos para a fila, sem aparecer como problema
+  setTimeout(() => { try {
+    const presos = all("SELECT DISTINCT c.id FROM contents c LEFT JOIN jobs j ON j.content_id=c.id WHERE c.status NOT IN ('posted','discarded','approved') AND (c.error LIKE '%dangerously-skip-permissions%' OR c.error LIKE '%root/sudo%' OR j.error LIKE '%dangerously-skip-permissions%' OR j.error LIKE '%root/sudo%')");
+    for (const { id } of presos) { run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id); setContent(id, { error: '' }); try { contentAct(id, 'reprocess'); } catch { /* segue */ } }
+    if (presos.length) { log(null, `${presos.length} item(ns) parados pelo erro antigo de configuração voltaram para a fila`); changed(); }
+  } catch (e) { console.error('reprocessar presos:', e.message); } }, 3000).unref?.();
   const formatos = () => all('SELECT * FROM formatos ORDER BY ordem').map(f => ({ ...f, etapas: JSON.parse(f.etapas), ativo: !!f.ativo }));
   const jobsDe = id => all('SELECT agent,kind,status,error,run_after FROM jobs WHERE content_id=? ORDER BY id', id);
   const hoje = () => new Date().toISOString().slice(0, 10);

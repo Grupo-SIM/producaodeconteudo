@@ -494,11 +494,13 @@ async function escritorio3d(head, ban) {
   const vid = store.get('telao2', 'GG1XOAZ9Vd0'), on = store.get('telaoOn', true);
   $('#main').innerHTML = `<div id="escw">${ban}${head}
     <div id="esc"></div><div id="eshud">${hud}</div><div id="escfeed" class="escf">${feed}</div></div>`;
+  if (S.e3carregando) return; S.e3carregando = true;
   try {
     const { criarEscritorio } = await import('/escritorio-v2.js');
     E3 = criarEscritorio($('#esc'), { onPick: id => { if (id === 'chefe') return chatToggle(true); const its = F.filter(i => i.etapa === id && ['etapa', 'ajuste', 'parado'].includes(i.estado)); if (its[0]) abrirItem(its[0].id); else toast('Sem tarefa agora'); } });
     E3.atualizar(st.agents, parados, info); if (on) E3.telaoVideo(vid);
   } catch (e) { $('#esc').innerHTML = `<div class="empty">Sem 3D neste aparelho (${esc(e.message)}).</div>`; }
+  finally { S.e3carregando = false; }
 }
 function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', on); E3?.telaoVideo(on ? store.get('telao2', 'GG1XOAZ9Vd0') : ''); event.target.textContent = on ? 'Desligar telão' : 'Ligar telão'; }
 function trocaVideo() { const u = prompt('Link ou ID do vídeo do YouTube para o telão', store.get('telao2', 'GG1XOAZ9Vd0')); const id = ytId(u); if (!id) return; store.set('telao2', id); store.set('telaoOn', true); E3?.telaoVideo(id); }
