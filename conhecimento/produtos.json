@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Atlas Hosting", "type": "software", "marcas": ["007 Spyhacker"],
+    "promise": "Hospedagem de sites com servidores de alta velocidade e segurança avançada, para quem não pode ficar fora do ar.",
+    "audience": "Quem tem site, blog, loja ou sistema online e precisa que ele fique no ar, rápido e seguro.",
+    "pains": "Site fora do ar justo no pico de acesso; venda que vai para outro lugar quando o site cai; não saber se o plano aguenta crescer.",
+    "deliverable": "Planos de hospedagem para todos os tamanhos: o plano mais barato atende site com pouca visita; quando crescer, é só fazer o upgrade.",
+    "objections": "Vale pagar mais em hospedagem com pouca visita? Não precisa: o plano mais barato atende; quando crescer, faça o upgrade. Não cite suporte pelo WhatsApp (o Atlas não tem). Não fale em \"trocar de empresa\" ao falar de upgrade.",
+    "bonus": "Até R$ 250 em crédito no Vale Bonus por transação para o cliente (crédito para usar no app Vale Bonus, não é dinheiro de volta).",
+    "guarantee": "",
+    "page_text": "Atlas é masculino: \"o Atlas\", \"no Atlas\", \"conheça o Atlas\". O perfil do próprio Atlas só recebe vídeo institucional (confiança e credibilidade), não vídeo de venda."
+  },
+  {
+    "name": "SimIntPay", "type": "servico", "marcas": ["Marketing Raiz", "SIM Int Pay"],
+    "promise": "Gateway de pagamento com aprovação acima de 90% e até R$ 250 em crédito no Vale Bonus para o cliente a cada compra.",
+    "audience": "Quem vende produto digital ou serviço e precisa receber pagamentos (cartão, parcelado, Pix) de forma profissional.",
+    "pains": "Cliente que já decidiu comprar e vê \"pagamento recusado\"; dar desconto para fechar venda; receber só por Pix e perder quem compra parcelado.",
+    "deliverable": "Link de pagamento e checkout para receber das vendas, com aprovação acima de 90% e cashback em crédito no Vale Bonus para quem compra.",
+    "objections": "Taxa de aprovação faz diferença? Muita: cada venda recusada é um cliente que queria comprar. Use sempre \"acima de 90%\", nunca 100%. Prazo de recebimento depende de quem processa e do acordo com a adquirente.",
+    "bonus": "Cada compra do cliente pode gerar até R$ 250 de crédito no Vale Bonus, o que faz ele voltar para comprar de novo.",
+    "guarantee": "",
+    "page_text": "Quem recebe o crédito é o cliente que compra do lojista, não o vendedor. Diferencial padrão quando não houver outro: o cashback no Vale Bonus."
+  },
+  {
+    "name": "PagaTG", "type": "software", "marcas": ["Seguidores em Alta"],
+    "promise": "Cobrança e acesso automáticos para grupos pagos do Telegram: quem paga entra, quem para de pagar sai.",
+    "audience": "Criadores que vendem acesso a grupo ou canal pago no Telegram.",
+    "pains": "Conferir na mão quem pagou; tirar do grupo quem parou de pagar; perder tempo com cobrança em vez de criar conteúdo.",
+    "deliverable": "Controle da cobrança e da entrada e saída de quem assina o grupo pago do Telegram.",
+    "objections": "O grupo pago não morre por causa da cobrança: morre quando o dono para de alimentar o conteúdo. O PagaTG cuida da cobrança para o dono cuidar do conteúdo.",
+    "bonus": "O assinante do grupo recebe até R$ 250 em crédito no Vale Bonus por transação.",
+    "guarantee": "",
+    "page_text": "Confirmado pelo dono: cuida da cobrança e do acesso de quem assina nos grupos pagos do Telegram."
+  },
+  {
+    "name": "ÁreaFlix", "type": "software", "marcas": ["Marketing Raiz", "Seguidores em Alta"],
+    "promise": "Área de membros para cursos.",
+    "audience": "Quem vende curso ou conteúdo em vídeo e precisa de uma área de membros.",
+    "pains": "", "deliverable": "Área de membros para hospedar e entregar cursos.", "objections": "", "bonus": "", "guarantee": "",
+    "page_text": "Ficha incompleta: confirmar recursos, preço e diferenciais com o dono antes de usar na copy."
+  },
+  {
+    "name": "EbookSIM", "type": "ebook", "marcas": ["Marketing Raiz"],
+    "promise": "Marketplace de livros digitais em que toda compra dá ao cliente até R$ 250 em crédito no Vale Bonus.",
+    "audience": "Quem compra e-books (leitor) e quem vende e-books (autor/vendedor).",
+    "pains": "",
+    "deliverable": "O comprador recebe o ebook na hora, na biblioteca e no e-mail. Fácil e intuitivo.",
+    "objections": "Para quem vende: taxa de 14,99% + R$ 4 por venda, mais cara de propósito porque o serviço é premium. Nunca venda como \"taxa baixa\": o argumento é o cliente dele ganhar o crédito e a experiência premium.",
+    "bonus": "Toda compra dá ao cliente até R$ 250 em crédito no Vale Bonus. Nenhum marketplace de livros digitais no Brasil dá esse cashback (afirmação do dono).",
+    "guarantee": "",
+    "page_text": "Confirmado pelo dono em 11/11/2026."
+  },
+  {
+    "name": "Controle Patrimonial", "type": "software", "marcas": ["Corte dos Ricos"],
+    "promise": "Organiza todos os bens da empresa num lugar só: onde cada um está e com quem.",
+    "audience": "Empresários e gestores que precisam organizar o negócio e controlar o que a empresa tem.",
+    "pains": "Dinheiro parado ou perdido em bens que a empresa nem sabe que tem; descobrir tarde que algo sumiu.",
+    "deliverable": "Cada item da empresa registrado com localização, preço, categoria, nota fiscal e responsável.",
+    "objections": "",
+    "price": "R$ 69,90 por mês",
+    "bonus": "100% da mensalidade em crédito no Vale Bonus, todo mês (nunca escreva \"mensalidade de volta\" nem \"dinheiro de volta\").",
+    "guarantee": "",
+    "page_text": "Carrossel aprovado pelo dono sem ajustes serve de régua para post de venda."
+  },
+  {
+    "name": "Controle de Motorista", "type": "software", "marcas": ["Corte dos Ricos"],
+    "url": "https://motorista.simintermediacoes.com",
+    "promise": "Controla a quilometragem de cada veículo da empresa e mostra onde está o gargalo do combustível.",
+    "audience": "Donos de empresa com frota (carro, moto, caminhão) usada por colaboradores.",
+    "pains": "Colaborador usando o veículo da empresa para uso pessoal, paradinha no caminho, rota mais longa; gasto alto com combustível sem saber por quê.",
+    "deliverable": "Acompanhamento da quilometragem por veículo para achar os gargalos de combustível.",
+    "objections": "", "bonus": "Até R$ 250 em crédito no Vale Bonus por transação.", "guarantee": "", "page_text": ""
+  },
+  {
+    "name": "Teron", "type": "software", "marcas": ["Corte dos Ricos", "007 Spyhacker"],
+    "url": "https://teron.app",
+    "promise": "Plataforma de trabalho em equipe que junta comunicação, organização e gestão num lugar só.",
+    "audience": "Empresas de todos os setores que trabalham em equipe.",
+    "pains": "Informação espalhada em vários apps; tarefas sem responsável nem prazo.",
+    "deliverable": "Tarefas (responsáveis, prazos e prioridades), agenda, documentos, chat e grupos, presença, projetos, videochamada e notificações. Integra com GitHub, e-mail e Telegram.",
+    "objections": "Ainda não tem IA nem automação (o site diz que serão incorporados): não cite como recurso atual. Tem botão de WhatsApp no site.",
+    "price": "Plano Empresas R$ 9,99 por usuário por mês; plano grátis com 30 dias para experimentar.",
+    "bonus": "Até R$ 250 em crédito no Vale Bonus por transação.", "guarantee": "",
+    "page_text": "Informações privadas, acessíveis só por quem a empresa autorizar; espaço personalizável; preço por usuário."
+  }
+]

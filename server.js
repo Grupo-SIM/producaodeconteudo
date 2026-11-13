@@ -6505,7 +6505,7 @@ async function api(req, res, url) {
   if (p === '/api/users' && m === 'GET') return send(res, 200, { users: all('SELECT * FROM users ORDER BY name COLLATE NOCASE').map(userView), areas: AREAS, presets: PERM_PRESETS });
   if (p === '/api/users' && m === 'POST') {
     const b = await readBody(req, 10000), username = String(b.username || '').trim().toLowerCase();
-    if (!/^[a-z0-9._-]{3,30}$/.test(username) || username === 'dono') throw fail(400, 'Usuário: 3 a 30 caracteres (letras minúsculas, números, ponto, hífen ou _). “dono” é reservado.');
+    if (!/^[a-z0-9._@+-]{3,80}$/.test(username) || username === 'dono') throw fail(400, 'Login: e-mail ou usuário de 3 a 80 caracteres (letras minúsculas, números, ponto, hífen ou _). “dono” é reservado.');
     if (one('SELECT 1 x FROM users WHERE username=?', username)) throw fail(400, 'Já existe um usuário com esse login');
     if (String(b.password || '').length < 8) throw fail(400, 'A senha precisa ter pelo menos 8 caracteres');
     const salt = crypto.randomBytes(16).toString('hex'), role = b.role === 'admin' ? 'admin' : 'custom';

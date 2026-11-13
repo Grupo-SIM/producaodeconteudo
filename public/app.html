@@ -220,6 +220,15 @@ img.av{object-fit:cover;padding:0}
 .prob2{background:#161618;border:1px solid var(--line2);border-radius:12px;padding:12px 14px;margin-bottom:10px}.prob2 summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}.prob2 summary b{flex:1;font-size:14.5px}.prob2[open] summary{margin-bottom:10px}
 .pfaca{background:#16140e;border:1px solid var(--goldline);color:var(--gold2);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:10px}.prob2 .kvr span:last-child{display:flex;gap:6px}
 .vermais{display:block;margin:0 auto 6px;font-size:12px;color:var(--tx3);text-decoration:underline}
+.rede{display:grid;place-items:center;border-radius:10px;margin-bottom:8px}.redesc .rede{margin:0}
+.mnav2{display:flex;align-items:center;gap:10px;margin-bottom:10px}.mnav2 b{text-transform:capitalize;flex:1}
+.calm{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.calm>b{font-size:11px;color:var(--tx3);text-align:center;font-weight:500}.calm>div{min-height:54px;border:1px solid var(--line);border-radius:8px;padding:4px 6px;cursor:pointer;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;background:#141416}.calm>div:hover{border-color:var(--line2)}.calm>div.on{border-color:#a8864a;background:#1a1710}.calm>div.hj em{color:var(--gold2)}.calm em{font-style:normal;font-size:12px;width:100%}.calm span{width:8px;height:8px;border-radius:50%}.calm small{font-size:10px;color:var(--tx3)}
+.agdia{margin-top:12px}.agdia h5{text-transform:none;font-size:13px;color:var(--tx);letter-spacing:0}
+.ibtn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--tx2);border:1px solid var(--line2);background:#161618}.ibtn:hover{color:var(--tx)}
+.leitura{max-width:760px;margin:0 auto;font-size:15.5px;line-height:1.75;color:#e4e4e6;text-align:justify;hyphens:auto}.leitura h3{font-size:18px;margin:18px 0 6px;text-align:left}.leitura p{margin-bottom:12px}
+.ov2{z-index:120}
+.kvr.li{cursor:pointer}.kvr.li:hover{background:#1c1c1f}.kvr .cut{max-width:62%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kvr span:first-child{white-space:nowrap}
+.tconf,.tprop{font-style:normal;font-size:10px;border-radius:5px;padding:1px 6px;margin-left:4px}.tconf{background:#2a2014;color:#e9b87a}.tprop{background:#10241a;color:#7fd1a0}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -268,7 +277,7 @@ img.av{object-fit:cover;padding:0}
 <div id="loginv" class="hidden" style="display:flex;width:100%;height:100%">
   <form class="box login" onsubmit="event.preventDefault();doLogin()">
     <div class="logo" style="margin-bottom:18px">Agentes SIM</div>
-    <input class="f" id="lu" placeholder="Usuário (deixe vazio para o dono)" autocomplete="username" style="margin-bottom:8px">
+    <input class="f" id="lu" placeholder="E-mail ou usuário (vazio para o dono)" autocomplete="username" style="margin-bottom:8px">
     <input class="f" id="lp" type="password" placeholder="Senha" autocomplete="current-password" style="margin-bottom:12px">
     <button class="btn ok" style="width:100%;justify-content:center">Entrar</button>
     <p class="small muted" id="lerr" style="margin-top:8px"></p>
@@ -517,15 +526,15 @@ function mesaCel() {
   const its = cont.hasOwnProperty(S.filtro) ? todos.filter(i => TIPO(i) === S.filtro) : todos, nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
   $('#main').innerHTML = topCel('Revisão', `<span class="chip sm">${todos.length} esperando</span>`) + `<div class="tabs">${[['todos', 'Tudo'], ['texto', 'Textos'], ['arte', 'Artes'], ['video', 'Vídeos']].map(([k, n]) => `<button class="${(S.filtro === k || (k === 'todos' && !cont.hasOwnProperty(S.filtro))) ? 'on' : ''}" onclick="S.filtro='${k}';render()">${n}</button>`).join('')}</div>
     ${its.map(i => `<div class="card ccel"><div class="pv ${TIPO(i)}">${TIPO(i) === 'video' ? '<span class="play">▶</span>' : i.thumb && TIPO(i) === 'arte' ? `<img src="${i.thumb}">` : `<div class="head" id="pv${i.id}">${esc(i.titulo)}</div>`}<span class="tp">${TIPO(i) === 'video' ? 'Vídeo' : TIPO(i) === 'arte' ? 'Arte · ' + esc(nomeR(i.raia).toLowerCase()) : 'Texto · ' + esc(nomeR(i.raia).toLowerCase())}</span><span class="age">${ha(i.atualizado)}</span></div>
-      <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')} · ${esc(nomeR(i.raia))}</span><div class="ac"><button class="btn" onclick="${TIPO(i) === 'texto' ? `abrirEditor(${i.id})` : `abreEstudio('${TIPO(i)}',${i.id})`}">Editar</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('') || '<div class="empty">Nada esperando você agora.</div>'}`;
+      <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')} · ${esc(nomeR(i.raia))}</span><div class="ac"><button class="btn ok" onclick="verItem(${i.id})">Ver</button></div></div></div>`).join('') || '<div class="empty">Nada esperando você agora.</div>'}`;
   for (const i of its.filter(i => !i.thumb && TIPO(i) !== 'video')) api('/api/v2/itens/' + i.id).then(d => { const el = $('#pv' + i.id); const l = (d.materia || d.roteiro || '').split('\n').filter(Boolean)[0]; if (el && l) el.textContent = l.replace(/^[^:]{2,20}:\s*/, ''); }).catch(() => { });
 }
 function publicarCel() {
   const F = S.fluxo, prontos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao'), nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
   const cores = ['linear-gradient(135deg,#f58529,#dd2a7b,#8134af)', '#1877f2', '#111;border:1px solid #444', '#ff0000', '#e60023', '#c9a86a'];
   const amanha = ['09h', '12h', '18h'].map(h => [h, prontos.filter(i => RHORA[i.raia] === h)]);
-  $('#main').innerHTML = topCel('Publicar', '<span class="chip sm on">Manual</span>') + `<div class="redesc">${cores.map(c => `<div><i style="background:${c}"></i><span>em breve</span></div>`).join('')}</div>
-    <h5 style="margin:14px 0 8px">Prontos para postar · hoje</h5>${prontos.map(i => `<div class="ppc"><div class="th">${i.thumb ? `<img src="${i.thumb}">` : ''}</div><div style="flex:1;min-width:0"><b>${esc(i.titulo)}</b><span>${esc(i.marca || '')} · ${['materia', 'blog'].includes(i.raia) ? 'site' : 'Instagram'} ${RHORA[i.raia]}</span></div><button class="btn sm ok" onclick="marcarPostado(${i.id})">${['materia', 'blog'].includes(i.raia) ? 'Publicado' : 'Postado'}</button></div>`).join('') || '<p class="muted small">Nada pronto agora.</p>'}
+  $('#main').innerHTML = topCel('Publicar', '<span class="chip sm on">Manual</span>') + `<div class="redesc">${REDES.map(r => `<div>${logoRede(r, 44)}<span>em breve</span></div>`).join('')}</div>
+    <h5 style="margin:14px 0 8px">Prontos para postar · hoje</h5>${prontos.map(i => `<div class="ppc"><div class="th">${i.thumb ? `<img src="${i.thumb}">` : ''}</div><div style="flex:1;min-width:0"><b>${esc(i.titulo)}</b><span>${esc(i.marca || '')} · ${['materia', 'blog'].includes(i.raia) ? 'site' : 'Instagram'} ${RHORA[i.raia]}</span></div><button class="btn sm ok" onclick="verPronto(${i.id})">Ver</button></div>`).join('') || '<p class="muted small">Nada pronto agora.</p>'}
     <h5 style="margin:16px 0 8px">Agenda de amanhã</h5>${amanha.map(([h, L]) => `<div class="agc"><b>${h}</b><span>${L.map(i => `${esc(nomeR(i.raia))} · ${esc(i.marca)}`).join(', ') || '—'}</span></div>`).join('')}`;
 }
 
@@ -547,6 +556,8 @@ async function criaConteudo() {
 // ───────── Mesa de revisão
 const ha = t => { const m = Math.max(1, Math.round((Date.now() - new Date(t)) / 60000)); return m < 60 ? `há ${m} min` : m < 1440 ? `há ${Math.round(m / 60)} h` : `há ${Math.round(m / 1440)} d`; };
 const TIPO = i => i.raia === 'reels' ? 'video' : i.roteiro || ['blog', 'materia'].includes(i.raia) ? 'texto' : 'arte';
+// Ver: abre direto o editor certo (arte → editor de arte, vídeo → editor de vídeo, texto → editor de texto), já com Aprovar
+function verItem(id) { const i = S.fluxo.itens.find(x => x.id === id); if (!i) return; const t = TIPO(i); if (t === 'arte' && (i.tem_arte || i.tem_art_spec)) return abreEstudio('arte', id); if (t === 'video' && (i.tem_video || i.tem_spec)) return abreEstudio('video', id); abrirEditor(id); }
 const QUEM = { carrossel: 'Designer', estatico: 'Designer', stories: 'Designer', reels: 'Editor de vídeo', materia: 'Roteirista + SEO', blog: 'Roteirista' };
 VIEWS.mesa = () => {
   const F = S.fluxo; if (!F) return;
@@ -561,7 +572,7 @@ VIEWS.mesa = () => {
     <div class="top" style="margin-top:-4px"><div class="tabs" style="margin:0">${[['todos', `Tudo (${todos.length})`], ['texto', `Textos (${cont.texto})`], ['arte', `Artes (${cont.arte})`], ['video', `Vídeos (${cont.video})`]].map(([k, n]) => `<button class="${(S.filtro === k || (k === 'todos' && !cont.hasOwnProperty(S.filtro))) ? 'on' : ''}" onclick="S.filtro='${k}';render()">${n}</button>`).join('')}</div><span style="flex:1"></span>${marcaSel()}</div>
     ${its.length ? `<div class="mgrid mesa1">${its.map((i, k) => `<div class="card ${k === (S.mi = Math.min(S.mi || 0, its.length - 1)) ? 'cur' : ''}"><div class="pv ${TIPO(i)}">${TIPO(i) === 'arte' ? (i.thumb ? `<img src="${i.thumb}" loading="lazy">` : `<div class="head" id="pv${i.id}">…</div>`) : TIPO(i) === 'video' ? `${i.thumb ? `<img src="${i.thumb}">` : ''}<span class="play">▶</span>` : `<div class="txt" id="pv${i.id}">…</div>`}<span class="tp">${esc(lbl(i))}</span><span class="age">${ha(i.atualizado)}</span></div>
       <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${[i.marca || 'Sem marca', nomeR(i.raia), i.roteiro ? 'Roteirista' : QUEM[i.raia]].map(esc).join(' · ')}</span>
-      <div class="ac"><button class="btn" onclick="${TIPO(i) === 'texto' ? `abrirEditor(${i.id})` : `abreEstudio('${TIPO(i)}',${i.id})`}">Abrir editor</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('')}</div><div class="mnav"><button class="btn" onclick="S.mi=Math.max(0,(S.mi||0)-1);render()">‹ Anterior</button><span class="small muted" style="align-self:center">${(S.mi || 0) + 1} de ${its.length}</span><button class="btn" onclick="S.mi=(S.mi||0)+1;render()">Próximo ›</button></div>` : '<div class="empty">Nada esperando você agora.</div>'}`;
+      <div class="ac"><button class="btn ok" onclick="verItem(${i.id})">Ver</button></div></div></div>`).join('')}</div><div class="mnav"><button class="btn" onclick="S.mi=Math.max(0,(S.mi||0)-1);render()">‹ Anterior</button><span class="small muted" style="align-self:center">${(S.mi || 0) + 1} de ${its.length}</span><button class="btn" onclick="S.mi=(S.mi||0)+1;render()">Próximo ›</button></div>` : '<div class="empty">Nada esperando você agora.</div>'}`;
   const g = $('.mesa1'); if (g) { let x0 = null; g.ontouchstart = e => x0 = e.touches[0].clientX; g.ontouchend = e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) { S.mi = Math.max(0, (S.mi || 0) + (dx < 0 ? 1 : -1)); render(); } x0 = null; }; }
   for (const i of its.filter(i => TIPO(i) === 'texto' || (TIPO(i) === 'arte' && !i.thumb))) api('/api/v2/itens/' + i.id).then(d => { const el = $('#pv' + i.id); if (!el) return; const t = (d.materia || d.roteiro || d.legenda || '').trim(), l = t.split('\n').filter(Boolean); el.innerHTML = el.classList.contains('head') ? esc(l[0] || i.titulo) : i.raia === 'materia' ? `<h4>${esc(l[0] || '')}</h4><p>${esc(l.slice(1, 4).join(' '))}</p>` : l.slice(0, 4).map(x => `<p>${esc(x).replace(/^([^:]{2,20}):/, '<b>$1:</b>')}</p>`).join(''); }).catch(() => { });
 };
@@ -635,9 +646,21 @@ async function salvarEd(aprova) {
   } catch (e) { toast(e.message); }
 }
 async function pedirAjuste() { const m = $('#ajm').value.trim(); if (!m) return toast('Diga o que ajustar'); await tryDo(() => api(`/api/v2/itens/${ED.id}/ajuste`, { body: { motivo: m, alvo: ED.tab === 'arte' ? 'designer' : ED.tab === 'video' ? 'editor' : 'roteirista' } }), 'Pedido enviado: o item volta para o agente com a tag de ajuste'); fecha(); }
-async function acao(id, a) { if (a === 'descartar' && !confirm('Descartar este item? Ele vai para a lixeira.')) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
+function confirmaDescarte(id) {
+  return new Promise(ok => {
+    S._desc = ok;
+    const box = document.createElement('div'); box.className = 'ov ov2'; box.innerHTML = `<div class="mo sm"><div class="hd"><h2>Descartar este item?</h2></div><div class="mb">
+      <p style="margin-bottom:10px">Se você descartar:</p><ul class="small" style="margin-left:18px;line-height:1.8;color:var(--tx2)"><li>a produção dele para na hora e as tarefas na fila são canceladas;</li><li>ele sai do Fluxo, da Mesa de revisão e da Publicação;</li><li>vai para a lixeira em Configurações, de onde dá para restaurar.</li></ul>
+      <p style="margin-top:12px"><b>Tem certeza?</b></p></div><div class="ft"><button class="btn" style="margin-left:auto" onclick="this.closest('.ov2').remove();S._desc(false)">Cancelar</button><button class="btn dg" onclick="this.closest('.ov2').remove();S._desc(true)">Sim, descartar</button></div></div>`;
+    document.body.appendChild(box);
+  });
+}
+async function acao(id, a) { if (a === 'descartar' && !(await confirmaDescarte(id))) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
 
 // ───────── Publicação (manual)
+const REDES_P = {"instagram": "M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077", "facebook": "M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z", "tiktok": "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z", "youtube": "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", "pinterest": "M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"};
+const REDES = [['Instagram', 'feed, carrossel, stories, reels', 'instagram', 'linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)'], ['Facebook', 'página da marca', 'facebook', '#0866FF'], ['TikTok', 'vídeo vertical', 'tiktok', '#000'], ['YouTube', 'shorts e vídeo longo', 'youtube', '#FF0000'], ['Pinterest', 'pins com link', 'pinterest', '#E60023'], ['Site e blog', 'matérias e posts de blog', 'site', '#2a2a2e']];
+const logoRede = ([, , k, bg], px = 40) => `<i class="rede" style="background:${bg};width:${px}px;height:${px}px">${k === 'site' ? `<svg viewBox="0 0 24 24" width="${px * .55}" height="${px * .55}" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>` : `<svg viewBox="0 0 24 24" width="${px * .55}" height="${px * .55}" fill="#fff"><path d="${REDES_P[k]}"/></svg>`}</i>`;
 const RCOR = { carrossel: '#c2347a', estatico: '#5a5a5f', stories: '#e07a1f', reels: '#7c3aed', materia: '#c9a86a', blog: '#c9a86a' };
 const RHORA = { materia: '09h', blog: '09h', carrossel: '12h', reels: '18h', stories: '18h', estatico: '20h' };
 VIEWS.publicacao = () => {
@@ -650,15 +673,37 @@ VIEWS.publicacao = () => {
   const dias = Array.from({ length: 7 }, (_, k) => { const d = new Date(d0); d.setDate(d.getDate() + k); return d; }), horas = ['09h', '12h', '18h', '20h'];
   const hoje = new Date().toISOString().slice(0, 10);
   const naAgenda = (d, h) => { const key = d.toISOString().slice(0, 10); return [...feitos.filter(i => (i.postado_em || '').slice(0, 10) === key), ...(key === hoje ? prontos : [])].filter(i => RHORA[i.raia] === h); };
-  const agenda = `<div class="cal2"><span></span>${dias.map(d => `<b>${d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').replace(/^./, c => c.toUpperCase())} ${d.getDate()}</b>`).join('')}${horas.map(h => `<i>${h}</i>${dias.map(d => `<div>${naAgenda(d, h).map(i => `<span style="background:${RCOR[i.raia]}" title="${esc(i.titulo)}" onclick="abrirItem(${i.id})">${esc(nomeR(i.raia).split(' ')[0])} · ${esc(curta(i.marca))}</span>`).join('')}</div>`).join('')}`).join('')}</div>`;
+  const agendaSem = `<div class="cal2"><span></span>${dias.map(d => `<b>${d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').replace(/^./, c => c.toUpperCase())} ${d.getDate()}</b>`).join('')}${horas.map(h => `<i>${h}</i>${dias.map(d => `<div>${naAgenda(d, h).map(i => `<span style="background:${RCOR[i.raia]}" title="${esc(i.titulo)}" onclick="abrirItem(${i.id})">${esc(nomeR(i.raia).split(' ')[0])} · ${esc(curta(i.marca))}</span>`).join('')}</div>`).join('')}`).join('')}</div>`;
+  const doDia = key => [...feitos.filter(i => (i.postado_em || '').slice(0, 10) === key), ...(key === hoje ? prontos : [])];
+  const m0 = S.agMes ? new Date(S.agMes + '-01T12:00') : new Date(), ano = m0.getFullYear(), mes = m0.getMonth(), prim = new Date(ano, mes, 1), dIni = (prim.getDay() + 6) % 7, nDias = new Date(ano, mes + 1, 0).getDate();
+  const mesNome = prim.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }), mk = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
+  const agendaMes = `<div class="mnav2"><button class="btn sm" onclick="S.agMes='${mk(mes ? ano : ano - 1, (mes + 11) % 12)}';render()">‹</button><b>${mesNome}</b><button class="btn sm" onclick="S.agMes='${mk(mes === 11 ? ano + 1 : ano, (mes + 1) % 12)}';render()">›</button><input type="date" class="f" style="width:auto;padding:4px 8px" value="${S.agDia || hoje}" onchange="S.agDia=this.value;S.agMes=this.value.slice(0,7);render()"></div>
+    <div class="calm">${['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map(d => `<b>${d}</b>`).join('')}${'<i></i>'.repeat(dIni)}${Array.from({ length: nDias }, (_, k) => { const key = `${mk(ano, mes)}-${String(k + 1).padStart(2, '0')}`, L = doDia(key); return `<div class="${key === (S.agDia || hoje) ? 'on' : ''} ${key === hoje ? 'hj' : ''}" onclick="S.agDia='${key}';render()"><em>${k + 1}</em>${L.slice(0, 3).map(i => `<span style="background:${RCOR[i.raia]}"></span>`).join('')}${L.length > 3 ? `<small>+${L.length - 3}</small>` : ''}</div>`; }).join('')}</div>
+    <div class="agdia"><h5>${new Date((S.agDia || hoje) + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</h5>${doDia(S.agDia || hoje).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span><i class="sw" style="background:${RCOR[i.raia]}"></i>${esc(i.titulo)}</span><span>${esc(nomeR(i.raia))} · ${esc(i.marca)} · ${RHORA[i.raia]}</span></div>`).join('') || '<p class="muted small">Nada neste dia.</p>'}</div>`;
+  const agenda = `<div class="tabs" style="margin-bottom:10px">${[['semana', 'Semana'], ['mes', 'Mês']].map(([k, n]) => `<button class="${(S.agModo || 'semana') === k ? 'on' : ''}" onclick="S.agModo='${k}';render()">${n}</button>`).join('')}</div>${(S.agModo || 'semana') === 'mes' ? agendaMes : agendaSem}`;
   const pronto = i => `<div class="pp"><div class="th">${i.thumb ? `<img src="${i.thumb}">` : ''}</div><div style="flex:1;min-width:0"><b>${esc(i.titulo)}</b><span>${[i.marca, nomeR(i.raia), ['materia', 'blog'].includes(i.raia) ? 'site' : 'Instagram', RHORA[i.raia]].filter(Boolean).map(esc).join(' · ')}</span></div>
-    <div class="pa">${i.thumb ? `<a class="btn sm" href="/api/contents/${i.id}/arte/zip" download onclick="copiaLegenda(${i.id})">Baixar arte e legenda</a>` : i.tem_video ? `<a class="btn sm" href="/api/contents/${i.id}/render/file" download onclick="copiaLegenda(${i.id})">Baixar vídeo e legenda</a>` : `<button class="btn sm" onclick="copiaLegenda(${i.id})">Copiar texto</button>`}<button class="btn sm ok" onclick="marcarPostado(${i.id})">${['materia', 'blog'].includes(i.raia) ? 'Marcar publicado' : 'Marcar postado'}</button></div></div>`;
+    <div class="pa"><button class="btn sm ok" onclick="verPronto(${i.id})">Ver</button></div></div>`;
   $('#main').innerHTML = `<div class="top"><h1>Publicação</h1><span style="flex:1"></span><span class="chip on">Modo: Manual</span><span class="chip">Automático · em breve</span>${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${S.brands.length})`)}</b> ▾`)}</div>
     <div class="note"><div><b>Por enquanto você posta e marca aqui.</b><br><span>Quando os treinos estiverem validados, o Publicador conecta nas redes e posta sozinho nos horários abaixo.</span></div><span class="tagg">Publicador automático · em breve</span></div>
-    <div class="redes">${redes.map(([n, s, c]) => `<div class="box"><i style="background:${c}"></i><b>${n}</b><span>${s}</span><button class="btn" disabled>Conectar · em breve</button></div>`).join('')}</div>
-    <div class="pub2"><div class="box"><div class="bh"><b>Agenda da semana</b><span>horários sugeridos pelo Publicador</span></div>${agenda}</div>
+    <div class="redes">${REDES.map(r => `<div class="box">${logoRede(r)}<b>${r[0]}</b><span>${r[1]}</span><button class="btn" disabled>Conectar · em breve</button></div>`).join('')}</div><!---->
+    <div class="pub2"><div class="box"><div class="bh"><b>Agenda</b><span>horários sugeridos pelo Publicador</span></div>${agenda}</div>
     <div class="box"><div class="bh"><b>Prontos para postar</b><span>aprovados por você</span></div>${prontos.map(pronto).join('') || '<p class="muted small" style="padding:20px 0">Nada pronto para postar agora.</p>'}<p class="small muted" style="margin-top:12px">Ao marcar como postado, você cola o link. O item vai para Finalizado e entra na Otimização.</p></div></div>`;
 };
+async function verPronto(id) {
+  const d = await api('/api/v2/itens/' + id), txt = (d.materia || d.legenda || d.roteiro || '').trim(); S._vp = { d, txt };
+  const html = esc(txt).replace(/^#+\s*(.+)$/gm, '<h3>$1</h3>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+  const ic = (p, t, f) => `<button class="ibtn" title="${t}" onclick="${f}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg></button>`;
+  modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca)} · ${esc(d.raia)}</span>
+    ${ic('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', 'Baixar em PDF', 'baixaPdf()')}${ic('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/>', 'Copiar texto', 'copiaVp()')}${d.tem_arte ? ic('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>', 'Baixar arte', `location.href='/api/contents/${id}/arte/zip'`) : ''}${d.tem_video ? ic('<path d="m10 9 5 3-5 3z"/><rect x="3" y="5" width="18" height="14" rx="2"/>', 'Baixar vídeo', `location.href='/api/contents/${id}/render/file'`) : ''}${ic('<path d="M18 6 6 18M6 6l12 12"/>', 'Fechar', 'fecha()')}</div>
+    <div class="mb"><article class="leitura"><p>${html || '<span class="muted">Sem texto.</span>'}</p></article></div>
+    <div class="ft"><span class="muted small" style="margin-right:auto">Depois de publicar, marque aqui e cole o link.</span><button class="btn ok" onclick="marcarPostado(${id})">${['materia', 'blog'].includes(d.raia) ? 'Marcar como publicado' : 'Marcar como postado'}</button></div>`);
+}
+async function copiaVp() { try { await navigator.clipboard.writeText(S._vp.txt); toast('Texto copiado'); } catch { toast('Não consegui copiar'); } }
+function baixaPdf() {
+  const { d } = S._vp, w = open('', '_blank'); if (!w) return toast('Libere pop-ups para baixar o PDF');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(d.titulo)}</title><style>body{font:16px/1.65 Georgia,serif;max-width:720px;margin:40px auto;padding:0 24px;color:#111}h1{font:700 26px/1.25 Arial,sans-serif}h3{font:700 18px Arial,sans-serif;margin-top:24px}small{color:#666}</style></head><body><h1>${esc(d.titulo)}</h1><small>${esc(d.marca)}</small>${document.querySelector('.leitura').innerHTML}<script>onload=()=>{print()}<\/script></body></html>`);
+  w.document.close();
+}
 async function copiaLegenda(id) { const d = await api('/api/v2/itens/' + id); try { await navigator.clipboard.writeText(d.legenda || d.materia || d.roteiro || ''); toast('Legenda copiada'); } catch { toast('Não consegui copiar'); } }
 function marcarPostado(id) {
   modal(`<div class="hd"><h2>Marcar como postado</h2></div><div class="mb"><input class="f" id="plink" placeholder="Link do post (opcional)"></div><div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="confPostado(${id})">Confirmar</button></div>`, 'sm');
@@ -690,9 +735,11 @@ VIEWS.marcas = async () => {
   const ident = b => docsDe(b).find(ehId);
   const logo = b => S._assets.find(x => (x.brand || '').toLowerCase() === b.name.toLowerCase() && /logo/i.test(x.kind + ' ' + x.name));
   const nicho = b => { const p = achaSec(secoes(descr(b).map(x => x.content).join('\n')), 'PAPEL')[0]; return p ? juntar(p).split(/(?<=\.)\s/)[0].slice(0, 70) : ''; };
-  const av = (b, big) => { const l = logo(b); return l ? `<img class="av ${big ? 'gold' : ''}" src="/api/assets/${l.id}/thumb" alt="">` : `<span class="av ${big ? 'gold' : ''}">${esc(sigla(b.name))}</span>`; };
+  const av = (b, big) => { const l = logo(b); return l ? `<img class="av ${big ? 'gold' : ''}" src="/api/assets/${l.id}/file" alt="">` : `<span class="av ${big ? 'gold' : ''}">${esc(sigla(b.name))}</span>`; };
   const linha = (k, v, cls = '') => `<div class="kvr ${cls}"><span>${esc(k)}</span><span>${v}</span></div>`;
   const bloco = s => `<div class="sec"><b>${esc(s.t.charAt(0) + s.t.slice(1).toLowerCase())}</b><p>${esc(juntar(s)).replace(/\[(PROPOSTA|CONFIRMAR)[^\]]*\]/g, m => `<em class="${m.includes('CONFIRMAR') ? 'conf' : 'prop'}">${m.slice(1, -1)}</em>`).replace(/\n/g, '<br>')}</p></div>`;
+  // lista compacta: cada assunto em uma linha; clique abre o texto completo
+  const blocoL = s => { const t = s.t.charAt(0) + s.t.slice(1).toLowerCase(), v = juntar(s), tags = (v.match(/\[(PROPOSTA|CONFIRMAR)/g) || []).map(x => x.slice(1)); return `<div class="kvr li" onclick='verCampo(${JSON.stringify(esc(t))}, ${JSON.stringify(bloco(s))}, true)'><span>${esc(t)}${tags.includes('CONFIRMAR') ? ' <em class="tconf">confirmar</em>' : tags.includes('PROPOSTA') ? ' <em class="tprop">proposta</em>' : ''}</span><span class="cut">${esc(v.replace(/\[[^\]]*\]/g, '').slice(0, 70))}</span></div>`; };
   const tab = S.marcaTab || 'id';
   let det = '';
   if (sel) {
@@ -708,20 +755,20 @@ VIEWS.marcas = async () => {
     let esq = '', dir = '';
     if (tab === 'id') {
       esq = (est.length ? `<h5>Estilo aprovado pelo dono</h5>${est.map(([k, v]) => linha(k, esc(String(v).slice(0, 80)))).join('')}<h5 style="margin-top:16px">Desta marca</h5>` : '<h5>Desta marca</h5>')
-        + (campos.map(([k, v, g]) => linha(k + (g && !/IDENTIDADE/i.test(g) ? ' · ' + g.toLowerCase() : ''), sw(v.slice(0, 110)))).join('') || '<p class="muted small">Identidade visual ainda não cadastrada.</p>')
-        + achaSec(ss, 'IDENTIDADE').map(bloco).join('');
+        + (campos.map(([k, v, g]) => `<div class="kvr li" onclick='verCampo(${JSON.stringify(esc(k))}, ${JSON.stringify(esc(v))})'><span>${esc(k)}</span><span class="cut">${sw(v.replace(/\s*\([^)]*\)/g, '').slice(0, 60))}</span></div>`).join('') || '<p class="muted small">Identidade visual ainda não cadastrada.</p>')
+        + achaSec(ss, 'IDENTIDADE').map(blocoL).join('');
       dir = `<h5>Formatos treinados</h5><div class="tagsw">${treinados.map(n => `<span class="tg">${esc(n)}</span>`).join('')}${outros.map(n => `<span class="tg out">+ ${esc(n)}</span>`).join('')}</div>
         <h5 style="margin-top:20px">Peças aprovadas</h5>${aprov.slice(0, 6).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhuma ainda.</p>'}
-        <h5 style="margin-top:20px">Arquivos da marca</h5><div class="arqs">${arqs.slice(0, 12).map(x => `<figure><img src="/api/assets/${x.id}/thumb" loading="lazy"><figcaption>${esc(x.kind || x.name)}</figcaption></figure>`).join('') || '<p class="muted small">Nenhum arquivo.</p>'}</div>`;
+        <h5 style="margin-top:20px">Arquivos da marca</h5><div class="arqs">${arqs.slice(0, 12).map(x => `<figure><img src="/api/assets/${x.id}/file" loading="lazy"><figcaption>${esc(x.kind || x.name)}</figcaption></figure>`).join('') || '<p class="muted small">Nenhum arquivo.</p>'}</div>`;
     } else if (tab === 'voz') {
       const L = achaSec(ss, 'PAPEL', 'PÚBLICO', 'PUBLICO', 'VOZ', 'GANCHO'), R = achaSec(ss, 'O INIMIGO', 'INIMIGO', 'DOR', 'DESEJO', 'MECANISMO', 'CTA', 'MONETIZ', 'CONCORRENTES');
-      esq = L.map(bloco).join('') || '<p class="muted small">Sem descrição de voz e público.</p>'; dir = R.map(bloco).join('');
+      esq = L.map(blocoL).join('') || '<p class="muted small">Sem descrição de voz e público.</p>'; dir = R.map(blocoL).join('');
     } else if (tab === 'formatos') {
       esq = `<h5>Metas por formato</h5>${S.fluxo.formatos.map(f => linha(f.nome, `meta ${f.meta_dia}/dia · ${f.modo === 'manual' ? 'Manual' : 'Automático'} · ${its.filter(i => i.raia === f.id).length} no fluxo`)).join('')}`;
-      dir = achaSec(ss, 'TIPOS', 'GANCHO').map(bloco).join('') || '';
+      dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
       esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('')}<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>`;
-      dir = achaSec(ss, 'CANAIS', 'CTA').map(bloco).join('');
+      dir = achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('');
     }
     det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
       <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos e metas'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
@@ -731,6 +778,7 @@ VIEWS.marcas = async () => {
   $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><span style="flex:1"></span><span class="chip">${brands.length} marcas</span><button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
     ${brands.length ? `<div class="mlay"><div class="mcards">${brands.map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()">${av(b)}<b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b).replace(/^(.{0,48})\s.*/s, '$1…'))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
 };
+function verCampo(t, v, html) { modal(`<div class="hd"><h2>${t}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><div class="leitura">${html ? v : `<p>${sw(v)}</p>`}</div></div><div class="ft"><span class="muted small" style="margin-right:auto">Para mudar, use Editar ou peça ao gerente no chat.</span></div>`, 'sm'); }
 async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
 async function detMarca(id) {
   const b = S.brands.find(x => x.id === id); const fs = S.fluxo.formatos;
@@ -879,7 +927,7 @@ VIEWS.config = async () => {
       <a class="btn sm" style="margin-top:8px" href="/antigo#/settings">Conectar ou trocar a conta</a></div>
     <div class="box"><div class="bh"><b>Gasto do mês</b><span>${esc(gs.mes)}</span></div>
       ${kv('Imagens (fal.ai)', `US$ ${Number(gs.imagens_usd).toFixed(2)} · ${gs.imagens} geradas`)}${kv('Tarefas dos agentes', gs.tarefas)}${kv('Tokens', (gs.tokens_in + gs.tokens_out).toLocaleString('pt-BR'))}${kv('Assinatura do Claude', 'valor fixo do plano')}</div>
-    <div class="box"><div class="bh"><b>Logins</b>${S.me.admin ? '<button class="btn sm" onclick="novoLogin()">+ Novo login</button>' : ''}</div>
+    <div class="box"><div class="bh"><b>Logins</b>${S.me.admin ? '<button class="btn sm ok" onclick="novoLogin()">+ Adicionar conta</button>' : ''}</div>
       <p class="small muted" style="margin-bottom:8px">Dono: acesso a tudo. Revisor: Fluxo, Revisão, Publicação e conversa com o gerente.</p>
       ${kv(S.me.owner ? 'Você (dono)' : esc(S.me.name), 'Dono')}${us.users.map(u => `<div class="kvr"><span>${esc(u.name)} <small class="muted">${esc(u.username)}${u.active ? '' : ' · desativado'}</small></span><span>${perfil(u)} ${S.me.admin && u.id !== S.me.id ? `<button class="btn sm dg" onclick="apagaLogin(${u.id},'${esc(u.name)}')">Remover</button>` : ''}</span></div>`).join('')}</div>
     <div class="box"><div class="bh"><b>Lixeira</b><span>itens descartados</span></div>${lixo.map(i => `<div class="kvr"><span>${esc(i.titulo)} <small class="muted">${esc(i.marca)}</small></span><span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></span></div>`).join('') || '<p class="muted small">Vazia.</p>'}</div>
@@ -890,7 +938,7 @@ VIEWS.config = async () => {
   </div>`;
 };
 function novoLogin() {
-  modal(`<div class="hd"><h2>Novo login</h2></div><div class="mb" style="display:grid;gap:8px"><input class="f" id="ln" placeholder="Nome"><input class="f" id="lu2" placeholder="Login (letras minúsculas)"><input class="f" id="lp2" type="password" placeholder="Senha (mínimo 8)">
+  modal(`<div class="hd"><h2>Nova conta de acesso</h2></div><div class="mb" style="display:grid;gap:8px"><input class="f" id="ln" placeholder="Nome"><input class="f" id="lu2" type="email" placeholder="E-mail (usado para entrar)"><input class="f" id="lp2" type="password" placeholder="Senha (mínimo 8)">
     <select class="f" id="lr"><option value="revisor">Revisor (Fluxo, Revisão, Publicação)</option><option value="dono">Dono (tudo)</option></select></div>
     <div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="criaLogin()">Criar</button></div>`, 'sm');
 }

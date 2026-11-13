@@ -78,6 +78,16 @@ export function criarFluxoV2(ctx) {
   }
   FORMATOS_PADRAO.forEach((f, i) => run('INSERT OR IGNORE INTO formatos(id,nome,etapas,meta_dia,modo,ordem,updated_at) VALUES(?,?,?,?,?,?,?)', f.id, f.nome, JSON.stringify(f.etapas), f.meta, 'manual', i, T()));
 
+  // Produtos conhecidos do treino (conhecimento/produtos.json): entram uma vez, sem sobrescrever o que já foi cadastrado ou editado
+  try {
+    const lista = JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'produtos.json'), 'utf8'));
+    for (const p of lista) {
+      if (one('SELECT 1 x FROM products WHERE lower(name)=lower(?)', p.name)) continue;
+      const r = run('INSERT INTO products(brand,name,type,url,price,deliverable,promise,audience,pains,objections,bonus,guarantee,page_text,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', '', p.name, p.type || 'outro', p.url || '', p.price || '', p.deliverable || '', p.promise || '', p.audience || '', p.pains || '', p.objections || '', p.bonus || '', p.guarantee || '', p.page_text || '', T(), T());
+      for (const m of p.marcas || []) { const b = one('SELECT name FROM brands WHERE lower(name)=lower(?)', m); if (b) run('INSERT OR IGNORE INTO product_brands(product_id,brand) VALUES(?,?)', +r.lastInsertRowid, b.name); }
+      log(null, `Produto cadastrado a partir do treino: ${p.name}`);
+    }
+  } catch (e) { if (e.code !== 'ENOENT') console.error('produtos do treino:', e.message); }
   const formatos = () => all('SELECT * FROM formatos ORDER BY ordem').map(f => ({ ...f, etapas: JSON.parse(f.etapas), ativo: !!f.ativo }));
   const jobsDe = id => all('SELECT agent,kind,status,error,run_after FROM jobs WHERE content_id=? ORDER BY id', id);
   const hoje = () => new Date().toISOString().slice(0, 10);
@@ -88,7 +98,7 @@ export function criarFluxoV2(ctx) {
       id: c.id, titulo: c.title, marca: c.brand || '', produto_id: c.product_id || null, formato: c.format, tipo: c.kind, raia: raiaDe(c, ctx),
       status: c.status, ...e, estado_nome: ESTADOS[e.estado], etapa_nome: ETAPA_NOME[e.etapa] || e.etapa,
       em_ajuste: !!c.em_ajuste, ajuste_motivo: c.ajuste_motivo || '', nota: c.score, post_url: c.post_url || '', postado_em: c.posted_at,
-      tem_arte: c.art_status === 'ok', tem_video: !!c.video, atualizado: c.updated_at, criado: c.created_at,
+      tem_arte: c.art_status === 'ok', tem_video: !!c.video, tem_spec: !!c.spec, tem_art_spec: !!c.art_spec, atualizado: c.updated_at, criado: c.created_at,
       thumb: c.art_status === 'ok' ? `/api/contents/${c.id}/arte/file/1?review=1&t=${encodeURIComponent(c.updated_at)}` : ''
     };
   }
