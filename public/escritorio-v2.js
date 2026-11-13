@@ -81,7 +81,7 @@ export function criarEscritorio(el, { onPick } = {}) {
     iframe?.remove(); iframe = null;
     if (!id) return;
     iframe = document.createElement('iframe');
-    iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(id)}?autoplay=1&mute=1&loop=1&playlist=${encodeURIComponent(id)}&controls=0&modestbranding=1&playsinline=1`;
+    iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&mute=1&loop=1&playlist=${encodeURIComponent(id)}&controls=0&modestbranding=1&playsinline=1`;
     iframe.allow = 'autoplay; encrypted-media'; iframe.style.cssText = 'position:absolute;border:0;pointer-events:none;border-radius:4px'; el.appendChild(iframe);
   }
   const v = new THREE.Vector3(), tela2d = p => { v.copy(p).project(cam); return [(v.x + 1) / 2 * W(), (1 - v.y) / 2 * H(), v.z]; };

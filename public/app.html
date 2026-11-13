@@ -422,11 +422,11 @@ async function abrirEditor(id) {
   const d = await api('/api/v2/itens/' + id);
   const campo = d.materia ? 'materia' : 'script';
   ED = { id, campo, orig: { [campo]: d[campo === 'script' ? 'roteiro' : 'materia'] || '', caption: d.legenda || '' }, d, tab: d.thumb ? 'arte' : 'texto' };
-  const arte = d.thumb ? `<div style="display:flex;gap:8px;overflow-x:auto">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<img src="/api/contents/${id}/arte/file/${n}?review=1&t=${encodeURIComponent(d.atualizado)}" onerror="this.remove()" style="height:340px;border-radius:10px">`).join('')}</div><p class="small muted" style="margin-top:8px">O editor de arte em camadas (estilo Canva) chega na Etapa 11. Para ajustar a arte agora, peça ao gerente acima.</p>` : '';
-  const video = d.tem_video ? `<video src="/api/contents/${id}/render/file" controls style="max-height:420px;border-radius:10px"></video><p class="small muted" style="margin-top:8px">O editor de vídeo (estilo CapCut) chega na Etapa 12.</p>` : '';
+  const arte = d.thumb ? `<div style="display:flex;gap:8px;overflow-x:auto">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<img src="/api/contents/${id}/arte/file/${n}?review=1&t=${encodeURIComponent(d.atualizado)}" onerror="this.remove()" style="height:340px;border-radius:10px">`).join('')}</div><div style="display:flex;gap:8px;margin-top:10px;align-items:center"><button class="btn ok" onclick="abreEstudio('arte',${id})">Abrir editor de arte</button><span class="small muted">Camadas, slides, biblioteca da marca, texto, imagem, alinhar, duplicar, desfazer. Salvar gera o PNG final.</span></div>` : '';
+  const video = d.tem_video || d.spec ? `${d.tem_video ? `<video src="/api/contents/${id}/render/file" controls style="max-height:420px;border-radius:10px"></video>` : ''}<div style="display:flex;gap:8px;margin-top:10px;align-items:center"><button class="btn ok" onclick="abreEstudio('video',${id})">Abrir editor de vídeo</button><span class="small muted">Cenas, cortes, legendas, mídia, transições. Salvar renderiza de novo.</span></div>` : '';
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca || '')}</span><button class="btn sm" onclick="fecha()">Fechar</button></div>
     <div class="ask"><input class="f" id="ajm" placeholder="Pedir ajuste ao gerente: diga o que mudar…" onkeydown="if(event.key==='Enter')pedirAjuste()"><button class="btn" onclick="pedirAjuste()">Pedir ajuste</button></div>
-    <div class="mb"><div class="tabs">${d.thumb ? `<button class="${ED.tab === 'arte' ? 'on' : ''}" onclick="edTab('arte')">Arte</button>` : ''}${d.tem_video ? `<button onclick="edTab('video')">Vídeo</button>` : ''}<button class="${ED.tab === 'texto' ? 'on' : ''}" onclick="edTab('texto')">Texto</button><button onclick="edTab('versoes')">Versões</button></div>
+    <div class="mb"><div class="tabs">${d.thumb ? `<button class="${ED.tab === 'arte' ? 'on' : ''}" onclick="edTab('arte')">Arte</button>` : ''}${d.tem_video || d.spec ? `<button onclick="edTab('video')">Vídeo</button>` : ''}<button class="${ED.tab === 'texto' ? 'on' : ''}" onclick="edTab('texto')">Texto</button><button onclick="edTab('versoes')">Versões</button></div>
       <div data-t="arte" class="${ED.tab === 'arte' ? '' : 'hidden'}">${arte}</div>
       <div data-t="video" class="hidden">${video}</div>
       <div data-t="texto" class="${ED.tab === 'texto' ? '' : 'hidden'}"><div class="doc" id="doc" contenteditable="plaintext-only" spellcheck="true"></div>
@@ -437,6 +437,11 @@ async function abrirEditor(id) {
   $('#doc').textContent = ED.orig[campo]; $('#leg').value = ED.orig.caption;
   $('#doc').addEventListener('input', () => { $('#learn').textContent = 'Você está editando: ao aprovar, o gerente transforma a mudança em regra.'; });
 }
+function abreEstudio(tipo, id) {
+  const f = document.createElement('iframe'); f.src = `/?embed=${tipo}&id=${id}`; f.id = 'estudio';
+  f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;z-index:95;background:#0c0c0d'; document.body.appendChild(f);
+}
+addEventListener('message', e => { if (e.origin !== location.origin || e.data?.tipo !== 'editor-fechado') return; $('#estudio')?.remove(); const id = e.data.id; if (e.data.erro) toast(e.data.erro); refresh().then(() => { if (ED?.id === id) abrirEditor(id); }); });
 function edTab(t) { document.querySelectorAll('.mb [data-t]').forEach(e => e.classList.toggle('hidden', e.dataset.t !== t)); document.querySelectorAll('.mb .tabs button').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase().startsWith(t.slice(0, 4)))); }
 async function salvarEd(aprova) {
   const campos = {}, txt = $('#doc').innerText.replace(/\n$/, '');

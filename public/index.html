@@ -889,6 +889,12 @@ async function boot() {
   S.me = me.user; S.areas = me.areas; S.presets = me.presets;
   $('#login').hidden = true; $('#app').hidden = false;
   S.st = await api('/state');
+  { const q = new URLSearchParams(location.search), emb = q.get('embed'), eid = +q.get('id');   // novo front (app.html): abre só o editor, sem o painel antigo em volta
+    if (emb && eid) { document.body.classList.add('embed'); const st = document.createElement('style'); st.textContent = 'body.embed #app{display:none!important} body.embed{background:#0c0c0d}'; document.head.append(st);
+      const fecha = () => parent.postMessage({ tipo: 'editor-fechado', id: eid }, location.origin);
+      try { if (emb === 'arte') await arteEditor(eid, fecha); else if (emb === 'video') await videoEditor(eid, fecha); }
+      catch (e) { parent.postMessage({ tipo: 'editor-fechado', id: eid, erro: e.message || 'Não consegui abrir o editor' }, location.origin); }
+      return; } }
   if (['pipeline', 'video', 'brain', 'dashboard'].some(canSee)) api('/motivos').then(m => { S.motivos = m; }).catch(() => {});
   let v = location.hash.replace('#/', ''); if (v === 'media') { v = 'video'; S.vtTab = 'lib'; } if (v === 'agents' && canSee('settings')) { v = 'settings'; S.setSec = 'agents'; } if (v === 'chefe' && canSee('office')) v = 'office'; S.view = NAV.some(n => n[0] === v) && canSee(v) ? v : (NAV.find(n => canSee(n[0])) || NAV[0])[0];
   renderNav(); renderView();

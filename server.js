@@ -7879,8 +7879,8 @@ async function api(req, res, url) {
 }
 
 const SEC_HEADERS = {
-  'x-content-type-options': 'nosniff', 'x-frame-options': 'DENY', 'referrer-policy': 'same-origin',
-  'content-security-policy': "default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-src 'self' http://localhost:5175 http://127.0.0.1:5175; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+  'x-content-type-options': 'nosniff', 'x-frame-options': 'SAMEORIGIN', 'referrer-policy': 'same-origin',
+  'content-security-policy': "default-src 'self'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com http://localhost:5175 http://127.0.0.1:5175; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"
 };
 const indexFile = path.join(__dirname, 'public', 'index.html');
 
