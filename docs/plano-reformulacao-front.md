@@ -1,7 +1,11 @@
 # Plano de implementação: novo front do sistema de produção
 
 Referência visual: `mockup/final/` (computador) e `mockup/celular/` (celular).
-Regra geral: cada etapa é feita num branch, testada localmente, mostrada ao dono e só então vai para produção. Nada é apagado: as telas antigas ficam escondidas até a nova estar validada.
+Como vamos trabalhar:
+- O front antigo será **substituído** pelo novo. O motor que já funciona continua: servidor, banco, agentes, treinos, `motor/` e `conhecimento/`.
+- Tudo é feito no branch de desenvolvimento, com o sistema rodando localmente para testar cada etapa.
+- Nada vai para o ar no meio do caminho. O deploy é feito pelo dono, uma vez, quando todas as etapas estiverem prontas e testadas.
+- O front novo começa num arquivo separado (`public/app.html`), ao lado do antigo. Quando estiver completo, ele vira a página principal e o antigo é apagado.
 
 ## Decisões já fechadas
 
@@ -49,12 +53,12 @@ Regra geral: cada etapa é feita num branch, testada localmente, mostrada ao don
   - marcar postado (com link)
   - salvar edição (com o que mudou)
 - Gravar cada edição como uma nova versão do item; é daí que vem o histórico.
-- **Pronto quando:** as ações funcionam pela API e o front atual continua igual.
+- **Pronto quando:** as ações funcionam pela API, testadas localmente.
 
 ### Etapa 1: casca nova
 - Tema premium (grafite e champanhe), o novo menu e o chat do gerente fixo à direita.
 - Versão de celular desde o início: barra embaixo, botão do gerente e telas em uma coluna.
-- As telas antigas saem do menu, mas continuam acessíveis por um endereço escondido durante a transição.
+- Construída em `public/app.html`. O front antigo fica intacto até a troca final.
 - **Pronto quando:** dá para navegar no menu novo, no computador e no celular.
 
 ### Etapa 2: Fluxo (lista) e Mesa de revisão
@@ -134,6 +138,16 @@ Regra geral: cada etapa é feita num branch, testada localmente, mostrada ao don
 - Postagem automática nas redes: Instagram, Facebook, TikTok, YouTube, Pinterest e site.
 - Modo Automático por formato: o revisor aprova sozinho quando o dono der a palavra.
 - Cenários de cidade no escritório, com modelos 3D melhores.
+
+### Etapa final: troca e limpeza
+- O novo front vira a página principal e o antigo (`public/index.html` e as telas que não fazem mais sentido) é apagado, junto com as rotas do servidor que só ele usava.
+- Teste completo de ponta a ponta, no computador e no celular.
+- O README é atualizado.
+- O dono faz o deploy.
+
+## Depois do deploy
+- Continuar os treinos de **arte** e de **vídeo** até finalizar. O treino de copy já está concluído.
+- Ajustes do dia a dia: o que faltar, o que tirar, o que melhorar.
 
 ## Ordem e dependências
 - 0 → 1 → 2 → 3 → 4 é o caminho mínimo para usar o sistema novo no dia a dia.
