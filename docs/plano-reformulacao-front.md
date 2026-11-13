@@ -10,7 +10,7 @@ Regra geral: cada etapa é feita num branch, testada localmente, mostrada ao don
 - **Visual:** premium grafite com destaque champanhe.
 - **Chat do gerente:**
   - No computador, fica sempre à direita.
-  - No celular, é um botão flutuante que abre o chat em tela cheia.
+  - No celular, é uma bolinha de chat flutuante, com ponto verde de online e contador de mensagens não lidas. Ao tocar, o chat abre como uma gaveta por cima da tela atual, com "digitando…" e sugestões rápidas.
 - **Fluxo:**
   - Uma raia por formato: Carrossel, Estático, Stories de venda, Reels, Matéria de jornal e Post de blog.
   - Cada raia abre e fecha. Fechada, mostra um resumo; aberta, mostra as etapas.
