@@ -2,7 +2,6 @@
   "forceLoginMethod": "claudeai",
   "includeCoAuthoredBy": false,
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "deny": ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "Task", "WebFetch", "NotebookEdit"]
   }
 }

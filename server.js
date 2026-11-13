@@ -310,7 +310,7 @@ async function callAssinatura({ system, content, images = [], model, search }) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdc-turno-')), sys = path.join(dir, 'system.md');
   fs.writeFileSync(sys, system);
   const args = ['-p', '--input-format', 'stream-json', '--output-format', 'stream-json', '--verbose', '--model', /opus/i.test(model) ? 'opus' : /haiku/i.test(model) ? 'haiku' : 'sonnet',   // apelido: o CLI resolve para o modelo atual da assinatura
-    '--tools', search ? 'WebSearch' : '', '--strict-mcp-config', '--permission-mode', 'bypassPermissions', '--system-prompt-file', sys];
+    '--tools', search ? 'WebSearch' : '', ...(search ? ['--allowedTools', 'WebSearch'] : []), '--strict-mcp-config', '--system-prompt-file', sys];   // sem bypassPermissions: o container roda como root e o CLI recusa
   try {
     return await new Promise((ok, ko) => {
       const ch = spawn('claude', args, { cwd: dir, env: claudeEnv() }); let err = '', res = null, buf = '';
