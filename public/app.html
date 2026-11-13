@@ -175,11 +175,19 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .mlay{display:grid;grid-template-columns:460px 1fr;gap:16px;align-items:start}.mcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mc{cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:14px}.mc.on{border-color:#a8864a!important}.mc b{font-size:14px}.mc.add{border-style:dashed;align-items:center;justify-content:center;color:var(--tx2)}
 .av{width:36px;height:36px;border-radius:9px;background:#1c1c1f;display:grid;place-items:center;font-size:12px;font-weight:700;margin-bottom:8px}.av.gold{width:52px;height:52px;border:1px solid #a8864a;color:var(--gold2);background:#1a1710;margin:0}
 .mdet .mh{display:flex;gap:14px;align-items:center;margin-bottom:14px}.mdet h2{font-size:19px;font-weight:600}.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}h5{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
-.kvr{display:flex;justify-content:space-between;gap:12px;background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px}.kvr span:last-child{color:var(--tx3);text-align:right}
+.kvr{display:flex;justify-content:space-between;gap:12px;background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px}.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 4px -1px 6px;border:1px solid #ffffff22}.kvr span:last-child{color:var(--tx3);text-align:right}
 .tagsw{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.tg{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:var(--gold2)}.tg.out{background:#1c1c1f;color:var(--tx2)}
 .learnbox{margin-top:18px;padding:10px 14px;border:1px solid var(--goldline);background:#16140e;border-radius:10px;font-size:12.5px;color:var(--gold)}
 .kps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.kp span{font-size:12px;color:var(--tx2);display:block}.kp b{font-size:24px}
 .an{background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px}.an b{display:block;font-size:13.5px;font-weight:500}.an span{font-size:12px;color:var(--tx3)}.an.gold{color:var(--gold);font-size:13px}.an.gold b{display:inline;font-weight:700}
+.cerw{position:relative;margin:-20px -26px;padding:20px 26px;min-height:100vh;background:#08080a}
+.cbusca{position:relative;z-index:3;display:flex;align-items:center;width:400px;background:#111113;border:1px solid var(--line2);border-radius:10px;padding:0 12px}.cbusca input{flex:1;background:none;border:none;outline:none;padding:10px 0;font-size:13px}.cbusca span{color:var(--gold);font-size:13px;white-space:nowrap}
+#cer{position:absolute;inset:0;z-index:1}#cer.lista{position:relative;inset:auto;margin-top:14px}#cer.const{top:110px}
+.cerw .top{position:relative;z-index:3}
+#cerTip{position:fixed;z-index:30;pointer-events:none;background:#111113f0;border:1px solid #a8864a;border-radius:12px;padding:12px 14px;max-width:260px;font-size:12px}#cerTip b{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:8px}#cerTip b i{width:9px;height:9px;border-radius:50%}#cerTip b span{margin-left:auto;font-size:11px;color:var(--tx3);font-weight:400}#cerTip div{display:flex;flex-wrap:wrap;gap:5px}#cerTip em{font-style:normal;background:#1c1c1f;border-radius:6px;padding:2px 7px;color:var(--tx2)}#cerTip em.on{background:var(--goldbg);color:var(--gold2);outline:1px solid #a8864a}
+#cerCard{position:absolute;right:26px;top:120px;width:340px;max-height:calc(100vh - 300px);overflow:auto;z-index:4;background:#111113;border:1px solid var(--line2);border-radius:14px;padding:14px}
+.cfeed{position:absolute;right:26px;bottom:20px;width:330px;display:flex;flex-direction:column;gap:6px;z-index:3}.cfeed div{background:#111113e0;border:1px solid var(--line2);border-radius:8px;padding:7px 10px;font-size:12px}.cfeed span{color:var(--tx3);margin-right:4px}
+.chint{position:absolute;left:26px;bottom:20px;font-size:12px;color:var(--tx3);z-index:3}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -198,6 +206,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
   .fab .dot{position:absolute;right:3px;bottom:3px;width:12px;height:12px;border-radius:50%;background:#3ddc84;border:2px solid #0c0c0d}
   .fab .cnt{position:absolute;top:-4px;right:-4px;background:#e06060;color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
   .fab .cnt:empty{display:none}
+  .cbusca{width:100%}.cfeed{display:none}.cerw{margin:-14px;padding:14px}
   .grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
   .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
@@ -535,11 +544,11 @@ async function confPostado(id) { await tryDo(() => api(`/api/v2/itens/${id}/post
 // ───────── Marcas
 const sigla = n => (n.match(/\d+/)?.[0]) || n.split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 3).toUpperCase();
 VIEWS.marcas = async () => {
-  const [{ brands }, k] = await Promise.all([api('/api/brands'), api('/api/knowledge').catch(() => ({ items: [] }))]);
-  S.brands = brands; S._docs = k.items || [];
+  const [{ brands }, k, sty] = await Promise.all([api('/api/brands'), api('/api/knowledge').catch(() => ({ items: [] })), api('/api/art-styles').catch(() => ({ styles: [] }))]);
+  S.brands = brands; S._docs = k.items || []; S._sty = sty.styles || [];
   const sel = brands.find(b => b.id === S.marcaSel) || brands[0]; S.marcaSel = sel?.id;
   const docsDe = (b, cats) => S._docs.filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase() && cats.includes(x.category));
-  const nicho = b => (docsDe(b, ['marca'])[0]?.content || '').split('\n').find(l => l.trim() && !l.startsWith('#'))?.slice(0, 40) || 'sem nicho cadastrado';
+  const nicho = b => (docsDe(b, ['marca']).find(x => !/^#\s*IDENTIDADE/i.test(x.content))?.content || '').split('\n').find(l => l.trim() && !l.startsWith('#'))?.slice(0, 40) || '';
   const linha = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(v)}</span></div>`;
   const tab = S.marcaTab || 'id';
   let det = '';
@@ -548,9 +557,18 @@ VIEWS.marcas = async () => {
     const aprov = its.filter(i => ['finalizado'].includes(i.estado) || (i.estado === 'esperando' && i.etapa === 'publicacao'));
     const treinados = [...new Set(aprov.map(i => S.fluxo.formatos.find(f => f.id === i.raia)?.nome))].filter(Boolean), outros = S.fluxo.formatos.map(f => f.nome).filter(n => !treinados.includes(n));
     const docs = docsDe(sel, tab === 'voz' ? ['tom_de_voz'] : ['marca', 'diretrizes', 'outros']);
+    // linhas "Chave: valor" dos documentos cadastrados (ex.: # IDENTIDADE VISUAL com ## CORES, ## TIPOGRAFIA, ## LOGO)
+    const campos = ds => ds.flatMap(dc => { let g = ''; return dc.content.split('\n').flatMap(l => { if (/^##\s/.test(l)) { g = l.replace(/^#+\s*/, ''); return []; } const m = l.replace(/^[-*]\s*/, '').match(/^([^:#]{2,40}):\s*(.+)$/); return m ? [[m[1].trim(), m[2].trim().replace(/\*\*/g, ''), g, dc.id]] : []; }); });
+    const sw = v => v.replace(/#[0-9a-fA-F]{6}\b/g, h => `<i class="sw" style="background:${h}"></i>${h}`);
+    const lin2 = ([k, v, g, id]) => `<div class="kvr" style="cursor:pointer" onclick="detMarca(${sel.id})"><span>${esc(k)}${g ? `<small class="muted"> · ${esc(g.toLowerCase())}</small>` : ''}</span><span>${sw(esc(v.slice(0, 90)))}</span></div>`;
+    const geral = (S._sty.find(x => x.brand === '') || {}).params || {}, prop = (S._sty.find(x => (x.brand || '').toLowerCase() === sel.name.toLowerCase()) || {}).params || {};
+    const est = [['Estilo visual', prop.estilo_visual || geral.estilo_visual], ['Fundo', (prop.fundo_ia || geral.fundo_ia || {}).estilo], ['Luz', (prop.fundo_ia || geral.fundo_ia || {}).iluminacao], ['Composição', [(prop.composicao || geral.composicao || {}).alinhamento, (prop.composicao || geral.composicao || {}).margens].filter(Boolean).join(' · ')], ['O que evitar', (prop.fundo_ia || geral.fundo_ia || {}).negativo]].filter(x => x[1]);
+    const voz = tab === 'voz' ? S._docs.filter(x => (x.brand || '').toLowerCase() === sel.name.toLowerCase() && x.voice_name) : [];
     const corpo = tab === 'formatos' ? S.fluxo.formatos.map(f => linha(f.nome, `meta ${f.meta_dia}/dia · ${f.modo === 'manual' ? 'Manual' : 'Automático'} · ${its.filter(i => i.raia === f.id).length} no fluxo`)).join('')
       : tab === 'contas' ? ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('') + '<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>'
-      : (docs.map(d => `<div class="kvr" style="cursor:pointer" onclick="detMarca(${sel.id})"><span>${esc(d.title)}</span><span>${esc(d.content.replace(/[#*]/g, '').trim().split('\n')[0].slice(0, 50))}</span></div>`).join('') || '<p class="muted small">Nada cadastrado ainda. Clique em Editar ou peça ao gerente.</p>');
+      : ((tab === 'id' && est.length ? `<h5>Estilo aprovado pelo dono</h5>${est.map(([k, v]) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(String(v).slice(0, 80))}</span></div>`).join('')}<h5 style="margin-top:16px">Desta marca</h5>` : '')
+        + (campos(docs).slice(0, 18).map(lin2).join('') || docs.map(d => `<div class="kvr" style="cursor:pointer" onclick="detMarca(${sel.id})"><span>${esc(d.title)}</span><span>${esc(d.content.replace(/[#*]/g, '').trim().split('\n')[0].slice(0, 50))}</span></div>`).join('') || '<p class="muted small">Nada cadastrado ainda. Clique em Editar ou peça ao gerente.</p>')
+        + voz.map(x => `<div class="kvr"><span>Voz da narração</span><span>${esc(x.voice_name)} (${esc(x.voice_provider)})</span></div>`).join(''));
     det = `<div class="box mdet"><div class="mh"><span class="av gold">${esc(sigla(sel.name))}</span><div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(nicho(sel))}</span></div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
       <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos e metas'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
       <div class="two"><div><h5>${tab === 'voz' ? 'Voz e público' : tab === 'formatos' ? 'Formatos e metas' : tab === 'contas' ? 'Contas' : 'Desta marca'}</h5>${corpo}</div>
@@ -648,20 +666,19 @@ async function salvaMet(id) { const b = { content_id: id }; for (const k of ['vi
 let C3 = null;
 VIEWS.cerebro = async () => {
   C3?.destruir(); C3 = null;
-  const d = await api('/api/v2/cerebro'); S.cer = d; S.cerModo ||= '3d';
+  const [d, st] = await Promise.all([api('/api/v2/cerebro'), api('/api/state')]); S.cer = d; S.cerModo ||= '3d';
   const modo = S.cerModo;
-  $('#main').innerHTML = `<div class="top"><h1>Cérebro</h1><div class="tog">${[['3d', '3D'], ['const', 'Constelação'], ['lista', 'Lista']].map(([k, n]) => `<button class="${modo === k ? 'on' : ''}" onclick="S.cerModo='${k}';render()">${n}</button>`).join('')}</div><input class="f" style="width:220px" placeholder="Buscar e acender o caminho…" oninput="cerBusca(this.value)"></div>
-    <div style="position:relative">
-      <div id="cer" style="height:calc(100vh - 130px);min-height:420px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 45%,#1a1710,#0c0c0d 70%);border:1px solid var(--line)"></div>
-      <div id="cerTip" class="hidden" style="position:fixed;pointer-events:none;background:#111113;border:1px solid var(--line2);border-radius:8px;padding:5px 9px;font-size:12px;z-index:20"></div>
-      <div id="cerCard" class="box hidden" style="position:absolute;right:12px;top:12px;width:340px;max-height:calc(100% - 24px);overflow:auto"></div>
-    </div>
-    <p class="small muted" style="margin-top:6px">Bolinhas douradas: o Gerente mandando para os agentes. Losangos coloridos: o que volta. Arraste para girar, role para aproximar, clique para abrir. Pergunte no chat e os arquivos usados acendem.</p>`;
+  const feed = st.activity.filter(x => x.agent).slice(0, 4).map(x => `<div><span>${ha(x.ts).replace('há ', '')}</span> ${esc(x.message)}</div>`).join('');
+  $('#main').innerHTML = `<div class="cerw"><div class="top"><h1>Cérebro</h1><span style="flex:1"></span>${[['3d', 'Cérebro'], ['const', 'Constelação'], ['lista', 'Lista']].map(([k, n]) => `<button class="chip ${modo === k ? 'on' : ''}" onclick="S.cerModo='${k}';render()">${n}</button>`).join('')}${marcaSel(`Marca: ${esc(S.marca || 'Todas')} ▾`)}</div>
+    <div class="cbusca"><input placeholder="Buscar e acender o caminho… (ex.: stories de venda)" oninput="cerBusca(this.value)"><span id="cerN"></span></div>
+    <div id="cer" class="${modo}"></div>
+    <div id="cerTip" class="hidden"></div><div id="cerCard" class="hidden"></div>
+    ${modo !== 'lista' ? `<div class="cfeed">${feed}</div><div class="chint">Passe o mouse para destacar · clique para abrir · arraste para girar</div>` : ''}</div>`;
   const el = $('#cer');
   if (modo === '3d') {
     try {
       const { criarCerebro3D } = await import('/cerebro3d.js');
-      C3 = criarCerebro3D(el, d, { onPick: cerAbre, onHover: (u, e) => { const t = $('#cerTip'); if (!u) return t.classList.add('hidden'); t.textContent = u.titulo; t.style.left = e.clientX + 12 + 'px'; t.style.top = e.clientY + 12 + 'px'; t.classList.remove('hidden'); } });
+      C3 = criarCerebro3D(el, d, { onPick: cerAbre, onHover: (u, e) => { const t = $('#cerTip'); if (!u) return t.classList.add('hidden'); if (u.tipo === 'agente') { const a = d.agentes.find(x => x.id === u.agente); t.innerHTML = `<b><i style="background:${esc(a.cor || '#8fd0c0')}"></i>${esc(a.nome)}<span>${a.itens.length} arquivos</span></b><div>${a.itens.slice(0, 11).map(i => `<em class="${S.cerAcesos?.has(i.id) ? 'on' : ''}">${esc(i.titulo.split(/[:(—-]/)[0].slice(0, 22))}</em>`).join('')}${a.itens.length > 11 ? `<em>+${a.itens.length - 11}</em>` : ''}</div>`; } else t.innerHTML = `<b>${esc(u.titulo)}</b>`; t.style.left = Math.min(innerWidth - 280, e.clientX + 16) + 'px'; t.style.top = e.clientY + 12 + 'px'; t.classList.remove('hidden'); } });
     } catch (e) { el.innerHTML = `<div class="empty">Não consegui abrir o 3D (${esc(e.message)}). Use Constelação ou Lista.</div>`; }
   } else if (modo === 'const') {
     const ags = d.agentes.filter(a => a.id !== 'chefe'), W = 1000, H = 640, cx = W / 2, cy = H / 2;
@@ -670,13 +687,12 @@ VIEWS.cerebro = async () => {
       const ang = k / ags.length * Math.PI * 2 - Math.PI / 2, x = cx + Math.cos(ang) * 230, y = cy + Math.sin(ang) * 210;
       svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#3a3220" data-ag="${a.id}"/>`;
       a.itens.forEach((it, j) => { const t = ang + (j - a.itens.length / 2) * 0.09, r = 70 + (j % 3) * 16, ix = x + Math.cos(t) * r, iy = y + Math.sin(t) * r; svg += `<g class="cn" data-id="${it.id}" style="cursor:pointer" onclick="cerAbre({tipo:'${it.tipo}',id:'${it.id}',agente:'${a.id}'})"><title>${esc(it.titulo)}</title>${it.tipo === 'regra' ? `<rect x="${ix - 4}" y="${iy - 4}" width="8" height="8" transform="rotate(45 ${ix} ${iy})" fill="${esc(a.cor || '#8fd0c0')}"/>` : `<rect x="${ix - 3}" y="${iy - 4}" width="6" height="8" fill="#cfd6e4" opacity=".8"/>`}</g>`; });
-      svg += `<g style="cursor:pointer" onclick="cerAbre({tipo:'agente',agente:'${a.id}',titulo:${esc(JSON.stringify(a.nome))}})"><circle cx="${x}" cy="${y}" r="20" fill="${esc(a.cor || '#8fd0c0')}"/><text x="${x}" y="${y + 36}" fill="#d0d0d4" font-size="13" text-anchor="middle">${esc(a.nome)}</text></g>`;
+      svg += `<g style="cursor:pointer" onclick="cerAbre({tipo:'agente',agente:'${a.id}'})"><circle cx="${x}" cy="${y}" r="20" fill="${esc(a.cor || '#8fd0c0')}"/><text x="${x}" y="${y + 36}" fill="#d0d0d4" font-size="13" text-anchor="middle">${esc(a.nome)}</text><text x="${x}" y="${y + 52}" fill="#77777d" font-size="11" text-anchor="middle">${a.itens.length} arquivos</text></g>`;
     });
     svg += `<circle cx="${cx}" cy="${cy}" r="30" fill="url(#gg)"/><defs><radialGradient id="gg"><stop offset="0" stop-color="#e9d8a6"/><stop offset="1" stop-color="#a8864a"/></radialGradient></defs><text x="${cx}" y="${cy + 50}" fill="#e9d29a" font-size="14" text-anchor="middle">Gerente</text></svg>`;
     el.innerHTML = svg;
   } else {
-    el.style.height = 'auto'; el.style.background = 'none'; el.style.border = 'none';
-    el.innerHTML = d.agentes.map(a => `<details class="box" style="margin-bottom:8px" ${a.itens.length ? '' : ''}><summary><b>${esc(a.nome)}</b> <span class="small muted">${a.itens.filter(i => i.tipo === 'arquivo').length} arquivos · ${a.itens.filter(i => i.tipo === 'regra').length} regras</span></summary>${a.itens.map(i => `<div class="ver cn" data-id="${i.id}" style="cursor:pointer" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})"><span class="pill">${i.tipo}</span><span style="flex:1">${esc(i.titulo)}</span></div>`).join('')}</details>`).join('');
+    el.innerHTML = d.agentes.map(a => `<details class="box" style="margin-bottom:8px"><summary><b>${esc(a.nome)}</b> <span class="small muted">${a.itens.filter(i => i.tipo === 'arquivo').length} arquivos · ${a.itens.filter(i => i.tipo === 'regra').length} regras</span></summary>${a.itens.map(i => `<div class="ver cn" data-id="${i.id}" style="cursor:pointer" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})"><span class="pill">${i.tipo}</span><span style="flex:1">${esc(i.titulo)}</span></div>`).join('')}</details>`).join('');
   }
 };
 async function cerAbre(u) {
@@ -692,7 +708,8 @@ let cerT;
 function cerBusca(q) { clearTimeout(cerT); cerT = setTimeout(() => cerAcende(q), 300); }
 async function cerAcende(q) {
   const { acesos } = await api('/api/v2/cerebro?q=' + encodeURIComponent(q));
-  C3?.acender(acesos);
+  C3?.acender(acesos); S.cerAcesos = new Set(acesos.map(x => x.id));
+  const nA = new Set(acesos.map(x => x.agente)).size, cn = $('#cerN'); if (cn) cn.textContent = q.trim() ? `${nA} área${nA === 1 ? '' : 's'} acesa${nA === 1 ? '' : 's'}` : '';
   document.querySelectorAll('.cn').forEach(e => { const on = acesos.some(x => x.id === e.dataset.id); e.style.filter = on ? 'drop-shadow(0 0 6px #e9d29a)' : ''; e.style.background = on && e.classList.contains('ver') ? 'var(--goldbg)' : ''; });
   document.querySelectorAll('line[data-ag]').forEach(l => l.setAttribute('stroke', acesos.some(x => x.agente === l.dataset.ag) ? '#e9d29a' : '#3a3220'));
   return acesos;

@@ -11,31 +11,39 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
   cam.position.set(0, 4, 22);
   const grupo = new THREE.Group(); scene.add(grupo);
 
-  // forma de cérebro: dois hemisférios (elipsoides) com sulcos por ruído
+  const ags0 = dados.agentes.filter(a => a.id !== 'chefe');
+  // forma de cérebro: dois hemisférios com sulcos; cada ponto ganha a cor da região (agente) mais próxima
+  let nuvem;
   {
-    const N = 2600, pos = new Float32Array(N * 3);
+    const N = 9000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), cs = ags0.map(a => new THREE.Color(a.cor || '#8fd0c0')), tmp = new THREE.Color();
     for (let i = 0; i < N; i++) {
-      const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, r = Math.sqrt(1 - u * u);
-      let x = r * Math.cos(th), y = u, z = r * Math.sin(th);
+      const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, r = Math.cbrt(Math.random()) * Math.sqrt(1 - u * u);
+      let x = r * Math.cos(th), y = u * Math.cbrt(Math.random()), z = r * Math.sin(th);
       const lado = x >= 0 ? 1 : -1, sulco = 1 + 0.07 * Math.sin(9 * y + 5 * z) * Math.cos(7 * x);
       x = (Math.abs(x) * 4.2 + 0.35) * lado; y = y * 4.4; z = z * 6;
       pos.set([x * sulco * 1.55, y * sulco * 1.1, z * sulco * 1.25], i * 3);
+      const ang = Math.atan2(z, x), k = cs.length ? Math.floor(((ang + Math.PI) / (Math.PI * 2)) * cs.length) % cs.length : 0;
+      tmp.copy(cs[k] || new THREE.Color(0xd9c08a)).lerp(new THREE.Color(0xffffff), Math.random() * 0.3);
+      col.set([tmp.r, tmp.g, tmp.b], i * 3);
     }
-    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    grupo.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xd9c08a, size: 0.06, transparent: true, opacity: 0.35 })));
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    nuvem = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }));
+    grupo.add(nuvem);
   }
   scene.add(new THREE.AmbientLight(0xffffff, 0.6)); const l = new THREE.PointLight(0xffe6b0, 60, 60); scene.add(l);
 
-  const pickables = [], nos = new Map();
-  const gerente = new THREE.Mesh(new THREE.IcosahedronGeometry(1.1, 2), new THREE.MeshStandardMaterial({ color: 0xe9d29a, emissive: 0x6a5420, roughness: 0.3, metalness: 0.6 }));
-  gerente.userData = { tipo: 'gerente', titulo: 'Gerente' }; grupo.add(gerente); pickables.push(gerente);
+  const pickables = [], nos = new Map(), rotulos = [];
+  el.style.position = el.style.position || 'relative';
+  const rot = (txt, sub, gold) => { const d = document.createElement('div'); d.style.cssText = `position:absolute;transform:translate(-50%,0);text-align:center;pointer-events:none;font:600 13px Inter,system-ui;color:${gold ? '#f2f2f3' : '#e8e8ea'};text-shadow:0 2px 8px #000;white-space:nowrap`; d.innerHTML = `${txt}<br><span style="font-weight:400;font-size:11.5px;color:#9a9aa0">${sub}</span>`; el.appendChild(d); return d; };
+  const gerente = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 24), new THREE.MeshStandardMaterial({ color: 0xf6e3a8, emissive: 0xb08a3a, emissiveIntensity: 0.8, roughness: 0.35, metalness: 0.2 }));
+  gerente.userData = { tipo: 'gerente', titulo: 'Gerente' }; grupo.add(gerente); pickables.push(gerente); rotulos.push([gerente, rot('Gerente', 'controla todos os agentes', true), 1.1]);
 
   const ags = dados.agentes.filter(a => a.id !== 'chefe');
-  const linhaMat = new THREE.LineBasicMaterial({ color: 0x3a3220, transparent: true, opacity: 0.6 });
+  const linhaMat = new THREE.LineBasicMaterial({ color: 0x5a5a66, transparent: true, opacity: 0.45 });
   ags.forEach((a, k) => {
     const cor = new THREE.Color(a.cor || '#8fd0c0');
     const ang = (k / ags.length) * Math.PI * 2, raio = 6.5 + (k % 2) * 1.6, inc = (k % 3 - 1) * 0.35;
-    const no = new THREE.Mesh(new THREE.SphereGeometry(0.55, 24, 16), new THREE.MeshStandardMaterial({ color: cor, emissive: cor.clone().multiplyScalar(0.25), roughness: 0.4 }));
+    const no = new THREE.Mesh(new THREE.SphereGeometry(0.32, 24, 16), new THREE.MeshStandardMaterial({ color: cor, emissive: cor.clone().multiplyScalar(0.25), roughness: 0.4 }));
     no.position.set(Math.cos(ang) * raio, Math.sin(ang * 2) * 1.6 + inc * 3, Math.sin(ang) * raio);
     no.userData = { tipo: 'agente', agente: a.id, titulo: a.nome, ang, raio, inc }; grupo.add(no); pickables.push(no);
     const lg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), no.position.clone()]);
@@ -48,7 +56,8 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
       m.userData = { tipo: it.tipo, id: it.id, titulo: it.titulo, agente: a.id, base: new THREE.Vector3(Math.cos(t) * rr, (j % 7 - 3) * 0.18, Math.sin(t) * rr) };
       grupo.add(m); pickables.push(m); filhos.push(m); nos.set(it.id, m);
     });
-    nos.set(a.id, no); no.userData.filhos = filhos; no.userData.linha = linha;
+    nos.set(a.id, no); no.userData.filhos = filhos; no.userData.linha = linha; no.userData.itens = a.itens; no.userData.cor = a.cor;
+    rotulos.push([no, rot(a.nome, a.itens.length + ' arquivos'), 0.55]);
   });
 
   // partículas de fluxo
@@ -79,17 +88,17 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
   cv.addEventListener('touchend', () => pin = null);
 
   function acender(lista) {
-    for (const id of acesos) destaca(nos.get(id), false);
-    for (const a of ags) { const n = nos.get(a.id); n.userData.linha.material.color.setHex(0x3a3220); }
+    for (const id of acesos) destaca(nos.get(id), false); for (const a of ags) nos.get(a.id).scale.setScalar(1);
+    for (const a of ags) { const n = nos.get(a.id); n.userData.linha.material.color.setHex(0x5a5a66); n.userData.linha.material.opacity = .45; }
     acesos = new Set(lista.map(x => x.id));
-    for (const x of lista) { destaca(nos.get(x.id), true); const n = nos.get(x.agente); if (n) { n.userData.linha.material.color.setHex(0xe9d29a); for (let i = 0; i < 4; i++) parts.push({ m: (() => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), ouro); grupo.add(m); return m; })(), no: n, volta: false, t: -i * 0.15 }); } }
+    for (const x of lista) { destaca(nos.get(x.id), true); const n = nos.get(x.agente); if (n) { n.userData.linha.material.color.setHex(0xe9d29a); n.userData.linha.material.opacity = 1; n.scale.setScalar(1.35); for (let i = 0; i < 4; i++) parts.push({ m: (() => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), ouro); grupo.add(m); return m; })(), no: n, volta: false, t: -i * 0.15 }); } }
   }
 
   let raf, t0 = performance.now(), ultEm = 0;
   function loop(now) {
     const t = (now - t0) / 1000; if (auto) rotY += 0.0018;
     grupo.rotation.y = rotY; grupo.rotation.x = rotX;
-    cam.position.set(0, 4 * dist / 22, dist); cam.lookAt(0, 0, 0);
+    cam.position.set(0, 10 * dist / 22, dist); cam.lookAt(0, 0, 0);
     gerente.rotation.y = t * 0.4;
     for (const a of ags) {
       const n = nos.get(a.id), u = n.userData, ang = u.ang + t * 0.05;
@@ -103,9 +112,12 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
       p.m.position.copy(p.no.position).multiplyScalar(f); p.m.position.y += Math.sin(k * Math.PI) * 0.8; p.m.rotation.y += 0.1;
       if (p.t >= 1) { grupo.remove(p.m); p.m.geometry.dispose(); parts.splice(i, 1); }
     }
+    const v = new THREE.Vector3();
+    for (const [o, d, dy] of rotulos) { o.getWorldPosition(v); v.y -= dy; v.project(cam); d.style.left = ((v.x + 1) / 2 * W()) + 'px'; d.style.top = ((1 - v.y) / 2 * H()) + 'px'; d.style.display = v.z < 1 ? '' : 'none'; }
+    nuvem.rotation.y = t * 0.01;
     renderer.render(scene, cam); raf = requestAnimationFrame(loop);
   }
   raf = requestAnimationFrame(loop);
   const ro = new ResizeObserver(() => { renderer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); }); ro.observe(el);
-  return { acender, destruir() { cancelAnimationFrame(raf); ro.disconnect(); renderer.dispose(); el.innerHTML = ''; } };
+  return { acender, areas: () => new Set([...acesos].map(id => nos.get(id)?.userData.agente)).size, destruir() { cancelAnimationFrame(raf); ro.disconnect(); renderer.dispose(); el.innerHTML = ''; } };
 }
