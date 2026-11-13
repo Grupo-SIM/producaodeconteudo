@@ -188,6 +188,15 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 #cerCard{position:absolute;right:26px;top:120px;width:340px;max-height:calc(100vh - 300px);overflow:auto;z-index:4;background:#111113;border:1px solid var(--line2);border-radius:14px;padding:14px}
 .cfeed{position:absolute;right:26px;bottom:20px;width:330px;display:flex;flex-direction:column;gap:6px;z-index:3}.cfeed div{background:#111113e0;border:1px solid var(--line2);border-radius:8px;padding:7px 10px;font-size:12px}.cfeed span{color:var(--tx3);margin-right:4px}
 .chint{position:absolute;left:26px;bottom:20px;font-size:12px;color:var(--tx3);z-index:3}
+#escw{position:relative;margin:-20px -26px;padding:20px 26px;height:100vh;overflow:hidden;background:#0d1220}#escw>.top,#escw>.prob{position:relative;z-index:6}
+#esc{position:absolute;inset:0;z-index:1}#eshud{position:absolute;inset:0;pointer-events:none;z-index:5}#eshud a{pointer-events:auto}
+.ecard{position:absolute;transform:translate(-50%,-100%);background:#0b0e16e8;border:1px solid #2a3350;border-radius:8px;padding:7px 10px;font-size:12px;color:#e8eaf0;max-width:230px;pointer-events:none;z-index:4;line-height:1.35}.ecard small{display:block;color:#8a93a6;font-size:10.5px}.ecard u{display:block;height:3px;background:#222a40;border-radius:2px;margin-top:5px}.ecard u i{display:block;height:3px;background:#3ddc84;border-radius:2px}.ecard.erro{border-color:#6b2a2e}
+.enome{position:absolute;transform:translate(-50%,0);font:600 13px Inter,system-ui;color:#f2f2f3;text-shadow:0 2px 6px #000;pointer-events:none;z-index:4;white-space:nowrap}.enome.erro{color:#ff7b7b}
+.aovivo{position:absolute;z-index:3;background:#e11d48;color:#fff;font:700 11px Inter;padding:2px 8px;border-radius:4px;transform:rotate(12deg)}
+.edia{position:absolute;left:26px;top:140px;width:260px;background:#0b0e16e8;border:1px solid #2a3350;border-radius:12px;padding:12px 14px;font-size:12.5px}.edia u{display:block;height:6px;background:#222a40;border-radius:3px;margin:8px 0 6px}.edia u i{display:block;height:6px;background:linear-gradient(90deg,#a8864a,#e9d8a6);border-radius:3px}.edia span{color:#8a93a6;font-size:12px}
+.econt{position:absolute;left:26px;bottom:22px;display:flex;gap:8px}.econt div{background:#0b0e16e8;border:1px solid #2a3350;border-radius:10px;padding:8px 14px;font-size:12px;color:#aab}.econt b{display:block;font-size:20px;color:#fff}.econt b.r{color:#ff6b6b}
+.eesp{position:absolute;right:26px;bottom:22px;width:260px;background:#0b0e16e8;border:1px solid #2a3350;border-radius:12px;padding:12px 14px;font-size:12.5px;display:flex;flex-direction:column;gap:6px}.eesp b{color:var(--gold2);font-size:14px}.eesp a{color:var(--gold2);text-decoration:none}
+#escw .escf{position:absolute;right:26px;top:140px;left:auto;bottom:auto;width:300px;z-index:5}.escf span{color:#8a93a6;margin-right:4px}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -378,8 +387,8 @@ VIEWS.fluxo = () => {
   const nM = S.brands.length, aviso = F.avisos[0];
   const ban = F.avisos.length ? `<div class="prob"><b>${F.avisos.length} problema${F.avisos.length > 1 ? 's' : ''}</b><span>${esc(aviso.titulo)}: ${esc(aviso.motivo || 'parado')}</span><button onclick="abrirItem(${aviso.id})">Resolver</button></div>` : '';
   const head = `<div class="top"><h1>Fluxo</h1><button class="chip ${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');E3?.destruir();E3=null;render()">Lista</button><button class="chip ${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span>
-    ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}<button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button></div>`;
-  if (S.modoFluxo === 'escritorio') return escritorio3d(ban + head, '');
+    ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}${S.modoFluxo === 'escritorio' ? `<button class="chip" onclick="telao()">${store.get('telaoOn', true) ? 'Desligar telão' : 'Ligar telão'}</button><button class="chip" onclick="trocaVideo()">Vídeo</button><button class="chip" onclick="telaCheia()">Tela cheia</button>` : `<button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button>`}</div>`;
+  if (S.modoFluxo === 'escritorio') return escritorio3d(head, ban);
   E3?.destruir(); E3 = null;
   const lanes = F.formatos.filter(f => f.ativo).map(f => {
     const its = F.itens.filter(i => i.raia === f.id), aberta = S.abertas[f.id] ?? its.some(i => i.estado !== 'finalizado');
@@ -400,21 +409,32 @@ const setFormato = (id, b) => tryDo(() => api('/api/v2/formatos/' + id, { method
 let E3 = null;
 const ytId = u => { u = String(u || '').trim(); const m = u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{6,})/); return m ? m[1] : /^[\w-]{6,}$/.test(u) ? u : ''; };
 async function escritorio3d(head, ban) {
-  const st = await api('/api/state');
-  const parados = new Set(S.fluxo.itens.filter(i => i.estado === 'parado' && i.etapa).map(i => i.etapa));
-  const hud = () => { const F = S.fluxo.itens; return `<div><b>${st.agents.filter(a => a.working).length}</b> trabalhando</div><div><b>${F.filter(i => i.estado === 'esperando').length}</b> esperando você</div><div><b>${F.filter(i => i.estado === 'parado').length}</b> parados</div><div><b>${F.filter(i => i.estado === 'finalizado').length}</b> finalizados</div>`; };
-  const feed = () => st.activity.slice(0, 4).map(x => `<div>${esc(x.message)}<small>${fmtD(x.ts)}</small></div>`).join('');
-  if (E3 && $('#esc')) { $('#eschud').innerHTML = hud(); $('#escfeed').innerHTML = feed(); E3.atualizar(st.agents, parados); return; }
+  const st = await api('/api/state'), F = S.fluxo.itens;
+  const parados = new Set(F.filter(i => i.estado === 'parado' && i.etapa).map(i => i.etapa));
+  const info = {};
+  for (const ag of st.agents) {
+    const it = ag.current ? F.find(i => i.id === ag.current.content_id) : F.find(i => i.etapa === ag.id && ['etapa', 'ajuste', 'parado'].includes(i.estado));
+    const nomeR = it ? (S.fluxo.formatos.find(f => f.id === it.raia)?.nome || '') : '';
+    if (parados.has(ag.id) && it) info[ag.id] = { texto: `Parado: ${esc(it.motivo || 'sem tarefa')}`, sub: `"${esc(it.titulo)}" · ${esc(nomeR)}` };
+    else if (ag.current) info[ag.id] = { texto: `${esc(ag.current.label || 'Trabalhando')}: "${esc(ag.current.title || '')}"`, sub: it ? `${esc(it.marca)} · ${esc(nomeR)}` : '', prog: Math.min(.95, (Date.now() - new Date(ag.current.since)) / 6e5) };
+    else if (ag.queued) info[ag.id] = { texto: `${ag.queued} tarefa(s) na fila`, sub: it ? `"${esc(it.titulo)}"` : '' };
+  }
+  const esp = F.filter(i => i.estado === 'esperando'), pronto = F.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao').length;
+  if (pronto) info.publicador = { texto: 'Esperando o horário de postar', sub: `${pronto} item(ns) pronto(s) para postagem` };
+  const meta = S.fluxo.formatos.reduce((s, f) => s + (f.ativo ? f.meta_dia : 0), 0), hoje = new Date().toISOString().slice(0, 10), feitos = F.filter(i => ['finalizado', 'esperando'].includes(i.estado) && (i.atualizado || '').slice(0, 10) === hoje).length;
+  const mes = new Date().toISOString().slice(0, 7), noMes = F.filter(i => i.estado === 'finalizado' && (i.postado_em || '').slice(0, 7) === mes).length;
+  const hud = `<div class="edia"><b>Dia de produção</b> · ${feitos} de ${meta} entregas<u><i style="width:${meta ? Math.min(100, Math.round(100 * feitos / meta)) : 0}%"></i></u><span>${parados.size ? parados.size + ' agente(s) parado(s)' : 'Todos os agentes ok'}</span></div>
+    <div class="econt"><div><b>${st.agents.filter(a => a.working).length}</b>trabalhando</div><div><b class="r">${parados.size}</b>parado</div><div><b>${noMes}</b>entregas no mês</div></div>
+    <div class="eesp"><b>Esperando você: ${esp.length}</b><span>${esp.slice(0, 3).map(i => esc(i.titulo)).join(' · ')}${esp.length > 3 ? ' · +' + (esp.length - 3) : ''}</span><a href="#" onclick="go('mesa');return false">Abrir Mesa de revisão ›</a></div>`;
+  const feed = st.activity.slice(0, 4).map(x => `<div><span>${ha(x.ts).replace('há ', '')}</span> ${esc(x.message)}</div>`).join('');
+  if (E3 && $('#esc')) { $('#eshud').innerHTML = hud; $('#escfeed').innerHTML = feed; E3.atualizar(st.agents, parados, info); return; }
   const vid = store.get('telao', 'jfKfPfyJRdk'), on = store.get('telaoOn', true);
-  $('#main').innerHTML = head + ban + `<div id="escw" style="position:relative;height:calc(100vh - 140px);min-height:440px;border-radius:16px;overflow:hidden;border:1px solid var(--line)">
-    <div id="esc" style="position:absolute;inset:0"></div>
-    <div id="eschud" class="esch" style="left:12px;top:12px">${hud()}</div>
-    <div id="escfeed" class="escf">${feed()}</div>
-    <div class="esch" style="right:12px;top:12px"><button class="btn sm" onclick="telao()">${on ? 'Desligar telão' : 'Ligar telão'}</button><button class="btn sm" onclick="trocaVideo()">Vídeo</button><button class="btn sm" onclick="telaCheia()">Tela cheia</button></div></div>`;
+  $('#main').innerHTML = `<div id="escw">${ban}${head}
+    <div id="esc"></div><div id="eshud">${hud}</div><div id="escfeed" class="escf">${feed}</div></div>`;
   try {
     const { criarEscritorio } = await import('/escritorio-v2.js');
-    E3 = criarEscritorio($('#esc'), { onPick: id => { const its = S.fluxo.itens.filter(i => i.etapa === id && ['etapa', 'ajuste', 'parado'].includes(i.estado)); if (its[0]) abrirItem(its[0].id); else toast('Sem tarefa agora'); } });
-    E3.atualizar(st.agents, parados); if (on) E3.telaoVideo(vid);
+    E3 = criarEscritorio($('#esc'), { onPick: id => { if (id === 'chefe') return chatToggle(true); const its = F.filter(i => i.etapa === id && ['etapa', 'ajuste', 'parado'].includes(i.estado)); if (its[0]) abrirItem(its[0].id); else toast('Sem tarefa agora'); } });
+    E3.atualizar(st.agents, parados, info); if (on) E3.telaoVideo(vid);
   } catch (e) { $('#esc').innerHTML = `<div class="empty">Sem 3D neste aparelho (${esc(e.message)}).</div>`; }
 }
 function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', on); E3?.telaoVideo(on ? store.get('telao', 'jfKfPfyJRdk') : ''); event.target.textContent = on ? 'Desligar telão' : 'Ligar telão'; }
