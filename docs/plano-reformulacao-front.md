@@ -1,6 +1,7 @@
 # Plano de implementação: novo front do sistema de produção
 
 Referência visual: `mockup/final/` (computador) e `mockup/celular/` (celular).
+
 Como vamos trabalhar:
 - O front antigo será **substituído** pelo novo. O motor que já funciona continua: servidor, banco, agentes, treinos, `motor/` e `conhecimento/`.
 - Tudo é feito no branch de desenvolvimento, com o sistema rodando localmente para testar cada etapa.
@@ -134,11 +135,6 @@ Como vamos trabalhar:
 - Salvar renderiza de novo pelo `motor/render.mjs`.
 - **Pronto quando:** um ajuste simples sai no vídeo final sem precisar pedir ao agente.
 
-### Depois (fora deste plano)
-- Postagem automática nas redes: Instagram, Facebook, TikTok, YouTube, Pinterest e site.
-- Modo Automático por formato: o revisor aprova sozinho quando o dono der a palavra.
-- Cenários de cidade no escritório, com modelos 3D melhores.
-
 ### Etapa final: troca e limpeza
 - O novo front vira a página principal e o antigo (`public/index.html` e as telas que não fazem mais sentido) é apagado, junto com as rotas do servidor que só ele usava.
 - Teste completo de ponta a ponta, no computador e no celular.
@@ -149,4 +145,9 @@ Como vamos trabalhar:
 - 0 → 1 → 2 → 3 → 4 é o caminho mínimo para usar o sistema novo no dia a dia.
 - 5 pode andar junto com a 4.
 - O 3D vem antes dos editores: 6 (Cérebro) e 7 (Escritório), depois 8, 9 e 10.
-- Os editores estilo Canva (11) e CapCut (12) são codados por último, antes da troca final.
+- Os editores ficam por último: primeiro o estilo Canva (11) e depois o estilo CapCut (12), que dá mais trabalho. Em seguida, a troca final.
+
+## Depois (fora deste plano)
+- Postagem automática nas redes: Instagram, Facebook, TikTok, YouTube, Pinterest e site.
+- Modo Automático por formato: o revisor aprova sozinho quando o dono der a palavra.
+- Cenários de cidade no escritório, com modelos 3D melhores.
