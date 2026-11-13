@@ -1,0 +1,3 @@
+const {chromium,devices}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});
+for(const n of ['01-fluxo','03-mesa','04-editor-arte','06-publicacao','07-marcas','02-escritorio','10-cerebro']){const c=await b.newContext({...devices['iPhone 13']});const p=await c.newPage();p.on('pageerror',e=>console.log(n,e.message));await p.goto('file://'+process.cwd()+'/'+n+'.html');await p.waitForTimeout(n.match(/02|10/)?4000:800);try{await p.screenshot({path:'cel-'+n+'.png'})}catch(e){console.log('fail',n)}await c.close()}
+await b.close()})()
