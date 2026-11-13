@@ -83,14 +83,41 @@ Como vamos trabalhar:
 - Configurações: assinatura do Claude, logins com perfis Dono e Revisor, lixeira e gasto do mês.
 - **Pronto quando:** dá para editar marca e produto pela tela e pelo chat, e o resultado é o mesmo.
 
-### Etapa 6: editor de arte (estilo Canva)
+### Etapa 6: Cérebro 3D
+- Cérebro com as regiões por agente, o Gerente no centro e os agentes em órbita.
+- Dados reais da pasta `conhecimento/agentes` e das regras do banco.
+- Busca que acende o caminho e cartão ao clicar.
+- No celular: gaveta de baixo para os arquivos.
+- **Pronto quando:** perguntar no chat acende no mapa os arquivos usados.
+
+### Etapa 7: Escritório 3D
+- Escritório com os personagens, ligado ao estado real dos agentes (trabalhando, parado, descansando) e às entregas.
+- Telão com o vídeo do YouTube, que pode ser ligado e desligado.
+- Modo tela cheia.
+- **Pronto quando:** o que aparece no escritório bate com o que está no Fluxo.
+
+### Etapa 8: Otimização
+- Puxar curtidas, alcance e salvamentos dos itens postados.
+- Ranking e descobertas semanais do gerente, com Virar regra e Ignorar.
+- **Pronto quando:** existirem ao menos uns 10 posts finalizados por formato para comparar.
+
+### Etapa 9: extras
+- Notificações quando um item chega para você ou um agente para.
+- Busca geral.
+- Histórico de versões com a opção "voltar".
+
+### Etapa 10: sincronizar o treino
+- O que o gerente aprende no sistema aparece na pasta `conhecimento/` (GitHub), e o que é treinado lá chega ao gerente.
+- Hoje não está confirmado se esse caminho existe. Primeiro verificar, depois ligar os dois lados.
+
+### Etapa 11: editor de arte (estilo Canva)
 - Abrir a arte do Designer já em camadas. O motor já compõe por camadas (`motor/camadas.mjs`).
 - Mexer em texto, fonte, cor, posição e imagem, com as miniaturas dos slides e a biblioteca da marca com sugestões.
 - Requisitos básicos: trocar uma imagem por outra, aumentar ou diminuir e recortar elementos, mover, alinhar, duplicar, apagar, mudar a ordem das camadas, reordenar, duplicar ou apagar slides, e desfazer ou refazer.
 - Salvar regera o PNG final.
 - **Pronto quando:** você corrige um detalhe e o arquivo final sai igual ao que está na tela.
 
-### Etapa 7: editor de vídeo (estilo CapCut)
+### Etapa 12: editor de vídeo (estilo CapCut)
 - Linha do tempo a partir do roteiro de cena que o Editor de vídeo já gera (cenas, legendas, voz, música e efeitos).
 - Requisitos básicos de edição, todos obrigatórios:
   - **Cortar:** dividir um trecho em dois no ponto da agulha, apagar um trecho e encurtar ou alongar o começo e o fim de cada cena arrastando a borda.
@@ -107,33 +134,6 @@ Como vamos trabalhar:
 - Salvar renderiza de novo pelo `motor/render.mjs`.
 - **Pronto quando:** um ajuste simples sai no vídeo final sem precisar pedir ao agente.
 
-### Etapa 8: Cérebro 3D
-- Cérebro com as regiões por agente, o Gerente no centro e os agentes em órbita.
-- Dados reais da pasta `conhecimento/agentes` e das regras do banco.
-- Busca que acende o caminho e cartão ao clicar.
-- No celular: gaveta de baixo para os arquivos.
-- **Pronto quando:** perguntar no chat acende no mapa os arquivos usados.
-
-### Etapa 9: Escritório 3D
-- Escritório com os personagens, ligado ao estado real dos agentes (trabalhando, parado, descansando) e às entregas.
-- Telão com o vídeo do YouTube, que pode ser ligado e desligado.
-- Modo tela cheia.
-- **Pronto quando:** o que aparece no escritório bate com o que está no Fluxo.
-
-### Etapa 10: Otimização
-- Puxar curtidas, alcance e salvamentos dos itens postados.
-- Ranking e descobertas semanais do gerente, com Virar regra e Ignorar.
-- **Pronto quando:** existirem ao menos uns 10 posts finalizados por formato para comparar.
-
-### Etapa 11: extras
-- Notificações quando um item chega para você ou um agente para.
-- Busca geral.
-- Histórico de versões com a opção "voltar".
-
-### Etapa 12: sincronizar o treino
-- O que o gerente aprende no sistema aparece na pasta `conhecimento/` (GitHub), e o que é treinado lá chega ao gerente.
-- Hoje não está confirmado se esse caminho existe. Primeiro verificar, depois ligar os dois lados.
-
 ### Depois (fora deste plano)
 - Postagem automática nas redes: Instagram, Facebook, TikTok, YouTube, Pinterest e site.
 - Modo Automático por formato: o revisor aprova sozinho quando o dono der a palavra.
@@ -145,12 +145,8 @@ Como vamos trabalhar:
 - O README é atualizado.
 - O dono faz o deploy.
 
-## Depois do deploy
-- Continuar os treinos de **arte** e de **vídeo** até finalizar. O treino de copy já está concluído.
-- Ajustes do dia a dia: o que faltar, o que tirar, o que melhorar.
-
 ## Ordem e dependências
 - 0 → 1 → 2 → 3 → 4 é o caminho mínimo para usar o sistema novo no dia a dia.
 - 5 pode andar junto com a 4.
-- 6 e 7 são as maiores e dependem da 3.
-- 8, 9 e 10 são independentes entre si.
+- O 3D vem antes dos editores: 6 (Cérebro) e 7 (Escritório), depois 8, 9 e 10.
+- Os editores estilo Canva (11) e CapCut (12) são codados por último, antes da troca final.
