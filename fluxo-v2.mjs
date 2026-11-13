@@ -56,11 +56,15 @@ export function estadoDe(c, jobs = []) {
     return { estado: ajuste ? 'ajuste' : 'etapa', etapa: j.agent, aguardando: true };
   }
   if (c.status === 'queued') return { estado: 'fila', etapa: 'roteirista' };
+  // entre uma etapa e outra o item fica alguns instantes sem tarefa: não é parado
+  if (c.updated_at && Date.now() - new Date(c.updated_at).getTime() < 3 * 60e3) return { estado: ajuste ? 'ajuste' : 'etapa', etapa: jobs.at(-1)?.agent || 'roteirista', aguardando: true };
   return { estado: 'parado', etapa: '', motivo: 'Sem tarefa na fila' };
 }
 
 export function criarFluxoV2(ctx) {
   const { db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip } = ctx;
+  const path = ctx.path, fsx = ctx.fs;
+  db.exec(`CREATE TABLE IF NOT EXISTS descobertas(id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, semana TEXT NOT NULL, raia TEXT DEFAULT '', agente TEXT DEFAULT 'roteirista', marca TEXT DEFAULT '', texto TEXT NOT NULL, evidencia TEXT DEFAULT '', status TEXT NOT NULL DEFAULT 'nova', regra_id INTEGER, UNIQUE(semana, texto))`);
 
   db.exec(`CREATE TABLE IF NOT EXISTS formatos(
     id TEXT PRIMARY KEY, nome TEXT NOT NULL, etapas TEXT NOT NULL, meta_dia INTEGER NOT NULL DEFAULT 1,
@@ -81,7 +85,7 @@ export function criarFluxoV2(ctx) {
   function item(c, jobs) {
     const e = estadoDe(c, jobs ?? jobsDe(c.id));
     return {
-      id: c.id, titulo: c.title, marca: c.brand || '', formato: c.format, tipo: c.kind, raia: raiaDe(c, ctx),
+      id: c.id, titulo: c.title, marca: c.brand || '', produto_id: c.product_id || null, formato: c.format, tipo: c.kind, raia: raiaDe(c, ctx),
       status: c.status, ...e, estado_nome: ESTADOS[e.estado], etapa_nome: ETAPA_NOME[e.etapa] || e.etapa,
       em_ajuste: !!c.em_ajuste, ajuste_motivo: c.ajuste_motivo || '', nota: c.score, post_url: c.post_url || '', postado_em: c.posted_at,
       tem_arte: c.art_status === 'ok', tem_video: !!c.video, atualizado: c.updated_at, criado: c.created_at,
@@ -205,6 +209,63 @@ export function criarFluxoV2(ctx) {
     throw fail(404, 'Ação desconhecida');
   }
 
+
+  // ── Otimização
+  const engaj = x => (x.likes || 0) + 2 * (x.saves || 0) + 2 * (x.shares || 0) + (x.comments || 0);
+  function otimizacao() {
+    const rows = all(`SELECT c.id,c.title,c.brand,c.format,c.kind,c.materia,c.raia,c.posted_at,c.post_url, COALESCE(MAX(m.views),0) views, COALESCE(MAX(m.likes),0) likes, COALESCE(MAX(m.saves),0) saves, COALESCE(MAX(m.shares),0) shares, COALESCE(MAX(m.comments),0) comments, COUNT(m.id) medidas
+      FROM contents c LEFT JOIN metrics m ON m.content_id=c.id WHERE c.teste=0 AND c.status='posted' GROUP BY c.id ORDER BY c.posted_at DESC LIMIT 500`);
+    const itens = rows.map(r => ({ ...r, raia: raiaDe(r, ctx), score: engaj(r) }));
+    const porRaia = {}; for (const i of itens) (porRaia[i.raia] ||= []).push(i);
+    return { itens: itens.sort((a, b) => b.score - a.score), contagem: Object.fromEntries(Object.entries(porRaia).map(([k, v]) => [k, { postados: v.length, medidos: v.filter(x => x.medidas).length }])), descobertas: all("SELECT * FROM descobertas ORDER BY status='nova' DESC, id DESC LIMIT 40"), minimo: 10 };
+  }
+  // Descobertas da semana: compara tipos de conteúdo e marcas dentro de cada formato (só com dados suficientes)
+  function gerarDescobertas() {
+    const semana = (() => { const d = new Date(); d.setDate(d.getDate() - d.getDay()); return d.toISOString().slice(0, 10); })();
+    const { itens } = otimizacao(), novas = [];
+    const porRaia = {}; for (const i of itens.filter(x => x.medidas)) (porRaia[i.raia] ||= []).push(i);
+    for (const [raia, L] of Object.entries(porRaia)) {
+      if (L.length < 4) continue;
+      const media = L.reduce((a, x) => a + x.score, 0) / L.length || 1;
+      const grupos = {}; for (const x of L) (grupos[x.kind] ||= []).push(x);
+      for (const [kind, G] of Object.entries(grupos)) {
+        if (G.length < 2) continue;
+        const mg = G.reduce((a, x) => a + x.score, 0) / G.length, rel = mg / media;
+        if (rel >= 1.3 || rel <= 0.7) {
+          const texto = rel >= 1.3 ? `Em ${raia}, priorize conteúdo do tipo "${kind}": rende ${Math.round((rel - 1) * 100)}% acima da média.` : `Em ${raia}, evite conteúdo do tipo "${kind}": rende ${Math.round((1 - rel) * 100)}% abaixo da média.`;
+          const ev = `${G.length} posts de "${kind}" contra ${L.length} no formato. Melhor: ${G.sort((a, b) => b.score - a.score)[0].title}`;
+          const r = run('INSERT OR IGNORE INTO descobertas(ts,semana,raia,agente,texto,evidencia) VALUES(?,?,?,?,?,?)', T(), semana, raia, 'roteirista', texto, ev);
+          if (r.changes) novas.push(texto);
+        }
+      }
+      const top = [...L].sort((a, b) => b.score - a.score)[0];
+      if (top && top.score > media * 1.8) { const t = `Em ${raia}, use como referência o post "${clip(top.title, 80)}": foi o de melhor desempenho.`; if (run('INSERT OR IGNORE INTO descobertas(ts,semana,raia,agente,texto,evidencia,marca) VALUES(?,?,?,?,?,?,?)', T(), semana, raia, 'roteirista', t, `Engajamento ${top.score} contra média ${Math.round(media)}`, top.brand || '').changes) novas.push(t); }
+    }
+    if (novas.length) { addChat('gerente', `Descobertas da semana na Otimização:\n• ${novas.join('\n• ')}\nAbra a tela Otimização para virar regra ou ignorar.`); changed(); }
+    return novas;
+  }
+  // Sincronização com a pasta conhecimento/: regras aprendidas viram arquivos em conhecimento/aprendido/<agente>.md (fora da pasta de bases, para não entrarem em dobro no prompt)
+  const raizCon = () => path.join(ctx.dirname, 'conhecimento');
+  function exportarAprendido() {
+    const dir = path.join(raizCon(), 'aprendido'); fsx.mkdirSync(dir, { recursive: true });
+    const regras = all("SELECT * FROM brain_rules WHERE status='ativa' ORDER BY agent, brand, id"), por = {};
+    for (const r of regras) (por[r.agent] ||= []).push(r);
+    const arquivos = [];
+    for (const [ag, L] of Object.entries(por)) {
+      const f = path.join(dir, `${ag.replace(/[^a-z0-9_*-]/gi, '') || 'geral'}.md`.replace('*', 'todos'));
+      fsx.writeFileSync(f, `# Regras aprendidas: ${ag}\n\n<!-- gerado pelo sistema em ${T()}: não edite à mão; ensine pelo chat ou pelos arquivos em conhecimento/agentes -->\n\n` + L.map(r => `- ${r.brand ? `[${r.brand}] ` : ''}${r.text.replace(/\n/g, ' ')} _(#${r.id}, ${r.source})_`).join('\n') + '\n');
+      arquivos.push(path.relative(ctx.dirname, f));
+    }
+    run("INSERT INTO settings(key,value) VALUES('sync_exportado',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", T());
+    return { ok: true, arquivos, regras: regras.length };
+  }
+  function syncStatus() {
+    let bases = 0; try { for (const a of fsx.readdirSync(path.join(raizCon(), 'agentes'))) bases += fsx.readdirSync(path.join(raizCon(), 'agentes', a)).filter(f => f.endsWith('.md')).length; } catch { /* sem pasta */ }
+    return { entrada: { arquivos: bases, carregados: one("SELECT COUNT(*) n FROM agent_docs WHERE origem='casa'")?.n || 0, como: 'Os arquivos de conhecimento/agentes entram sozinhos a cada início do servidor (e pelo botão Importar).' },
+      saida: { ultima: one("SELECT value FROM settings WHERE key='sync_exportado'")?.value || null, regras: one("SELECT COUNT(*) n FROM brain_rules WHERE status='ativa'").n, como: 'As regras aprendidas são gravadas em conhecimento/aprendido/. Para chegarem ao GitHub, faça commit dessa pasta.' } };
+  }
+  setInterval(() => { try { if (new Date().getDay() === 1 && new Date().getHours() === 8) gerarDescobertas(); exportarAprendido(); } catch (e) { console.error('fluxo-v2 rotina:', e.message); } }, 3600e3).unref();
+
   async function rota(req, res, p, m, user) {
     let mt;
     if (p === '/api/v2/fluxo' && m === 'GET') { const u = new URL(req.url, 'http://x'); return send(res, 200, fluxo({ marca: u.searchParams.get('marca') || '', incluirDescartados: u.searchParams.get('lixeira') === '1' })); }
@@ -238,6 +299,53 @@ export function criarFluxoV2(ctx) {
       addChat('gerente', `Pronto, desfiz a regra #${r.id}. Ela não vale mais.`); changed();
       return send(res, 200, { ok: true });
     }
+
+    // ── Etapa 8: otimização (só postados)
+    if (p === '/api/v2/otimizacao' && m === 'GET') return send(res, 200, otimizacao());
+    if (p === '/api/v2/otimizacao/metricas' && m === 'POST') {
+      const b = await readBody(req, 20000), c = getContent(+b.content_id); if (!c || c.status !== 'posted') throw fail(400, 'Só itens postados entram na otimização');
+      const n = v => Math.max(0, Math.round(+v || 0));
+      run('INSERT INTO metrics(date,platform,post_title,content_id,views,likes,comments,shares,saves,followers,notes) VALUES(?,?,?,?,?,?,?,?,?,?,?)', (b.date || T()).slice(0, 10), str(b.platform, 40, 'Rede', false), c.title, c.id, n(b.views), n(b.likes), n(b.comments), n(b.shares), n(b.saves), 0, '');
+      changed(); return send(res, 200, { ok: true });
+    }
+    if (p === '/api/v2/descobertas/gerar' && m === 'POST') return send(res, 200, { novas: gerarDescobertas() });
+    if ((mt = p.match(/^\/api\/v2\/descobertas\/(\d+)\/(regra|ignorar)$/)) && m === 'POST') {
+      const d = one('SELECT * FROM descobertas WHERE id=?', +mt[1]); if (!d) throw fail(404, 'Descoberta não encontrada');
+      if (mt[2] === 'ignorar') run("UPDATE descobertas SET status='ignorada' WHERE id=?", d.id);
+      else {
+        const r = run("INSERT INTO brain_rules(agent,brand,type,text,evidence,source,status,weight,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)", d.agente, d.marca, 'regra', d.texto, d.evidencia, 'otimizacao', 'ativa', 2, T(), T());
+        run("UPDATE descobertas SET status='regra', regra_id=? WHERE id=?", +r.lastInsertRowid, d.id);
+        addChat('gerente', `Virou regra: “${d.texto}”`, { actions: [{ ok: true, texto: `Regra #${r.lastInsertRowid} salva para o ${d.agente}`, tipo: 'desfazer_regra', regra: +r.lastInsertRowid }] });
+      }
+      changed(); return send(res, 200, { ok: true });
+    }
+    // ── Etapa 9: notificações e busca geral
+    if (p === '/api/v2/notificacoes' && m === 'GET') {
+      const f = fluxo();
+      const L = f.itens.filter(i => i.estado === 'esperando' || i.estado === 'parado').map(i => ({ chave: i.id + ':' + i.estado + ':' + i.etapa, id: i.id, tipo: i.estado, titulo: i.estado === 'parado' ? `Parou: ${i.titulo}` : i.etapa === 'publicacao' ? `Pronto para postar: ${i.titulo}` : `Chegou para você: ${i.titulo}`, detalhe: i.motivo || i.marca || '', ts: i.atualizado }));
+      for (const a of all("SELECT id,name FROM agents WHERE enabled=1")) { const e = one("SELECT error,finished_at FROM jobs WHERE agent=? ORDER BY id DESC LIMIT 1", a.id); if (e?.error && e.finished_at && Date.now() - new Date(e.finished_at) < 864e5) L.push({ chave: 'ag:' + a.id + ':' + e.finished_at, tipo: 'agente', titulo: `${a.name} parou com erro`, detalhe: clip(e.error, 140), ts: e.finished_at }); }
+      return send(res, 200, { itens: L.sort((a, b) => String(b.ts).localeCompare(String(a.ts))).slice(0, 60) });
+    }
+    if (p === '/api/v2/busca' && m === 'GET') {
+      const q = String(new URL(req.url, 'http://x').searchParams.get('q') || '').trim().slice(0, 80); if (q.length < 2) return send(res, 200, { resultados: [] });
+      const like = '%' + q.replace(/[%_]/g, '') + '%', R = [];
+      for (const c of all("SELECT id,title,brand,status FROM contents WHERE teste=0 AND (title LIKE ? OR script LIKE ? OR caption LIKE ?) ORDER BY updated_at DESC LIMIT 15", like, like, like)) R.push({ tipo: 'conteudo', id: c.id, titulo: c.title, sub: c.brand || '' });
+      for (const b of all('SELECT id,name FROM brands WHERE name LIKE ? LIMIT 5', like)) R.push({ tipo: 'marca', id: b.id, titulo: b.name, sub: 'Marca' });
+      for (const x of all('SELECT id,name FROM products WHERE name LIKE ? OR promise LIKE ? LIMIT 5', like, like)) R.push({ tipo: 'produto', id: x.id, titulo: x.name, sub: 'Produto' });
+      for (const r of all("SELECT id,agent,text FROM brain_rules WHERE status='ativa' AND text LIKE ? LIMIT 8", like)) R.push({ tipo: 'regra', id: r.id, titulo: clip(r.text, 120), sub: 'Regra · ' + r.agent });
+      for (const k of all('SELECT id,title,brand FROM knowledge WHERE title LIKE ? OR content LIKE ? LIMIT 6', like, like)) R.push({ tipo: 'documento', id: k.id, titulo: k.title, sub: k.brand || 'Base' });
+      return send(res, 200, { resultados: R });
+    }
+    // ── Configurações: gasto do mês
+    if (p === '/api/v2/gastos' && m === 'GET') {
+      const ini = new Date(); ini.setDate(1); ini.setHours(0, 0, 0, 0); const i0 = ini.toISOString();
+      const img = one('SELECT COALESCE(SUM(usd),0) s, COUNT(*) n FROM gen_costs WHERE ts>=?', i0), tk = one('SELECT COALESCE(SUM(tokens_in),0) ti, COALESCE(SUM(tokens_out),0) tout, COUNT(*) n FROM jobs WHERE created_at>=?', i0);
+      return send(res, 200, { mes: i0.slice(0, 7), imagens_usd: img.s, imagens: img.n, tarefas: tk.n, tokens_in: tk.ti, tokens_out: tk.tout });
+    }
+    // ── Etapa 10: sincronizar o treino com conhecimento/
+    if (p === '/api/v2/sync' && m === 'GET') return send(res, 200, syncStatus());
+    if (p === '/api/v2/sync/exportar' && m === 'POST') { const r = exportarAprendido(); changed(); return send(res, 200, r); }
+    if (p === '/api/v2/sync/importar' && m === 'POST') { ctx.carregaBasesAgentes?.(); changed(); return send(res, 200, { ok: true, ...syncStatus() }); }
     throw fail(404, 'Rota não encontrada');
   }
 

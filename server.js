@@ -6458,7 +6458,7 @@ function contentAct(id, act, b = {}) {
   }
 }
 
-const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro });
+const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, path, fs, dirname: __dirname });
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;

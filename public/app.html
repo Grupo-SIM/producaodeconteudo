@@ -98,7 +98,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .card .pv{aspect-ratio:4/5;background:#0f0f10;display:grid;place-items:center;position:relative;overflow:hidden}
 .card .pv img{width:100%;height:100%;object-fit:cover}
-.card .pv.txt{place-items:start;padding:14px;font-size:12px;color:var(--tx2);white-space:pre-wrap;overflow:hidden}
+.card .pv.txt{place-items:start;padding:38px 14px 14px;font-size:12px;color:var(--tx2);white-space:pre-wrap;overflow:hidden}
 .card .tp{position:absolute;left:8px;top:8px;background:#000b;font-size:11px;padding:2px 8px;border-radius:999px}
 .card .bd{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
 .card .ac{display:flex;gap:6px;margin-top:auto}
@@ -142,6 +142,11 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .cal div{background:#0e0e0f;border:1px solid #1c1c1f;border-radius:10px;min-height:86px;padding:6px;font-size:11px}
 .cal div b{color:var(--tx3);font-weight:500}
 .cal span{display:block;margin-top:4px;background:var(--field);border-radius:6px;padding:2px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bell{position:relative}.bell i{position:absolute;top:-5px;right:-5px;background:#e06060;color:#fff;font-style:normal;font-size:10px;border-radius:999px;padding:0 5px}.bell i:empty{display:none}
+.pop{position:absolute;right:0;top:110%;width:340px;max-height:420px;overflow:auto;background:#111113;border:1px solid var(--line2);border-radius:12px;padding:6px;z-index:40;box-shadow:0 20px 40px #000a}
+.pop .it{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px}.pop .it:hover{background:#1a1a1d}.pop .it small{display:block;color:var(--tx3)}.pop .it.nova{border-left:2px solid var(--gold)}
+.gsearch{position:relative}.gsearch input{width:220px}
+.mnav{display:none;gap:8px;justify-content:center;margin-top:10px}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -165,7 +170,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
   .lstwrap{overflow-x:auto}
   .cal{display:none}
   .kv{grid-template-columns:1fr}
-  .mesa1 .card:not(:first-child){display:none}
+  .mesa1 .card{display:none}.card .pv{aspect-ratio:1}.mesa1 .card.cur{display:flex}.mnav{display:flex}.gsearch input{width:140px}.pop{position:fixed;left:8px;right:8px;width:auto;top:60px}
 }
 </style>
 </head>
@@ -256,7 +261,7 @@ async function refresh() {
 function live() {
   try {
     const es = new EventSource('/api/stream');
-    es.addEventListener('change', () => { clearTimeout(refreshT); refreshT = setTimeout(() => { refresh().catch(() => { }); loadChat().catch(() => { }); }, 400); });
+    es.addEventListener('change', () => { clearTimeout(refreshT); refreshT = setTimeout(() => { refresh().catch(() => { }); loadChat().catch(() => { }); notifs().catch(() => { }); }, 400); });
   } catch { setInterval(refresh, 15000); }
 }
 
@@ -274,6 +279,31 @@ function pin(n) { S.fix = S.fix.includes(n) ? S.fix.filter(x => x !== n) : [...S
 function setMarca(n) { S.marca = n; store.set('marca', n); refresh(); }
 document.addEventListener('click', () => $('#mpop')?.classList.add('hidden'));
 
+// ───────── barra de topo: busca geral e notificações
+function topo() { return `<div class="gsearch"><input class="f" placeholder="Buscar…" oninput="busca(this.value)" onclick="event.stopPropagation()"><div class="pop hidden" id="bpop"></div></div><div class="bell" style="position:relative"><button class="chip" onclick="event.stopPropagation();abreNotif()">🔔<i id="ncnt">${S.ncnt || ''}</i></button><div class="pop hidden" id="npop"></div></div>`; }
+let buscaT;
+function busca(q) {
+  clearTimeout(buscaT); const p = $('#bpop'); if (q.trim().length < 2) return p.classList.add('hidden');
+  buscaT = setTimeout(async () => { const { resultados } = await api('/api/v2/busca?q=' + encodeURIComponent(q)); p.classList.remove('hidden');
+    p.innerHTML = resultados.map(r => `<div class="it" onclick='abreBusca(${JSON.stringify(r)})'>${esc(r.titulo)}<small>${esc(r.tipo)} · ${esc(r.sub)}</small></div>`).join('') || '<div class="it muted">Nada encontrado</div>'; }, 250);
+}
+function abreBusca(r) { $('#bpop').classList.add('hidden'); if (r.tipo === 'conteudo') abrirItem(r.id); else if (r.tipo === 'marca') { go('marcas'); setTimeout(() => detMarca(r.id), 400); } else if (r.tipo === 'produto') { go('produtos'); setTimeout(() => detProduto(r.id), 400); } else if (r.tipo === 'regra') { chatToggle(true); $('#cin').value = `Me explica a regra #${r.id}`; } else { go('marcas'); } }
+async function notifs(primeira) {
+  const { itens } = await api('/api/v2/notificacoes'); const vistas = new Set(store.get('notifVistas', []));
+  const novas = itens.filter(n => !vistas.has(n.chave)); S.notif = itens; S.ncnt = novas.length || '';
+  const el = $('#ncnt'); if (el) el.textContent = S.ncnt;
+  const avisadas = new Set(store.get('notifAvisadas', []));
+  if (!primeira && 'Notification' in window && Notification.permission === 'granted') for (const n of novas.filter(n => !avisadas.has(n.chave)).slice(0, 3)) { try { new Notification(n.titulo, { body: n.detalhe || '' }); } catch { } }
+  store.set('notifAvisadas', itens.map(n => n.chave));
+}
+function abreNotif() {
+  const p = $('#npop'); p.classList.toggle('hidden'); if (p.classList.contains('hidden')) return;
+  const vistas = new Set(store.get('notifVistas', []));
+  p.innerHTML = (('Notification' in window && Notification.permission === 'default') ? '<div class="it" onclick="Notification.requestPermission()">Ativar avisos no navegador</div>' : '') + ((S.notif || []).map(n => `<div class="it ${vistas.has(n.chave) ? '' : 'nova'}" onclick="${n.id ? `abrirItem(${n.id})` : ''}">${esc(n.titulo)}<small>${esc(n.detalhe || '')} · ${fmtD(n.ts)}</small></div>`).join('') || '<div class="it muted">Sem avisos</div>');
+  store.set('notifVistas', (S.notif || []).map(n => n.chave)); S.ncnt = ''; $('#ncnt').textContent = '';
+}
+document.addEventListener('click', () => { $('#bpop')?.classList.add('hidden'); $('#npop')?.classList.add('hidden'); });
+
 // ───────── Fluxo
 const COR = { etapa: 'var(--ok)', esperando: 'var(--gold)', ajuste: 'var(--warn)', parado: 'var(--err)', fila: 'var(--q)', finalizado: '#7fbf98' };
 const CLS = { etapa: '', esperando: 'y', ajuste: 'aj', parado: 'e', fila: 'q', finalizado: 'd' };
@@ -289,7 +319,7 @@ function colunaDe(i, etapas) {
 }
 VIEWS.fluxo = () => {
   const F = S.fluxo; if (!F) return;
-  const head = `<div class="top"><h1>Fluxo</h1>
+  const head = `<div class="top"><h1>Fluxo</h1>${topo()}
     <div class="tog"><button class="${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');render()">Lista</button><button class="${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button></div>
     ${marcaSel()}<button class="btn ok" onclick="novoConteudo()">+ Novo conteúdo</button></div>`;
   const ban = F.avisos.length ? `<div class="ban"><b>⚠ ${F.avisos.length} item(ns) parado(s)</b><span>${esc(F.avisos[0].titulo)}: ${esc(F.avisos[0].motivo || '')}</span><button class="btn sm" style="margin-left:auto" onclick="abrirItem(${F.avisos[0].id})">Ver</button></div>` : '';
@@ -339,11 +369,12 @@ VIEWS.mesa = () => {
   const raias = [...new Set(its.map(i => i.raia))];
   if (S.filtro !== 'todos') its = its.filter(i => i.raia === S.filtro);
   const nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
-  $('#main').innerHTML = `<div class="top"><h1>Mesa de revisão</h1>${marcaSel()}</div>
+  $('#main').innerHTML = `<div class="top"><h1>Mesa de revisão</h1>${topo()}${marcaSel()}</div>
     <div class="tabs"><button class="${S.filtro === 'todos' ? 'on' : ''}" onclick="S.filtro='todos';render()">Todos</button>${raias.map(r => `<button class="${S.filtro === r ? 'on' : ''}" onclick="S.filtro='${r}';render()">${esc(nomeR(r))}</button>`).join('')}</div>
-    ${its.length ? `<div class="grid mesa1">${its.map(i => `<div class="card"><div class="pv ${i.thumb ? '' : 'txt'}">${i.thumb ? `<img src="${i.thumb}" loading="lazy">` : `<span id="pv${i.id}">…</span>`}<span class="tp">${esc(nomeR(i.raia))}${i.roteiro ? ' · roteiro' : ''}</span></div>
+    ${its.length ? `<div class="grid mesa1">${its.map((i, k) => `<div class="card ${k === (S.mi = Math.min(S.mi || 0, its.length - 1)) ? 'cur' : ''}"><div class="pv ${i.thumb ? '' : 'txt'}">${i.thumb ? `<img src="${i.thumb}" loading="lazy">` : `<span id="pv${i.id}">…</span>`}<span class="tp">${esc(nomeR(i.raia))}${i.roteiro ? ' · roteiro' : ''}</span></div>
       <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')}${i.nota != null ? ' · nota ' + Number(i.nota).toFixed(1) : ''} · ${fmtD(i.atualizado)}</span>
-      <div class="ac"><button class="btn" onclick="abrirEditor(${i.id})">Abrir editor</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('')}</div>` : '<div class="empty">Nada esperando você agora. ✨</div>'}`;
+      <div class="ac"><button class="btn" onclick="abrirEditor(${i.id})">Abrir editor</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('')}</div><div class="mnav"><button class="btn" onclick="S.mi=Math.max(0,(S.mi||0)-1);render()">‹ Anterior</button><span class="small muted" style="align-self:center">${(S.mi || 0) + 1} de ${its.length}</span><button class="btn" onclick="S.mi=(S.mi||0)+1;render()">Próximo ›</button></div>` : '<div class="empty">Nada esperando você agora. ✨</div>'}`;
+  const g = $('.mesa1'); if (g) { let x0 = null; g.ontouchstart = e => x0 = e.touches[0].clientX; g.ontouchend = e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) { S.mi = Math.max(0, (S.mi || 0) + (dx < 0 ? 1 : -1)); render(); } x0 = null; }; }
   for (const i of its.filter(i => !i.thumb)) api('/api/v2/itens/' + i.id).then(d => { const el = $('#pv' + i.id); if (el) el.textContent = (d.materia || d.roteiro || d.legenda || '').slice(0, 600); }).catch(() => { });
 };
 const aprovar = id => tryDo(() => api(`/api/v2/itens/${id}/aprovar`, { body: {} }), 'Aprovado');
@@ -414,7 +445,7 @@ VIEWS.publicacao = () => {
     corpo = `<div class="cal">${Array.from({ length: 14 }, (_, k) => { const d = new Date(d0); d.setDate(d.getDate() + k); const key = d.toISOString().slice(0, 10); const its = F.itens.filter(i => (i.postado_em || '').slice(0, 10) === key); return `<div><b>${d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' })}</b>${its.map(i => `<span title="${esc(i.titulo)}">${esc(nomeR(i.raia))} · ${esc(i.titulo)}</span>`).join('')}</div>`; }).join('')}</div>
       <p class="small muted" style="margin-top:8px">Postagens por formato e marca nas duas semanas. No celular, veja a aba Postados.</p>`;
   } else corpo = `<div class="lstwrap"><table class="lst"><tr><th>Item</th><th>Formato</th><th>Marca</th><th>Postado</th><th>Link</th></tr>${feitos.map(i => `<tr onclick="abrirItem(${i.id})"><td>${esc(i.titulo)}</td><td>${esc(nomeR(i.raia))}</td><td>${esc(i.marca)}</td><td>${fmtD(i.postado_em)}</td><td>${i.post_url ? `<a href="${esc(i.post_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">abrir</a>` : ''}</td></tr>`).join('')}</table></div>`;
-  $('#main').innerHTML = `<div class="top"><h1>Publicação</h1><span class="pill esperando">Modo manual</span>${marcaSel()}</div>
+  $('#main').innerHTML = `<div class="top"><h1>Publicação</h1>${topo()}<span class="pill esperando">Modo manual</span>${marcaSel()}</div>
     <div class="box" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="small muted">Redes:</span>${redes.map(r => `<span class="chip">${r} · em breve</span>`).join('')}</div>
     <div class="tabs">${[['pronto', `Pronto para postar (${prontos.length})`], ['agenda', 'Agenda'], ['feitos', `Postados (${feitos.length})`]].map(([k, n]) => `<button class="${S.pubTab === k ? 'on' : ''}" onclick="S.pubTab='${k}';render()">${n}</button>`).join('')}</div>${corpo}`;
 };
@@ -429,7 +460,7 @@ VIEWS.marcas = async () => {
   const [{ brands }, { products }] = await Promise.all([api('/api/brands'), api('/api/products')]);
   S.brands = brands;
   const n = b => S.fluxo.itens.filter(i => i.marca.toLowerCase() === b.name.toLowerCase()).length;
-  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><button class="btn ok" onclick="novaMarca()">+ Nova marca</button></div>
+  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1>${topo()}<button class="btn ok" onclick="novaMarca()">+ Nova marca</button></div>
     ${brands.length ? `<div class="grid">${brands.map(b => `<div class="box" style="cursor:pointer" onclick="detMarca(${b.id})"><b style="font-size:15px">${esc(b.name)}</b><p class="small muted" style="margin-top:6px">${n(b)} itens no fluxo · ${products.filter(p => (p.brands || []).includes(b.name)).length} produtos</p></div>`).join('')}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}
     <p class="small muted" style="margin-top:12px">Dica: tudo aqui também pode ser alterado pelo chat (“muda o tom de voz da marca X para…”).</p>`;
 };
@@ -438,7 +469,8 @@ async function detMarca(id) {
   const b = S.brands.find(x => x.id === id); const fs = S.fluxo.formatos;
   const k = await api('/api/knowledge').catch(() => ({ items: [] }));
   const docs = (k.items || k.knowledge || []).filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase());
-  const sec = cat => docs.filter(x => cat.includes(x.category)).map(x => `<details class="box" style="margin-bottom:6px;padding:10px"><summary>${esc(x.title)}</summary><div style="white-space:pre-wrap;font-size:12.5px;margin-top:8px">${esc(x.content.slice(0, 3000))}</div></details>`).join('') || '<p class="muted small">Nada cadastrado.</p>';
+  S._docs = docs;
+  const sec = cat => docs.filter(x => cat.includes(x.category)).map(x => `<details class="box" style="margin-bottom:6px;padding:10px"><summary>${esc(x.title)}</summary><textarea class="f" id="kd${x.id}" rows="10" style="margin-top:8px">${esc(x.content)}</textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm ok" onclick="salvaDoc(${x.id})">Salvar</button><button class="btn sm dg" onclick="apagaDoc(${x.id},${id})">Apagar</button></div></details>`).join('') + `<button class="btn sm" onclick="novoDoc(${id},'${cat[0]}')">+ Documento</button>`;
   modal(`<div class="hd"><h2>${esc(b.name)}</h2><button class="btn sm" onclick="renMarca(${id})">Renomear</button><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
     <div class="tabs"><button class="on" onclick="mTab(this,'v')">Visual</button><button onclick="mTab(this,'z')">Voz</button><button onclick="mTab(this,'f')">Formatos e metas</button><button onclick="mTab(this,'c')">Contas</button></div>
     <div data-m="v">${sec(['marca', 'diretrizes'])}</div><div data-m="z" class="hidden">${sec(['tom_de_voz'])}</div>
@@ -446,36 +478,59 @@ async function detMarca(id) {
     <div data-m="c" class="hidden"><p class="muted">Conexão com as redes: em breve. Hoje a publicação é manual.</p></div></div>`);
 }
 function mTab(b, k) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('[data-m]').forEach(e => e.classList.toggle('hidden', e.dataset.m !== k)); }
+async function salvaDoc(kid) { const x = S._docs.find(d => d.id === kid); await tryDo(() => api('/api/knowledge/' + kid, { method: 'PUT', body: { ...x, content: $('#kd' + kid).value } }), 'Salvo'); x.content = $('#kd' + kid).value; }
+async function apagaDoc(kid, bid) { if (!confirm('Apagar este documento?')) return; await tryDo(() => api('/api/knowledge/' + kid, { method: 'DELETE' }), 'Apagado'); detMarca(bid); }
+async function novoDoc(bid, cat) { const b = S.brands.find(x => x.id === bid), t = prompt('Título do documento'); if (!t) return; await tryDo(() => api('/api/knowledge', { body: { title: t, category: cat, content: 'Escreva aqui.', brand: b.name } }), 'Criado'); detMarca(bid); }
 async function renMarca(id) { const n = prompt('Novo nome'); if (n) { await tryDo(() => api('/api/brands/' + id, { method: 'PUT', body: { name: n } }), 'Renomeada'); fecha(); render(); } }
 
 // ───────── Produtos
 VIEWS.produtos = async () => {
   const { products } = await api('/api/products');
-  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1>${marcaSel()}</div>
+  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1>${topo()}${marcaSel()}<button class="btn ok" onclick="detProduto(0)">+ Novo produto</button></div>
     ${products.length ? `<div class="grid">${products.filter(p => !S.marca || (p.brands || []).includes(S.marca)).map(p => `<div class="box" style="cursor:pointer" onclick='detProduto(${JSON.stringify(p.id)})'><b>${esc(p.name)}</b><p class="small muted" style="margin-top:4px">${esc(p.type)} · ${esc((p.brands || []).join(', ') || 'geral')}</p></div>`).join('')}</div>` : '<div class="empty">Nenhum produto. Peça ao gerente para cadastrar.</div>'}`;
   S._prods = products;
 };
-function detProduto(id) {
-  const p = S._prods.find(x => x.id === id);
-  const feitos = S.fluxo.itens.filter(i => i.titulo && p.name && false);
-  modal(`<div class="hd"><h2>${esc(p.name)}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><dl class="kv">${Object.entries(p).filter(([k, v]) => v && typeof v !== 'object' && !['id', 'image'].includes(k)).map(([k, v]) => `<dt>${esc(k)}</dt><dd style="white-space:pre-wrap">${esc(String(v).slice(0, 1500))}</dd>`).join('')}</dl>${feitos.length ? '' : ''}</div>`);
+const PCAMPOS = [['name', 'Nome'], ['type', 'Tipo'], ['url', 'Link'], ['price', 'Preço'], ['promise', 'Promessa'], ['audience', 'Público'], ['deliverable', 'Entregável'], ['pains', 'Dores'], ['objections', 'Objeções'], ['bonus', 'Bônus'], ['guarantee', 'Garantia']];
+async function detProduto(id) {
+  if (!S._prods) S._prods = (await api('/api/products')).products;
+  const p = id ? S._prods.find(x => x.id === id) : { brands: S.marca ? [S.marca] : [] };
+  const feitos = id ? S.fluxo.itens.filter(i => i.produto_id === id) : [];
+  modal(`<div class="hd"><h2>${esc(p.name || 'Novo produto')}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><div class="tabs"><button class="on" onclick="mTab(this,'fi')">Ficha</button><button onclick="mTab(this,'co')">Conteúdos feitos (${feitos.length})</button></div>
+    <div data-m="fi" style="display:grid;gap:8px">${PCAMPOS.map(([k, n]) => `<label class="small muted">${n}${k === 'type' ? `<select class="f" id="pf_type">${['ebook', 'curso', 'mentoria', 'servico', 'software', 'fisico', 'outro'].map(t => `<option ${p.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select>` : ['promise', 'audience', 'deliverable', 'pains', 'objections'].includes(k) ? `<textarea class="f" id="pf_${k}" rows="3">${esc(p[k] || '')}</textarea>` : `<input class="f" id="pf_${k}" value="${esc(p[k] || '')}">`}</label>`).join('')}
+      <label class="small muted">Marcas<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${S.brands.map(b => `<label class="chip"><input type="checkbox" class="pfb" value="${esc(b.name)}" ${(p.brands || []).includes(b.name) ? 'checked' : ''}> ${esc(b.name)}</label>`).join('')}</div></label></div>
+    <div data-m="co" class="hidden">${feitos.map(cartao).join('') || '<p class="muted">Nenhum conteúdo feito com este produto.</p>'}</div></div>
+    <div class="ft">${id ? `<button class="btn dg" onclick="apagaProd(${id})">Apagar</button>` : ''}<button class="btn ok" style="margin-left:auto" onclick="salvaProd(${id || 0})">Salvar</button></div>`);
 }
+async function salvaProd(id) {
+  const old = S._prods.find(x => x.id === id) || {}, b = { ...old };
+  for (const [k] of PCAMPOS) b[k] = $('#pf_' + k).value;
+  b.brands = [...document.querySelectorAll('.pfb:checked')].map(x => x.value);
+  await tryDo(() => api('/api/products' + (id ? '/' + id : ''), { method: id ? 'PUT' : 'POST', body: b }), 'Produto salvo'); S._prods = null; fecha();
+}
+async function apagaProd(id) { if (!confirm('Apagar este produto?')) return; await tryDo(() => api('/api/products/' + id, { method: 'DELETE' }), 'Apagado'); S._prods = null; fecha(); }
 
 // ───────── Otimização
 VIEWS.otimizacao = async () => {
-  const m = await api('/api/metrics').catch(() => ({ items: [] }));
-  const posted = S.fluxo.itens.filter(i => i.estado === 'finalizado');
-  const rank = (m.items || []).filter(x => x.content_id).sort((a, b) => (b.likes + b.saves * 2 + b.shares * 2) - (a.likes + a.saves * 2 + a.shares * 2));
-  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1></div>
-    <p class="muted small" style="margin-bottom:12px">Só itens postados. Ranking por curtidas, salvamentos e compartilhamentos. As descobertas do gerente aparecem quando houver uns 10 posts por formato.</p>
-    ${rank.length ? `<div class="lstwrap"><table class="lst"><tr><th>#</th><th>Post</th><th>Alcance</th><th>Curtidas</th><th>Salvamentos</th></tr>${rank.slice(0, 30).map((x, k) => `<tr><td>${k + 1}</td><td>${esc(x.post_title)}</td><td>${x.views}</td><td>${x.likes}</td><td>${x.saves}</td></tr>`).join('')}</table></div>` : `<div class="empty">${posted.length} post(s) finalizado(s), ainda sem métricas. Elas chegam na Etapa 8.</div>`}`;
+  const d = await api('/api/v2/otimizacao'), F = S.fluxo, nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
+  const its = d.itens.filter(i => S.filtro === 'todos' || i.raia === S.filtro), raias = Object.keys(d.contagem);
+  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1>${topo()}<button class="btn" onclick="tryDo(()=>api('/api/v2/descobertas/gerar',{body:{}}),'Análise feita').then(render)">Analisar agora</button></div>
+    <p class="muted small" style="margin-bottom:10px">Só itens postados. Engajamento = curtidas + comentários + 2×salvamentos + 2×compartilhamentos. Comparações ficam confiáveis a partir de ${d.minimo} posts por formato.</p>
+    <div class="grid" style="margin-bottom:12px">${raias.map(r => `<div class="box"><b>${esc(nomeR(r))}</b><p class="small muted">${d.contagem[r].postados} postados · ${d.contagem[r].medidos} com métricas${d.contagem[r].medidos < d.minimo ? ` · faltam ${d.minimo - d.contagem[r].medidos}` : ''}</p></div>`).join('') || '<div class="empty">Nenhum post finalizado ainda.</div>'}</div>
+    ${d.descobertas.length ? `<h3 class="small muted" style="margin:6px 0">Descobertas do gerente</h3>${d.descobertas.map(x => `<div class="ver"><span style="flex:1">${esc(x.texto)}<br><span class="small muted">${esc(x.evidencia)}</span></span>${x.status === 'nova' ? `<button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/descobertas/${x.id}/regra',{body:{}}),'Virou regra').then(render)">Virar regra</button><button class="btn sm" onclick="tryDo(()=>api('/api/v2/descobertas/${x.id}/ignorar',{body:{}}),'Ignorada').then(render)">Ignorar</button>` : `<span class="pill">${x.status === 'regra' ? 'virou regra' : 'ignorada'}</span>`}</div>`).join('')}` : ''}
+    <div class="tabs" style="margin-top:14px"><button class="${S.filtro === 'todos' ? 'on' : ''}" onclick="S.filtro='todos';render()">Todos</button>${raias.map(r => `<button class="${S.filtro === r ? 'on' : ''}" onclick="S.filtro='${r}';render()">${esc(nomeR(r))}</button>`).join('')}</div>
+    <div class="lstwrap"><table class="lst"><tr><th>#</th><th>Post</th><th>Formato</th><th>Alcance</th><th>Curtidas</th><th>Salv.</th><th>Comp.</th><th></th></tr>${its.map((x, k) => `<tr><td>${k + 1}</td><td>${esc(x.title)}${x.post_url ? ` <a href="${esc(x.post_url)}" target="_blank" rel="noopener">↗</a>` : ''}</td><td>${esc(nomeR(x.raia))}</td><td>${x.views}</td><td>${x.likes}</td><td>${x.saves}</td><td>${x.shares}</td><td><button class="btn sm" onclick="metricas(${x.id})">${x.medidas ? 'Atualizar' : 'Lançar'}</button></td></tr>`).join('')}</table></div>
+    <p class="small muted" style="margin-top:8px">Hoje as métricas são lançadas à mão. A leitura automática chega com a conexão das redes.</p>`;
 };
+function metricas(id) {
+  modal(`<div class="hd"><h2>Métricas do post</h2></div><div class="mb" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${[['views', 'Alcance'], ['likes', 'Curtidas'], ['comments', 'Comentários'], ['saves', 'Salvamentos'], ['shares', 'Compartilhamentos']].map(([k, n]) => `<label class="small muted">${n}<input class="f" type="number" min="0" id="mt_${k}"></label>`).join('')}</div><div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="salvaMet(${id})">Salvar</button></div>`, 'sm');
+}
+async function salvaMet(id) { const b = { content_id: id }; for (const k of ['views', 'likes', 'comments', 'saves', 'shares']) b[k] = +$('#mt_' + k).value || 0; await tryDo(() => api('/api/v2/otimizacao/metricas', { body: b }), 'Métricas salvas'); fecha(); }
 
 // ───────── Cérebro (lista; o 3D chega na Etapa 6)
 VIEWS.cerebro = async () => {
   const d = await api('/api/brain').catch(() => null);
   const regras = d?.rules || d?.regras || [];
-  $('#main').innerHTML = `<div class="top"><h1>Cérebro</h1><div class="tog"><button class="on">Lista</button><button disabled title="Etapa 6">Constelação</button><button disabled title="Etapa 6">3D</button></div><input class="f" style="width:240px" placeholder="Buscar…" oninput="filtraCer(this.value)"></div>
+  $('#main').innerHTML = `<div class="top"><h1>Cérebro</h1>${topo()}<div class="tog"><button class="on">Lista</button><button disabled title="Etapa 6">Constelação</button><button disabled title="Etapa 6">3D</button></div><input class="f" style="width:240px" placeholder="Buscar…" oninput="filtraCer(this.value)"></div>
     <p class="small muted" style="margin-bottom:10px">Regras não têm tela própria: pergunte ao gerente. Aqui fica a lista do que ele sabe.</p>
     <div id="cerl">${regras.filter(r => r.status === 'ativa').map(r => `<div class="ver" data-q="${esc((r.agent + ' ' + r.text).toLowerCase())}"><span class="pill">${esc(r.agent)}</span><span style="flex:1">${esc(r.text)}</span>${r.brand ? `<span class="small muted">${esc(r.brand)}</span>` : ''}</div>`).join('') || '<div class="empty">Sem regras ativas.</div>'}</div>`;
 };
@@ -483,11 +538,12 @@ function filtraCer(q) { q = q.toLowerCase(); document.querySelectorAll('#cerl [d
 
 // ───────── Configurações
 VIEWS.config = async () => {
-  const [st, us, lx] = await Promise.all([api('/api/state'), S.me.admin ? api('/api/users').catch(() => ({ users: [] })) : { users: [] }, api('/api/v2/fluxo?lixeira=1')]);
+  const [st, us, lx, gs, sy] = await Promise.all([api('/api/state'), S.me.admin ? api('/api/users').catch(() => ({ users: [] })) : { users: [] }, api('/api/v2/fluxo?lixeira=1'), api('/api/v2/gastos'), api('/api/v2/sync').catch(() => null)]);
   const lixo = lx.itens.filter(i => i.estado === 'descartado');
-  $('#main').innerHTML = `<div class="top"><h1>Configurações</h1></div><div class="grid">
+  $('#main').innerHTML = `<div class="top"><h1>Configurações</h1>${topo()}</div><div class="grid">
     <div class="box"><b>Assinatura do Claude</b><p class="small muted" style="margin-top:6px">Modo: ${esc(st.api?.provider)}${st.api?.assinatura ? ' · conectada' : ''}</p><p class="small muted">Tarefas hoje: ${st.jobsToday}</p></div>
-    <div class="box"><b>Gasto do mês</b><p class="small muted" style="margin-top:6px">Imagens hoje: US$ ${Number(st.imgHoje?.usd ?? st.imgHoje ?? 0).toFixed(2)}</p></div>
+    <div class="box"><b>Gasto do mês (${esc(gs.mes)})</b><p class="small muted" style="margin-top:6px">Imagens: US$ ${Number(gs.imagens_usd).toFixed(2)} (${gs.imagens} geradas)<br>Tarefas dos agentes: ${gs.tarefas} · tokens ${(gs.tokens_in + gs.tokens_out).toLocaleString('pt-BR')}</p></div>
+    ${sy ? `<div class="box"><b>Treino ↔ conhecimento/</b><p class="small muted" style="margin-top:6px">Entrada: ${sy.entrada.arquivos} arquivos na pasta, ${sy.entrada.carregados} carregados. ${esc(sy.entrada.como)}<br>Saída: ${sy.saida.regras} regras ativas, última gravação ${fmtD(sy.saida.ultima) || 'nunca'}. ${esc(sy.saida.como)}</p><div style="display:flex;gap:6px;margin-top:8px"><button class="btn sm" onclick="tryDo(()=>api('/api/v2/sync/importar',{body:{}}),'Bases recarregadas').then(render)">Importar da pasta</button><button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/sync/exportar',{body:{}}),'Regras gravadas em conhecimento/aprendido').then(render)">Gravar regras na pasta</button></div></div>` : ''}
     <div class="box"><b>Logins</b><p class="small muted" style="margin:6px 0">Perfis: Dono (tudo) e Revisor (Fluxo, Revisão e Publicação).</p>${us.users.map(u => `<div class="ver">${esc(u.name)} <span class="muted">${esc(u.username)}</span><span class="pill" style="margin-left:auto">${u.role === 'admin' ? 'Dono' : 'Revisor'}</span></div>`).join('')}${S.me.admin ? '<button class="btn sm" style="margin-top:8px" onclick="novoRevisor()">+ Revisor</button>' : ''}</div>
     <div class="box"><b>Lixeira</b>${lixo.map(i => `<div class="ver"><span style="flex:1">${esc(i.titulo)}</span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></div>`).join('') || '<p class="small muted" style="margin-top:6px">Vazia.</p>'}</div>
   </div><p class="small muted" style="margin-top:14px"><a href="/">Abrir o painel antigo</a> (fica até a troca final).</p>`;
@@ -498,7 +554,7 @@ async function novoRevisor() {
 }
 
 // ───────── Mais (celular)
-VIEWS.mais = () => { $('#main').innerHTML = `<div class="top"><h1>Mais</h1></div><div style="display:grid;gap:8px">${MENU.filter(m => !m[3]).map(([id, nome, ic]) => `<button class="nv box" style="color:var(--tx)" onclick="go('${id}')">${ico(ic)}${nome}</button>`).join('')}<button class="nv box" style="color:var(--tx)" onclick="logout()">Sair</button></div>`; };
+VIEWS.mais = () => { $('#main').innerHTML = `<div class="top"><h1>Mais</h1>${topo()}</div><div style="display:grid;gap:8px">${MENU.filter(m => !m[3]).map(([id, nome, ic]) => `<button class="nv box" style="color:var(--tx)" onclick="go('${id}')">${ico(ic)}${nome}</button>`).join('')}<button class="nv box" style="color:var(--tx)" onclick="logout()">Sair</button></div>`; };
 
 // ───────── Chat do gerente
 const SUGS = ['O que está parado?', 'Quais regras você aprendeu esta semana?', 'Cria 2 carrosséis para amanhã', 'Resumo do dia'];
@@ -535,7 +591,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('.ov')) 
   $('#app').classList.remove('hidden');
   const h = location.hash.slice(1); if (VIEWS[h]) S.view = h;
   S.brands = (await api('/api/brands').catch(() => ({ brands: [] }))).brands;
-  await refresh(); loadChat().catch(() => { }); live();
+  await refresh(); loadChat().catch(() => { }); notifs(true).catch(() => { }); live(); setInterval(() => notifs().catch(() => { }), 30000);
   addEventListener('resize', () => renderSide());
 })();
 </script>
