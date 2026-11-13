@@ -153,7 +153,7 @@ export function criarFluxoV2(ctx) {
     const texto = clip(`Nas peças de ${raiaDe(c, ctx)}${c.brand ? ' da marca ' + c.brand : ''}, siga o padrão que o dono aplicou ao editar: ${motivo || resumo.replace(/\n/g, '; ')}`, 600);
     const r = run("INSERT INTO brain_rules(agent,brand,type,text,evidence,source,status,weight,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)", agente, c.brand || '', 'regra', texto, clip(`Edição do dono em "${c.title}" (#${c.id}):\n${resumo}`, 1500), 'edicao_dono', 'ativa', 2, T(), T());
     const rid = +r.lastInsertRowid;
-    addChat('gerente', `Aprendi com a sua edição em "${clip(c.title, 60)}" e salvei uma regra para o ${agente}:\n“${texto}”`, { actions: [{ tipo: 'desfazer_regra', regra: rid, rotulo: 'Desfazer' }] });
+    addChat('gerente', `Aprendi com a sua edição em "${clip(c.title, 60)}" e salvei uma regra para o ${agente}:\n“${texto}”`, { actions: [{ ok: true, texto: `Regra #${rid} salva para o ${agente}`, tipo: 'desfazer_regra', regra: rid, rotulo: 'Desfazer' }] });
     return rid;
   }
 

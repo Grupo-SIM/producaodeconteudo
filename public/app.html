@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agentes SIM</title>
+<style>
+:root{
+  --bg:#0c0c0d;--side:#0f0f10;--card:#141416;--card2:#111113;--line:#222225;--line2:#26262a;--field:#18181b;
+  --tx:#f2f2f3;--tx2:#a5a5aa;--tx3:#6f6f75;
+  --gold:#d9c08a;--gold2:#e9d29a;--goldbg:#2a2418;--goldline:#3a3220;
+  --ok:#6fcf97;--warn:#d98a5a;--err:#e06060;--q:#4a4a50;
+  --grad:linear-gradient(135deg,#e9d8a6,#a8864a);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:14px/1.45 Inter,"Segoe UI",system-ui,Arial,sans-serif;letter-spacing:-.005em;display:flex;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--gold2)}
+.hidden{display:none!important}
+/* menu */
+.side{width:232px;background:var(--side);border-right:1px solid #1f1f22;padding:22px 14px;display:flex;flex-direction:column;gap:4px;flex:none}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;margin:0 8px 24px}
+.logo:before{content:"";width:26px;height:26px;border-radius:8px;background:var(--grad);box-shadow:0 0 0 1px #ffffff22 inset}
+.nv{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#8b8b90;font-size:13.5px;border:1px solid transparent;text-align:left;width:100%}
+.nv svg{width:17px;height:17px;flex:none}
+.nv:hover{color:var(--tx)}
+.nv.on{background:linear-gradient(180deg,#1c1c1f,#161618);color:var(--tx);border-color:#2a2a2e;box-shadow:inset 0 1px 0 #ffffff0d}
+.nv b{margin-left:auto;background:var(--goldbg);color:var(--gold2);border:1px solid #4a3f26;border-radius:9px;font-size:11px;padding:0 7px;font-weight:600}
+.nv b:empty{display:none}
+.side .sp{margin-top:auto}
+.who{font-size:12px;color:var(--tx3);padding:8px 12px}
+/* principal */
+.main{flex:1;min-width:0;overflow:auto;padding:20px 26px;background:radial-gradient(1200px 500px at 30% -10%,#1a1a1d 0,var(--bg) 60%)}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.top h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-right:auto}
+.chip{font-size:12px;background:#161618;border:1px solid var(--line2);color:var(--tx2);padding:6px 12px;border-radius:999px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;background:#1a1a1d;border:1px solid #2a2a2e;color:#d0d0d4;white-space:nowrap}
+.btn.ok{background:var(--grad);color:#141006;border:none}
+.btn.bl{background:var(--tx);color:var(--bg);border:none}
+.btn.dg{color:#f0a0a0;border-color:#3a2224}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:default}
+.box{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:16px;box-shadow:inset 0 1px 0 #ffffff08,0 10px 30px #0006;padding:14px}
+.muted{color:var(--tx3)}.small{font-size:12px}
+.f{background:var(--field);border:1px solid var(--line2);border-radius:10px;padding:9px 11px;width:100%;outline:none}
+.f:focus{border-color:var(--goldline)}
+textarea.f{resize:vertical;min-height:80px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.empty{padding:40px;text-align:center;color:var(--tx3);border:1px dashed var(--line2);border-radius:16px}
+.ban{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;margin-bottom:12px;background:linear-gradient(90deg,#1d1414,#121112);border:1px solid #3a2224;font-size:13px}
+.ban b{color:#f0a0a0}
+/* fluxo */
+.lane{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:16px;box-shadow:inset 0 1px 0 #ffffff08,0 10px 30px #0006;padding:9px 12px;margin-bottom:8px}
+.lh{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.lh .car{transition:transform .15s;color:var(--tx3)}
+.lane.open .lh .car{transform:rotate(90deg)}
+.lh b{font-size:14px;font-weight:600}
+.sum{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px}
+.sum span{padding:2px 8px;border-radius:999px;background:#1a1a1d;color:var(--tx2)}
+.meta{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:11.5px;color:#cfd6e4}
+.pb{width:70px;height:5px;background:#232326;border-radius:3px;overflow:hidden}.pb u{display:block;height:5px;background:linear-gradient(90deg,#a8864a,#e9d8a6)}
+.tog{display:inline-flex;background:#0e0e0f;border:1px solid var(--line2);border-radius:999px;padding:2px}
+.tog button{font-size:11px;padding:3px 9px;border-radius:999px;color:var(--tx3)}
+.tog button.on{background:var(--goldbg);color:var(--gold2)}
+.metain{width:44px;background:#0e0e0f;border:1px solid var(--line2);border-radius:6px;padding:2px 4px;text-align:center;font-size:11.5px}
+.st{display:none;gap:6px;margin-top:8px}
+.lane.open .st{display:flex}
+.s{flex:1;min-width:0;background:#0e0e0f;border:1px solid #1c1c1f;border-radius:11px;padding:6px;display:flex;flex-direction:column;gap:5px;min-height:54px}
+.s.me{background:linear-gradient(180deg,#19160f,#121110);border-color:var(--goldline)}
+.s.done{background:#0f1311;border-color:#1c2a22}
+.sh{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--tx3);display:flex;justify-content:space-between;font-weight:500}
+.s.me .sh{color:var(--gold)}.s.done .sh{color:#7fbf98}
+.c{background:var(--field);border:1px solid var(--line2);box-shadow:inset 2px 0 0 var(--ok);border-radius:8px;padding:5px 7px;font-size:11.5px;line-height:1.3;cursor:pointer;text-align:left;width:100%}
+.c i{font-style:normal;font-size:10px;color:#7b7b82;display:block}
+.c.y{box-shadow:inset 2px 0 0 var(--gold)}.c.aj{box-shadow:inset 2px 0 0 var(--warn)}.c.aj i{color:#d9a07a}
+.c.e{box-shadow:inset 2px 0 0 var(--err);background:#1d1414;border-color:#3a2224}.c.e i{color:#e88}
+.c.q{box-shadow:inset 2px 0 0 var(--q)}.c.d{opacity:.65}
+.tagaj{display:inline-block;font-size:9.5px;background:#2a1a10;color:#f0b080;border-radius:6px;padding:0 5px;margin-left:4px}
+.leg{display:flex;gap:16px;font-size:11px;color:var(--tx3);margin-top:10px;flex-wrap:wrap}
+.leg span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--c)}
+table.lst{width:100%;border-collapse:collapse;font-size:13px}
+table.lst td,table.lst th{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+table.lst th{color:var(--tx3);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+table.lst tr:hover td{background:#141416;cursor:pointer}
+.pill{font-size:11px;padding:2px 8px;border-radius:999px;background:#1a1a1d;color:var(--tx2);white-space:nowrap}
+.pill.esperando{background:var(--goldbg);color:var(--gold2)}.pill.ajuste{background:#2a1a10;color:#f0b080}
+.pill.parado{background:#2a1416;color:#f0a0a0}.pill.finalizado{background:#0f1a14;color:#7fbf98}.pill.etapa{background:#10181a;color:#8fd0c0}
+/* marca */
+.msel{position:relative}
+.mpop{position:absolute;right:0;top:110%;width:260px;background:#111113;border:1px solid var(--line2);border-radius:12px;padding:8px;z-index:30;box-shadow:0 20px 40px #000a}
+.mpop .it{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;cursor:pointer;font-size:13px}
+.mpop .it:hover{background:#1a1a1d}
+.mpop .pin{margin-left:auto;color:var(--tx3);font-size:12px}.mpop .pin.on{color:var(--gold)}
+/* mesa */
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.card .pv{aspect-ratio:4/5;background:#0f0f10;display:grid;place-items:center;position:relative;overflow:hidden}
+.card .pv img{width:100%;height:100%;object-fit:cover}
+.card .pv.txt{place-items:start;padding:14px;font-size:12px;color:var(--tx2);white-space:pre-wrap;overflow:hidden}
+.card .tp{position:absolute;left:8px;top:8px;background:#000b;font-size:11px;padding:2px 8px;border-radius:999px}
+.card .bd{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card .ac{display:flex;gap:6px;margin-top:auto}
+.card .ac .btn{flex:1;justify-content:center}
+/* chat */
+.chat{width:360px;flex:none;background:#0f0f10;border-left:1px solid #1f1f22;display:flex;flex-direction:column;min-height:0}
+.ch{padding:16px 18px;border-bottom:1px solid #1f1f22;font-weight:600;display:flex;align-items:center;gap:8px}
+.live{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84}
+.ch .x{margin-left:auto;display:none;font-size:20px;color:var(--tx3)}
+.msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.45}
+.m{padding:9px 12px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-wrap:break-word}
+.m.u{background:var(--tx);color:var(--bg);align-self:flex-end}
+.m.g{background:var(--field);border:1px solid var(--line2)}
+.m small{display:block;color:#c9b37f;margin-top:6px;font-size:11.5px}
+.m .acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.typing{font-size:12px;color:var(--tx3);padding:0 16px 6px}
+.sugs{display:flex;gap:6px;padding:0 14px;overflow-x:auto}
+.sugs button{font-size:11.5px;border:1px solid var(--line2);background:#161618;border-radius:999px;padding:5px 10px;white-space:nowrap;color:var(--tx2)}
+.cin{display:flex;gap:8px;margin:12px 14px 14px;padding:6px;background:#161618;border:1px solid var(--line2);border-radius:12px}
+.cin textarea{flex:1;background:none;border:none;outline:none;resize:none;padding:6px;height:38px;max-height:120px}
+.fab{display:none}
+/* modal / editor */
+.ov{position:fixed;inset:0;background:#000a;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px}
+.mo{background:#111113;border:1px solid var(--line2);border-radius:18px;width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden}
+.mo.sm{width:min(480px,100%)}
+.hd,.ft{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #1f1f22;flex-wrap:wrap}
+.ft{border-bottom:none;border-top:1px solid #1f1f22}
+.hd h2{font-size:16px;font-weight:600;margin-right:auto}
+.mb{padding:16px;overflow:auto;flex:1}
+.ask{display:flex;gap:8px;padding:10px 16px;background:#141210;border-bottom:1px solid var(--goldline)}
+.doc{min-height:380px;font-size:15px;line-height:1.65;background:#0e0e0f;border:1px solid var(--line2);border-radius:12px;padding:20px 22px;outline:none;white-space:pre-wrap}
+.learn{font-size:12px;color:var(--gold);margin-right:auto}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{background:#161618;border:1px solid var(--line2);color:var(--tx2);border-radius:999px;padding:5px 12px;font-size:12px}
+.tabs button.on{background:var(--tx);color:var(--bg)}
+.ver{padding:8px 10px;border-bottom:1px solid var(--line);font-size:12.5px;display:flex;gap:8px;align-items:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1c1c1f;border:1px solid var(--line2);padding:10px 16px;border-radius:12px;z-index:99;font-size:13px;box-shadow:0 10px 30px #000a}
+.login{margin:auto;width:min(360px,92vw)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:13px}.kv dt{color:var(--tx3)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal div{background:#0e0e0f;border:1px solid #1c1c1f;border-radius:10px;min-height:86px;padding:6px;font-size:11px}
+.cal div b{color:var(--tx3);font-weight:500}
+.cal span{display:block;margin-top:4px;background:var(--field);border-radius:6px;padding:2px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---------- celular ---------- */
+@media (max-width:760px){
+  body{display:block;overflow:auto}
+  .side{position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;height:calc(64px + env(safe-area-inset-bottom));flex-direction:row;padding:6px 6px env(safe-area-inset-bottom);gap:0;z-index:50;border-right:none;border-top:1px solid #1f1f22;justify-content:space-around}
+  .side .logo,.side .sp,.side .who,.nv.dsk{display:none}
+  .nv{flex-direction:column;font-size:10px;padding:6px;gap:3px;min-width:56px;width:auto;align-items:center;position:relative}
+  .nv b{position:absolute;top:0;right:2px;font-size:9px;padding:0 5px}
+  .main{padding:14px 14px 96px;min-height:100vh;overflow:visible}
+  .top h1{width:100%;font-size:20px}
+  .lh{flex-wrap:wrap;row-gap:6px}.meta{margin-left:0;width:100%}
+  .st{overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.s{min-width:150px;scroll-snap-align:start}
+  .chat{position:fixed;inset:auto 0 0 0;width:auto;height:82vh;border-left:none;border-top:1px solid var(--line2);border-radius:18px 18px 0 0;z-index:70;transform:translateY(105%);transition:transform .25s;box-shadow:0 -20px 40px #000a}
+  .chat.open{transform:none}
+  .ch .x{display:block}
+  .fab{display:grid;place-items:center;position:fixed;right:14px;bottom:80px;width:56px;height:56px;border-radius:50%;background:var(--grad);color:#141006;font-weight:700;font-size:10px;z-index:60;box-shadow:0 8px 24px #000a}
+  .fab .dot{position:absolute;right:3px;bottom:3px;width:12px;height:12px;border-radius:50%;background:#3ddc84;border:2px solid #0c0c0d}
+  .fab .cnt{position:absolute;top:-4px;right:-4px;background:#e06060;color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
+  .fab .cnt:empty{display:none}
+  .grid{grid-template-columns:1fr}
+  .ov{padding:0}.mo{border-radius:0;height:100%}
+  .lstwrap{overflow-x:auto}
+  .cal{display:none}
+  .kv{grid-template-columns:1fr}
+  .mesa1 .card:not(:first-child){display:none}
+}
+</style>
+</head>
+<body>
+<div id="app" class="hidden" style="display:contents">
+  <nav class="side" id="side"></nav>
+  <main class="main" id="main"></main>
+  <aside class="chat" id="chat">
+    <div class="ch"><span class="live"></span>Gerente<span class="muted small" id="chst" style="font-weight:400">online</span><button class="x" onclick="chatToggle(false)">×</button></div>
+    <div class="msgs" id="msgs"></div>
+    <div class="typing hidden" id="typing">Gerente digitando…</div>
+    <div class="sugs" id="sugs"></div>
+    <div class="cin"><textarea id="cin" placeholder="Fale com o gerente…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea><button class="btn ok sm" onclick="chatSend()">Enviar</button></div>
+  </aside>
+  <button class="fab" id="fab" onclick="chatToggle(true)">Gerente<span class="dot"></span><span class="cnt" id="fabcnt"></span></button>
+</div>
+<div id="loginv" class="hidden" style="display:flex;width:100%;height:100%">
+  <form class="box login" onsubmit="event.preventDefault();doLogin()">
+    <div class="logo" style="margin-bottom:18px">Agentes SIM</div>
+    <input class="f" id="lu" placeholder="Usuário (deixe vazio para o dono)" autocomplete="username" style="margin-bottom:8px">
+    <input class="f" id="lp" type="password" placeholder="Senha" autocomplete="current-password" style="margin-bottom:12px">
+    <button class="btn ok" style="width:100%;justify-content:center">Entrar</button>
+    <p class="small muted" id="lerr" style="margin-top:8px"></p>
+  </form>
+</div>
+<div id="ovs"></div>
+<script>
+'use strict';
+// ───────── utilidades
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const api = async (u, o = {}) => {
+  const r = await fetch(u, { method: o.method || (o.body ? 'POST' : 'GET'), headers: { 'content-type': 'application/json', 'x-nerd': '1' }, body: o.body ? JSON.stringify(o.body) : undefined, credentials: 'same-origin' });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { showLogin(); throw new Error('Faça login'); }
+  if (!r.ok) throw new Error(j.error || j.message || 'Erro ' + r.status);
+  return j;
+};
+const toast = t => { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3200); };
+const tryDo = async (fn, ok) => { try { const r = await fn(); if (ok) toast(ok); await refresh(); return r; } catch (e) { toast(e.message); } };
+const store = { get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
+const fmtD = t => t ? new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+const isMobile = () => matchMedia('(max-width:760px)').matches;
+
+const I = {
+  fluxo: '<path d="M3 6h18M3 12h12M3 18h7"/>', mesa: '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="m8 11 3 3 5-6"/>', pub: '<path d="M4 12v7h16v-7M12 3v12M7 8l5-5 5 5"/>',
+  marcas: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/>', prod: '<path d="m3 7 9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/>', otim: '<path d="M3 20h18M6 16l4-5 3 3 6-8"/>',
+  cerebro: '<circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="m7 7 3 3m4 0 3-3M7 17l3-3m4 0 3 3"/>',
+  cfg: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>', mais: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'
+};
+const ico = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
+const MENU = [
+  ['fluxo', 'Fluxo', 'fluxo', 1], ['mesa', 'Mesa de revisão', 'mesa', 1, 'Revisão'], ['publicacao', 'Publicação', 'pub', 1, 'Publicar'], ['marcas', 'Marcas', 'marcas', 0],
+  ['produtos', 'Produtos', 'prod', 0], ['otimizacao', 'Otimização', 'otim', 0], ['cerebro', 'Cérebro', 'cerebro', 1], ['config', 'Configurações', 'cfg', 0]
+];
+
+// ───────── estado
+const S = { view: 'fluxo', me: null, fluxo: null, brands: [], marca: store.get('marca', ''), fix: store.get('marcasFixas', []), modoFluxo: store.get('modoFluxo', 'lista'), abertas: store.get('raiasAbertas', {}), filtro: 'todos', chat: [], lidas: store.get('chatLidas', 0), pubTab: 'pronto' };
+
+// ───────── login
+function showLogin() { $('#app').classList.add('hidden'); $('#loginv').classList.remove('hidden'); }
+async function doLogin() {
+  try { await api('/api/login', { body: { username: $('#lu').value.trim(), password: $('#lp').value } }); location.reload(); }
+  catch (e) { $('#lerr').textContent = e.message; }
+}
+
+// ───────── navegação
+function renderSide() {
+  const n = { mesa: S.fluxo?.itens.filter(i => i.estado === 'esperando' && i.etapa === 'revisao').length || '', publicacao: S.fluxo?.itens.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao').length || '' };
+  const items = MENU.map(([id, nome, ic, mob, curto]) => `<button class="nv ${S.view === id ? 'on' : ''} ${mob ? '' : 'dsk'}" onclick="go('${id}')">${ico(ic)}<span>${isMobile() && curto ? curto : nome}</span><b>${n[id] || ''}</b></button>`);
+  $('#side').innerHTML = `<div class="logo">Agentes SIM</div>${items.slice(0, 7).join('')}<div class="sp"></div>${items[7]}
+    <button class="nv ${['marcas', 'produtos', 'otimizacao', 'config', 'mais'].includes(S.view) && isMobile() ? 'on' : ''}" style="${isMobile() ? '' : 'display:none'}" onclick="go('mais')">${ico('mais')}<span>Mais</span></button>
+    <div class="who">${esc(S.me?.name || '')} · <a href="#" onclick="logout();return false">sair</a></div>`;
+}
+function go(v) { S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); }
+async function logout() { await api('/api/logout', { body: {} }).catch(() => { }); location.reload(); }
+const VIEWS = {};
+function render() { (VIEWS[S.view] || VIEWS.fluxo)(); }
+
+// ───────── dados
+let refreshT;
+async function refresh() {
+  const q = S.marca ? '?marca=' + encodeURIComponent(S.marca) : '';
+  S.fluxo = await api('/api/v2/fluxo' + q);
+  renderSide();
+  if (!$('.ov') || S.view === 'fluxo') render();
+}
+function live() {
+  try {
+    const es = new EventSource('/api/stream');
+    es.addEventListener('change', () => { clearTimeout(refreshT); refreshT = setTimeout(() => { refresh().catch(() => { }); loadChat().catch(() => { }); }, 400); });
+  } catch { setInterval(refresh, 15000); }
+}
+
+// ───────── seletor de marca (com busca e fixadas)
+function marcaSel() {
+  return `<div class="msel"><button class="chip ${S.marca ? 'on' : ''}" onclick="togglePop(event)">${esc(S.marca || 'Todas as marcas')} ▾</button>
+  <div class="mpop hidden" id="mpop"><input class="f" placeholder="Buscar marca…" oninput="fillPop(this.value)" style="margin-bottom:6px"><div id="mlist"></div></div></div>`;
+}
+function togglePop(e) { e.stopPropagation(); const p = $('#mpop'); p.classList.toggle('hidden'); if (!p.classList.contains('hidden')) { fillPop(''); p.querySelector('input').focus(); } }
+function fillPop(q) {
+  const l = S.brands.map(b => b.name).filter(n => n.toLowerCase().includes(q.toLowerCase())).sort((a, b) => (S.fix.includes(b) - S.fix.includes(a)) || a.localeCompare(b));
+  $('#mlist').innerHTML = `<div class="it" onclick="setMarca('')">Todas as marcas</div>` + l.map(n => `<div class="it" onclick="setMarca(${esc(JSON.stringify(n))})">${esc(n)}<span class="pin ${S.fix.includes(n) ? 'on' : ''}" onclick="event.stopPropagation();pin(${esc(JSON.stringify(n))})">★</span></div>`).join('');
+}
+function pin(n) { S.fix = S.fix.includes(n) ? S.fix.filter(x => x !== n) : [...S.fix, n]; store.set('marcasFixas', S.fix); fillPop($('#mpop input').value); }
+function setMarca(n) { S.marca = n; store.set('marca', n); refresh(); }
+document.addEventListener('click', () => $('#mpop')?.classList.add('hidden'));
+
+// ───────── Fluxo
+const COR = { etapa: 'var(--ok)', esperando: 'var(--gold)', ajuste: 'var(--warn)', parado: 'var(--err)', fila: 'var(--q)', finalizado: '#7fbf98' };
+const CLS = { etapa: '', esperando: 'y', ajuste: 'aj', parado: 'e', fila: 'q', finalizado: 'd' };
+function cartao(i) {
+  const sub = i.estado === 'parado' ? (i.motivo || 'Parado') : i.estado === 'fila' ? 'Na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '') : i.estado === 'esperando' ? 'Esperando você' : i.estado === 'finalizado' ? 'Finalizado' : (i.aguardando ? 'Aguardando ' : 'Trabalhando · ') + esc(i.etapa_nome);
+  return `<button class="c ${CLS[i.estado]}" onclick="abrirItem(${i.id})">${esc(i.titulo)}${i.em_ajuste ? '<span class="tagaj">ajuste</span>' : ''}<i>${i.marca ? esc(i.marca) + ' · ' : ''}${esc(sub)}</i></button>`;
+}
+function colunaDe(i, etapas) {
+  if (i.estado === 'finalizado') return 'fim';
+  if (i.estado === 'esperando') return i.etapa === 'publicacao' ? 'publicacao' : 'revisao';
+  const e = i.etapa === 'publicador' ? 'publicacao' : i.etapa;
+  return etapas.includes(e) ? e : etapas[0];
+}
+VIEWS.fluxo = () => {
+  const F = S.fluxo; if (!F) return;
+  const head = `<div class="top"><h1>Fluxo</h1>
+    <div class="tog"><button class="${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');render()">Lista</button><button class="${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button></div>
+    ${marcaSel()}<button class="btn ok" onclick="novoConteudo()">+ Novo conteúdo</button></div>`;
+  const ban = F.avisos.length ? `<div class="ban"><b>⚠ ${F.avisos.length} item(ns) parado(s)</b><span>${esc(F.avisos[0].titulo)}: ${esc(F.avisos[0].motivo || '')}</span><button class="btn sm" style="margin-left:auto" onclick="abrirItem(${F.avisos[0].id})">Ver</button></div>` : '';
+  if (S.modoFluxo === 'escritorio') { $('#main').innerHTML = head + ban + escritorio(); return; }
+  const lanes = F.formatos.filter(f => f.ativo).map(f => {
+    const its = F.itens.filter(i => i.raia === f.id), aberta = S.abertas[f.id] ?? its.length > 0;
+    const etapas = f.etapas, cols = [...etapas, 'fim'];
+    const nomeCol = e => e === 'fim' ? 'Finalizado' : S.fluxo.etapas[e] || e;
+    const pct = f.meta_dia ? Math.min(100, Math.round(100 * f.hoje / f.meta_dia)) : 0;
+    const sum = Object.entries(f.contagem).map(([k, v]) => `<span style="box-shadow:inset 2px 0 0 ${COR[k] || '#555'}">${v} ${esc(F.estados[k]).toLowerCase()}</span>`).join('');
+    return `<div class="lane ${aberta ? 'open' : ''}"><div class="lh" onclick="raia('${f.id}')"><span class="car">▶</span><b>${esc(f.nome)}</b><div class="sum">${sum || '<span>vazio</span>'}</div>
+      <div class="meta" onclick="event.stopPropagation()">Hoje ${f.hoje}/<input class="metain" type="number" min="0" value="${f.meta_dia}" onchange="setFormato('${f.id}',{meta_dia:+this.value})"><div class="pb"><u style="width:${pct}%"></u></div>
+      <div class="tog"><button class="${f.modo === 'manual' ? 'on' : ''}" onclick="setFormato('${f.id}',{modo:'manual'})">Manual</button><button class="${f.modo === 'automatico' ? 'on' : ''}" onclick="setFormato('${f.id}',{modo:'automatico'})">Automático</button></div></div></div>
+      <div class="st">${cols.map(e => { const cs = its.filter(i => colunaDe(i, etapas) === e); return `<div class="s ${e === 'revisao' ? 'me' : e === 'fim' ? 'done' : ''}"><div class="sh">${esc(nomeCol(e))}<i>${cs.length || ''}</i></div>${cs.slice(0, 8).map(cartao).join('')}${cs.length > 8 ? `<span class="small muted">+${cs.length - 8}</span>` : ''}</div>`; }).join('')}</div></div>`;
+  }).join('');
+  const leg = `<div class="leg">${Object.entries(COR).map(([k, c]) => `<span style="--c:${c}">${esc(F.estados[k])}</span>`).join('')}</div>`;
+  $('#main').innerHTML = head + ban + lanes + leg;
+};
+function raia(id) { const el = event.currentTarget.parentElement; el.classList.toggle('open'); S.abertas[id] = el.classList.contains('open'); store.set('raiasAbertas', S.abertas); }
+const setFormato = (id, b) => tryDo(() => api('/api/v2/formatos/' + id, { method: 'PUT', body: b }));
+function escritorio() {
+  const ag = {}; for (const i of S.fluxo.itens) if (i.estado === 'etapa' || i.estado === 'ajuste') (ag[i.etapa] ||= []).push(i);
+  const nomes = { roteirista: 'Roteirista', gerente: 'Gerente', designer: 'Designer', editor: 'Editor de vídeo', publicador: 'Social Media', radar: 'Radar' };
+  return `<div class="grid">${Object.entries(nomes).map(([k, n]) => `<div class="box"><b>${n}</b> <span class="pill ${ag[k]?.length ? 'etapa' : ''}">${ag[k]?.length ? 'trabalhando' : 'descansando'}</span><div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">${(ag[k] || []).slice(0, 4).map(cartao).join('') || '<span class="small muted">Sem tarefa agora</span>'}</div></div>`).join('')}</div>
+    <p class="small muted" style="margin-top:12px">O escritório 3D completo chega na Etapa 7. Esta visão já mostra o estado real de cada agente.</p>`;
+}
+
+// ───────── Novo conteúdo
+function novoConteudo() {
+  modal(`<div class="hd"><h2>Novo conteúdo</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb" style="display:grid;gap:10px">
+    <input class="f" id="nt" placeholder="Tema ou título">
+    <select class="f" id="nf"><option value="carrossel">Carrossel</option><option value="feed">Estático</option><option value="stories">Stories de venda</option><option value="video_vertical">Reels</option><option value="feed|noticia">Matéria de jornal</option><option value="feed|texto">Post de blog</option></select>
+    <select class="f" id="nm"><option value="">Sem marca</option>${S.brands.map(b => `<option ${b.name === S.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select>
+    <textarea class="f" id="nb" placeholder="Briefing (opcional)"></textarea></div>
+    <div class="ft"><span class="muted small" style="margin-right:auto">Ou peça direto ao gerente no chat.</span><button class="btn ok" onclick="criaConteudo()">Criar</button></div>`, 'sm');
+}
+async function criaConteudo() {
+  const [format, kind] = $('#nf').value.split('|');
+  await tryDo(() => api('/api/contents', { body: { title: $('#nt').value, format, kind: kind || 'educativo', brand: $('#nm').value, brief: $('#nb').value } }), 'Pedido criado');
+  fecha();
+}
+
+// ───────── Mesa de revisão
+VIEWS.mesa = () => {
+  const F = S.fluxo; if (!F) return;
+  let its = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'revisao');
+  const raias = [...new Set(its.map(i => i.raia))];
+  if (S.filtro !== 'todos') its = its.filter(i => i.raia === S.filtro);
+  const nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
+  $('#main').innerHTML = `<div class="top"><h1>Mesa de revisão</h1>${marcaSel()}</div>
+    <div class="tabs"><button class="${S.filtro === 'todos' ? 'on' : ''}" onclick="S.filtro='todos';render()">Todos</button>${raias.map(r => `<button class="${S.filtro === r ? 'on' : ''}" onclick="S.filtro='${r}';render()">${esc(nomeR(r))}</button>`).join('')}</div>
+    ${its.length ? `<div class="grid mesa1">${its.map(i => `<div class="card"><div class="pv ${i.thumb ? '' : 'txt'}">${i.thumb ? `<img src="${i.thumb}" loading="lazy">` : `<span id="pv${i.id}">…</span>`}<span class="tp">${esc(nomeR(i.raia))}${i.roteiro ? ' · roteiro' : ''}</span></div>
+      <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')}${i.nota != null ? ' · nota ' + Number(i.nota).toFixed(1) : ''} · ${fmtD(i.atualizado)}</span>
+      <div class="ac"><button class="btn" onclick="abrirEditor(${i.id})">Abrir editor</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('')}</div>` : '<div class="empty">Nada esperando você agora. ✨</div>'}`;
+  for (const i of its.filter(i => !i.thumb)) api('/api/v2/itens/' + i.id).then(d => { const el = $('#pv' + i.id); if (el) el.textContent = (d.materia || d.roteiro || d.legenda || '').slice(0, 600); }).catch(() => { });
+};
+const aprovar = id => tryDo(() => api(`/api/v2/itens/${id}/aprovar`, { body: {} }), 'Aprovado');
+
+// ───────── Item e editor de texto (Etapa 3)
+async function abrirItem(id) {
+  const i = S.fluxo.itens.find(x => x.id === id);
+  if (i && i.estado === 'esperando' && i.etapa === 'revisao') return abrirEditor(id);
+  const d = await api('/api/v2/itens/' + id);
+  modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="pill ${d.estado}">${esc(d.estado_nome)}${d.estado === 'etapa' ? ' · ' + esc(d.etapa_nome) : ''}</span><button class="btn sm" onclick="fecha()">Fechar</button></div>
+    <div class="mb"><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(d.raia)}</dd>${d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
+    ${d.roteiro ? `<h3 style="margin:16px 0 6px;font-size:13px" class="muted">Roteiro</h3><div class="doc" style="min-height:0">${esc(d.roteiro)}</div>` : ''}
+    ${versoesHtml(d)}</div>
+    <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}</div>`);
+}
+function versoesHtml(d) {
+  if (!d.versoes?.length) return '';
+  return `<h3 style="margin:16px 0 6px;font-size:13px" class="muted">Histórico de versões</h3>${d.versoes.map(v => `<div class="ver"><b>v${v.n}</b><span>${esc(v.autor)}</span><span class="muted">${fmtD(v.ts)}</span><span class="small muted" style="flex:1">${esc(v.motivo || v.resumo || '')}</span>${v.n !== d.versoes[0].n ? `<button class="btn sm" onclick="voltarVersao(${d.id},${v.n})">Voltar</button>` : '<span class="small muted">atual</span>'}</div>`).join('')}`;
+}
+const voltarVersao = async (id, n) => { await tryDo(() => api(`/api/v2/itens/${id}/voltar_versao`, { body: { n } }), 'Versão restaurada'); fecha(); abrirEditor(id); };
+let ED = null;
+async function abrirEditor(id) {
+  const d = await api('/api/v2/itens/' + id);
+  const campo = d.materia ? 'materia' : 'script';
+  ED = { id, campo, orig: { [campo]: d[campo === 'script' ? 'roteiro' : 'materia'] || '', caption: d.legenda || '' }, d, tab: d.thumb ? 'arte' : 'texto' };
+  const arte = d.thumb ? `<div style="display:flex;gap:8px;overflow-x:auto">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<img src="/api/contents/${id}/arte/file/${n}?review=1&t=${encodeURIComponent(d.atualizado)}" onerror="this.remove()" style="height:340px;border-radius:10px">`).join('')}</div><p class="small muted" style="margin-top:8px">O editor de arte em camadas (estilo Canva) chega na Etapa 11. Para ajustar a arte agora, peça ao gerente acima.</p>` : '';
+  const video = d.tem_video ? `<video src="/api/contents/${id}/render/file" controls style="max-height:420px;border-radius:10px"></video><p class="small muted" style="margin-top:8px">O editor de vídeo (estilo CapCut) chega na Etapa 12.</p>` : '';
+  modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca || '')}</span><button class="btn sm" onclick="fecha()">Fechar</button></div>
+    <div class="ask"><input class="f" id="ajm" placeholder="Pedir ajuste ao gerente: diga o que mudar…" onkeydown="if(event.key==='Enter')pedirAjuste()"><button class="btn" onclick="pedirAjuste()">Pedir ajuste</button></div>
+    <div class="mb"><div class="tabs">${d.thumb ? `<button class="${ED.tab === 'arte' ? 'on' : ''}" onclick="edTab('arte')">Arte</button>` : ''}${d.tem_video ? `<button onclick="edTab('video')">Vídeo</button>` : ''}<button class="${ED.tab === 'texto' ? 'on' : ''}" onclick="edTab('texto')">Texto</button><button onclick="edTab('versoes')">Versões</button></div>
+      <div data-t="arte" class="${ED.tab === 'arte' ? '' : 'hidden'}">${arte}</div>
+      <div data-t="video" class="hidden">${video}</div>
+      <div data-t="texto" class="${ED.tab === 'texto' ? '' : 'hidden'}"><div class="doc" id="doc" contenteditable="plaintext-only" spellcheck="true"></div>
+        <h3 class="muted small" style="margin:12px 0 6px">Legenda</h3><textarea class="f" id="leg" rows="4"></textarea>
+        <input class="f" id="porque" placeholder="Por que mudou? (opcional, ajuda o gerente a criar a regra)" style="margin-top:10px"></div>
+      <div data-t="versoes" class="hidden">${versoesHtml(d) || '<p class="muted">Ainda sem edições.</p>'}</div></div>
+    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn" onclick="salvarEd()">Salvar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
+  $('#doc').textContent = ED.orig[campo]; $('#leg').value = ED.orig.caption;
+  $('#doc').addEventListener('input', () => { $('#learn').textContent = 'Você está editando: ao aprovar, o gerente transforma a mudança em regra.'; });
+}
+function edTab(t) { document.querySelectorAll('.mb [data-t]').forEach(e => e.classList.toggle('hidden', e.dataset.t !== t)); document.querySelectorAll('.mb .tabs button').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase().startsWith(t.slice(0, 4)))); }
+async function salvarEd(aprova) {
+  const campos = {}, txt = $('#doc').innerText.replace(/\n$/, '');
+  if (txt !== ED.orig[ED.campo]) campos[ED.campo] = txt;
+  if ($('#leg').value !== ED.orig.caption) campos.caption = $('#leg').value;
+  try {
+    if (Object.keys(campos).length) await api(`/api/v2/itens/${ED.id}/editar`, { body: { campos, motivo: $('#porque').value } });
+    if (aprova) { const r = await api(`/api/v2/itens/${ED.id}/aprovar`, { body: {} }); toast(r.regra ? 'Aprovado. O gerente salvou uma regra (veja no chat).' : 'Aprovado'); fecha(); if (r.regra) chatToggle(true); }
+    else { toast(Object.keys(campos).length ? 'Edição salva como nova versão' : 'Nada mudou'); ED.orig = { ...ED.orig, ...campos }; }
+    await refresh(); loadChat();
+  } catch (e) { toast(e.message); }
+}
+async function pedirAjuste() { const m = $('#ajm').value.trim(); if (!m) return toast('Diga o que ajustar'); await tryDo(() => api(`/api/v2/itens/${ED.id}/ajuste`, { body: { motivo: m, alvo: ED.tab === 'arte' ? 'designer' : ED.tab === 'video' ? 'editor' : 'roteirista' } }), 'Pedido enviado: o item volta para o agente com a tag de ajuste'); fecha(); }
+async function acao(id, a) { if (a === 'descartar' && !confirm('Descartar este item? Ele vai para a lixeira.')) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
+
+// ───────── Publicação (manual)
+VIEWS.publicacao = () => {
+  const F = S.fluxo; if (!F) return;
+  const prontos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao'), feitos = F.itens.filter(i => i.estado === 'finalizado');
+  const nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
+  const redes = ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site'];
+  let corpo = '';
+  if (S.pubTab === 'pronto') corpo = prontos.length ? `<div class="grid">${prontos.map(i => `<div class="card"><div class="pv ${i.thumb ? '' : 'txt'}">${i.thumb ? `<img src="${i.thumb}">` : '<span>Texto</span>'}<span class="tp">${esc(nomeR(i.raia))}</span></div><div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')}</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${i.thumb ? `<a class="btn sm" href="/api/contents/${i.id}/arte/zip" download>Baixar arte</a>` : ''}${i.tem_video ? `<a class="btn sm" href="/api/contents/${i.id}/render/file" download>Baixar vídeo</a>` : ''}<button class="btn sm" onclick="copiaLegenda(${i.id})">Copiar legenda</button></div>
+      <div class="ac"><button class="btn ok" onclick="marcarPostado(${i.id})">Marcar postado</button></div></div></div>`).join('')}</div>` : '<div class="empty">Nada pronto para postar.</div>';
+  else if (S.pubTab === 'agenda') {
+    const d0 = new Date(); d0.setDate(d0.getDate() - d0.getDay());
+    corpo = `<div class="cal">${Array.from({ length: 14 }, (_, k) => { const d = new Date(d0); d.setDate(d.getDate() + k); const key = d.toISOString().slice(0, 10); const its = F.itens.filter(i => (i.postado_em || '').slice(0, 10) === key); return `<div><b>${d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' })}</b>${its.map(i => `<span title="${esc(i.titulo)}">${esc(nomeR(i.raia))} · ${esc(i.titulo)}</span>`).join('')}</div>`; }).join('')}</div>
+      <p class="small muted" style="margin-top:8px">Postagens por formato e marca nas duas semanas. No celular, veja a aba Postados.</p>`;
+  } else corpo = `<div class="lstwrap"><table class="lst"><tr><th>Item</th><th>Formato</th><th>Marca</th><th>Postado</th><th>Link</th></tr>${feitos.map(i => `<tr onclick="abrirItem(${i.id})"><td>${esc(i.titulo)}</td><td>${esc(nomeR(i.raia))}</td><td>${esc(i.marca)}</td><td>${fmtD(i.postado_em)}</td><td>${i.post_url ? `<a href="${esc(i.post_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">abrir</a>` : ''}</td></tr>`).join('')}</table></div>`;
+  $('#main').innerHTML = `<div class="top"><h1>Publicação</h1><span class="pill esperando">Modo manual</span>${marcaSel()}</div>
+    <div class="box" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="small muted">Redes:</span>${redes.map(r => `<span class="chip">${r} · em breve</span>`).join('')}</div>
+    <div class="tabs">${[['pronto', `Pronto para postar (${prontos.length})`], ['agenda', 'Agenda'], ['feitos', `Postados (${feitos.length})`]].map(([k, n]) => `<button class="${S.pubTab === k ? 'on' : ''}" onclick="S.pubTab='${k}';render()">${n}</button>`).join('')}</div>${corpo}`;
+};
+async function copiaLegenda(id) { const d = await api('/api/v2/itens/' + id); try { await navigator.clipboard.writeText(d.legenda || d.materia || d.roteiro || ''); toast('Legenda copiada'); } catch { toast('Não consegui copiar'); } }
+function marcarPostado(id) {
+  modal(`<div class="hd"><h2>Marcar como postado</h2></div><div class="mb"><input class="f" id="plink" placeholder="Link do post (opcional)"></div><div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="confPostado(${id})">Confirmar</button></div>`, 'sm');
+}
+async function confPostado(id) { await tryDo(() => api(`/api/v2/itens/${id}/postado`, { body: { link: $('#plink').value.trim() } }), 'Finalizado'); fecha(); }
+
+// ───────── Marcas
+VIEWS.marcas = async () => {
+  const [{ brands }, { products }] = await Promise.all([api('/api/brands'), api('/api/products')]);
+  S.brands = brands;
+  const n = b => S.fluxo.itens.filter(i => i.marca.toLowerCase() === b.name.toLowerCase()).length;
+  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><button class="btn ok" onclick="novaMarca()">+ Nova marca</button></div>
+    ${brands.length ? `<div class="grid">${brands.map(b => `<div class="box" style="cursor:pointer" onclick="detMarca(${b.id})"><b style="font-size:15px">${esc(b.name)}</b><p class="small muted" style="margin-top:6px">${n(b)} itens no fluxo · ${products.filter(p => (p.brands || []).includes(b.name)).length} produtos</p></div>`).join('')}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}
+    <p class="small muted" style="margin-top:12px">Dica: tudo aqui também pode ser alterado pelo chat (“muda o tom de voz da marca X para…”).</p>`;
+};
+async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
+async function detMarca(id) {
+  const b = S.brands.find(x => x.id === id); const fs = S.fluxo.formatos;
+  const k = await api('/api/knowledge').catch(() => ({ items: [] }));
+  const docs = (k.items || k.knowledge || []).filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase());
+  const sec = cat => docs.filter(x => cat.includes(x.category)).map(x => `<details class="box" style="margin-bottom:6px;padding:10px"><summary>${esc(x.title)}</summary><div style="white-space:pre-wrap;font-size:12.5px;margin-top:8px">${esc(x.content.slice(0, 3000))}</div></details>`).join('') || '<p class="muted small">Nada cadastrado.</p>';
+  modal(`<div class="hd"><h2>${esc(b.name)}</h2><button class="btn sm" onclick="renMarca(${id})">Renomear</button><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
+    <div class="tabs"><button class="on" onclick="mTab(this,'v')">Visual</button><button onclick="mTab(this,'z')">Voz</button><button onclick="mTab(this,'f')">Formatos e metas</button><button onclick="mTab(this,'c')">Contas</button></div>
+    <div data-m="v">${sec(['marca', 'diretrizes'])}</div><div data-m="z" class="hidden">${sec(['tom_de_voz'])}</div>
+    <div data-m="f" class="hidden">${fs.map(f => `<div class="ver"><b style="width:160px">${esc(f.nome)}</b><span class="muted">meta ${f.meta_dia}/dia · ${f.modo}</span></div>`).join('')}<p class="small muted" style="margin-top:8px">As metas valem por formato; ajuste no Fluxo.</p></div>
+    <div data-m="c" class="hidden"><p class="muted">Conexão com as redes: em breve. Hoje a publicação é manual.</p></div></div>`);
+}
+function mTab(b, k) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('[data-m]').forEach(e => e.classList.toggle('hidden', e.dataset.m !== k)); }
+async function renMarca(id) { const n = prompt('Novo nome'); if (n) { await tryDo(() => api('/api/brands/' + id, { method: 'PUT', body: { name: n } }), 'Renomeada'); fecha(); render(); } }
+
+// ───────── Produtos
+VIEWS.produtos = async () => {
+  const { products } = await api('/api/products');
+  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1>${marcaSel()}</div>
+    ${products.length ? `<div class="grid">${products.filter(p => !S.marca || (p.brands || []).includes(S.marca)).map(p => `<div class="box" style="cursor:pointer" onclick='detProduto(${JSON.stringify(p.id)})'><b>${esc(p.name)}</b><p class="small muted" style="margin-top:4px">${esc(p.type)} · ${esc((p.brands || []).join(', ') || 'geral')}</p></div>`).join('')}</div>` : '<div class="empty">Nenhum produto. Peça ao gerente para cadastrar.</div>'}`;
+  S._prods = products;
+};
+function detProduto(id) {
+  const p = S._prods.find(x => x.id === id);
+  const feitos = S.fluxo.itens.filter(i => i.titulo && p.name && false);
+  modal(`<div class="hd"><h2>${esc(p.name)}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><dl class="kv">${Object.entries(p).filter(([k, v]) => v && typeof v !== 'object' && !['id', 'image'].includes(k)).map(([k, v]) => `<dt>${esc(k)}</dt><dd style="white-space:pre-wrap">${esc(String(v).slice(0, 1500))}</dd>`).join('')}</dl>${feitos.length ? '' : ''}</div>`);
+}
+
+// ───────── Otimização
+VIEWS.otimizacao = async () => {
+  const m = await api('/api/metrics').catch(() => ({ items: [] }));
+  const posted = S.fluxo.itens.filter(i => i.estado === 'finalizado');
+  const rank = (m.items || []).filter(x => x.content_id).sort((a, b) => (b.likes + b.saves * 2 + b.shares * 2) - (a.likes + a.saves * 2 + a.shares * 2));
+  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1></div>
+    <p class="muted small" style="margin-bottom:12px">Só itens postados. Ranking por curtidas, salvamentos e compartilhamentos. As descobertas do gerente aparecem quando houver uns 10 posts por formato.</p>
+    ${rank.length ? `<div class="lstwrap"><table class="lst"><tr><th>#</th><th>Post</th><th>Alcance</th><th>Curtidas</th><th>Salvamentos</th></tr>${rank.slice(0, 30).map((x, k) => `<tr><td>${k + 1}</td><td>${esc(x.post_title)}</td><td>${x.views}</td><td>${x.likes}</td><td>${x.saves}</td></tr>`).join('')}</table></div>` : `<div class="empty">${posted.length} post(s) finalizado(s), ainda sem métricas. Elas chegam na Etapa 8.</div>`}`;
+};
+
+// ───────── Cérebro (lista; o 3D chega na Etapa 6)
+VIEWS.cerebro = async () => {
+  const d = await api('/api/brain').catch(() => null);
+  const regras = d?.rules || d?.regras || [];
+  $('#main').innerHTML = `<div class="top"><h1>Cérebro</h1><div class="tog"><button class="on">Lista</button><button disabled title="Etapa 6">Constelação</button><button disabled title="Etapa 6">3D</button></div><input class="f" style="width:240px" placeholder="Buscar…" oninput="filtraCer(this.value)"></div>
+    <p class="small muted" style="margin-bottom:10px">Regras não têm tela própria: pergunte ao gerente. Aqui fica a lista do que ele sabe.</p>
+    <div id="cerl">${regras.filter(r => r.status === 'ativa').map(r => `<div class="ver" data-q="${esc((r.agent + ' ' + r.text).toLowerCase())}"><span class="pill">${esc(r.agent)}</span><span style="flex:1">${esc(r.text)}</span>${r.brand ? `<span class="small muted">${esc(r.brand)}</span>` : ''}</div>`).join('') || '<div class="empty">Sem regras ativas.</div>'}</div>`;
+};
+function filtraCer(q) { q = q.toLowerCase(); document.querySelectorAll('#cerl [data-q]').forEach(e => e.classList.toggle('hidden', !e.dataset.q.includes(q))); }
+
+// ───────── Configurações
+VIEWS.config = async () => {
+  const [st, us, lx] = await Promise.all([api('/api/state'), S.me.admin ? api('/api/users').catch(() => ({ users: [] })) : { users: [] }, api('/api/v2/fluxo?lixeira=1')]);
+  const lixo = lx.itens.filter(i => i.estado === 'descartado');
+  $('#main').innerHTML = `<div class="top"><h1>Configurações</h1></div><div class="grid">
+    <div class="box"><b>Assinatura do Claude</b><p class="small muted" style="margin-top:6px">Modo: ${esc(st.api?.provider)}${st.api?.assinatura ? ' · conectada' : ''}</p><p class="small muted">Tarefas hoje: ${st.jobsToday}</p></div>
+    <div class="box"><b>Gasto do mês</b><p class="small muted" style="margin-top:6px">Imagens hoje: US$ ${Number(st.imgHoje?.usd ?? st.imgHoje ?? 0).toFixed(2)}</p></div>
+    <div class="box"><b>Logins</b><p class="small muted" style="margin:6px 0">Perfis: Dono (tudo) e Revisor (Fluxo, Revisão e Publicação).</p>${us.users.map(u => `<div class="ver">${esc(u.name)} <span class="muted">${esc(u.username)}</span><span class="pill" style="margin-left:auto">${u.role === 'admin' ? 'Dono' : 'Revisor'}</span></div>`).join('')}${S.me.admin ? '<button class="btn sm" style="margin-top:8px" onclick="novoRevisor()">+ Revisor</button>' : ''}</div>
+    <div class="box"><b>Lixeira</b>${lixo.map(i => `<div class="ver"><span style="flex:1">${esc(i.titulo)}</span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></div>`).join('') || '<p class="small muted" style="margin-top:6px">Vazia.</p>'}</div>
+  </div><p class="small muted" style="margin-top:14px"><a href="/">Abrir o painel antigo</a> (fica até a troca final).</p>`;
+};
+async function novoRevisor() {
+  const name = prompt('Nome do revisor'); if (!name) return; const username = prompt('Login (letras minúsculas)'); if (!username) return; const password = prompt('Senha (mín. 8)'); if (!password) return;
+  await tryDo(() => api('/api/users', { body: { name, username, password, role: 'custom', perms: { pipeline: 'editar', dashboard: 'editar', office: 'ver', video: 'ver', arte: 'ver', chefe: 'editar' } } }), 'Revisor criado'); render();
+}
+
+// ───────── Mais (celular)
+VIEWS.mais = () => { $('#main').innerHTML = `<div class="top"><h1>Mais</h1></div><div style="display:grid;gap:8px">${MENU.filter(m => !m[3]).map(([id, nome, ic]) => `<button class="nv box" style="color:var(--tx)" onclick="go('${id}')">${ico(ic)}${nome}</button>`).join('')}<button class="nv box" style="color:var(--tx)" onclick="logout()">Sair</button></div>`; };
+
+// ───────── Chat do gerente
+const SUGS = ['O que está parado?', 'Quais regras você aprendeu esta semana?', 'Cria 2 carrosséis para amanhã', 'Resumo do dia'];
+async function loadChat() {
+  const d = await api('/api/gerente');
+  const sig = d.msgs.map(m => m.id).join() + d.pending.length;
+  $('#typing').classList.toggle('hidden', !d.pending.length);
+  if (sig === S.chatSig) return; S.chatSig = sig; S.chat = d.msgs;
+  $('#msgs').innerHTML = d.msgs.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${esc(m.text)}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>';
+  $('#msgs').scrollTop = 1e9;
+  const ult = d.msgs.at(-1)?.id || 0, novas = d.msgs.filter(m => m.role !== 'user' && m.id > S.lidas).length;
+  if ($('#chat').classList.contains('open') || !isMobile()) { S.lidas = ult; store.set('chatLidas', ult); $('#fabcnt').textContent = ''; } else $('#fabcnt').textContent = novas || '';
+}
+async function chatSend(t) {
+  const text = t || $('#cin').value.trim(); if (!text) return; $('#cin').value = '';
+  $('#typing').classList.remove('hidden');
+  try { await api('/api/gerente/chat', { body: { text } }); } catch (e) { toast(e.message); }
+  await loadChat(); refresh();
+}
+async function desfazRegra(id, b) { b.disabled = true; await tryDo(() => api(`/api/v2/regras/${id}/desfazer`, { body: {} }), 'Regra desfeita'); loadChat(); }
+function chatToggle(on) { $('#chat').classList.toggle('open', on); if (on) { S.lidas = S.chat.at(-1)?.id || 0; store.set('chatLidas', S.lidas); $('#fabcnt').textContent = ''; } }
+$('#sugs').innerHTML = SUGS.map(s => `<button onclick="chatSend(${esc(JSON.stringify(s))})">${esc(s)}</button>`).join('');
+
+// ───────── modal
+function modal(html, cls = '') { $('#ovs').innerHTML = `<div class="ov" onclick="if(event.target===this)fecha()"><div class="mo ${cls}">${html}</div></div>`; }
+function fecha() { $('#ovs').innerHTML = ''; ED = null; render(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('.ov')) fecha(); });
+
+// ───────── início
+(async () => {
+  const me = await fetch('/api/me', { headers: { 'x-nerd': '1' } }).then(r => r.json()).catch(() => ({}));
+  if (!me.authed) return showLogin();
+  S.me = me.user;
+  $('#app').classList.remove('hidden');
+  const h = location.hash.slice(1); if (VIEWS[h]) S.view = h;
+  S.brands = (await api('/api/brands').catch(() => ({ brands: [] }))).brands;
+  await refresh(); loadChat().catch(() => { }); live();
+  addEventListener('resize', () => renderSide());
+})();
+</script>
+</body>
+</html>
