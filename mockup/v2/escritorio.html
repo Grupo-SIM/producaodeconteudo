@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif}
+body{background:#0e1117;color:#e7e9ee;width:1920px;height:1080px;display:flex}
+.side{width:200px;background:#0a0c11;border-right:1px solid #222836;padding:18px 12px;display:flex;flex-direction:column;gap:6px}
+.logo{font-weight:800;margin:0 8px 18px}.nv{padding:10px 12px;border-radius:10px;color:#8a93a6;font-size:14px;display:flex}.nv.on{background:#1f2633;color:#fff}.nv b{margin-left:auto;background:#ffc857;color:#222;border-radius:9px;font-size:11px;padding:1px 7px}
+.main{flex:1;padding:18px 24px;position:relative}
+.top{display:flex;gap:10px;align-items:center;margin-bottom:12px}.top h1{font-size:20px}.chip{font-size:12px;background:#1a202b;padding:7px 12px;border-radius:999px;color:#aab}.chip.on{background:#2b5cff;color:#fff}
+.stage{position:relative;height:960px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#141a26,#0b0f16)}
+.floor{position:absolute;left:50%;top:52%;width:1100px;height:1100px;transform:translate(-50%,-50%) rotateX(60deg) rotateZ(45deg);background:
+repeating-linear-gradient(0deg,#1a2232 0 68px,#172030 68px 136px),#1a2232;border-radius:20px;box-shadow:0 0 0 14px #222c3f,0 60px 120px #000}
+.floor:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 135px,#ffffff08 135px 137px),repeating-linear-gradient(0deg,transparent 0 135px,#ffffff08 135px 137px)}
+.st{position:absolute;transform:translate(-50%,-100%);text-align:center}
+.desk{width:150px;height:62px;position:relative;margin:0 auto}
+.desk .top2{position:absolute;left:0;right:0;top:20px;height:34px;background:linear-gradient(#3a4a66,#2b3850);transform:skewX(-30deg);border-radius:4px;box-shadow:0 12px 0 #1b2333}
+.mon{position:absolute;left:52px;top:-16px;width:52px;height:36px;border-radius:4px;background:#0b0e14;border:3px solid #4b5b7a;box-shadow:0 0 18px var(--g);overflow:hidden}
+.mon i{display:block;height:3px;margin:4px 5px;background:var(--g);border-radius:2px;opacity:.85}
+.mon i:nth-child(2){width:60%}.mon i:nth-child(3){width:80%}
+.bot{width:46px;height:58px;margin:-6px auto 0;position:relative}
+.bot .hd{width:34px;height:30px;border-radius:12px;background:var(--c);margin:0 auto;position:relative;box-shadow:inset -5px -5px 0 #0003}
+.bot .hd:before,.bot .hd:after{content:"";position:absolute;top:11px;width:6px;height:6px;border-radius:50%;background:#0b0e14}.bot .hd:before{left:8px}.bot .hd:after{right:8px}
+.bot .bd{width:44px;height:26px;border-radius:12px 12px 6px 6px;background:var(--c);margin:3px auto 0;filter:brightness(.8)}
+.bot .an{position:absolute;left:50%;top:-10px;width:2px;height:10px;background:var(--c)}.bot .an:after{content:"";position:absolute;left:-3px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g)}
+.lbl{margin-top:6px;font-size:13px;font-weight:700}.sub{font-size:11px;color:#8a93a6}
+.bub{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);width:210px;background:#f4f6fb;color:#111;font-size:11.5px;line-height:1.35;border-radius:12px;padding:8px 10px;text-align:left;box-shadow:0 8px 20px #0006}
+.bub:after{content:"";position:absolute;left:50%;bottom:-6px;border:6px solid transparent;border-top-color:#f4f6fb;border-bottom:0}
+.bub small{display:block;color:#666;font-size:10px;margin-top:3px}
+.pg{height:4px;background:#ddd;border-radius:3px;margin-top:5px}.pg u{display:block;height:4px;background:#22a35a;border-radius:3px}
+.zz{position:absolute;right:-6px;top:-4px;font-size:13px;color:#8a93a6;font-weight:700}
+.alert{position:absolute;right:-8px;top:-8px;width:22px;height:22px;border-radius:50%;background:#ff5b5b;color:#fff;font-weight:900;display:grid;place-items:center;font-size:13px}
+.doc{position:absolute;width:22px;height:28px;background:#fff;border-radius:3px;box-shadow:0 4px 10px #0008}.doc:before{content:"";position:absolute;left:4px;right:4px;top:6px;height:2px;background:#bbb;box-shadow:0 5px 0 #bbb,0 10px 0 #bbb}
+svg.p{position:absolute;inset:0}
+.hud{position:absolute;left:20px;top:20px;display:flex;gap:10px}.hud div{background:#0b0e14cc;border:1px solid #2a3344;border-radius:12px;padding:10px 14px;font-size:12px;color:#8a93a6}.hud b{display:block;font-size:20px;color:#fff}
+.you{position:absolute;right:20px;top:20px;background:#1d1a10ee;border:1px solid #4a3f1a;border-radius:12px;padding:12px 14px;font-size:12.5px;width:250px}.you b{color:#ffc857;font-size:14px}.you div{margin-top:6px;color:#ddd}
+.chat{width:360px;border-left:1px solid #222836;display:flex;flex-direction:column}.ch{padding:16px 18px;border-bottom:1px solid #222836;font-weight:700}
+.msgs{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.45}.m{padding:9px 12px;border-radius:12px;max-width:90%}.u{background:#2b5cff;align-self:flex-end}.g{background:#1a202b}
+.in{margin:14px;padding:12px;background:#1a202b;border-radius:12px;color:#77808f;font-size:13px}
+</style></head><body>
+<div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv on">Fluxo<b>6</b></div><div class="nv">Mesa de revisão<b>6</b></div><div class="nv">Marcas</div><div class="nv">Produtos</div><div class="nv">Otimização</div><div class="nv">Cérebro</div><div class="nv" style="margin-top:auto">Configurações</div></div>
+<div class="main"><div class="top"><h1>Fluxo</h1><span class="chip">Lista</span><span class="chip on">Escritório</span><span style="flex:1"></span><span class="chip" style="border:1px solid #2b5cff">Marca: <b style="color:#fff">Todas (7)</b> ▾</span><span class="chip">Tela cheia</span></div>
+<div class="stage"><div class="floor"></div>
+<svg class="p" viewBox="0 0 1356 960"><g stroke="#2b5cff" stroke-width="2" stroke-dasharray="6 7" fill="none" opacity=".55">
+<path d="M330 420 Q500 330 678 330"/><path d="M678 330 Q860 330 1030 420"/><path d="M330 420 Q420 560 560 620"/><path d="M1030 420 Q940 560 800 620"/><path d="M678 590 L678 680"/></g></svg>
+<div class="doc" style="left:500px;top:340px;transform:rotate(-12deg)"></div><div class="doc" style="left:880px;top:345px;transform:rotate(10deg)"></div>
+<div class="st" style="left:678px;top:580px;--c:#e0b23a;--g:#ffc857"><div class="bub">Designer, o roteiro "Aluno profissional" foi aprovado. É contigo.<small>distribuindo 6 tarefas</small></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl">Gerente</div></div>
+<div class="st" style="left:330px;top:400px;--c:#4d7cff;--g:#3ddc84"><div class="bub">Escrevendo "Delivery e comissão"<small>Corte dos Ricos · Carrossel</small><div class="pg"><u style="width:62%"></u></div></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl">Roteirista</div></div>
+<div class="st" style="left:678px;top:290px;--c:#7c8ba8;--g:#3ddc84"><div class="bub">Checando "Fyre Festival" no checklist de história real<small>Seguidores em Alta</small></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl">Revisor de copy</div></div>
+<div class="st" style="left:1030px;top:400px;--c:#c056e0;--g:#3ddc84"><div class="bub">Montando "Toy Story 2 quase apagado", slide 6 de 10<small>007 Spyhacker · Carrossel</small><div class="pg"><u style="width:60%"></u></div></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl">Designer</div></div>
+<div class="st" style="left:230px;top:720px;--c:#2fb37a;--g:#3ddc84"><div class="bub">Lendo ge, ESPN e CNN Esportes<small>Vivendo de Bet · pauta do dia</small></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl">Agente de Notícias</div></div>
+<div class="st" style="left:520px;top:800px;--c:#3aa0c8;--g:#3ddc84"><div class="bub">Palavras-chave de "IA do Instagram para adolescentes"<small>Seguidores em Alta · Matéria</small></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl">SEO</div></div>
+<div class="st" style="left:840px;top:800px;--c:#e06a4d;--g:#ff5b5b"><span class="alert" style="right:40px;top:60px">!</span><div class="bub" style="background:#ffe3e3">Parei em "Atlas, pico de acesso". A assinatura do Claude saiu do login.<small>007 Spyhacker · Reels</small></div><div class="bot"><span class="an"></span><div class="hd"></div><div class="bd"></div></div><div class="desk"><div class="top2"></div><div class="mon"><i></i><i></i><i></i></div></div><div class="lbl" style="color:#ff8b8b">Editor de vídeo</div></div>
+<div class="st" style="left:1130px;top:720px;--c:#55607a;--g:#666"><div class="bub" style="background:#d9dde6">Nada para postar agora.<small>1 item marcado para postagem</small></div><div class="bot" style="opacity:.75"><span class="an"></span><div class="hd"></div><div class="bd"></div><span class="zz">z z</span></div><div class="desk"><div class="top2"></div><div class="mon" style="box-shadow:none"><i></i></div></div><div class="lbl">Publicador</div><div class="sub">descansando</div></div>
+<div class="hud"><div><b>6</b>trabalhando</div><div><b>1</b>parado</div><div><b>8 de 13</b>meta de hoje</div></div>
+<div class="you"><b>Esperando você: 6</b><div>Moldura de preço · Efeito isca · Atlas Hosting · +3</div><div style="color:#ffc857;margin-top:8px">Abrir Mesa de revisão ›</div></div>
+</div></div>
+<div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Como tá o time agora?</div><div class="m g">6 trabalhando, o Editor de vídeo parado (precisa de login) e o Publicador sem nada para postar. Meta de hoje: 8 de 13. Tem 6 itens esperando você.</div></div><div class="in">Fale com o gerente…</div></div>
+</body></html>

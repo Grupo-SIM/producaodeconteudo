@@ -1,0 +1,57 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif}
+body{background:#0e1117;color:#e7e9ee;width:1920px;height:1080px;display:flex}
+.side{width:200px;background:#0a0c11;border-right:1px solid #222836;padding:18px 12px;display:flex;flex-direction:column;gap:6px}
+.logo{font-weight:800;margin:0 8px 18px}.nv{padding:10px 12px;border-radius:10px;color:#8a93a6;font-size:14px;display:flex;gap:10px;align-items:center}.nv.on{background:#1f2633;color:#fff}.nv b{margin-left:auto;background:#ffc857;color:#222;border-radius:9px;font-size:11px;padding:1px 7px}
+.main{flex:1;position:relative;overflow:hidden}
+.top{position:absolute;top:18px;left:24px;right:24px;display:flex;gap:10px;align-items:center;z-index:3}.top h1{font-size:20px;margin-right:auto}
+.chip{font-size:12px;background:#1a202b;padding:7px 12px;border-radius:999px;color:#aab}.chip.on{background:#2b5cff;color:#fff}
+svg.g{position:absolute;left:0;top:0;width:100%;height:100%}
+.n{position:absolute;transform:translate(-50%,-50%);text-align:center;font-size:12px;color:#cfd6e4}
+.n i{display:block;margin:0 auto 6px;border-radius:50%}
+.hub i{width:84px;height:84px;background:radial-gradient(circle,#ffc857,#8a6a10);box-shadow:0 0 50px #ffc85788}
+.ag i{width:50px;height:50px;background:radial-gradient(circle,#4d7cff,#1b3a99);box-shadow:0 0 26px #2b5cff99}
+.br i{width:34px;height:34px;background:radial-gradient(circle,#3ddc84,#16613a);box-shadow:0 0 18px #3ddc8477}
+.fi i{width:12px;height:12px;background:#8aa0c8}.fi{font-size:10px;color:#8a93a6}
+.on i{outline:3px solid #fff;outline-offset:4px}
+.leg{position:absolute;left:24px;bottom:20px;display:flex;gap:16px;font-size:12px;color:#8a93a6}.leg span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--c)}
+.srch{position:absolute;left:24px;top:64px;width:380px;background:#1a202b;border-radius:10px;padding:10px 12px;font-size:13px;color:#77808f;z-index:3}
+.chat{width:360px;border-left:1px solid #222836;display:flex;flex-direction:column}.ch{padding:16px 18px;border-bottom:1px solid #222836;font-weight:700}
+.msgs{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.45}.m{padding:9px 12px;border-radius:12px;max-width:90%}.u{background:#2b5cff;align-self:flex-end}.gg{background:#1a202b}.gg small{display:block;color:#7fd1a0;margin-top:6px;font-size:11.5px}
+.in{margin:14px;padding:12px;background:#1a202b;border-radius:12px;color:#77808f;font-size:13px}
+.mo{position:absolute;right:30px;top:110px;width:520px;bottom:30px;background:#12161ef2;border:1px solid #2c3445;border-radius:16px;padding:18px;box-shadow:0 20px 60px #000c;z-index:4;font-size:13px;line-height:1.5;display:none}
+.mo h2{font-size:17px}.mo .sub{font-size:12px;color:#8a93a6;margin-bottom:12px}
+.mo .bx{background:#0f131a;border-radius:10px;padding:10px 12px;margin-bottom:8px}.mo .bx b{display:block;font-size:11px;color:#8a93a6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.mo .rel{display:flex;gap:6px;flex-wrap:wrap}.mo .rel span{font-size:11.5px;background:#1f2633;border-radius:999px;padding:4px 10px}
+</style></head><body>
+<div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv">Fluxo<b>6</b></div><div class="nv">Mesa de revisão<b>6</b></div><div class="nv">Marcas</div><div class="nv">Produtos</div><div class="nv">Otimização</div><div class="nv on">Cérebro</div><div class="nv" style="margin-top:auto">Configurações</div></div>
+<div class="main"><div class="top"><h1>Cérebro</h1><span class="chip on">Mapa</span><span class="chip">Lista</span><span class="chip">Marca: Todas ▾</span></div>
+<div class="srch">Buscar: "gancho", "zona segura", "CTA"…</div>
+<svg class="g" id="g"></svg><div id="nodes"></div>
+<div class="leg"><span style="--c:#ffc857">Gerente</span><span style="--c:#4d7cff">agente</span><span style="--c:#8aa0c8">arquivo de treino</span><span style="--c:#3ddc84">marca</span><span style="color:#8a93a6">· clique em qualquer ponto para abrir</span></div>
+<div class="mo"><h2>Stories de venda</h2><div class="sub">Roteirista · arquivo 10 · atualizado em 11/11/2026</div>
+<div class="bx"><b>Resumo</b>18 a 20 telas em formato caixinha (pergunta e resposta). Alterna polêmica, humor e autoridade. O produto aparece no meio, não em todas as telas.</div>
+<div class="bx"><b>Regras</b>Todo CTA leva ao link da tela. Sem emoji. Fundo: imagem ligada à tela, cores fortes, camada preta por cima.</div>
+<div class="bx"><b>Exemplos aprovados</b>ÁreaFlix (18 telas) · Atlas Hosting (19) · SimIntPay (19) · PagaTG no Seguidores em Alta (20) · Corte dos Ricos com Controle de Motorista e Controle Patrimonial (20)</div>
+<div class="bx"><b>Ligado a</b><div class="rel"><span>Designer · fundo dos stories de venda</span><span>Revisor · checklist stories de venda</span><span>Seguidores em Alta</span><span>Corte dos Ricos</span></div></div>
+<div class="bx" style="background:#0f2418;color:#8fe0b0">Para mudar, fale com o gerente: "nos stories de venda, ..."</div></div>
+</div>
+<div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Mostra o que os stories de venda usam.</div><div class="m gg">Abri no mapa. São 3 arquivos ligados: o do Roteirista, o fundo do Designer e o checklist do Revisor.<small>Destacado no mapa</small></div></div><div class="in">Fale com o gerente…</div></div>
+<script>
+const W=1360,H=1080,cx=520,cy=560;const A={Roteirista:16,'Editor de vídeo':12,'Revisor de copy':9,Designer:8,Gerente2:0,SEO:3,Publicador:3,'Agente de Notícias':2};
+const agents=['Roteirista','Designer','Editor de vídeo','Revisor de copy','SEO','Publicador','Agente de Notícias'];const cnt=[16,8,12,9,3,3,2];
+const files={Roteirista:['Carrossel','Narrativa','Copy que converte','Manchetes','Ganchos','Engenharia reversa','Estático','Matéria','História real','Stories de venda','Marketing digital','Corte dos Ricos','Post de venda','Reels','Blog','Serviço'],Designer:['Arte que para o dedo','Zonas seguras','Carrossel','Originalidade','Modelos','Estilo do dono','Fotos de notícia','Fundo dos stories'],'Editor de vídeo':['Retenção','Duração','Zonas seguras','Vídeo que vende','Direitos','Motion DNA','Áudio','M1','M2','M3','M4','M5'],'Revisor de copy':['Narrativa','Hard copy','Manchete','Padrão do dono','História real','Stories de venda','Matéria','Blog','Serviço'],SEO:['Notícias e IA','Blog','Serviço'],Publicador:['Legenda e hashtags','Horário','Monetização'],'Agente de Notícias':['Fontes por nicho','Nota da pauta']};
+const brands=['007 Spyhacker','Central do Marketing','Corte dos Ricos','Marketing Raiz','Seguidores em Alta','SIM Int Pay','Vivendo de Bet'];
+let svg='',nd='';const add=(x,y,c,t,on)=>nd+=`<div class="n ${c}${on?' on':''}" style="left:${x}px;top:${y}px"><i></i>${t}</div>`;
+const line=(x1,y1,x2,y2,c,w,o)=>svg+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" opacity="${o}"/>`;
+add(cx,cy,'hub','<b>Gerente</b>');
+agents.forEach((a,i)=>{const ang=i/agents.length*Math.PI*2-Math.PI/2;const ax=cx+Math.cos(ang)*250,ay=cy+Math.sin(ang)*250;line(cx,cy,ax,ay,'#4d7cff',2,.6);
+ add(ax,ay,'ag',`<b>${a}</b><br><span style="color:#8a93a6;font-size:10.5px">${cnt[i]} arquivos</span>`);
+ const fs=files[a];fs.forEach((f,j)=>{const spread=Math.min(1.5,fs.length*0.11);const fa=ang-spread/2+spread*(j+.5)/fs.length;const r=110+(j%3)*26;const fx=ax+Math.cos(fa)*r,fy=ay+Math.sin(fa)*r;
+  const hot=(a=='Roteirista'&&f=='Stories de venda')||(a=='Designer'&&f=='Fundo dos stories')||(a=='Revisor de copy'&&f=='Stories de venda');
+  line(ax,ay,fx,fy,hot?'#ffc857':'#8aa0c8',hot?2.5:1,hot?1:.35);add(fx,fy,'fi'+(hot?' on':''),hot?`<b style="color:#ffc857">${f}</b>`:"",false);});});
+brands.forEach((b,i)=>{const ang=i/brands.length*Math.PI*2;const bx=cx+Math.cos(ang)*95,by=cy+Math.sin(ang)*95;});
+// brands in outer ring right side
+brands.forEach((b,i)=>{const bx=1180,by=150+i*120;line(cx,cy,bx,by,'#3ddc84',1,.18);add(bx,by,'br',b)});
+document.getElementById('g').innerHTML=svg;document.getElementById('nodes').innerHTML=nd;
+</script></body></html>
