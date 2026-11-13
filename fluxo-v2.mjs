@@ -45,7 +45,7 @@ export function estadoDe(c, jobs = []) {
     case 'discarded': return { estado: 'descartado', etapa: '' };
     case 'approved': return { estado: c.avulso ? 'finalizado' : 'esperando', etapa: 'publicacao' };
     case 'awaiting_approval': case 'awaiting_script': return { estado: 'esperando', etapa: 'revisao', roteiro: c.status === 'awaiting_script' };
-    case 'blocked': return { estado: 'parado', etapa: rodando?.agent || 'gerente', motivo: c.error || 'Travou na revisão' };
+    case 'blocked': if (!/dangerously-skip|root\/sudo|limite de uso|sem resposta/i.test(c.error || '')) return { estado: 'esperando', etapa: 'revisao', travado: true, motivo: c.error || 'O revisor reprovou: decida você' }; return { estado: 'fila', etapa: 'roteirista', motivo: '' };
     case 'error': return { estado: 'parado', etapa: rodando?.agent || '', motivo: c.error || 'Erro' };
   }
   if (comErro || c.error && !ativos.length) return { estado: 'parado', etapa: jobs.at(-1)?.agent || '', motivo: c.error || jobs.at(-1)?.error || 'Parado' };
@@ -94,6 +94,34 @@ export function criarFluxoV2(ctx) {
     for (const { id } of presos) { run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id); setContent(id, { error: '' }); try { contentAct(id, 'reprocess'); } catch { /* segue */ } }
     if (presos.length) { log(null, `${presos.length} item(ns) parados pelo erro antigo de configuração voltaram para a fila`); changed(); }
   } catch (e) { console.error('reprocessar presos:', e.message); } }, 3000).unref?.();
+  db.exec('CREATE TABLE IF NOT EXISTS brand_metas(brand TEXT NOT NULL, raia TEXT NOT NULL, qtd INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(brand, raia))');
+  const novoFormatos = () => { try { return JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'formatos-novo-conteudo.json'), 'utf8')); } catch { return []; } };
+  const diaLocal = t => new Date(t).toLocaleDateString('en-CA', { timeZone: ctx.settings().tz || 'America/Sao_Paulo' });
+  // Modo autônomo por marca: a cada minuto confere a meta de cada marca × formato e pede ao Gerente só as pautas que faltam
+  function metasTick() {
+    const s = ctx.settings(); if (s.autopilot !== '1') return;
+    const hora = +new Date().toLocaleString('en-US', { timeZone: s.tz || 'America/Sao_Paulo', hour: 'numeric', hour12: false }); if (hora < +(s.start_hour || 0)) return;
+    const hoje = diaLocal(Date.now()), F = novoFormatos();
+    const feitos = all("SELECT * FROM contents WHERE teste=0 AND created_by='autopilot' AND created_at>=?", new Date(Date.now() - 40 * 3600e3).toISOString()).filter(c => diaLocal(c.created_at) === hoje);
+    for (const m of all('SELECT * FROM brand_metas WHERE qtd>0')) {
+      const f = F.find(x => x.id === m.raia); if (!f) continue;
+      const falta = m.qtd - feitos.filter(c => (c.brand || '').toLowerCase() === m.brand.toLowerCase() && raiaDe(c, ctx) === m.raia).length; if (falta <= 0) continue;
+      const tag = `"meta":"${m.brand}|${m.raia}"`;
+      if (one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running') AND input LIKE ?", '%' + tag + '%')) continue;
+      if (one("SELECT COUNT(*) n FROM jobs WHERE kind='pautas' AND cday=? AND input LIKE ?", hoje, '%' + tag + '%').n >= 3) continue;
+      ctx.enqueue(null, 'chefe', 'pautas', { auto: true, brand: m.brand, quota: { [f.format]: falta }, kinds: f.tipos.map(t => t[0]), meta: `${m.brand}|${m.raia}` }, 'auto');
+    }
+  }
+  // Itens parados por causa técnica que se resolve sozinha (limite da assinatura, resposta vazia, erro antigo): tenta de novo a cada hora
+  function retentaTick() {
+    const L = all("SELECT DISTINCT c.id FROM contents c JOIN jobs j ON j.content_id=c.id WHERE c.teste=0 AND c.status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script') AND j.status='error' AND (j.error LIKE '%limite de uso%' OR j.error LIKE '%sem resposta%' OR j.error LIKE '%dangerously-skip%' OR j.error LIKE '%root/sudo%') AND (j.finished_at IS NULL OR j.finished_at < ?)", new Date(Date.now() - 3600e3).toISOString());
+    for (const { id } of L) { run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id); setContent(id, { error: '' }); try { contentAct(id, 'reprocess'); } catch { /* segue */ } }
+    if (L.length) { log(null, `${L.length} item(ns) parados por limite ou falha do Claude voltaram para a fila sozinhos`); changed(); }
+  }
+  ctx.temMetasMarca = () => !!one('SELECT 1 x FROM brand_metas WHERE qtd>0');
+  setInterval(() => { try { metasTick(); } catch (e) { console.error('metas por marca:', e.message); } }, 60e3).unref();
+  setInterval(() => { try { retentaTick(); } catch (e) { console.error('retentativa:', e.message); } }, 15 * 60e3).unref();
+
   const formatos = () => all('SELECT * FROM formatos ORDER BY ordem').map(f => ({ ...f, etapas: JSON.parse(f.etapas), ativo: !!f.ativo }));
   const jobsDe = id => all('SELECT agent,kind,status,error,run_after FROM jobs WHERE content_id=? ORDER BY id', id);
   const hoje = () => new Date().toISOString().slice(0, 10);
@@ -294,6 +322,14 @@ export function criarFluxoV2(ctx) {
     let mt;
     if (p === '/api/v2/fluxo' && m === 'GET') { const u = new URL(req.url, 'http://x'); return send(res, 200, fluxo({ marca: u.searchParams.get('marca') || '', incluirDescartados: u.searchParams.get('lixeira') === '1' })); }
     if (p === '/api/v2/novo-formatos' && m === 'GET') { try { return send(res, 200, { formatos: JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'formatos-novo-conteudo.json'), 'utf8')) }); } catch { return send(res, 200, { formatos: [] }); } }
+    if (p === '/api/v2/metas' && m === 'GET') return send(res, 200, { metas: all('SELECT * FROM brand_metas'), formatos: novoFormatos(), autopilot: ctx.settings().autopilot === '1' });
+    if (p === '/api/v2/metas' && m === 'PUT') {
+      const b = await readBody(req, 20000), br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || '')); if (!br) throw fail(400, 'Marca não encontrada');
+      if (!novoFormatos().some(f => f.id === b.raia)) throw fail(400, 'Formato inválido');
+      run('INSERT INTO brand_metas(brand,raia,qtd) VALUES(?,?,?) ON CONFLICT(brand,raia) DO UPDATE SET qtd=excluded.qtd', br.name, b.raia, Math.max(0, Math.min(20, Math.round(+b.qtd || 0))));
+      changed(); return send(res, 200, { ok: true });
+    }
+    if (p === '/api/v2/autonomo' && m === 'PUT') { const b = await readBody(req, 2000); run("INSERT INTO settings(key,value) VALUES('autopilot',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", b.ligado ? '1' : '0'); log(null, `Modo autônomo ${b.ligado ? 'ligado' : 'desligado'}`); changed(); return send(res, 200, { ok: true }); }
     if (p === '/api/v2/formatos' && m === 'GET') return send(res, 200, { formatos: formatos() });
     if ((mt = p.match(/^\/api\/v2\/formatos\/([a-z_]+)$/)) && m === 'PUT') {
       const f = one('SELECT * FROM formatos WHERE id=?', mt[1]); if (!f) throw fail(404, 'Formato não encontrado');
@@ -364,8 +400,7 @@ export function criarFluxoV2(ctx) {
     // ── Etapa 9: notificações e busca geral
     if (p === '/api/v2/notificacoes' && m === 'GET') {
       const f = fluxo();
-      const L = f.itens.filter(i => i.estado === 'esperando' || i.estado === 'parado').map(i => ({ chave: i.id + ':' + i.estado + ':' + i.etapa, id: i.id, tipo: i.estado, titulo: i.estado === 'parado' ? `Parou: ${i.titulo}` : i.etapa === 'publicacao' ? `Pronto para postar: ${i.titulo}` : `Chegou para você: ${i.titulo}`, detalhe: i.motivo || i.marca || '', ts: i.atualizado }));
-      for (const a of all("SELECT id,name FROM agents WHERE enabled=1")) { const e = one("SELECT error,finished_at FROM jobs WHERE agent=? ORDER BY id DESC LIMIT 1", a.id); if (e?.error && e.finished_at && Date.now() - new Date(e.finished_at) < 864e5) L.push({ chave: 'ag:' + a.id + ':' + e.finished_at, tipo: 'agente', titulo: `${a.name} parou com erro`, detalhe: clip(e.error, 140), ts: e.finished_at }); }
+      const L = f.itens.filter(i => i.estado === 'esperando').map(i => ({ chave: i.id + ':' + i.etapa, id: i.id, tipo: 'esperando', titulo: i.etapa === 'publicacao' ? `Pronto para postar: ${i.titulo}` : `Para você revisar: ${i.titulo}`, detalhe: i.marca || '', ts: i.atualizado }));
       return send(res, 200, { itens: L.sort((a, b) => String(b.ts).localeCompare(String(a.ts))).slice(0, 60) });
     }
     if (p === '/api/v2/busca' && m === 'GET') {
@@ -391,5 +426,5 @@ export function criarFluxoV2(ctx) {
     throw fail(404, 'Rota não encontrada');
   }
 
-  return { rota, fluxo, acao, formatos, item };
+  return { rota, fluxo, acao, formatos, item, temMetasMarca: ctx.temMetasMarca };
 }

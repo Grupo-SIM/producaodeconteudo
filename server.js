@@ -5904,7 +5904,7 @@ function schedulerTick() {
   if (s.autopilot === '1' && hour >= +s.start_hour) {
     // Produz até bater a meta do dia e para: sem meta pendente, nenhum pedido novo (e nenhum crédito gasto). Máx. 3 tentativas por dia.
     const q = quotaHoje();
-    if (q.ativo && q.faltaTotal > 0 && !one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running')")
+    if (q.ativo && q.faltaTotal > 0 && !fluxoV2.temMetasMarca?.() && !one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running')")
       && one("SELECT COUNT(*) n FROM jobs WHERE kind='pautas' AND origin='auto' AND cday=?", date).n < 3) {
       enqueue(null, 'chefe', 'pautas', { auto: true, quota: q.falta });
     }
@@ -6458,7 +6458,7 @@ function contentAct(id, act, b = {}) {
   }
 }
 
-const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, path, fs, dirname: __dirname });
+const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), path, fs, dirname: __dirname });
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;

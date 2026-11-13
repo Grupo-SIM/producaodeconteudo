@@ -349,7 +349,9 @@ async function refresh() {
   const q = S.marca ? '?marca=' + encodeURIComponent(S.marca) : '';
   S.fluxo = await api('/api/v2/fluxo' + q);
   // erro antigo de configuração (já corrigido no servidor) não é problema seu: o item conta como na fila até rodar de novo
-  for (const i of S.fluxo.itens) if (i.estado === 'parado' && /dangerously-skip-permissions|root\/sudo/i.test(i.motivo || '')) Object.assign(i, { estado: 'fila', motivo: '' });
+  // o que se resolve sozinho (limite da assinatura, resposta vazia, erro antigo) não é problema seu: conta como fila e o servidor tenta de novo
+  S.autoRetry = 0;
+  for (const i of S.fluxo.itens) if (i.estado === 'parado' && explica(i.motivo).auto) { Object.assign(i, { estado: 'fila', motivo: '', retenta: true }); S.autoRetry++; }
   S.fluxo.avisos = S.fluxo.itens.filter(i => i.estado === 'parado').slice(0, 5).map(i => ({ id: i.id, titulo: i.titulo, motivo: i.motivo }));
   renderSide();
   if (!$('.ov') && ['fluxo', 'mesa', 'publicacao'].includes(S.view)) render();
@@ -403,11 +405,11 @@ document.addEventListener('click', () => { $('#bpop')?.classList.add('hidden'); 
 // ───────── problemas em linguagem simples: o que aconteceu e o que depende de você
 function explica(motivo) {
   const m = String(motivo || '');
-  if (/limite de uso/i.test(m)) return { causa: 'limite', titulo: 'A assinatura do Claude atingiu o limite de uso', faca: 'Espere o limite renovar (algumas horas) e clique em Resolvido. Se quiser evitar, diminua as metas por dia.' };
-  if (/dangerously-skip-permissions|root\/sudo/i.test(m)) return { causa: 'config', titulo: 'Erro de configuração do servidor (já corrigido)', faca: 'Nada a fazer além de clicar em Resolvido: o item volta para a fila e roda de novo.' };
+  if (/limite de uso/i.test(m)) return { auto: true, causa: 'limite', titulo: 'A assinatura do Claude atingiu o limite de uso', faca: 'Espere o limite renovar (algumas horas) e clique em Resolvido. Se quiser evitar, diminua as metas por dia.' };
+  if (/dangerously-skip-permissions|root\/sudo/i.test(m)) return { auto: true, causa: 'config', titulo: 'Erro de configuração do servidor (já corrigido)', faca: 'Nada a fazer além de clicar em Resolvido: o item volta para a fila e roda de novo.' };
   if (/login|logad|autentic|credencia|401/i.test(m)) return { causa: 'login', titulo: 'A assinatura do Claude saiu do login', faca: 'Vá em Configurações → Conectar ou trocar a conta, entre de novo e depois clique em Resolvido.' };
-  if (/sem resposta|código 1|timeout|tempo/i.test(m)) return { causa: 'falha', titulo: 'O Claude parou sem responder', faca: 'Clique em Resolvido para tentar de novo. Se repetir, confira a assinatura em Configurações.' };
-  if (/sem tarefa/i.test(m)) return { causa: 'fila', titulo: 'O item ficou sem a próxima etapa', faca: 'Clique em Resolvido para a produção recomeçar de onde parou.' };
+  if (/sem resposta|código 1|timeout|tempo/i.test(m)) return { auto: true, causa: 'falha', titulo: 'O Claude parou sem responder', faca: 'Clique em Resolvido para tentar de novo. Se repetir, confira a assinatura em Configurações.' };
+  if (/sem tarefa/i.test(m)) return { auto: true, causa: 'fila', titulo: 'O item ficou sem a próxima etapa', faca: 'Clique em Resolvido para a produção recomeçar de onde parou.' };
   if (/revis|reprov|travou|bloque/i.test(m)) return { causa: 'revisao', titulo: 'O revisor reprovou várias vezes', faca: 'Abra o item e decida: peça um ajuste dizendo o que mudar, aprove assim mesmo ou clique em Resolvido para refazer.' };
   if (/fal\.ai|imagem|saldo|crédit/i.test(m)) return { causa: 'imagem', titulo: 'A geração de imagem falhou', faca: 'Confira o saldo da fal.ai em Configurações avançadas e clique em Resolvido.' };
   return { causa: 'outro', titulo: 'O agente parou com um erro', faca: 'Clique em Resolvido para tentar de novo. Se repetir, me pergunte no chat o que houve.' };
@@ -448,7 +450,7 @@ function colunaDe(i) {
   return e === 'roteirista' || e === 'radar' ? 'roteiro' : e === 'revisorcopy' || e === 'gerente' || e === 'seo' ? 'copy' : e === 'designer' || e === 'editor' ? 'arte' : e === 'publicador' ? 'postagem' : 'roteiro';
 }
 function cartao(i) {
-  const sub = i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '') : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : (i.aguardando ? 'aguardando' : 'trabalhando');
+  const sub = i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : (i.aguardando ? 'aguardando' : 'trabalhando');
   return `<button class="c ${CLS[i.estado]}${i.em_ajuste ? ' aj' : ''}" onclick="abrirItem(${i.id})">${esc(i.titulo)}<i>${[i.marca, sub].filter(Boolean).map(esc).join(' · ')}</i></button>`;
 }
 VIEWS.fluxo = () => {
@@ -471,7 +473,8 @@ VIEWS.fluxo = () => {
       <div class="st">${cols.map(([id, nome, quem]) => { const cs = its.filter(i => colunaDe(i) === id); return `<div class="s ${!quem && id !== 'fim' ? 'me' : id === 'fim' ? 'done' : ''}"><div class="sh">${esc(nome)}<i>${esc(quem)}</i></div>${cs.slice(0, 6).map(cartao).join('')}${cs.length > 6 ? `<span class="small muted">+${cs.length - 6}</span>` : ''}</div>`; }).join('')}</div></div>`;
   }).join('');
   const leg = `<div class="leg">${Object.entries(COR).map(([k, c]) => `<span style="--c:${c}">${LEG[k]}</span>`).join('')}</div>`;
-  $('#main').innerHTML = ban + head + lanes + leg;
+  const info = S.autoRetry ? `<p class="small muted" style="margin:-4px 0 10px">${S.autoRetry} item(ns) esperando o limite da assinatura do Claude renovar: voltam para a produção sozinhos, você não precisa fazer nada.</p>` : '';
+  $('#main').innerHTML = ban + head + info + lanes + leg;
 };
 function mudaMeta(id, v) { const n = prompt('Meta por dia', v); if (n != null && n !== '') setFormato(id, { meta_dia: +n }); }
 function raia(id) { const el = event.currentTarget.parentElement; el.classList.toggle('open'); S.abertas[id] = el.classList.contains('open'); store.set('raiasAbertas', S.abertas); }
@@ -759,7 +762,7 @@ const juntar = s => s.l.join(' ').replace(/\s+-\s/g, '\n- ');
 const sw = v => esc(v).replace(/#[0-9a-fA-F]{6}\b/g, h => `<i class="sw" style="background:${h}"></i>${h.toUpperCase()}`);
 VIEWS.marcas = async () => {
   const [{ brands }, k, sty] = await Promise.all([api('/api/brands'), api('/api/knowledge').catch(() => ({ items: [], assets: [] })), api('/api/art-styles').catch(() => ({ styles: [] }))]);
-  S.brands = brands; S._docs = k.items || []; S._assets = k.assets || []; S._sty = sty.styles || [];
+  S.brands = brands; S._docs = k.items || []; if (!S._metas) S._metas = await api('/api/v2/metas').catch(() => null); S._assets = k.assets || []; S._sty = sty.styles || [];
   const sel = brands.find(b => b.id === S.marcaSel) || brands[0]; S.marcaSel = sel?.id;
   const docsDe = b => S._docs.filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase());
   const ehId = x => /^#?\s*IDENTIDADE VISUAL/i.test(x.content.trim()) || /^identidade visual/i.test(x.title);
@@ -796,7 +799,10 @@ VIEWS.marcas = async () => {
       const L = achaSec(ss, 'PAPEL', 'PÚBLICO', 'PUBLICO', 'VOZ', 'GANCHO'), R = achaSec(ss, 'O INIMIGO', 'INIMIGO', 'DOR', 'DESEJO', 'MECANISMO', 'CTA', 'MONETIZ', 'CONCORRENTES');
       esq = L.map(blocoL).join('') || '<p class="muted small">Sem descrição de voz e público.</p>'; dir = R.map(blocoL).join('');
     } else if (tab === 'formatos') {
-      esq = `<h5>Metas por formato</h5>${S.fluxo.formatos.map(f => linha(f.nome, `meta ${f.meta_dia}/dia · ${f.modo === 'manual' ? 'Manual' : 'Automático'} · ${its.filter(i => i.raia === f.id).length} no fluxo`)).join('')}`;
+      const MT = S._metas || { metas: [], formatos: [] };
+      esq = `<h5>Quantos posts por dia (modo autônomo)</h5><div class="kvr"><span>Modo autônomo</span><span><button class="chip ${MT.autopilot ? 'gold' : ''}" onclick="tryDo(()=>api('/api/v2/autonomo',{method:'PUT',body:{ligado:${!MT.autopilot}}}),'${MT.autopilot ? 'Desligado' : 'Ligado'}').then(()=>{S._metas=null;render()})">${MT.autopilot ? 'Ligado' : 'Desligado'}</button></span></div>
+        ${MT.formatos.map(f => { const q = MT.metas.find(x => x.brand.toLowerCase() === sel.name.toLowerCase() && x.raia === f.id)?.qtd || 0; return `<div class="kvr"><span>${esc(f.nome)}</span><span><input class="metain" style="width:56px" type="number" min="0" max="20" value="${q}" onchange="salvaMeta(${JSON.stringify(esc(sel.name))},'${f.id}',this.value)"> por dia</span></div>`; }).join('')}
+        <p class="small muted" style="margin-top:8px">Com o modo autônomo ligado, o Gerente cria sozinho as pautas que faltam para bater essas metas, todo dia, a partir da hora de início. Os posts chegam para você revisar na Mesa.</p>`;
       dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
       esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('')}<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>`;
@@ -811,6 +817,7 @@ VIEWS.marcas = async () => {
     ${brands.length ? `<div class="mlay"><div class="mcards">${brands.filter(b => !S.qMarca || b.name.toLowerCase().includes(S.qMarca.toLowerCase())).map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()">${av(b)}<b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b).replace(/^(.{0,48})\s.*/s, '$1…'))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
 };
 function verCampo(t, v, html) { modal(`<div class="hd"><h2>${t}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><div class="leitura">${html ? v : `<p>${sw(v)}</p>`}</div></div><div class="ft"><span class="muted small" style="margin-right:auto">Para mudar, use Editar ou peça ao gerente no chat.</span></div>`, 'sm'); }
+async function salvaMeta(brand, raia, qtd) { await tryDo(() => api('/api/v2/metas', { method: 'PUT', body: { brand, raia, qtd: +qtd } }), 'Meta salva'); S._metas = null; }
 async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
 async function detMarca(id) {
   const b = S.brands.find(x => x.id === id); const fs = S.fluxo.formatos;
