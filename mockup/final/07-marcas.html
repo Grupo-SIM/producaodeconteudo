@@ -1,0 +1,92 @@
+<!doctype html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif}
+body{background:#0c0c0d;color:#e7e9ee;width:1920px;height:1080px;display:flex}
+.side{width:200px;background:#0f0f10;border-right:1px solid #222225;padding:18px 12px;display:flex;flex-direction:column;gap:6px}
+.logo{font-weight:800;margin:0 8px 18px}.nv{padding:10px 12px;border-radius:10px;color:#8a93a6;font-size:14px}.nv.on{background:#1c1c1f;color:#fff}
+.nv b{float:right;background:#e9d29a;color:#222;border-radius:9px;font-size:11px;padding:1px 7px}
+.main{flex:1;padding:20px 24px;overflow:hidden}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}.top h1{font-size:20px;margin-right:auto}
+.chip{font-size:12px;background:#18181b;padding:6px 11px;border-radius:999px;color:#aab}.chip.on{background:#c9a86a;color:#fff}
+.chat{width:360px;border-left:1px solid #222225;display:flex;flex-direction:column}
+.ch{padding:16px 18px;border-bottom:1px solid #222225;font-weight:700}
+.msgs{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.45}
+.m{padding:9px 12px;border-radius:12px;max-width:90%}.u{background:#c9a86a;align-self:flex-end}.g{background:#18181b}
+.g small{display:block;color:#7fd1a0;margin-top:6px;font-size:11.5px}
+.in{margin:14px;padding:12px;background:#18181b;border-radius:12px;color:#77808f;font-size:13px}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 8px #3ddc84}
+
+.nv{display:flex;align-items:center;gap:10px}.nv b{margin-left:auto}
+.brandtag{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#1c1c1f;color:#bcd}
+.wrap{display:flex;gap:18px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:430px;align-content:start}
+.b{background:#141416;border:1px solid #222225;border-radius:12px;padding:12px}.b.on{outline:2px solid #e9d29a}.b b{display:block;font-size:13.5px}.b span{font-size:11.5px;color:#8a93a6}
+.ini{width:38px;height:38px;border-radius:10px;background:#1c1c1f;display:grid;place-items:center;font-weight:800;font-size:13px;margin-bottom:8px}
+.ed{flex:1;background:#141416;border:1px solid #222225;border-radius:14px;padding:16px 18px}.tabs{display:flex;gap:6px;margin:12px 0}.tabs span{font-size:12.5px;padding:7px 12px;border-radius:8px;background:#18181b;color:#99a}.tabs span.on{background:#e9d29a;color:#111;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.box{background:#0f0f10;border-radius:12px;padding:12px;font-size:12.5px}.box h4{font-size:11px;color:#8a93a6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.f{background:#18181b;border-radius:8px;padding:8px 10px;margin-bottom:6px;line-height:1.4;display:flex;justify-content:space-between;gap:8px}.f span{color:#8a93a6}
+.tag{display:inline-block;background:#173322;color:#7fe0a5;border-radius:999px;padding:4px 10px;font-size:11.5px;margin:0 5px 6px 0}.tag.n{background:#18181b;color:#99a}</style><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+body{background:#0c0c0d!important;font-feature-settings:"cv11","ss01";letter-spacing:-.005em}
+.side{background:#0f0f10!important;border-right:1px solid #1f1f22!important;width:232px!important;padding:22px 14px!important}
+.logo{font-size:15px;letter-spacing:.02em;margin-bottom:26px!important;display:flex;align-items:center;gap:10px}
+.logo:before{content:"";width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#e9d8a6,#a8864a);box-shadow:0 0 0 1px #ffffff22 inset}
+.nv{color:#8b8b90!important;font-size:13.5px!important;padding:10px 12px!important;border:1px solid transparent}
+.nv.on{background:linear-gradient(180deg,#1c1c1f,#161618)!important;color:#f2f2f3!important;border-color:#2a2a2e;box-shadow:inset 0 1px 0 #ffffff0d}
+.nv b{background:#2a2418!important;color:#e9d29a!important;border:1px solid #4a3f26;font-weight:600!important}
+.main{background:radial-gradient(1200px 500px at 30% -10%,#1a1a1d 0,#0c0c0d 60%)!important;padding:26px 30px!important}
+.top h1{font-size:22px!important;font-weight:600;letter-spacing:-.02em}
+.chip{background:#161618!important;border:1px solid #26262a!important;color:#a5a5aa!important;font-weight:500}
+.chip.on{background:#f2f2f3!important;color:#0c0c0d!important;border-color:#f2f2f3!important}
+.lane{background:linear-gradient(180deg,#141416,#111113)!important;border:1px solid #222225!important;border-radius:16px!important;box-shadow:inset 0 1px 0 #ffffff08,0 10px 30px #0006;padding:12px 14px!important}
+.lh b{font-weight:600;letter-spacing:-.01em}
+.s{background:#0e0e0f!important;border:1px solid #1c1c1f;border-radius:11px!important}
+.s.me{background:linear-gradient(180deg,#19160f,#121110)!important;outline:none!important;border-color:#3a3220!important}
+.s.done{background:#0f1311!important;border-color:#1c2a22}
+.sh{color:#6f6f75!important;font-weight:500}.s.me .sh{color:#d9c08a!important}.s.done .sh{color:#7fbf98!important}
+.c{background:#18181b!important;border-left:none!important;border:1px solid #26262a;box-shadow:inset 2px 0 0 #6fcf97;border-radius:8px!important;color:#e8e8ea}
+.c.y{box-shadow:inset 2px 0 0 #d9c08a}.c.aj{box-shadow:inset 2px 0 0 #d98a5a}.c.e{box-shadow:inset 2px 0 0 #e06060;background:#1d1414!important}.c.q{box-shadow:inset 2px 0 0 #4a4a50}
+.c i{color:#7b7b82!important}.c.aj i{color:#d9a07a!important}.c.e i{color:#e88!important}
+.pb{background:#232326!important}.pb u{background:linear-gradient(90deg,#a8864a,#e9d8a6)!important}
+.chat{background:#0f0f10!important;border-left:1px solid #1f1f22!important}
+.ch{border-bottom:1px solid #1f1f22!important;font-weight:600!important}
+.m.u{background:#f2f2f3!important;color:#0c0c0d}.m.g{background:#18181b!important;border:1px solid #26262a}
+.g small{color:#c9b37f!important}
+.in{background:#161618!important;border:1px solid #26262a}
+.leg span:before{border-radius:50%!important}
+.c,.c.y,.c.aj,.c.e,.c.q,.c.d{border-color:#26262a!important}.c.e{border-color:#3a2224!important}
+.lane{margin-bottom:7px!important;padding:9px 12px!important}.s{min-height:54px!important}.main{padding:20px 26px!important}
+div[style*="width:300px;background:#1a202b"]{display:none!important}
+
+.box,.card,.b,.p,.ed,.pr,.k div,.empty,.nc,.q{background:linear-gradient(180deg,#141416,#111113)!important;border-color:#222225!important}
+.box .f,.ed .f,.f,.fl,.fd.on,.srch,.ins,.cap,.it,.tag.n,.tb span,.lib div{background-color:#18181b!important;border-color:#26262a}
+.fd.on{background:#1c1c1f!important}
+.tabs span{background:#161618!important;border:1px solid #26262a;color:#a5a5aa!important}
+.tabs span.on{background:#f2f2f3!important;color:#0c0c0d!important}
+.btn.ok,.ac i.ok,.q .ac i.ok,.ins .a i.ok{background:linear-gradient(135deg,#e9d8a6,#a8864a)!important;color:#141006!important}
+.btn.bl{background:#f2f2f3!important;color:#0c0c0d!important}
+.btn.gh,.ac i,.q .ac i{background:#1a1a1d!important;border:1px solid #2a2a2e;color:#d0d0d4!important}
+.mo{background:#111113!important;border-color:#26262a!important}
+.hd,.ft{border-color:#1f1f22!important}
+.ask div{background:#161618!important;border-color:#3a3220!important}
+.steps i{background:#18181b!important}.steps i.now{background:#2a2418!important;color:#e9d29a!important}.steps i.ok{color:#9fd3b2!important}
+.learn{color:#d9c08a!important}
+.tag{background:#1f1c14!important;color:#e9d29a!important}
+.ini{background:#1c1c1f!important}
+.b.on,.p.on{outline:1px solid #a8864a!important}
+.card .tp,.card .age{background:#000b!important}
+.pv.txt{background:#0f0f10!important}
+.ban{background:linear-gradient(90deg,#1a1710,#121112)!important;border-color:#3a3220!important}
+.tg{background:#2a2418!important;color:#e9d29a!important}
+.th.on{border-color:#d9c08a!important}
+.lay .on{background:#2a2418!important;color:#e9d29a!important}
+.note,[style*="#0f2418"]{background:#16140e!important;border-color:#3a3220!important;color:#d9c08a!important}
+.tl,.pl,.cv{background:#0d0d0e!important}
+.chip.on{background:#f2f2f3!important;color:#0c0c0d!important}
+.lv,.feed div,.hud div,.tick div{background:#111113e0!important;border-color:#26262a!important}
+.you{background:#16140ee6!important;border-color:#3a3220!important}
+.xp u{background:linear-gradient(90deg,#a8864a,#e9d8a6)!important}
+</style></head><body><div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Fluxo<b>6</b></div><div class="nv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H4z"/><path d="M8 20h8M12 16v4"/><path d="M9 10l2 2 4-4"/></svg>Mesa de revisão<b>6</b></div><div class="nv">Publicação<b>3</b></div><div class="nv on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>Marcas</div><div class="nv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Produtos</div><div class="nv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 16l5-5 4 3 6-7"/><path d="M15 7h5v5"/></svg>Otimização</div><div class="nv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 006 0V6a2 2 0 00-3-2z"/><path d="M15 4a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-6 0"/></svg>Cérebro</div><div style="margin-top:auto;font-size:11.5px;color:#8a93a6;padding:10px 12px;border-top:1px solid #222225">Gasto do mês<br><b style="color:#dde;font-size:14px">R$ 0,00</b> <span>assinatura Claude + fal.ai</span></div><div class="nv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Configurações</div></div><div class="main"><div class="top"><h1>Marcas</h1><span class="chip">7 marcas</span><span class="chip" style="background:#c9a86a;color:#fff">+ Nova marca</span></div><div class="wrap"><div class="grid"><div class="b"><div class="ini">007</div><b>007 Spyhacker</b><span>Tecnologia</span></div><div class="b on"><div class="ini">CM</div><b>Central do Marketing</b><span>Marketing digital</span></div><div class="b"><div class="ini">CR</div><b>Corte dos Ricos</b><span>Empreendedorismo e finanças</span></div><div class="b"><div class="ini">MR</div><b>Marketing Raiz</b><span>Marketing digital</span></div><div class="b"><div class="ini">SA</div><b>Seguidores em Alta</b><span>Redes sociais</span></div><div class="b"><div class="ini">SIP</div><b>SIM Int Pay</b><span>Sem nicho (lê todos)</span></div><div class="b"><div class="ini">VB</div><b>Vivendo de Bet</b><span>Esportes</span></div></div>
+<div class="ed"><div style="display:flex;gap:12px;align-items:center"><div class="ini" style="width:52px;height:52px;margin:0;background:#050505;border:1px solid #e9d29a;color:#e9d29a">CM</div><div><b style="font-size:18px">Central do Marketing</b><br><span style="font-size:12px;color:#8a93a6">Marketing digital · CTA leva ao blog da Marketing Raiz</span></div></div>
+<div class="tabs"><span class="on">Identidade visual</span><span>Voz e público</span><span>Formatos e metas</span><span>Contas e postagem</span></div>
+<div class="two"><div><div class="box"><h4>Estilo aprovado pelo dono (vale para todas as marcas)</h4><div class="f">Fundo<span>escuro, preto dominante</span></div><div class="f">Luz<span>cor de destaque vindo do canto</span></div><div class="f">O que muda por marca<span>cores, logo, fonte, mascote</span></div></div>
+<div class="box" style="margin-top:12px"><h4>Desta marca</h4><div class="f">Cor de destaque<span>do cadastro</span></div><div class="f">Fonte dos títulos<span>do cadastro</span></div><div class="f">Logo e @<span>do cadastro · modelo citação usa fio + @</span></div></div></div>
+<div><div class="box"><h4>Formatos treinados</h4><span class="tag">Carrossel educativo</span><span class="tag">História real</span><span class="tag">Reels opinião</span><span class="tag">Post de blog</span><span class="tag">Citação</span><span class="tag n">+ Stories de venda</span><span class="tag n">+ Matéria</span></div>
+<div class="box" style="margin-top:12px"><h4>Peças aprovadas no treino</h4><div class="f">Moldura de preço<span>carrossel</span></div><div class="f">Conteúdo de vitrine e de decisão<span>carrossel</span></div><div class="f">IA e preço<span>reels</span></div><div class="f">Post de blog (11/11)<span>blog</span></div></div></div></div>
+<div style="margin-top:12px;font-size:12px;color:#8fe0b0;background:#0f2418;border:1px solid #1f5a36;border-radius:10px;padding:9px 12px">O que você mudar aqui, o gerente avisa os agentes e salva no cérebro da marca. Também dá para mudar só pela conversa.</div></div></div></div><div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Na Central do Marketing, o CTA do blog continua indo para a Marketing Raiz?</div><div class="m g">Sim. Está no post de blog aprovado em 11/11: o CTA leva ao post de blog da Marketing Raiz.<small>Fonte: peça 39, carrosséis aprovados</small></div></div><div class="in">Fale com o gerente…</div></div></body></html>

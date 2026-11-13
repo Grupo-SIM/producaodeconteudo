@@ -1,0 +1,89 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../v2/modal_common.css"><style>
+.body{flex:1;display:grid;grid-template-columns:140px 64px 1fr 270px;gap:12px;padding:0 20px 14px;min-height:0}
+.thumbs{display:flex;flex-direction:column;gap:7px;overflow:hidden}.th{height:96px;flex:none;border-radius:8px;background:radial-gradient(circle at 100% 0,#3a2f0a,#050505 60%);font-size:9px;padding:7px;color:#ddd;border:2px solid transparent;position:relative;line-height:1.3}.th.on{border-color:#e9d29a}.th em{position:absolute;bottom:4px;right:6px;color:#888;font-style:normal}
+.tools{background:#18181b;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:14px;color:#aab;font-size:11px;text-align:center}
+.cv{background:#0b0e14;border-radius:12px;display:grid;place-items:center;position:relative}
+.post{width:500px;height:625px;background:radial-gradient(circle at 100% 0,#5a470c 0,#0a0a0a 55%);position:relative;padding:44px 40px}
+.post .t{font-size:40px;font-weight:900;line-height:1.08;color:#fff;outline:1.5px dashed #e9d29a;outline-offset:6px}
+.post .t em{color:#e9d29a;font-style:normal}
+.post .s{margin-top:26px;font-size:16px;color:#bbb;line-height:1.45}
+.post .lg{position:absolute;bottom:30px;left:40px;font-weight:800;color:#e9d29a;font-size:14px;letter-spacing:.06em}
+.post .sw{position:absolute;bottom:30px;right:40px;font-size:13px;color:#999}
+.flt{position:absolute;top:150px;left:50%;transform:translateX(-50%);background:#1c1c1f;border-radius:9px;padding:6px 10px;display:flex;gap:12px;font-size:12px;color:#dde;box-shadow:0 6px 20px #0008}
+.zoom{position:absolute;bottom:10px;left:12px;font-size:11px;color:#8a93a6}
+.lib{display:grid;grid-template-columns:1fr 1fr;gap:5px}.lib div{height:58px;border-radius:7px}
+.tb{display:flex;gap:4px;margin-bottom:8px}.tb span{padding:5px 8px;border-radius:6px;background:#11151d;font-size:11px}.tb span.on{background:#c9a86a;color:#fff}
+</style><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+body{background:#0c0c0d!important;font-feature-settings:"cv11","ss01";letter-spacing:-.005em}
+.side{background:#0f0f10!important;border-right:1px solid #1f1f22!important;width:232px!important;padding:22px 14px!important}
+.logo{font-size:15px;letter-spacing:.02em;margin-bottom:26px!important;display:flex;align-items:center;gap:10px}
+.logo:before{content:"";width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#e9d8a6,#a8864a);box-shadow:0 0 0 1px #ffffff22 inset}
+.nv{color:#8b8b90!important;font-size:13.5px!important;padding:10px 12px!important;border:1px solid transparent}
+.nv.on{background:linear-gradient(180deg,#1c1c1f,#161618)!important;color:#f2f2f3!important;border-color:#2a2a2e;box-shadow:inset 0 1px 0 #ffffff0d}
+.nv b{background:#2a2418!important;color:#e9d29a!important;border:1px solid #4a3f26;font-weight:600!important}
+.main{background:radial-gradient(1200px 500px at 30% -10%,#1a1a1d 0,#0c0c0d 60%)!important;padding:26px 30px!important}
+.top h1{font-size:22px!important;font-weight:600;letter-spacing:-.02em}
+.chip{background:#161618!important;border:1px solid #26262a!important;color:#a5a5aa!important;font-weight:500}
+.chip.on{background:#f2f2f3!important;color:#0c0c0d!important;border-color:#f2f2f3!important}
+.lane{background:linear-gradient(180deg,#141416,#111113)!important;border:1px solid #222225!important;border-radius:16px!important;box-shadow:inset 0 1px 0 #ffffff08,0 10px 30px #0006;padding:12px 14px!important}
+.lh b{font-weight:600;letter-spacing:-.01em}
+.s{background:#0e0e0f!important;border:1px solid #1c1c1f;border-radius:11px!important}
+.s.me{background:linear-gradient(180deg,#19160f,#121110)!important;outline:none!important;border-color:#3a3220!important}
+.s.done{background:#0f1311!important;border-color:#1c2a22}
+.sh{color:#6f6f75!important;font-weight:500}.s.me .sh{color:#d9c08a!important}.s.done .sh{color:#7fbf98!important}
+.c{background:#18181b!important;border-left:none!important;border:1px solid #26262a;box-shadow:inset 2px 0 0 #6fcf97;border-radius:8px!important;color:#e8e8ea}
+.c.y{box-shadow:inset 2px 0 0 #d9c08a}.c.aj{box-shadow:inset 2px 0 0 #d98a5a}.c.e{box-shadow:inset 2px 0 0 #e06060;background:#1d1414!important}.c.q{box-shadow:inset 2px 0 0 #4a4a50}
+.c i{color:#7b7b82!important}.c.aj i{color:#d9a07a!important}.c.e i{color:#e88!important}
+.pb{background:#232326!important}.pb u{background:linear-gradient(90deg,#a8864a,#e9d8a6)!important}
+.chat{background:#0f0f10!important;border-left:1px solid #1f1f22!important}
+.ch{border-bottom:1px solid #1f1f22!important;font-weight:600!important}
+.m.u{background:#f2f2f3!important;color:#0c0c0d}.m.g{background:#18181b!important;border:1px solid #26262a}
+.g small{color:#c9b37f!important}
+.in{background:#161618!important;border:1px solid #26262a}
+.leg span:before{border-radius:50%!important}
+.c,.c.y,.c.aj,.c.e,.c.q,.c.d{border-color:#26262a!important}.c.e{border-color:#3a2224!important}
+.lane{margin-bottom:7px!important;padding:9px 12px!important}.s{min-height:54px!important}.main{padding:20px 26px!important}
+div[style*="width:300px;background:#1a202b"]{display:none!important}
+
+.box,.card,.b,.p,.ed,.pr,.k div,.empty,.nc,.q{background:linear-gradient(180deg,#141416,#111113)!important;border-color:#222225!important}
+.box .f,.ed .f,.f,.fl,.fd.on,.srch,.ins,.cap,.it,.tag.n,.tb span,.lib div{background-color:#18181b!important;border-color:#26262a}
+.fd.on{background:#1c1c1f!important}
+.tabs span{background:#161618!important;border:1px solid #26262a;color:#a5a5aa!important}
+.tabs span.on{background:#f2f2f3!important;color:#0c0c0d!important}
+.btn.ok,.ac i.ok,.q .ac i.ok,.ins .a i.ok{background:linear-gradient(135deg,#e9d8a6,#a8864a)!important;color:#141006!important}
+.btn.bl{background:#f2f2f3!important;color:#0c0c0d!important}
+.btn.gh,.ac i,.q .ac i{background:#1a1a1d!important;border:1px solid #2a2a2e;color:#d0d0d4!important}
+.mo{background:#111113!important;border-color:#26262a!important}
+.hd,.ft{border-color:#1f1f22!important}
+.ask div{background:#161618!important;border-color:#3a3220!important}
+.steps i{background:#18181b!important}.steps i.now{background:#2a2418!important;color:#e9d29a!important}.steps i.ok{color:#9fd3b2!important}
+.learn{color:#d9c08a!important}
+.tag{background:#1f1c14!important;color:#e9d29a!important}
+.ini{background:#1c1c1f!important}
+.b.on,.p.on{outline:1px solid #a8864a!important}
+.card .tp,.card .age{background:#000b!important}
+.pv.txt{background:#0f0f10!important}
+.ban{background:linear-gradient(90deg,#1a1710,#121112)!important;border-color:#3a3220!important}
+.tg{background:#2a2418!important;color:#e9d29a!important}
+.th.on{border-color:#d9c08a!important}
+.lay .on{background:#2a2418!important;color:#e9d29a!important}
+.note,[style*="#0f2418"]{background:#16140e!important;border-color:#3a3220!important;color:#d9c08a!important}
+.tl,.pl,.cv{background:#0d0d0e!important}
+.chip.on{background:#f2f2f3!important;color:#0c0c0d!important}
+.lv,.feed div,.hud div,.tick div{background:#111113e0!important;border-color:#26262a!important}
+.you{background:#16140ee6!important;border-color:#3a3220!important}
+.xp u{background:linear-gradient(90deg,#a8864a,#e9d8a6)!important}
+</style></head><body><iframe src="01-fluxo.html"></iframe><div class="mo">
+<div class="hd"><h2>Moldura de preço</h2><span>Central do Marketing · Carrossel educativo · 9 slides · Designer, há 6 min</span><div class="steps"><i class="ok">Roteiro</i><i class="ok">Revisor de copy</i><i class="ok">Aprovado</i><i class="ok">Arte</i><i class="now">Sua aprovação</i><i>Postagem</i><i>Finalizado</i></div><span class="x">✕</span></div>
+<div class="ask"><div>Pedir ajuste ao gerente: "no slide 7, destaca a resposta da marca forte em amarelo"…</div><span class="btn bl">Mandar ajustar</span></div>
+<div class="body">
+<div class="thumbs"><div class="th on">Se você cortasse seu preço pela metade amanhã…<em>1</em></div><div class="th">Você conhece essa cena. A pessoa assiste seus stories…<em>2</em></div><div class="th">Aí você faz o que qualquer um faria. Dá 10%…<em>3</em></div><div class="th">Só que o próximo cliente pede de novo.<em>4</em></div><div class="th">Ninguém ia parar de pedir.<em>5</em></div><div class="th">O marketing tem um nome para isso: moldura.<em>6</em></div><div class="th" style="height:60px">…<em>9</em></div></div>
+<div class="tools"><span>T<br>Texto</span><span>▭<br>Forma</span><span>▣<br>Imagem</span><span>◐<br>Fundo</span><span>↶<br>Desfazer</span></div>
+<div class="cv"><div class="flt"><b>Fonte da marca</b><span>40</span><span>B</span><span>Cor ■</span><span>Alinhar</span><span>Excluir</span></div>
+<div class="post"><div class="t">Se você cortasse seu preço pela metade amanhã, quem ia parar de pedir <em>desconto</em>?</div><div class="s">Arrasta pro lado.</div><div class="lg">CENTRAL DO MARKETING</div><div class="sw">1/9</div></div><span class="zoom">Clique num elemento para editar · arraste para mover · 1080 × 1350</span></div>
+<div class="pr"><h4>Camadas do slide 1</h4><div class="f"><b>Título</b>texto</div><div class="f">Chamada<span>texto</span></div><div class="f">Logo<span>imagem</span></div><div class="f">Numeração<span>texto</span></div><div class="f">Fundo<span>luz no canto</span></div>
+<h4>Biblioteca da marca</h4><div class="tb"><span class="on">Sugeridas</span><span>Fundos</span><span>Fotos</span><span>Ícones</span></div><div class="lib"><div style="background:radial-gradient(circle at 100% 0,#5a470c,#0a0a0a 60%)"></div><div style="background:radial-gradient(circle at 0 100%,#5a470c,#0a0a0a 60%)"></div><div style="background:#0a0a0a"></div><div style="background:linear-gradient(#222,#000)"></div></div>
+<h4>Legenda</h4><div class="f" style="display:block;line-height:1.4;color:#ccd">Desconto não resolve cliente que não entendeu o valor. Só adia a próxima pechincha…</div></div>
+</div>
+<div class="ft"><span class="learn">O gerente está observando suas edições. O que você mudar vira regra do Designer ao aprovar.</span><span class="btn gh">Descartar</span><span class="btn gh">Salvar e fechar</span><span class="btn ok">Aprovar e mandar para postagem</span></div>
+</div></body></html>
