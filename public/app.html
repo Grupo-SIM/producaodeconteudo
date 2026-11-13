@@ -168,7 +168,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .card .tp{background:#000b;font-weight:600;font-size:11px;left:12px;top:12px}.card .age{position:absolute;right:12px;top:12px;background:#000b;color:var(--gold2);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600}
 .chat .sugs{display:none}.chat.open .sugs{display:flex}
 .note{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:14px;background:linear-gradient(90deg,#1a1710,#121112);border:1px solid var(--goldline);margin-bottom:14px}.note b{font-size:15px}.note span{font-size:13px;color:var(--tx2)}.tagg{margin-left:auto;background:var(--goldbg);color:var(--gold2)!important;border-radius:999px;padding:4px 12px;white-space:nowrap}
-.redes{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}.redes .box{display:flex;flex-direction:column;gap:4px}.redes i{width:30px;height:30px;border-radius:8px;margin-bottom:8px}.redes b{font-size:14px}.redes span{font-size:12px;color:var(--tx3);margin-bottom:10px}.redes .btn{justify-content:center;margin-top:auto}
+.redes{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:14px}.redes .box{display:flex;flex-direction:column;gap:4px}.redes i{width:30px;height:30px;border-radius:8px;margin-bottom:8px}.redes b{font-size:14px}.redes span{font-size:12px;color:var(--tx3);margin-bottom:10px}.redes .btn{justify-content:center;margin-top:auto}
 .pub2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}.bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.bh b{font-size:15px}.bh span{font-size:12px;color:var(--tx3)}
 .cal2{display:grid;grid-template-columns:60px repeat(7,1fr);gap:6px;font-size:11.5px}.cal2>b{text-align:center;color:var(--tx3);font-weight:500}.cal2>i{font-style:normal;color:var(--tx3);padding-top:8px}.cal2>div{min-height:56px;border:1px solid #1f3a2a;border-radius:8px;padding:3px;display:flex;flex-direction:column;gap:3px;background:#141416}.cal2 span{color:#fff;border-radius:6px;padding:3px 6px;cursor:pointer;line-height:1.2}
 .pp{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.pp .th{width:46px;height:56px;border-radius:8px;background:linear-gradient(160deg,#1d1a12,#000);overflow:hidden;flex:none}.pp .th img{width:100%;height:100%;object-fit:cover}.pp b{display:block;font-size:13.5px}.pp span{font-size:12px;color:var(--tx3)}.pa{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
@@ -179,6 +179,8 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .hexes{display:flex;gap:10px;margin-top:6px;font-size:11.5px;color:var(--tx2);font-family:ui-monospace,monospace}
 .arqs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.arqs figure{margin:0}.arqs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#161618}.arqs figcaption{font-size:11px;color:var(--tx3);text-align:center;margin-top:3px}
 img.av{object-fit:cover;padding:0}
+.busca{width:260px;padding:7px 12px}
+.novo{display:grid;gap:8px}.novo .lb{font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-top:6px}.nvf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nvf button{text-align:left;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:#161618}.nvf button.on{border-color:#a8864a;background:#1a1710}.nvf b{display:block;font-size:13.5px}.nvf span{font-size:11.5px;color:var(--tx3)}
 .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 4px -1px 6px;border:1px solid #ffffff22}.kvr span:last-child{color:var(--tx3);text-align:right}
 .tagsw{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.tg{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:var(--gold2)}.tg.out{background:#1c1c1f;color:var(--tx2)}
 .learnbox{margin-top:18px;padding:10px 14px;border:1px solid var(--goldline);background:#16140e;border-radius:10px;font-size:12.5px;color:var(--gold)}
@@ -223,7 +225,7 @@ img.av{object-fit:cover;padding:0}
 .rede{display:grid;place-items:center;border-radius:10px;margin-bottom:8px}.redesc .rede{margin:0}
 .mnav2{display:flex;align-items:center;gap:10px;margin-bottom:10px}.mnav2 b{text-transform:capitalize;flex:1}
 .calm{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.calm>b{font-size:11px;color:var(--tx3);text-align:center;font-weight:500}.calm>div{min-height:54px;border:1px solid var(--line);border-radius:8px;padding:4px 6px;cursor:pointer;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;background:#141416}.calm>div:hover{border-color:var(--line2)}.calm>div.on{border-color:#a8864a;background:#1a1710}.calm>div.hj em{color:var(--gold2)}.calm em{font-style:normal;font-size:12px;width:100%}.calm span{width:8px;height:8px;border-radius:50%}.calm small{font-size:10px;color:var(--tx3)}
-.agdia{margin-top:12px}.agdia h5{text-transform:none;font-size:13px;color:var(--tx);letter-spacing:0}
+.agdia{margin-top:12px;height:230px;overflow:auto}.agdia h5{text-transform:none;font-size:13px;color:var(--tx);letter-spacing:0}
 .ibtn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--tx2);border:1px solid var(--line2);background:#161618}.ibtn:hover{color:var(--tx)}
 .leitura{max-width:760px;margin:0 auto;font-size:15.5px;line-height:1.75;color:#e4e4e6;text-align:justify;hyphens:auto}.leitura h3{font-size:18px;margin:18px 0 6px;text-align:left}.leitura p{margin-bottom:12px}
 .ov2{z-index:120}
@@ -251,7 +253,8 @@ img.av{object-fit:cover;padding:0}
   .eov{padding:0}.emod{border-radius:0}.epills,.ehd>span{display:none}.eft{flex-wrap:wrap}.eft .learn{width:100%}
   .gasto{display:none}.cmodes{display:none!important}#cer{position:relative!important;inset:auto!important;height:300px;margin-top:6px;overflow:hidden}#cer span{font-size:10px!important}.cerw .top{flex-wrap:nowrap}.cerw .top h1{width:auto}.cbusca{margin-top:4px}
   .fab svg{display:block}.fab .cnt{top:-4px;left:-4px;right:auto}
-  .cfg,.grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
+  .cfg,.nvf{grid-template-columns:1fr!important}.busca{width:100%}
+  .grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
   .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
   .lstwrap{overflow-x:auto}
@@ -544,17 +547,38 @@ function publicarCel() {
 }
 
 // ───────── Novo conteúdo
-function novoConteudo() {
-  modal(`<div class="hd"><h2>Novo conteúdo</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb" style="display:grid;gap:10px">
-    <input class="f" id="nt" placeholder="Tema ou título">
-    <select class="f" id="nf"><option value="carrossel">Carrossel</option><option value="feed">Estático</option><option value="stories">Stories de venda</option><option value="video_vertical">Reels</option><option value="feed|noticia">Matéria de jornal</option><option value="feed|texto">Post de blog</option></select>
-    <select class="f" id="nm"><option value="">Sem marca</option>${S.brands.map(b => `<option ${b.name === S.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select>
-    <textarea class="f" id="nb" placeholder="Briefing (opcional)"></textarea></div>
-    <div class="ft"><span class="muted small" style="margin-right:auto">Ou peça direto ao gerente no chat.</span><button class="btn ok" onclick="criaConteudo()">Criar</button></div>`, 'sm');
+// Formatos que já temos treinados: a base é o que o Roteirista (copy) sabe escrever; Designer e Editor dão vida a isso
+const NOVO = [
+  { id: 'carrossel', nome: 'Carrossel', desc: '4 a 10 slides. Roteirista escreve, Designer faz a arte.', format: 'carrossel', tipos: [['educativo', 'Educativo'], ['historia_real', 'História real (investigativa)'], ['noticia', 'Notícia'], ['venda', 'Post de venda']] },
+  { id: 'estatico', nome: 'Feed estático', desc: '2 cards: o assunto e o CTA. Designer faz a arte.', format: 'feed', tipos: [['educativo', 'Educativo'], ['venda', 'Venda']] },
+  { id: 'materia', nome: 'Feed jornalístico + matéria', desc: 'Matéria completa para o site e 2 cards de notícia (manchete e resumo).', format: 'feed', tipos: [['noticia', 'Notícia (fato com fonte)']] },
+  { id: 'stories', nome: 'Stories de venda', desc: '18 a 20 telas com caixinha de perguntas.', format: 'stories', tipos: [['venda', 'Venda']] },
+  { id: 'reels', nome: 'Reels', desc: 'Voz de IA, editado em motion pelo Editor de vídeo.', format: 'video_vertical', tipos: [['educativo', 'Educativo'], ['venda', 'Venda'], ['institucional', 'Institucional']] },
+  { id: 'blog', nome: 'Post de blog', desc: 'Aula escrita para o site, sem arte.', format: 'feed', tipos: [['texto', 'Aula escrita']] }
+];
+async function novoConteudo() {
+  if (!S._prods) S._prods = (await api('/api/products').catch(() => ({ products: [] }))).products;
+  S.nv = { marca: S.marca || '', f: 'carrossel', tipo: 'educativo', prod: S.prodPedido || '' };
+  desenhaNovo();
+}
+function desenhaNovo() {
+  const n = S.nv, F = NOVO.find(x => x.id === n.f), tipos = F.tipos; if (!tipos.some(t => t[0] === n.tipo)) n.tipo = tipos[0][0];
+  const prods = S._prods.filter(p => !n.marca || !(p.brands || []).length || p.brands.includes(n.marca));
+  modal(`<div class="hd"><h2>Novo conteúdo</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb novo">
+    <label class="lb">1. Marca</label><select class="f" onchange="S.nv.marca=this.value;desenhaNovo()"><option value="">Sem marca (estilo geral)</option>${S.brands.map(b => `<option ${b.name === n.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select>
+    ${n.marca ? '' : '<p class="small" style="color:var(--gold)">Sem marca, a arte sai no estilo geral da casa. Use o briefing para dizer o visual e o público.</p>'}
+    <label class="lb">2. Formato</label><div class="nvf">${NOVO.map(x => `<button class="${x.id === n.f ? 'on' : ''}" onclick="S.nv.f='${x.id}';desenhaNovo()"><b>${x.nome}</b><span>${x.desc}</span></button>`).join('')}</div>
+    <label class="lb">3. Tipo</label><div class="tabs" style="margin:0">${tipos.map(([k, l]) => `<button class="${k === n.tipo ? 'on' : ''}" onclick="S.nv.tipo='${k}';desenhaNovo()">${l}</button>`).join('')}</div>
+    ${n.tipo === 'venda' ? `<label class="lb">Produto</label><select class="f" onchange="S.nv.prod=this.value"><option value="">Escolha o produto</option>${prods.map(p => `<option value="${p.id}" ${+n.prod === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>` : ''}
+    <label class="lb">4. Tema</label><input class="f" id="nt" placeholder="Sobre o que é? Ex.: por que seu site cai no pico de acesso" value="${esc(n.tema || '')}" oninput="S.nv.tema=this.value">
+    <label class="lb">Briefing (opcional)</label><textarea class="f" id="nb" placeholder="Algo a acrescentar: fonte da notícia, ângulo, o que evitar…" oninput="S.nv.brief=this.value">${esc(n.brief || '')}</textarea></div>
+    <div class="ft"><span class="muted small" style="margin-right:auto">Só aparecem formatos que a equipe já sabe fazer.</span><button class="btn ok" onclick="criaConteudo()">Criar</button></div>`);
 }
 async function criaConteudo() {
-  const [format, kind] = $('#nf').value.split('|');
-  await tryDo(() => api('/api/contents', { body: { title: $('#nt').value, format, kind: kind || 'educativo', brand: $('#nm').value, brief: $('#nb').value, ...(S.prodPedido ? { goal: 'produto', product_id: S.prodPedido } : {}) } }), 'Pedido criado');
+  const n = S.nv, F = NOVO.find(x => x.id === n.f);
+  if (!(n.tema || '').trim()) return toast('Escreva o tema');
+  if (n.tipo === 'venda' && !n.prod) return toast('Escolha o produto da venda');
+  await tryDo(() => api('/api/contents', { body: { title: n.tema.trim(), format: F.format, kind: n.tipo, brand: n.marca, brief: n.brief || '', ...(n.tipo === 'venda' ? { goal: 'produto', product_id: +n.prod } : {}) } }), 'Pedido criado: o Roteirista já começou');
   S.prodPedido = null; fecha();
 }
 
@@ -629,7 +653,7 @@ function abreEstudio(tipo, id) {
     <div class="epills">${cols.map((c, k) => `<em class="${k < atual ? 'ok' : k === atual ? 'now' : ''}">${esc(c)}</em>`).join('')}</div><button class="x" onclick="fechaEstudio()">×</button></div>
     <div class="eask"><input id="eajm" placeholder="Pedir ajuste ao gerente: ${esc(ex)}…" onkeydown="if(event.key==='Enter')ajusteEstudio(${id},'${alvo}')"><button class="btn bl" onclick="ajusteEstudio(${id},'${alvo}')">Mandar ajustar</button></div>
     <iframe src="/?embed=${tipo}&id=${id}"></iframe>
-    <div class="eft"><span class="learn">O gerente está observando suas edições. O que você mudar vira regra do ${quem} ao aprovar.</span><button class="btn" onclick="acao(${id},'descartar').then(fechaEstudio)">Descartar</button><button class="btn" onclick="salvaEstudio(${id})">Salvar e fechar</button><button class="btn ok" onclick="salvaEstudio(${id},true)">Aprovar e mandar para postagem</button></div></div>`;
+    <div class="eft"><span class="learn">O gerente está observando suas edições. O que você mudar vira regra do ${quem} ao aprovar.</span><a class="btn" href="${tipo === 'video' ? `/api/contents/${id}/render/file` : `/api/contents/${id}/arte/zip`}" download title="Baixar para o computador (a versão salva)">⬇ Baixar</a><button class="btn" onclick="acao(${id},'descartar').then(fechaEstudio)">Descartar</button><button class="btn" onclick="salvaEstudio(${id})">Salvar e fechar</button><button class="btn ok" onclick="salvaEstudio(${id},true)">Aprovar e mandar para postagem</button></div></div>`;
   document.body.appendChild(d);
 }
 function fechaEstudio() { $('#estudio')?.remove(); refresh(); }
@@ -780,8 +804,8 @@ VIEWS.marcas = async () => {
       <div class="two"><div>${esq}</div><div>${dir}</div></div>
       <div class="learnbox">O que você mudar aqui, o gerente avisa os agentes e salva no cérebro da marca. Também dá para mudar só pela conversa.</div></div>`;
   }
-  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><span style="flex:1"></span><span class="chip">${brands.length} marcas</span><button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
-    ${brands.length ? `<div class="mlay"><div class="mcards">${brands.map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()">${av(b)}<b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b).replace(/^(.{0,48})\s.*/s, '$1…'))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
+  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><input class="f busca" placeholder="Buscar marca…" value="${esc(S.qMarca || '')}" oninput="S.qMarca=this.value;clearTimeout(S.tq);S.tq=setTimeout(()=>{render();setTimeout(()=>{const i=$('.busca');i.focus();i.setSelectionRange(99,99)},30)},250)"><span style="flex:1"></span><span class="chip">${brands.length} marcas</span><button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
+    ${brands.length ? `<div class="mlay"><div class="mcards">${brands.filter(b => !S.qMarca || b.name.toLowerCase().includes(S.qMarca.toLowerCase())).map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()">${av(b)}<b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b).replace(/^(.{0,48})\s.*/s, '$1…'))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
 };
 function verCampo(t, v, html) { modal(`<div class="hd"><h2>${t}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><div class="leitura">${html ? v : `<p>${sw(v)}</p>`}</div></div><div class="ft"><span class="muted small" style="margin-right:auto">Para mudar, use Editar ou peça ao gerente no chat.</span></div>`, 'sm'); }
 async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
@@ -806,7 +830,7 @@ async function renMarca(id) { const n = prompt('Novo nome'); if (n) { await tryD
 // ───────── Produtos
 VIEWS.produtos = async () => {
   const { products } = await api('/api/products'); S._prods = products;
-  const lst = products.filter(p => !S.marca || (p.brands || []).includes(S.marca));
+  const qp = (S.qProd || '').toLowerCase(), lst = products.filter(p => (!S.marca || (p.brands || []).includes(S.marca)) && (!qp || (p.name + ' ' + (p.promise || '')).toLowerCase().includes(qp)));
   const sel = lst.find(p => p.id === S.prodSel) || lst[0]; S.prodSel = sel?.id;
   const linha = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(v || '—')}</span></div>`, tab = S.prodTab || 'ficha';
   let det = '';
@@ -820,10 +844,10 @@ VIEWS.produtos = async () => {
       <div class="tabs">${[['ficha', 'Ficha'], ['pagina', 'Página de vendas'], ['objecoes', 'Objeções e bônus'], ['feitos', 'Conteúdos feitos']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.prodTab='${k}';render()">${n}</button>`).join('')}</div>
       <div class="two"><div><h5>${{ ficha: 'Ficha', pagina: 'Página de vendas', objecoes: 'Objeções e bônus', feitos: 'Conteúdos feitos' }[tab]}</h5>${corpo}</div><div><h5>Conteúdos com este produto</h5>${feitos.slice(0, 8).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhum ainda.</p>'}</div></div></div>`;
   }
-  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1><span class="chip">${lst.length} produtos</span><span style="flex:1"></span>${marcaSel()}</div>
+  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1><input class="f busca" placeholder="Buscar produto…" value="${esc(S.qProd || '')}" oninput="S.qProd=this.value;clearTimeout(S.tq);S.tq=setTimeout(()=>{render();setTimeout(()=>{const i=$('.busca');i.focus();i.setSelectionRange(99,99)},30)},250)"><span class="chip">${lst.length} produtos</span><span style="flex:1"></span>${marcaSel()}</div>
     <div class="mlay"><div class="mcards">${lst.map(p => `<div class="box mc ${p.id === sel?.id ? 'on' : ''}" onclick="S.prodSel=${p.id};render()"><b>${esc(p.name)}</b><span class="muted small">${esc((p.promise || p.type || '').slice(0, 60))}</span><div class="tagsw">${(p.brands || []).map(b => `<span class="tg out">${esc(b)}</span>`).join('')}</div></div>`).join('')}<div class="box mc add" onclick="detProduto(0)"><span>+ Novo produto</span><span class="muted small">ou cole o link no chat</span></div></div>${det}</div>`;
 };
-function pedirDoProduto(id) { S.prodPedido = id; novoConteudo(); }
+function pedirDoProduto(id) { S.prodPedido = id; novoConteudo().then(() => { S.nv.tipo = 'venda'; S.nv.prod = id; desenhaNovo(); }); }
 const PCAMPOS = [['name', 'Nome'], ['type', 'Tipo'], ['url', 'Link'], ['price', 'Preço'], ['promise', 'Promessa'], ['audience', 'Público'], ['deliverable', 'Entregável'], ['pains', 'Dores'], ['objections', 'Objeções'], ['bonus', 'Bônus'], ['guarantee', 'Garantia']];
 async function detProduto(id) {
   if (!S._prods) S._prods = (await api('/api/products')).products;
@@ -847,12 +871,12 @@ async function apagaProd(id) { if (!confirm('Apagar este produto?')) return; awa
 VIEWS.otimizacao = async () => {
   const d = await api('/api/v2/otimizacao'), F = S.fluxo, nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
   const dias = S.otDias || 30, lim = Date.now() - dias * 864e5;
-  const its = d.itens.filter(i => new Date(i.posted_at) >= lim && (!S.marca || (i.brand || '').toLowerCase() === S.marca.toLowerCase()) && (S.filtro === 'todos' || !F.formatos.some(f => f.id === S.filtro) || i.raia === S.filtro));
+  const qo = (S.qOt || '').toLowerCase(), its = d.itens.filter(i => (!qo || (i.title + ' ' + (i.brand || '')).toLowerCase().includes(qo)) && new Date(i.posted_at) >= lim && (!S.marca || (i.brand || '').toLowerCase() === S.marca.toLowerCase()) && (S.filtro === 'todos' || !F.formatos.some(f => f.id === S.filtro) || i.raia === S.filtro));
   const medidos = its.filter(i => i.medidas), alc = medidos.length ? Math.round(medidos.reduce((s, i) => s + i.views, 0) / medidos.length) : null;
   const aprovTreino = F.itens.filter(i => i.estado === 'finalizado' || (i.estado === 'esperando' && i.etapa === 'publicacao')).length;
   const kpi = (n, v) => `<div class="box kp"><span>${n}</span><b>${v ?? '—'}</b></div>`;
   const ana = [['Capa e gancho', 'Que tipo de abertura gera mais salvamento por formato e marca'], ['Formato x marca', 'Ex.: história real rende mais numa marca ou em outra'], ['Horário e frequência', 'Base: guia do Publicador, horário, frequência e testes'], ['Venda', 'Stories de venda e posts de venda: cliques no link da tela']];
-  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1><span style="flex:1"></span>${[7, 30, 90].map(n => `<button class="chip ${dias === n ? 'on' : ''}" onclick="S.otDias=${n};render()">Últimos ${n} dias</button>`).join('')}${marcaSel()}
+  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1><input class="f busca" placeholder="Buscar post, marca ou produto…" value="${esc(S.qOt || '')}" oninput="S.qOt=this.value;clearTimeout(S.tq);S.tq=setTimeout(()=>{render();setTimeout(()=>{const i=$('.busca');i.focus();i.setSelectionRange(99,99)},30)},250)"><span style="flex:1"></span>${[7, 30, 90].map(n => `<button class="chip ${dias === n ? 'on' : ''}" onclick="S.otDias=${n};render()">Últimos ${n} dias</button>`).join('')}${marcaSel()}
     <select class="chip" onchange="S.filtro=this.value;render()"><option value="todos">Todos os formatos</option>${F.formatos.map(f => `<option value="${f.id}" ${S.filtro === f.id ? 'selected' : ''}>${esc(f.nome)}</option>`).join('')}</select></div>
     <div class="kps">${kpi('Peças aprovadas no treino', aprovTreino)}${kpi('Postadas e finalizadas', its.length || null)}${kpi('Alcance médio', alc)}${kpi('Com métricas lançadas', medidos.length || null)}</div>
     <div class="pub2" style="grid-template-columns:1fr 1fr"><div class="box"><div class="bh"><b>O que performou</b><button class="btn sm" onclick="tryDo(()=>api('/api/v2/descobertas/gerar',{body:{}}),'Análise feita').then(render)">Analisar agora</button></div>
@@ -878,7 +902,7 @@ VIEWS.cerebro = async () => {
     <div class="cbusca"><input placeholder="Buscar e acender o caminho… (ex.: stories de venda)" oninput="cerBusca(this.value)"><span id="cerN"></span></div>
     <div id="cer" class="${modo}"></div>
     <div id="cerTip" class="hidden"></div><div id="cerCard" class="hidden"></div>
-    ${isMobile() ? (() => { const a0 = [...d.agentes].sort((x, y) => y.itens.length - x.itens.length)[0]; return a0 ? `<div class="csheet" id="csheet"><i class="grab"></i><b>${esc(a0.nome)}</b> <span class="muted small">${a0.itens.length} arquivos</span><div class="tagsw">${a0.itens.slice(0, 8).map(i => `<span class="tg out" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})">${esc(i.titulo.split(/[:(—-]/)[0].slice(0, 20))}</span>`).join('')}${a0.itens.length > 8 ? `<span class="tg out">+${a0.itens.length - 8}</span>` : ''}</div></div>` : ''; })() : ''}${modo !== 'lista' ? `<div class="cfeed">${feed}</div><div class="chint">Passe o mouse para destacar · clique para abrir · arraste para girar</div>` : ''}</div>`;
+    ${isMobile() ? (() => { const a0 = [...d.agentes].sort((x, y) => y.itens.length - x.itens.length)[0]; return a0 ? `<div class="csheet" id="csheet"><i class="grab"></i><b>${esc(a0.nome)}</b> <span class="muted small">${a0.itens.length} arquivos</span><div class="tagsw">${a0.itens.slice(0, 8).map(i => `<span class="tg out" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})">${esc(i.titulo.split(/[:(—-]/)[0].slice(0, 20))}</span>`).join('')}${a0.itens.length > 8 ? `<span class="tg out">+${a0.itens.length - 8}</span>` : ''}</div></div>` : ''; })() : ''}${modo !== 'lista' ? `<div class="cfeed" style="display:none"></div><div class="chint">Passe o mouse para destacar · clique para abrir · arraste para girar</div>` : ''}</div>`;
   const el = $('#cer');
   if (modo === '3d') {
     try {

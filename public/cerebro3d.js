@@ -77,7 +77,7 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
       const m = new THREE.Mesh(regra ? new THREE.OctahedronGeometry(0.13) : new THREE.BoxGeometry(0.2, 0.26, 0.04), new THREE.MeshStandardMaterial({ color: regra ? cor : 0xcfd6e4, emissive: 0x000000, transparent: true, opacity: 0.85 }));
       const t = j * 2.399, rr = 1.3 + 0.12 * Math.sqrt(j);
       m.userData = { tipo: it.tipo, id: it.id, titulo: it.titulo, agente: a.id, base: new THREE.Vector3(Math.cos(t) * rr, (j % 7 - 3) * 0.18, Math.sin(t) * rr) };
-      grupo.add(m); pickables.push(m); filhos.push(m); nos.set(it.id, m);
+      m.visible = false; grupo.add(m); filhos.push(m); nos.set(it.id, m);
     });
     nos.set(a.id, no); no.userData.filhos = filhos; no.userData.linha = linha; no.userData.itens = a.itens; no.userData.cor = a.cor;
     rotulos.push([no, rot(a.nome, a.itens.length + ' arquivos'), 0.55]);
@@ -114,14 +114,14 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
     for (const id of acesos) destaca(nos.get(id), false); for (const a of ags) nos.get(a.id).userData.alvo = 1;
     for (const a of ags) { const n = nos.get(a.id); n.userData.linha.material.color.setHex(0x5a5a66); n.userData.linha.material.opacity = .45; }
     acesos = new Set(lista.map(x => x.id));
-    for (const x of lista) { destaca(nos.get(x.id), true); const n = nos.get(x.agente); if (n) { n.userData.linha.material.color.setHex(0xe9d29a); n.userData.linha.material.opacity = 1; n.userData.alvo = 1.35; for (let i = 0; i < 4; i++) parts.push({ m: (() => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), ouro); grupo.add(m); return m; })(), no: n, volta: false, t: -i * 0.15 }); } }
+    for (const x of lista) { destaca(nos.get(x.id), true); const n = nos.get(x.agente); if (n) { n.userData.linha.material.color.setHex(0xe9d29a); n.userData.linha.material.opacity = 1; n.userData.alvo = 1.35; } }
   }
 
   let raf, t0 = performance.now(), ultEm = 0;
   function loop(now) {
     const t = (now - t0) / 1000; if (auto) rotY += 0.0018;
     grupo.rotation.y = rotY; grupo.rotation.x = rotX;
-    cam.position.set(0, 10 * dist / 22, dist); cam.lookAt(0, 0, 0);
+    cam.position.set(0, 10 * dist / 22, dist); cam.lookAt(0, -1.6, 0);
     gerente.rotation.y = t * 0.4;
     for (const a of ags) {
       const n = nos.get(a.id), u = n.userData, ang = u.ang + t * 0.05;
@@ -129,7 +129,7 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
       u.linha.geometry.setFromPoints([new THREE.Vector3(), n.position]);
       u.filhos.forEach((f, j) => { const b = f.userData.base, w = t * 0.3 + j; f.position.set(n.position.x + b.x * Math.cos(w * 0.1) - b.z * Math.sin(w * 0.1), n.position.y + b.y, n.position.z + b.x * Math.sin(w * 0.1) + b.z * Math.cos(w * 0.1)); f.rotation.y = w; });
     }
-    if (t - ultEm > 0.25) { emite(); ultEm = t; }
+
     for (let i = parts.length - 1; i >= 0; i--) {
       const p = parts[i]; p.t += 0.012; const k = Math.max(0, Math.min(1, p.t)), f = p.volta ? 1 - k : k;
       p.m.position.copy(p.no.position).multiplyScalar(f); p.m.position.y += Math.sin(k * Math.PI) * 0.8; p.m.rotation.y += 0.1;

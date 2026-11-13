@@ -4804,7 +4804,7 @@ async function arteEditor(id, onClose, opts = {}) {
       [['', 'Original'], ['mono', 'Preto e branco'], ['marca', 'Na cor da marca']].map(([k, l]) => h('option', { value: k, selected: (o.grade === 'mono' ? 'mono' : o.grade ? 'marca' : '') === k }, l)))),
     o.grade && o.grade !== 'mono' ? slideF('Intensidade da cor', () => o.grade.amount ?? .6, v => { o.grade = { ...o.grade, amount: r2(v) }; }, .1, 1, .01, v => Math.round(v * 100) + '%') : null,
     slideF('Girar', () => o.rot ?? 0, v => { o.rot = Math.round(v); }, -180, 180, 1, v => Math.round(v) + '°'));
-  const ABAS = [['el', 'Elemento'], ['cam', 'Camadas'], ['pag', 'Página']];
+  const ABAS = document.body.classList.contains('embed') ? [['el', 'Elemento'], ['cam', 'Camadas']] : [['el', 'Elemento'], ['cam', 'Camadas'], ['pag', 'Página']];
   const drawPanel = () => {
     if (E.sys && (E.sel || E.sysSi !== E.si || (E.multi && E.multi.length > 1))) E.sys = null;
     const multi = !!(E.multi && E.multi.length > 1), selObj = E.sel && getObj(E.sel.kind, E.sel.k), temEl = !!(E.sys || multi || selObj);
@@ -5156,9 +5156,10 @@ async function arteEditor(id, onClose, opts = {}) {
     e.preventDefault(); e.stopPropagation(); const rc = wrap.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width, y = (e.clientY - rc.top) / rc.height;
     if (d.t === 'icon' && AS.ICONES[d.n]) addIconAt(d.n, x, y); else if (d.t === 'forma' && MENU_FORMAS.some(f => f[0] === d.k)) addForma(d.k, x, y); else if (d.t === '3d' && /^[a-z0-9-]{1,80}$/.test(d.id)) usar3d(d.id, x, y); else if (d.t === 'preset') { const p = (d.l === 'selos' ? SELOS : TEXTOS)[d.i]; if (p) addPreset(p, x, y); }
   }, true);
+  const EMB = document.body.classList.contains('embed');   // dentro do novo painel: só o essencial (texto, biblioteca e formas)
   rail.append(flyBtn(AI.text, 'Texto', [['Título', () => addText('title')], ['Texto de apoio', () => addText('body')], ['Selo', () => addText('badge')], ['Número grande', () => addText('number')], ['Botão (CTA)', () => addText('cta')], ['Estilos e duplas de fonte…', () => abreEl('texto')]]),
-    libB, elB, h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), flyBtn(AI.shape, 'Forma', MENU_FORMAS.map(([k, l]) => [l, () => addForma(k)])),
-    h('button', { onclick: () => select(null) }, svg(AI.bg), 'Fundo'), h('button', { onclick: aplicarLayout }, svg(AI.layout), 'Layouts'), h('button', { title: 'Ímã: gruda no centro e nas bordas dos outros elementos (segure Alt para ignorar)', class: 'on', onclick: e => { E.snap = !E.snap; e.currentTarget.classList.toggle('on', E.snap); } }, svg(AI.shape), 'Ímã'), h('button', { onclick: e => { E.guides = !E.guides; e.currentTarget.classList.toggle('on', E.guides); drawOverlay(); } }, svg(AI.grid), 'Guias'));
+    libB, EMB ? null : elB, EMB ? null : h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), flyBtn(AI.shape, 'Forma', MENU_FORMAS.map(([k, l]) => [l, () => addForma(k)])),
+    EMB ? null : h('button', { onclick: () => select(null) }, svg(AI.bg), 'Fundo'), EMB ? null : h('button', { onclick: aplicarLayout }, svg(AI.layout), 'Layouts'), ...(EMB ? [] : [ h('button', { title: 'Ímã: gruda no centro e nas bordas dos outros elementos (segure Alt para ignorar)', class: 'on', onclick: e => { E.snap = !E.snap; e.currentTarget.classList.toggle('on', E.snap); } }, svg(AI.shape), 'Ímã'), h('button', { onclick: e => { E.guides = !E.guides; e.currentTarget.classList.toggle('on', E.guides); drawOverlay(); } }, svg(AI.grid), 'Guias')]));
   const nomeEst = opts.estilo ? h('input', { type: 'text', class: 'ttl', value: opts.estilo.nome, 'aria-label': 'Nome do estilo', style: { background: 'transparent', border: '1px solid var(--bd)', borderRadius: '8px', padding: '4px 8px', color: 'inherit', font: 'inherit', minWidth: '200px' } }) : null;
   const salvarEstilo = guard(async () => {
     if (!(await garantirSalvo())) return; if (!E.spec.slides.some(sl => sl.modelo)) { toast('Monte as páginas com os modelos (bloco "Modelo da página") para o estilo poder ser reaproveitado', 'bad'); return; }
