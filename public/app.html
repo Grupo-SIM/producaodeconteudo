@@ -17,7 +17,7 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--tx);font:14px/1.45 Inter,"Segoe UI",system-ui,Arial,sans-serif;letter-spacing:-.005em;display:flex;overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
-a{color:var(--gold2)}
+a{color:var(--gold2)}a.btn{text-decoration:none}
 .hidden{display:none!important}
 /* menu */
 .side{width:232px;background:var(--side);border-right:1px solid #1f1f22;padding:22px 14px;display:flex;flex-direction:column;gap:4px;flex:none}
@@ -216,6 +216,7 @@ img.av{object-fit:cover;padding:0}
 .ppc{display:flex;gap:12px;align-items:center;background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}.ppc .th{width:52px;height:64px;border-radius:8px;background:linear-gradient(160deg,#1d1a12,#000);overflow:hidden;flex:none}.ppc .th img{width:100%;height:100%;object-fit:cover}.ppc b{display:block;font-size:14px}.ppc span{font-size:12px;color:var(--tx3)}
 .agc{display:flex;gap:12px;align-items:center;margin-bottom:6px}.agc b{width:40px;color:var(--gold);font-size:13px}.agc span{flex:1;background:#161618;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px}
 .csheet{position:fixed;left:0;right:0;bottom:64px;z-index:20;background:#111113;border-top:1px solid var(--line2);border-radius:16px 16px 0 0;padding:10px 16px 16px}.csheet .grab{display:block;width:36px;height:4px;border-radius:2px;background:#3a3a40;margin:0 auto 10px}.csheet b{font-size:16px}
+.cfg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.cfg .kvr span:last-child{display:flex;gap:8px;align-items:center}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -238,7 +239,7 @@ img.av{object-fit:cover;padding:0}
   .eov{padding:0}.emod{border-radius:0}.epills,.ehd>span{display:none}.eft{flex-wrap:wrap}.eft .learn{width:100%}
   .gasto{display:none}.cmodes{display:none!important}#cer{position:relative!important;inset:auto!important;height:300px;margin-top:6px;overflow:hidden}#cer span{font-size:10px!important}.cerw .top{flex-wrap:nowrap}.cerw .top h1{width:auto}.cbusca{margin-top:4px}
   .fab svg{display:block}.fab .cnt{top:-4px;left:-4px;right:auto}
-  .grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
+  .cfg,.grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
   .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
   .lstwrap{overflow-x:auto}
@@ -839,19 +840,35 @@ async function cerAcende(q) {
 // ───────── Configurações
 VIEWS.config = async () => {
   const [st, us, lx, gs, sy] = await Promise.all([api('/api/state'), S.me.admin ? api('/api/users').catch(() => ({ users: [] })) : { users: [] }, api('/api/v2/fluxo?lixeira=1'), api('/api/v2/gastos'), api('/api/v2/sync').catch(() => null)]);
-  const lixo = lx.itens.filter(i => i.estado === 'descartado');
-  $('#main').innerHTML = `<div class="top"><h1>Configurações</h1></div><div class="grid">
-    <div class="box"><b>Assinatura do Claude</b><p class="small muted" style="margin-top:6px">Modo: ${esc(st.api?.provider)}${st.api?.assinatura ? ' · conectada' : ''}</p><p class="small muted">Tarefas hoje: ${st.jobsToday}</p></div>
-    <div class="box"><b>Gasto do mês (${esc(gs.mes)})</b><p class="small muted" style="margin-top:6px">Imagens: US$ ${Number(gs.imagens_usd).toFixed(2)} (${gs.imagens} geradas)<br>Tarefas dos agentes: ${gs.tarefas} · tokens ${(gs.tokens_in + gs.tokens_out).toLocaleString('pt-BR')}</p></div>
-    ${sy ? `<div class="box"><b>Treino ↔ conhecimento/</b><p class="small muted" style="margin-top:6px">Entrada: ${sy.entrada.arquivos} arquivos na pasta, ${sy.entrada.carregados} carregados. ${esc(sy.entrada.como)}<br>Saída: ${sy.saida.regras} regras ativas, última gravação ${fmtD(sy.saida.ultima) || 'nunca'}. ${esc(sy.saida.como)}</p><div style="display:flex;gap:6px;margin-top:8px"><button class="btn sm" onclick="tryDo(()=>api('/api/v2/sync/importar',{body:{}}),'Bases recarregadas').then(render)">Importar da pasta</button><button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/sync/exportar',{body:{}}),'Regras gravadas em conhecimento/aprendido').then(render)">Gravar regras na pasta</button></div></div>` : ''}
-    <div class="box"><b>Logins</b><p class="small muted" style="margin:6px 0">Perfis: Dono (tudo) e Revisor (Fluxo, Revisão e Publicação).</p>${us.users.map(u => `<div class="ver">${esc(u.name)} <span class="muted">${esc(u.username)}</span><span class="pill" style="margin-left:auto">${u.role === 'admin' ? 'Dono' : 'Revisor'}</span></div>`).join('')}${S.me.admin ? '<button class="btn sm" style="margin-top:8px" onclick="novoRevisor()">+ Revisor</button>' : ''}</div>
-    <div class="box"><b>Lixeira</b>${lixo.map(i => `<div class="ver"><span style="flex:1">${esc(i.titulo)}</span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></div>`).join('') || '<p class="small muted" style="margin-top:6px">Vazia.</p>'}</div>
-  </div><p class="small muted" style="margin-top:14px"><a href="/antigo">Abrir o painel antigo</a> (ainda usado pelos editores de arte e vídeo e pelas telas avançadas).</p>`;
+  const lixo = lx.itens.filter(i => i.estado === 'descartado'), kv = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${v}</span></div>`;
+  const prov = { assinatura: 'Assinatura do Claude', api: 'Chave de API', manual: 'Modo chat (sem conexão)' }[st.api?.provider] || st.api?.provider;
+  const perfil = u => u.role === 'admin' ? 'Dono' : 'Revisor';
+  $('#main').innerHTML = `<div class="top"><h1>Configurações</h1></div><div class="cfg">
+    <div class="box"><div class="bh"><b>Assinatura do Claude</b><span class="pill ${st.api?.provider === 'manual' ? 'parado' : 'finalizado'}">${st.api?.provider === 'manual' ? 'desconectado' : 'conectado'}</span></div>
+      ${kv('Como os agentes rodam', esc(prov))}${kv('Modelo', esc(st.settings?.model || '—'))}${kv('Tarefas hoje', st.jobsToday)}${kv('Modo autônomo', st.settings?.autopilot === '1' ? 'ligado' : 'desligado')}
+      <a class="btn sm" style="margin-top:8px" href="/antigo#/settings">Conectar ou trocar a conta</a></div>
+    <div class="box"><div class="bh"><b>Gasto do mês</b><span>${esc(gs.mes)}</span></div>
+      ${kv('Imagens (fal.ai)', `US$ ${Number(gs.imagens_usd).toFixed(2)} · ${gs.imagens} geradas`)}${kv('Tarefas dos agentes', gs.tarefas)}${kv('Tokens', (gs.tokens_in + gs.tokens_out).toLocaleString('pt-BR'))}${kv('Assinatura do Claude', 'valor fixo do plano')}</div>
+    <div class="box"><div class="bh"><b>Logins</b>${S.me.admin ? '<button class="btn sm" onclick="novoLogin()">+ Novo login</button>' : ''}</div>
+      <p class="small muted" style="margin-bottom:8px">Dono: acesso a tudo. Revisor: Fluxo, Revisão, Publicação e conversa com o gerente.</p>
+      ${kv(S.me.owner ? 'Você (dono)' : esc(S.me.name), 'Dono')}${us.users.map(u => `<div class="kvr"><span>${esc(u.name)} <small class="muted">${esc(u.username)}${u.active ? '' : ' · desativado'}</small></span><span>${perfil(u)} ${S.me.admin && u.id !== S.me.id ? `<button class="btn sm dg" onclick="apagaLogin(${u.id},'${esc(u.name)}')">Remover</button>` : ''}</span></div>`).join('')}</div>
+    <div class="box"><div class="bh"><b>Lixeira</b><span>itens descartados</span></div>${lixo.map(i => `<div class="kvr"><span>${esc(i.titulo)} <small class="muted">${esc(i.marca)}</small></span><span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></span></div>`).join('') || '<p class="muted small">Vazia.</p>'}</div>
+    ${sy ? `<div class="box"><div class="bh"><b>Treino ↔ pasta conhecimento/</b></div>${kv('Bases dos agentes na pasta', `${sy.entrada.arquivos} arquivos · ${sy.entrada.carregados} carregados`)}${kv('Regras aprendidas ativas', sy.saida.regras)}${kv('Última gravação na pasta', fmtD(sy.saida.ultima) || 'nunca')}
+      <p class="small muted" style="margin:8px 0">As regras são gravadas em conhecimento/aprendido/. Para chegarem ao GitHub, faça commit dessa pasta.</p>
+      <div style="display:flex;gap:6px"><button class="btn sm" onclick="tryDo(()=>api('/api/v2/sync/importar',{body:{}}),'Bases recarregadas').then(render)">Importar da pasta</button><button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/sync/exportar',{body:{}}),'Regras gravadas').then(render)">Gravar regras na pasta</button></div></div>` : ''}
+    <div class="box"><div class="bh"><b>Avançado</b></div><p class="small muted" style="margin-bottom:8px">Agentes, prompts, motor de vídeo, backup e integrações continuam no painel completo.</p><a class="btn sm" href="/antigo#/settings">Abrir configurações avançadas</a></div>
+  </div>`;
 };
-async function novoRevisor() {
-  const name = prompt('Nome do revisor'); if (!name) return; const username = prompt('Login (letras minúsculas)'); if (!username) return; const password = prompt('Senha (mín. 8)'); if (!password) return;
-  await tryDo(() => api('/api/users', { body: { name, username, password, role: 'custom', perms: { pipeline: 'editar', dashboard: 'editar', office: 'ver', video: 'ver', arte: 'ver', chefe: 'editar' } } }), 'Revisor criado'); render();
+function novoLogin() {
+  modal(`<div class="hd"><h2>Novo login</h2></div><div class="mb" style="display:grid;gap:8px"><input class="f" id="ln" placeholder="Nome"><input class="f" id="lu2" placeholder="Login (letras minúsculas)"><input class="f" id="lp2" type="password" placeholder="Senha (mínimo 8)">
+    <select class="f" id="lr"><option value="revisor">Revisor (Fluxo, Revisão, Publicação)</option><option value="dono">Dono (tudo)</option></select></div>
+    <div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="criaLogin()">Criar</button></div>`, 'sm');
 }
+async function criaLogin() {
+  const dono = $('#lr').value === 'dono';
+  await tryDo(() => api('/api/users', { body: { name: $('#ln').value, username: $('#lu2').value.trim().toLowerCase(), password: $('#lp2').value, role: dono ? 'admin' : 'custom', perms: dono ? {} : { pipeline: 'editar', dashboard: 'editar', office: 'ver', video: 'editar', arte: 'editar', chefe: 'editar', knowledge: 'ver', products: 'ver' } } }), 'Login criado'); fecha();
+}
+async function apagaLogin(id, nome) { if (!confirm(`Remover o login de ${nome}?`)) return; await tryDo(() => api('/api/users/' + id, { method: 'DELETE' }), 'Removido'); render(); }
 
 // ───────── Mais (celular)
 VIEWS.mais = () => { $('#main').innerHTML = `<div class="top"><h1>Mais</h1></div><div style="display:grid;gap:8px">${MENU.filter(m => !m[3]).map(([id, nome, ic]) => `<button class="nv box" style="color:var(--tx)" onclick="go('${id}')">${ico(ic)}${nome}</button>`).join('')}<button class="nv box" style="color:var(--tx)" onclick="logout()">Sair</button></div>`; };
