@@ -167,6 +167,19 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .mgrid .play{width:52px;height:52px;border-radius:50%;background:#ffffffd0;color:#111;display:grid;place-items:center;font-size:18px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
 .card .tp{background:#000b;font-weight:600;font-size:11px;left:12px;top:12px}.card .age{position:absolute;right:12px;top:12px;background:#000b;color:var(--gold2);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600}
 .chat .sugs{display:none}.chat.open .sugs{display:flex}
+.note{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:14px;background:linear-gradient(90deg,#1a1710,#121112);border:1px solid var(--goldline);margin-bottom:14px}.note b{font-size:15px}.note span{font-size:13px;color:var(--tx2)}.tagg{margin-left:auto;background:var(--goldbg);color:var(--gold2)!important;border-radius:999px;padding:4px 12px;white-space:nowrap}
+.redes{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}.redes .box{display:flex;flex-direction:column;gap:4px}.redes i{width:30px;height:30px;border-radius:8px;margin-bottom:8px}.redes b{font-size:14px}.redes span{font-size:12px;color:var(--tx3);margin-bottom:10px}.redes .btn{justify-content:center;margin-top:auto}
+.pub2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}.bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.bh b{font-size:15px}.bh span{font-size:12px;color:var(--tx3)}
+.cal2{display:grid;grid-template-columns:60px repeat(7,1fr);gap:6px;font-size:11.5px}.cal2>b{text-align:center;color:var(--tx3);font-weight:500}.cal2>i{font-style:normal;color:var(--tx3);padding-top:8px}.cal2>div{min-height:56px;border:1px solid #1f3a2a;border-radius:8px;padding:3px;display:flex;flex-direction:column;gap:3px;background:#141416}.cal2 span{color:#fff;border-radius:6px;padding:3px 6px;cursor:pointer;line-height:1.2}
+.pp{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.pp .th{width:46px;height:56px;border-radius:8px;background:linear-gradient(160deg,#1d1a12,#000);overflow:hidden;flex:none}.pp .th img{width:100%;height:100%;object-fit:cover}.pp b{display:block;font-size:13.5px}.pp span{font-size:12px;color:var(--tx3)}.pa{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.mlay{display:grid;grid-template-columns:460px 1fr;gap:16px;align-items:start}.mcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mc{cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:14px}.mc.on{border-color:#a8864a!important}.mc b{font-size:14px}.mc.add{border-style:dashed;align-items:center;justify-content:center;color:var(--tx2)}
+.av{width:36px;height:36px;border-radius:9px;background:#1c1c1f;display:grid;place-items:center;font-size:12px;font-weight:700;margin-bottom:8px}.av.gold{width:52px;height:52px;border:1px solid #a8864a;color:var(--gold2);background:#1a1710;margin:0}
+.mdet .mh{display:flex;gap:14px;align-items:center;margin-bottom:14px}.mdet h2{font-size:19px;font-weight:600}.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}h5{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.kvr{display:flex;justify-content:space-between;gap:12px;background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px}.kvr span:last-child{color:var(--tx3);text-align:right}
+.tagsw{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.tg{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:var(--gold2)}.tg.out{background:#1c1c1f;color:var(--tx2)}
+.learnbox{margin-top:18px;padding:10px 14px;border:1px solid var(--goldline);background:#16140e;border-radius:10px;font-size:12.5px;color:var(--gold)}
+.kps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.kp span{font-size:12px;color:var(--tx2);display:block}.kp b{font-size:24px}
+.an{background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px}.an b{display:block;font-size:13.5px;font-weight:500}.an span{font-size:12px;color:var(--tx3)}.an.gold{color:var(--gold);font-size:13px}.an.gold b{display:inline;font-weight:700}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -185,7 +198,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
   .fab .dot{position:absolute;right:3px;bottom:3px;width:12px;height:12px;border-radius:50%;background:#3ddc84;border:2px solid #0c0c0d}
   .fab .cnt{position:absolute;top:-4px;right:-4px;background:#e06060;color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
   .fab .cnt:empty{display:none}
-  .grid,.mgrid{grid-template-columns:1fr}.sidetools{display:none}.lh .sub{display:none}
+  .grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
   .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
   .lstwrap{overflow-x:auto}
@@ -410,8 +423,8 @@ function novoConteudo() {
 }
 async function criaConteudo() {
   const [format, kind] = $('#nf').value.split('|');
-  await tryDo(() => api('/api/contents', { body: { title: $('#nt').value, format, kind: kind || 'educativo', brand: $('#nm').value, brief: $('#nb').value } }), 'Pedido criado');
-  fecha();
+  await tryDo(() => api('/api/contents', { body: { title: $('#nt').value, format, kind: kind || 'educativo', brand: $('#nm').value, brief: $('#nb').value, ...(S.prodPedido ? { goal: 'produto', product_id: S.prodPedido } : {}) } }), 'Pedido criado');
+  S.prodPedido = null; fecha();
 }
 
 // ───────── Mesa de revisão
@@ -493,23 +506,25 @@ async function pedirAjuste() { const m = $('#ajm').value.trim(); if (!m) return 
 async function acao(id, a) { if (a === 'descartar' && !confirm('Descartar este item? Ele vai para a lixeira.')) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
 
 // ───────── Publicação (manual)
+const RCOR = { carrossel: '#c2347a', estatico: '#5a5a5f', stories: '#e07a1f', reels: '#7c3aed', materia: '#c9a86a', blog: '#c9a86a' };
+const RHORA = { materia: '09h', blog: '09h', carrossel: '12h', reels: '18h', stories: '18h', estatico: '20h' };
 VIEWS.publicacao = () => {
   const F = S.fluxo; if (!F) return;
   const prontos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao'), feitos = F.itens.filter(i => i.estado === 'finalizado');
-  const nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
-  const redes = ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site'];
-  let corpo = '';
-  if (S.pubTab === 'pronto') corpo = prontos.length ? `<div class="grid">${prontos.map(i => `<div class="card"><div class="pv ${i.thumb ? '' : 'txt'}">${i.thumb ? `<img src="${i.thumb}">` : '<span>Texto</span>'}<span class="tp">${esc(nomeR(i.raia))}</span></div><div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')}</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${i.thumb ? `<a class="btn sm" href="/api/contents/${i.id}/arte/zip" download>Baixar arte</a>` : ''}${i.tem_video ? `<a class="btn sm" href="/api/contents/${i.id}/render/file" download>Baixar vídeo</a>` : ''}<button class="btn sm" onclick="copiaLegenda(${i.id})">Copiar legenda</button></div>
-      <div class="ac"><button class="btn ok" onclick="marcarPostado(${i.id})">Marcar postado</button></div></div></div>`).join('')}</div>` : '<div class="empty">Nada pronto para postar.</div>';
-  else if (S.pubTab === 'agenda') {
-    const d0 = new Date(); d0.setDate(d0.getDate() - d0.getDay());
-    corpo = `<div class="cal">${Array.from({ length: 14 }, (_, k) => { const d = new Date(d0); d.setDate(d.getDate() + k); const key = d.toISOString().slice(0, 10); const its = F.itens.filter(i => (i.postado_em || '').slice(0, 10) === key); return `<div><b>${d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' })}</b>${its.map(i => `<span title="${esc(i.titulo)}">${esc(nomeR(i.raia))} · ${esc(i.titulo)}</span>`).join('')}</div>`; }).join('')}</div>
-      <p class="small muted" style="margin-top:8px">Postagens por formato e marca nas duas semanas. No celular, veja a aba Postados.</p>`;
-  } else corpo = `<div class="lstwrap"><table class="lst"><tr><th>Item</th><th>Formato</th><th>Marca</th><th>Postado</th><th>Link</th></tr>${feitos.map(i => `<tr onclick="abrirItem(${i.id})"><td>${esc(i.titulo)}</td><td>${esc(nomeR(i.raia))}</td><td>${esc(i.marca)}</td><td>${fmtD(i.postado_em)}</td><td>${i.post_url ? `<a href="${esc(i.post_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">abrir</a>` : ''}</td></tr>`).join('')}</table></div>`;
-  $('#main').innerHTML = `<div class="top"><h1>Publicação</h1><span class="pill esperando">Modo manual</span>${marcaSel()}</div>
-    <div class="box" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="small muted">Redes:</span>${redes.map(r => `<span class="chip">${r} · em breve</span>`).join('')}</div>
-    <div class="tabs">${[['pronto', `Pronto para postar (${prontos.length})`], ['agenda', 'Agenda'], ['feitos', `Postados (${feitos.length})`]].map(([k, n]) => `<button class="${S.pubTab === k ? 'on' : ''}" onclick="S.pubTab='${k}';render()">${n}</button>`).join('')}</div>${corpo}`;
+  const nomeR = id => F.formatos.find(f => f.id === id)?.nome || id, curta = m => (m || 'Sem marca').split(' ').filter(w => w.length > 2)[0] || m;
+  const redes = [['Instagram', 'feed, carrossel, stories, reels', 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)'], ['Facebook', 'página da marca', '#1877f2'], ['TikTok', 'vídeo vertical', '#111;border:1px solid #444'], ['YouTube', 'shorts e vídeo longo', '#ff0000'], ['Pinterest', 'pins com link', '#e60023'], ['Site e blog', 'matérias e posts de blog', '#c9a86a']];
+  const d0 = new Date(); d0.setHours(0, 0, 0, 0); d0.setDate(d0.getDate() - ((d0.getDay() + 6) % 7));
+  const dias = Array.from({ length: 7 }, (_, k) => { const d = new Date(d0); d.setDate(d.getDate() + k); return d; }), horas = ['09h', '12h', '18h', '20h'];
+  const hoje = new Date().toISOString().slice(0, 10);
+  const naAgenda = (d, h) => { const key = d.toISOString().slice(0, 10); return [...feitos.filter(i => (i.postado_em || '').slice(0, 10) === key), ...(key === hoje ? prontos : [])].filter(i => RHORA[i.raia] === h); };
+  const agenda = `<div class="cal2"><span></span>${dias.map(d => `<b>${d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').replace(/^./, c => c.toUpperCase())} ${d.getDate()}</b>`).join('')}${horas.map(h => `<i>${h}</i>${dias.map(d => `<div>${naAgenda(d, h).map(i => `<span style="background:${RCOR[i.raia]}" title="${esc(i.titulo)}" onclick="abrirItem(${i.id})">${esc(nomeR(i.raia).split(' ')[0])} · ${esc(curta(i.marca))}</span>`).join('')}</div>`).join('')}`).join('')}</div>`;
+  const pronto = i => `<div class="pp"><div class="th">${i.thumb ? `<img src="${i.thumb}">` : ''}</div><div style="flex:1;min-width:0"><b>${esc(i.titulo)}</b><span>${[i.marca, nomeR(i.raia), ['materia', 'blog'].includes(i.raia) ? 'site' : 'Instagram', RHORA[i.raia]].filter(Boolean).map(esc).join(' · ')}</span></div>
+    <div class="pa">${i.thumb ? `<a class="btn sm" href="/api/contents/${i.id}/arte/zip" download onclick="copiaLegenda(${i.id})">Baixar arte e legenda</a>` : i.tem_video ? `<a class="btn sm" href="/api/contents/${i.id}/render/file" download onclick="copiaLegenda(${i.id})">Baixar vídeo e legenda</a>` : `<button class="btn sm" onclick="copiaLegenda(${i.id})">Copiar texto</button>`}<button class="btn sm ok" onclick="marcarPostado(${i.id})">${['materia', 'blog'].includes(i.raia) ? 'Marcar publicado' : 'Marcar postado'}</button></div></div>`;
+  $('#main').innerHTML = `<div class="top"><h1>Publicação</h1><span style="flex:1"></span><span class="chip on">Modo: Manual</span><span class="chip">Automático · em breve</span>${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${S.brands.length})`)}</b> ▾`)}</div>
+    <div class="note"><div><b>Por enquanto você posta e marca aqui.</b><br><span>Quando os treinos estiverem validados, o Publicador conecta nas redes e posta sozinho nos horários abaixo.</span></div><span class="tagg">Publicador automático · em breve</span></div>
+    <div class="redes">${redes.map(([n, s, c]) => `<div class="box"><i style="background:${c}"></i><b>${n}</b><span>${s}</span><button class="btn" disabled>Conectar · em breve</button></div>`).join('')}</div>
+    <div class="pub2"><div class="box"><div class="bh"><b>Agenda da semana</b><span>horários sugeridos pelo Publicador</span></div>${agenda}</div>
+    <div class="box"><div class="bh"><b>Prontos para postar</b><span>aprovados por você</span></div>${prontos.map(pronto).join('') || '<p class="muted small" style="padding:20px 0">Nada pronto para postar agora.</p>'}<p class="small muted" style="margin-top:12px">Ao marcar como postado, você cola o link. O item vai para Finalizado e entra na Otimização.</p></div></div>`;
 };
 async function copiaLegenda(id) { const d = await api('/api/v2/itens/' + id); try { await navigator.clipboard.writeText(d.legenda || d.materia || d.roteiro || ''); toast('Legenda copiada'); } catch { toast('Não consegui copiar'); } }
 function marcarPostado(id) {
@@ -518,13 +533,33 @@ function marcarPostado(id) {
 async function confPostado(id) { await tryDo(() => api(`/api/v2/itens/${id}/postado`, { body: { link: $('#plink').value.trim() } }), 'Finalizado'); fecha(); }
 
 // ───────── Marcas
+const sigla = n => (n.match(/\d+/)?.[0]) || n.split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 3).toUpperCase();
 VIEWS.marcas = async () => {
-  const [{ brands }, { products }] = await Promise.all([api('/api/brands'), api('/api/products')]);
-  S.brands = brands;
-  const n = b => S.fluxo.itens.filter(i => i.marca.toLowerCase() === b.name.toLowerCase()).length;
-  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><button class="btn ok" onclick="novaMarca()">+ Nova marca</button></div>
-    ${brands.length ? `<div class="grid">${brands.map(b => `<div class="box" style="cursor:pointer" onclick="detMarca(${b.id})"><b style="font-size:15px">${esc(b.name)}</b><p class="small muted" style="margin-top:6px">${n(b)} itens no fluxo · ${products.filter(p => (p.brands || []).includes(b.name)).length} produtos</p></div>`).join('')}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}
-    <p class="small muted" style="margin-top:12px">Dica: tudo aqui também pode ser alterado pelo chat (“muda o tom de voz da marca X para…”).</p>`;
+  const [{ brands }, k] = await Promise.all([api('/api/brands'), api('/api/knowledge').catch(() => ({ items: [] }))]);
+  S.brands = brands; S._docs = k.items || [];
+  const sel = brands.find(b => b.id === S.marcaSel) || brands[0]; S.marcaSel = sel?.id;
+  const docsDe = (b, cats) => S._docs.filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase() && cats.includes(x.category));
+  const nicho = b => (docsDe(b, ['marca'])[0]?.content || '').split('\n').find(l => l.trim() && !l.startsWith('#'))?.slice(0, 40) || 'sem nicho cadastrado';
+  const linha = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(v)}</span></div>`;
+  const tab = S.marcaTab || 'id';
+  let det = '';
+  if (sel) {
+    const its = S.fluxo.itens.filter(i => i.marca.toLowerCase() === sel.name.toLowerCase());
+    const aprov = its.filter(i => ['finalizado'].includes(i.estado) || (i.estado === 'esperando' && i.etapa === 'publicacao'));
+    const treinados = [...new Set(aprov.map(i => S.fluxo.formatos.find(f => f.id === i.raia)?.nome))].filter(Boolean), outros = S.fluxo.formatos.map(f => f.nome).filter(n => !treinados.includes(n));
+    const docs = docsDe(sel, tab === 'voz' ? ['tom_de_voz'] : ['marca', 'diretrizes', 'outros']);
+    const corpo = tab === 'formatos' ? S.fluxo.formatos.map(f => linha(f.nome, `meta ${f.meta_dia}/dia · ${f.modo === 'manual' ? 'Manual' : 'Automático'} · ${its.filter(i => i.raia === f.id).length} no fluxo`)).join('')
+      : tab === 'contas' ? ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('') + '<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>'
+      : (docs.map(d => `<div class="kvr" style="cursor:pointer" onclick="detMarca(${sel.id})"><span>${esc(d.title)}</span><span>${esc(d.content.replace(/[#*]/g, '').trim().split('\n')[0].slice(0, 50))}</span></div>`).join('') || '<p class="muted small">Nada cadastrado ainda. Clique em Editar ou peça ao gerente.</p>');
+    det = `<div class="box mdet"><div class="mh"><span class="av gold">${esc(sigla(sel.name))}</span><div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(nicho(sel))}</span></div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
+      <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos e metas'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
+      <div class="two"><div><h5>${tab === 'voz' ? 'Voz e público' : tab === 'formatos' ? 'Formatos e metas' : tab === 'contas' ? 'Contas' : 'Desta marca'}</h5>${corpo}</div>
+      <div><h5>Formatos treinados</h5><div class="tagsw">${treinados.map(n => `<span class="tg">${esc(n)}</span>`).join('')}${outros.map(n => `<span class="tg out">+ ${esc(n)}</span>`).join('')}</div>
+      <h5 style="margin-top:20px">Peças aprovadas</h5>${aprov.slice(0, 6).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhuma ainda.</p>'}</div></div>
+      <div class="learnbox">O que você mudar aqui, o gerente avisa os agentes e salva no cérebro da marca. Também dá para mudar só pela conversa.</div></div>`;
+  }
+  $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><span style="flex:1"></span><span class="chip">${brands.length} marcas</span><button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
+    ${brands.length ? `<div class="mlay"><div class="mcards">${brands.map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()"><span class="av">${esc(sigla(b.name))}</span><b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
 };
 async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
 async function detMarca(id) {
@@ -547,11 +582,25 @@ async function renMarca(id) { const n = prompt('Novo nome'); if (n) { await tryD
 
 // ───────── Produtos
 VIEWS.produtos = async () => {
-  const { products } = await api('/api/products');
-  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1>${marcaSel()}<button class="btn ok" onclick="detProduto(0)">+ Novo produto</button></div>
-    ${products.length ? `<div class="grid">${products.filter(p => !S.marca || (p.brands || []).includes(S.marca)).map(p => `<div class="box" style="cursor:pointer" onclick='detProduto(${JSON.stringify(p.id)})'><b>${esc(p.name)}</b><p class="small muted" style="margin-top:4px">${esc(p.type)} · ${esc((p.brands || []).join(', ') || 'geral')}</p></div>`).join('')}</div>` : '<div class="empty">Nenhum produto. Peça ao gerente para cadastrar.</div>'}`;
-  S._prods = products;
+  const { products } = await api('/api/products'); S._prods = products;
+  const lst = products.filter(p => !S.marca || (p.brands || []).includes(S.marca));
+  const sel = lst.find(p => p.id === S.prodSel) || lst[0]; S.prodSel = sel?.id;
+  const linha = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(v || '—')}</span></div>`, tab = S.prodTab || 'ficha';
+  let det = '';
+  if (sel) {
+    const feitos = S.fluxo.itens.filter(i => i.produto_id === sel.id);
+    const corpo = tab === 'pagina' ? `${linha('Link de vendas', sel.url)}${linha('Preço', sel.price)}<div style="white-space:pre-wrap;font-size:12.5px;color:var(--tx2);margin-top:8px;max-height:300px;overflow:auto">${esc((sel.page_text || '').slice(0, 4000))}</div>`
+      : tab === 'objecoes' ? `${linha('Objeções', sel.objections)}${linha('Bônus', sel.bonus)}${linha('Garantia', sel.guarantee)}`
+      : tab === 'feitos' ? feitos.map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhum conteúdo ainda.</p>'
+      : `${linha('Tipo', sel.type)}${linha('Promessa', sel.promise)}${linha('Público', sel.audience)}${linha('Dores', sel.pains)}${linha('Entregável', sel.deliverable)}`;
+    det = `<div class="box mdet"><div class="mh"><div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(sel.type)} · usado por ${esc((sel.brands || []).join(', ') || 'todas as marcas')}</span></div><span style="flex:1"></span><button class="btn sm" onclick="detProduto(${sel.id})">Editar</button><button class="btn sm ok" onclick="pedirDoProduto(${sel.id})">Pedir conteúdo deste produto</button></div>
+      <div class="tabs">${[['ficha', 'Ficha'], ['pagina', 'Página de vendas'], ['objecoes', 'Objeções e bônus'], ['feitos', 'Conteúdos feitos']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.prodTab='${k}';render()">${n}</button>`).join('')}</div>
+      <div class="two"><div><h5>${{ ficha: 'Ficha', pagina: 'Página de vendas', objecoes: 'Objeções e bônus', feitos: 'Conteúdos feitos' }[tab]}</h5>${corpo}</div><div><h5>Conteúdos com este produto</h5>${feitos.slice(0, 8).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhum ainda.</p>'}</div></div></div>`;
+  }
+  $('#main').innerHTML = `<div class="top"><h1>Produtos</h1><span class="chip">${lst.length} produtos</span><span style="flex:1"></span>${marcaSel()}</div>
+    <div class="mlay"><div class="mcards">${lst.map(p => `<div class="box mc ${p.id === sel?.id ? 'on' : ''}" onclick="S.prodSel=${p.id};render()"><b>${esc(p.name)}</b><span class="muted small">${esc((p.promise || p.type || '').slice(0, 60))}</span><div class="tagsw">${(p.brands || []).map(b => `<span class="tg out">${esc(b)}</span>`).join('')}</div></div>`).join('')}<div class="box mc add" onclick="detProduto(0)"><span>+ Novo produto</span><span class="muted small">ou cole o link no chat</span></div></div>${det}</div>`;
 };
+function pedirDoProduto(id) { S.prodPedido = id; novoConteudo(); }
 const PCAMPOS = [['name', 'Nome'], ['type', 'Tipo'], ['url', 'Link'], ['price', 'Preço'], ['promise', 'Promessa'], ['audience', 'Público'], ['deliverable', 'Entregável'], ['pains', 'Dores'], ['objections', 'Objeções'], ['bonus', 'Bônus'], ['guarantee', 'Garantia']];
 async function detProduto(id) {
   if (!S._prods) S._prods = (await api('/api/products')).products;
@@ -574,14 +623,21 @@ async function apagaProd(id) { if (!confirm('Apagar este produto?')) return; awa
 // ───────── Otimização
 VIEWS.otimizacao = async () => {
   const d = await api('/api/v2/otimizacao'), F = S.fluxo, nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
-  const its = d.itens.filter(i => S.filtro === 'todos' || i.raia === S.filtro), raias = Object.keys(d.contagem);
-  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1><button class="btn" onclick="tryDo(()=>api('/api/v2/descobertas/gerar',{body:{}}),'Análise feita').then(render)">Analisar agora</button></div>
-    <p class="muted small" style="margin-bottom:10px">Só itens postados. Engajamento = curtidas + comentários + 2×salvamentos + 2×compartilhamentos. Comparações ficam confiáveis a partir de ${d.minimo} posts por formato.</p>
-    <div class="grid" style="margin-bottom:12px">${raias.map(r => `<div class="box"><b>${esc(nomeR(r))}</b><p class="small muted">${d.contagem[r].postados} postados · ${d.contagem[r].medidos} com métricas${d.contagem[r].medidos < d.minimo ? ` · faltam ${d.minimo - d.contagem[r].medidos}` : ''}</p></div>`).join('') || '<div class="empty">Nenhum post finalizado ainda.</div>'}</div>
-    ${d.descobertas.length ? `<h3 class="small muted" style="margin:6px 0">Descobertas do gerente</h3>${d.descobertas.map(x => `<div class="ver"><span style="flex:1">${esc(x.texto)}<br><span class="small muted">${esc(x.evidencia)}</span></span>${x.status === 'nova' ? `<button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/descobertas/${x.id}/regra',{body:{}}),'Virou regra').then(render)">Virar regra</button><button class="btn sm" onclick="tryDo(()=>api('/api/v2/descobertas/${x.id}/ignorar',{body:{}}),'Ignorada').then(render)">Ignorar</button>` : `<span class="pill">${x.status === 'regra' ? 'virou regra' : 'ignorada'}</span>`}</div>`).join('')}` : ''}
-    <div class="tabs" style="margin-top:14px"><button class="${S.filtro === 'todos' ? 'on' : ''}" onclick="S.filtro='todos';render()">Todos</button>${raias.map(r => `<button class="${S.filtro === r ? 'on' : ''}" onclick="S.filtro='${r}';render()">${esc(nomeR(r))}</button>`).join('')}</div>
-    <div class="lstwrap"><table class="lst"><tr><th>#</th><th>Post</th><th>Formato</th><th>Alcance</th><th>Curtidas</th><th>Salv.</th><th>Comp.</th><th></th></tr>${its.map((x, k) => `<tr><td>${k + 1}</td><td>${esc(x.title)}${x.post_url ? ` <a href="${esc(x.post_url)}" target="_blank" rel="noopener">↗</a>` : ''}</td><td>${esc(nomeR(x.raia))}</td><td>${x.views}</td><td>${x.likes}</td><td>${x.saves}</td><td>${x.shares}</td><td><button class="btn sm" onclick="metricas(${x.id})">${x.medidas ? 'Atualizar' : 'Lançar'}</button></td></tr>`).join('')}</table></div>
-    <p class="small muted" style="margin-top:8px">Hoje as métricas são lançadas à mão. A leitura automática chega com a conexão das redes.</p>`;
+  const dias = S.otDias || 30, lim = Date.now() - dias * 864e5;
+  const its = d.itens.filter(i => new Date(i.posted_at) >= lim && (!S.marca || (i.brand || '').toLowerCase() === S.marca.toLowerCase()) && (S.filtro === 'todos' || !F.formatos.some(f => f.id === S.filtro) || i.raia === S.filtro));
+  const medidos = its.filter(i => i.medidas), alc = medidos.length ? Math.round(medidos.reduce((s, i) => s + i.views, 0) / medidos.length) : null;
+  const aprovTreino = F.itens.filter(i => i.estado === 'finalizado' || (i.estado === 'esperando' && i.etapa === 'publicacao')).length;
+  const kpi = (n, v) => `<div class="box kp"><span>${n}</span><b>${v ?? '—'}</b></div>`;
+  const ana = [['Capa e gancho', 'Que tipo de abertura gera mais salvamento por formato e marca'], ['Formato x marca', 'Ex.: história real rende mais numa marca ou em outra'], ['Horário e frequência', 'Base: guia do Publicador, horário, frequência e testes'], ['Venda', 'Stories de venda e posts de venda: cliques no link da tela']];
+  $('#main').innerHTML = `<div class="top"><h1>Otimização</h1><span style="flex:1"></span>${[7, 30, 90].map(n => `<button class="chip ${dias === n ? 'on' : ''}" onclick="S.otDias=${n};render()">Últimos ${n} dias</button>`).join('')}${marcaSel()}
+    <select class="chip" onchange="S.filtro=this.value;render()"><option value="todos">Todos os formatos</option>${F.formatos.map(f => `<option value="${f.id}" ${S.filtro === f.id ? 'selected' : ''}>${esc(f.nome)}</option>`).join('')}</select></div>
+    <div class="kps">${kpi('Peças aprovadas no treino', aprovTreino)}${kpi('Postadas e finalizadas', its.length || null)}${kpi('Alcance médio', alc)}${kpi('Com métricas lançadas', medidos.length || null)}</div>
+    <div class="pub2" style="grid-template-columns:1fr 1fr"><div class="box"><div class="bh"><b>O que performou</b><button class="btn sm" onclick="tryDo(()=>api('/api/v2/descobertas/gerar',{body:{}}),'Análise feita').then(render)">Analisar agora</button></div>
+      ${its.length ? `<table class="lst"><tr><th>#</th><th>Post</th><th>Formato</th><th>Alcance</th><th>Curt.</th><th>Salv.</th><th></th></tr>${its.map((x, k) => `<tr><td>${k + 1}</td><td>${esc(x.title)}${x.post_url ? ` <a href="${esc(x.post_url)}" target="_blank" rel="noopener">↗</a>` : ''}</td><td>${esc(nomeR(x.raia))}</td><td>${x.views}</td><td>${x.likes}</td><td>${x.saves}</td><td><button class="btn sm" onclick="metricas(${x.id})">${x.medidas ? 'Atualizar' : 'Lançar'}</button></td></tr>`).join('')}</table>`
+        : `<div class="empty" style="margin-top:10px">Ainda não há posts finalizados com números.<br>Assim que você marcar o primeiro como <b>postado</b>, lance curtidas, alcance e salvamentos e o ranking aparece aqui, comparando cada peça com a média da marca e do formato.</div>`}</div>
+    <div class="box"><div class="bh"><b>O que o gerente vai analisar</b></div>${ana.map(([t, s]) => `<div class="an"><b>${t}</b><span>${s}</span></div>`).join('')}
+      ${d.descobertas.map(x => `<div class="an"><b>${esc(x.texto)}</b><span>${esc(x.evidencia)}</span>${x.status === 'nova' ? `<div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/descobertas/${x.id}/regra',{body:{}}),'Virou regra').then(render)">Virar regra</button><button class="btn sm" onclick="tryDo(()=>api('/api/v2/descobertas/${x.id}/ignorar',{body:{}}),'Ignorada').then(render)">Ignorar</button></div>` : `<span class="pill" style="margin-top:6px;display:inline-block">${x.status === 'regra' ? 'virou regra' : 'ignorada'}</span>`}</div>`).join('')}
+      <div class="an gold">Cada descoberta vem com os botões <b>Virar regra</b> ou <b>Ignorar</b>. Só entra no cérebro o que você confirmar.</div></div></div>`;
 };
 function metricas(id) {
   modal(`<div class="hd"><h2>Métricas do post</h2></div><div class="mb" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${[['views', 'Alcance'], ['likes', 'Curtidas'], ['comments', 'Comentários'], ['saves', 'Salvamentos'], ['shares', 'Compartilhamentos']].map(([k, n]) => `<label class="small muted">${n}<input class="f" type="number" min="0" id="mt_${k}"></label>`).join('')}</div><div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="salvaMet(${id})">Salvar</button></div>`, 'sm');
