@@ -1,0 +1,62 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="shell.css"><style>
+.srch{position:absolute;left:24px;top:66px;width:400px;background:#1a202bcc;border:1px solid #2b5cff;border-radius:10px;padding:10px 12px;font-size:13px;color:#dfe5f0;z-index:3}
+.pn{position:absolute;right:24px;top:70px;width:400px;background:#12161ee6;border:1px solid #2c3445;border-radius:16px;padding:16px;z-index:3;font-size:12.5px;line-height:1.5}
+.pn h2{font-size:16px}.pn .sub{font-size:11.5px;color:#8a93a6;margin-bottom:10px}.pn .bx{background:#0f131a;border-radius:10px;padding:9px 11px;margin-bottom:7px}.pn .bx b{display:block;font-size:10.5px;color:#8a93a6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.leg{position:absolute;left:24px;bottom:22px;display:flex;gap:14px;font-size:12px;color:#8a93a6;z-index:3;flex-wrap:wrap;width:900px}.leg span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--c)}
+.lab .n{font-size:12.5px}
+</style></head><body>
+<div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv">Fluxo<b>6</b></div><div class="nv">Mesa de revisão<b>6</b></div><div class="nv">Publicação<span style="margin-left:auto;font-size:10px;color:#8a93a6">em breve</span></div><div class="nv">Marcas</div><div class="nv">Produtos</div><div class="nv">Otimização</div><div class="nv on">Cérebro</div><div class="nv" style="margin-top:auto">Configurações</div></div>
+<div class="main"><canvas id="c"></canvas>
+<div class="top"><h1>Cérebro</h1><span style="flex:1"></span><span class="chip on">Cérebro</span><span class="chip">Constelação</span><span class="chip">Lista</span><span class="chip">Marca: Todas ▾</span></div>
+<div class="srch">stories de venda<span style="float:right;color:#ffc857">3 áreas acesas</span></div>
+<div class="pn"><h2>Stories de venda</h2><div class="sub">Área do Roteirista · arquivo 10</div>
+<div class="bx"><b>Resumo</b>18 a 20 telas em caixinha. Alterna polêmica, humor e autoridade. O produto aparece no meio.</div>
+<div class="bx"><b>Regras</b>Todo CTA leva ao link da tela. Sem emoji. Camada preta sobre a imagem.</div>
+<div class="bx"><b>Conexões acesas</b>Designer · fundo dos stories de venda<br>Revisor de copy · checklist stories de venda</div></div>
+<div class="leg" id="leg"></div><div id="labs"></div></div>
+<div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Mostra o que os stories de venda usam.</div><div class="m g">Acendi 3 áreas do cérebro: Roteirista, Designer e Revisor de copy. As faíscas mostram o caminho entre elas.<small>Cada agente é uma região do cérebro</small></div></div><div class="in">Fale com o gerente…</div></div>
+<script src="three.min.js"></script><script>
+const cv=document.getElementById('c'),W=cv.parentElement.clientWidth,H=1080;
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setSize(W,H);R.setPixelRatio(2);
+const S=new THREE.Scene();S.background=new THREE.Color(0x07090e);
+const cam=new THREE.PerspectiveCamera(38,W/H,.1,200);
+const root=new THREE.Group();S.add(root);
+// brain surface sample: two hemispheres + cerebellum + stem, with gyri noise
+function brainPoint(){while(true){let x=(Math.random()*2-1),y=(Math.random()*2-1),z=(Math.random()*2-1);
+ const hemi=Math.sign(x)||1;const cx=hemi*.52;const dx=(x-cx)/0.62,dy=(y-.05)/0.62,dz=z/0.95;let r=dx*dx+dy*dy*1.1+dz*dz;
+ if(y<-.35&&z>.3){const cb=((x)/0.7)**2+((y+.5)/0.28)**2+((z-.55)/0.35)**2;if(cb<1&&cb>.82)return[x,y,z,'cb']}
+ if(r<1&&r>.86&&!(Math.abs(x)<.06&&y>-.1)&&y>-.55)return[x,y,z,'cx']}}
+const N=9000,pos=new Float32Array(N*3),col=new Float32Array(N*3),reg=[];
+const regions=[{n:'Roteirista',c:[.30,.48,1],at:[-.55,.35,-.55]},{n:'Revisor de copy',c:[.6,.65,.8],at:[-.75,.05,.1]},{n:'Designer',c:[.75,.34,.88],at:[.55,.35,-.55]},{n:'Editor de vídeo',c:[.88,.42,.3],at:[.75,.05,.1]},{n:'SEO',c:[.23,.63,.78],at:[-.5,.5,.45]},{n:'Publicador',c:[.5,.55,.65],at:[.5,.5,.45]},{n:'Agente de Notícias',c:[.18,.7,.48],at:[0,-.5,.6]}];
+const hotR=['Roteirista','Designer','Revisor de copy'];
+for(let i=0;i<N;i++){let [x,y,z]=brainPoint();const g=Math.sin(x*18+Math.cos(z*14))*Math.sin(z*16+y*9)*.035;const l=Math.hypot(x,y,z)||1;x+=x/l*g;y+=y/l*g;z+=z/l*g;
+ pos.set([x*10,y*10,z*10],i*3);let best=0,bd=1e9;regions.forEach((r,k)=>{const d=(x-r.at[0])**2+(y-r.at[1])**2+(z-r.at[2])**2;if(d<bd){bd=d;best=k}});reg.push(best);
+ const r=regions[best];const hot=hotR.includes(r.n);const k=hot?.75:.32;col.set([r.c[0]*k,r.c[1]*k,r.c[2]*k],i*3)}
+const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(pos,3));gg.setAttribute('color',new THREE.BufferAttribute(col,3));
+const pm=new THREE.PointsMaterial({size:.11,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false});root.add(new THREE.Points(gg,pm));
+// inner glow shell
+const shell=new THREE.Mesh(new THREE.SphereGeometry(8.5,32,32),new THREE.MeshBasicMaterial({color:0x1a2a55,transparent:true,opacity:.08}));shell.scale.set(1.25,.75,1.05);root.add(shell);
+// neurons: synapse lines between nearby points of same region (sparse)
+const lp=[];for(let i=0;i<1400;i++){const a=Math.floor(Math.random()*N);let b=-1,bd=1e9;for(let j=0;j<40;j++){const c=Math.floor(Math.random()*N);if(reg[c]!=reg[a])continue;const d=(pos[a*3]-pos[c*3])**2+(pos[a*3+1]-pos[c*3+1])**2+(pos[a*3+2]-pos[c*3+2])**2;if(d<bd&&d>.2){bd=d;b=c}}if(b>=0&&bd<6){lp.push(pos[a*3],pos[a*3+1],pos[a*3+2],pos[b*3],pos[b*3+1],pos[b*3+2])}}
+const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));root.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x3a5aa0,transparent:true,opacity:.12,blending:THREE.AdditiveBlending})));
+// region centers & hot path
+const ctr=regions.map(r=>new THREE.Vector3(r.at[0]*10.5,r.at[1]*10,r.at[2]*10));
+const glowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'#fff');r.addColorStop(.3,'rgba(255,255,255,.5)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
+const core=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc857,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));core.scale.setScalar(5);core.position.set(0,-1,0);root.add(core);
+const sparks=[];const hotIdx=hotR.map(n=>regions.findIndex(r=>r.n==n));
+for(let s=0;s<14;s++){const from=core.position,to=ctr[hotIdx[s%3]];const mid=from.clone().lerp(to,.5);mid.y+=3;const cur=new THREE.QuadraticBezierCurve3(from.clone(),mid,to);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc857,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.setScalar(1.3);root.add(sp);sparks.push({sp,cur,o:s/14})}
+hotIdx.forEach(i=>{const a=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc857,transparent:true,opacity:.45,blending:THREE.AdditiveBlending,depthWrite:false}));a.scale.setScalar(4.5);a.position.copy(ctr[i]);root.add(a);sparks.push({halo:a})});
+// rule pulse (designer)
+const rule=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xff5bd0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));rule.position.copy(ctr[2]).add(new THREE.Vector3(1.6,1.2,0));root.add(rule);
+const labs=document.getElementById('labs');const L=regions.map((r,i)=>{const d=document.createElement('div');d.className='lab';const hot=hotR.includes(r.n);d.innerHTML=`<div class="n" style="color:${hot?'#ffc857':'#cfd6e4'}">${r.n}</div>`;labs.appendChild(d);return{d,p:ctr[i].clone().multiplyScalar(1.12)}});
+const gl=document.createElement('div');gl.className='lab';gl.innerHTML='<div class="n" style="color:#ffc857">Gerente</div>';labs.appendChild(gl);L.push({d:gl,p:new THREE.Vector3(0,-2.6,0)});
+const rl=document.createElement('div');rl.className='lab';rl.innerHTML='<div class="n" style="color:#ff8be0;font-size:11px">regra nova · hoje</div>';labs.appendChild(rl);L.push({d:rl,p:rule.position.clone().add(new THREE.Vector3(0,.8,0))});
+document.getElementById('leg').innerHTML=regions.map(r=>`<span style="--c:rgb(${r.c.map(v=>v*255|0)})">${r.n}</span>`).join('')+'<span style="--c:#ffc857">Gerente / caminho aceso</span><span style="--c:#ff5bd0">regra nova</span>';
+const v=new THREE.Vector3();
+function frame(t){t/=1000;root.rotation.y=Math.PI/2-.35+Math.sin(t*.15)*.35;root.rotation.x=.12;cam.position.set(-3,3,34);cam.lookAt(-3,-.5,0);
+ sparks.forEach(s=>{if(s.halo){s.halo.material.opacity=.3+Math.sin(t*3)*.15;return}const u=(t*.35+s.o)%1;s.sp.position.copy(s.cur.getPoint(u));s.sp.material.opacity=Math.sin(u*Math.PI)});
+ rule.scale.setScalar(1.6+Math.sin(t*5)*.7);core.material.opacity=.45+Math.sin(t*2)*.12;pm.size=.11+Math.sin(t*1.5)*.01;
+ R.render(S,cam);L.forEach(l=>{v.copy(l.p).applyMatrix4(root.matrixWorld).project(cam);l.d.style.left=((v.x+1)/2*W)+'px';l.d.style.top=((1-v.y)/2*H)+'px'});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>

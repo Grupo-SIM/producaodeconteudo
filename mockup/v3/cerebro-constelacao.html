@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="shell.css"><style>
+.srch{position:absolute;left:24px;top:66px;width:400px;background:#1a202bcc;border:1px solid #2b5cff;border-radius:10px;padding:10px 12px;font-size:13px;color:#dfe5f0;z-index:3}
+.lab .n{font-size:12px}.al .n{font-size:14px}
+.pn{position:absolute;right:24px;top:70px;width:420px;background:#12161ee6;border:1px solid #2c3445;border-radius:16px;padding:16px;z-index:3;font-size:12.5px;line-height:1.5;backdrop-filter:blur(10px)}
+.pn h2{font-size:16px}.pn .sub{font-size:11.5px;color:#8a93a6;margin-bottom:10px}.pn .bx{background:#0f131a;border-radius:10px;padding:9px 11px;margin-bottom:7px}.pn .bx b{display:block;font-size:10.5px;color:#8a93a6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.leg{position:absolute;left:24px;bottom:22px;display:flex;gap:16px;font-size:12px;color:#8a93a6;z-index:3}.leg span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--c)}
+</style></head><body>
+<div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv">Fluxo<b>6</b></div><div class="nv">Mesa de revisão<b>6</b></div><div class="nv">Marcas</div><div class="nv">Produtos</div><div class="nv">Otimização</div><div class="nv on">Cérebro</div><div class="nv" style="margin-top:auto">Configurações</div></div>
+<div class="main"><canvas id="c"></canvas>
+<div class="top"><h1>Cérebro</h1><span style="flex:1"></span><span class="chip on">3D</span><span class="chip">Lista</span><span class="chip">Marca: Todas ▾</span></div>
+<div class="srch">stories de venda<span style="float:right;color:#ffc857">3 arquivos acesos</span></div>
+<div class="pn"><h2>Stories de venda</h2><div class="sub">Roteirista · arquivo 10 · usado 5 vezes esta semana</div>
+<div class="bx"><b>Resumo</b>18 a 20 telas em caixinha. Alterna polêmica, humor e autoridade. O produto aparece no meio.</div>
+<div class="bx"><b>Regras</b>Todo CTA leva ao link da tela. Sem emoji. Camada preta sobre a imagem.</div>
+<div class="bx"><b>Exemplos aprovados</b>ÁreaFlix · Atlas Hosting · SimIntPay · PagaTG no Seguidores em Alta · Corte dos Ricos</div>
+<div class="bx"><b>Conexões acesas</b>Designer · fundo dos stories de venda<br>Revisor de copy · checklist stories de venda</div></div>
+<div class="leg"><span style="--c:#ffc857">Gerente</span><span style="--c:#4d7cff">agente</span><span style="--c:#9fb4dd">arquivo de treino</span><span style="--c:#3ddc84">marca</span><span style="--c:#ff5bd0">regra nova (pulsando)</span><span>· arraste para girar, role para aproximar</span></div>
+<div id="labs"></div></div>
+<div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Mostra o que os stories de venda usam.</div><div class="m g">Acendi no cérebro: 3 arquivos ligados. O pulso rosa no Designer é a regra que você ensinou hoje ("fundo escuro, preto dominante").<small>Clique em qualquer ponto para abrir</small></div></div><div class="in">Fale com o gerente…</div></div>
+<script src="three.min.js"></script><script>
+const cv=document.getElementById('c'),W=cv.parentElement.clientWidth,H=1080;
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setSize(W,H);R.setPixelRatio(2);
+const S=new THREE.Scene();S.background=new THREE.Color(0x070a10);S.fog=new THREE.FogExp2(0x070a10,.006);
+const cam=new THREE.PerspectiveCamera(45,W/H,.1,300);
+const glowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.25,'rgba(255,255,255,.6)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
+const root=new THREE.Group();S.add(root);
+function node(pos,col,size){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:col,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.setScalar(size);sp.position.copy(pos);root.add(sp);
+ const core=new THREE.Mesh(new THREE.SphereGeometry(size*.12,20,20),new THREE.MeshBasicMaterial({color:col}));core.position.copy(pos);core.scale.setScalar(1.2);root.add(core);return {sp,core,pos,size,col}}
+const links=[];function link(a,b,col,op){const g=new THREE.BufferGeometry().setFromPoints([a,b]);const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,blending:THREE.AdditiveBlending}));root.add(l);links.push({a,b,col});return l}
+const C=new THREE.Vector3();const hub=node(C,0xffc857,6);
+const ag=['Roteirista','Designer','Editor de vídeo','Revisor de copy','SEO','Publicador','Agente de Notícias'];const nf=[16,8,12,9,3,3,2];
+const files={Roteirista:['Carrossel','Narrativa','Copy que converte','Manchetes','Ganchos','Engenharia reversa','Estático','Matéria','História real','Stories de venda','Marketing digital','Corte dos Ricos','Post de venda','Reels','Blog','Serviço'],Designer:['Arte que para o dedo','Zonas seguras','Carrossel','Originalidade','Modelos','Estilo do dono','Fotos de notícia','Fundo dos stories']};
+const hot={'Roteirista':'Stories de venda','Designer':'Fundo dos stories','Revisor de copy':'Stories de venda'};
+const labels=[];const pulses=[];
+ag.forEach((a,i)=>{const phi=Math.acos(1-2*(i+.5)/ag.length),th=Math.PI*(1+Math.sqrt(5))*i;const p=new THREE.Vector3(Math.sin(phi)*Math.cos(th),Math.cos(phi)*.7,Math.sin(phi)*Math.sin(th)).multiplyScalar(17);
+ const n=node(p,0x4d7cff,3.4);link(C,p,0x4d7cff,.55);labels.push({p,t:`<div class="n">${a}</div><div style="font-size:10px;color:#8a93a6">${nf[i]} arquivos</div>`,cls:'al'});pulses.push({a:C,b:p,c:0x7aa2ff,o:i/7,sp:.35});
+ const names=files[a]||[];for(let j=0;j<nf[i];j++){const d=p.clone().normalize();const rnd=new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize();const q=p.clone().add(d.multiplyScalar(5).add(rnd.multiplyScalar(4.5)));
+  const isHot=names[j]&&hot[a]==names[j]||(a=='Revisor de copy'&&j==5);const fn=node(q,isHot?0xffc857:0x9fb4dd,isHot?2.6:1.1);link(p,q,isHot?0xffc857:0x9fb4dd,isHot?1:.4);
+  if(isHot){labels.push({p:q,t:`<div class="n" style="color:#ffc857">${names[j]||'Stories de venda'}</div>`});pulses.push({a:C,b:p,c:0xffc857,o:j/10,sp:.6,then:q})}
+  if(a=='Designer'&&j==5){fn.sp.material.color.set(0xff5bd0);fn.pulse=true;fn.sp.scale.setScalar(3);window.newRule=fn;labels.push({p:q,t:'<div class="n" style="color:#ff8be0">regra nova · hoje</div>'})}}});
+const br=['007 Spyhacker','Central do Marketing','Corte dos Ricos','Marketing Raiz','Seguidores em Alta','SIM Int Pay','Vivendo de Bet'];
+br.forEach((b,i)=>{const a=i/br.length*Math.PI*2;const p=new THREE.Vector3(Math.cos(a)*30,(i%2?3:-3),Math.sin(a)*30);node(p,0x3ddc84,3.6);link(C,p,0x3ddc84,.12);labels.push({p,t:`<div class="n" style="color:#9ff0c4;font-size:11px">${b}</div>`})});
+// ring
+const ring=new THREE.Mesh(new THREE.TorusGeometry(30,.05,8,200),new THREE.MeshBasicMaterial({color:0x3ddc84,transparent:true,opacity:.25}));ring.rotation.x=Math.PI/2;root.add(ring);
+// dust
+const N=1500,pa=new Float32Array(N*3);for(let i=0;i<N;i++){const r=20+Math.random()*60,a=Math.random()*6.28,b=Math.acos(Math.random()*2-1);pa[i*3]=r*Math.sin(b)*Math.cos(a);pa[i*3+1]=r*Math.cos(b)*.6;pa[i*3+2]=r*Math.sin(b)*Math.sin(a)}
+const dg=new THREE.BufferGeometry();dg.setAttribute('position',new THREE.BufferAttribute(pa,3));S.add(new THREE.Points(dg,new THREE.PointsMaterial({color:0x5a7ab8,size:.18,transparent:true,opacity:.5})));
+// pulse sprites
+pulses.forEach(p=>{p.s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:p.c,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));p.s.scale.setScalar(p.c==0xffc857?2.6:1.8);root.add(p.s)});
+const labs=document.getElementById('labs');labels.forEach(l=>{l.d=document.createElement('div');l.d.className='lab '+(l.cls||'');l.d.innerHTML=l.t;labs.appendChild(l.d)});
+const v=new THREE.Vector3();
+function frame(t){t/=1000;root.rotation.y=t*.08;root.rotation.x=Math.sin(t*.1)*.08;
+ cam.position.set(Math.sin(t*.05)*6+14,22,82);cam.lookAt(10,0,0);
+ hub.sp.scale.setScalar(6+Math.sin(t*2)*1.2);
+ if(window.newRule){window.newRule.sp.scale.setScalar(3+Math.sin(t*5)*1.4)}
+ pulses.forEach(p=>{let u=(t*p.sp+p.o)%1;let P;if(p.then){if(u<.6)P=p.a.clone().lerp(p.b,u/.6);else P=p.b.clone().lerp(p.then,(u-.6)/.4)}else P=p.a.clone().lerp(p.b,u);p.s.position.copy(P)});
+ R.render(S,cam);
+ labels.forEach(l=>{v.copy(l.p).applyMatrix4(root.matrixWorld).project(cam);const vis=v.z<1;l.d.style.display=vis?'':'none';l.d.style.left=((v.x+1)/2*W)+'px';l.d.style.top=((1-v.y)/2*H-14)+'px'});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>
