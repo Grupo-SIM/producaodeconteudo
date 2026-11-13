@@ -1,0 +1,100 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="shell.css"><style>
+.srch{position:absolute;left:24px;top:66px;width:400px;background:#1a202bcc;border:1px solid #2b5cff;border-radius:10px;padding:10px 12px;font-size:13px;color:#dfe5f0;z-index:3}
+.pn{position:absolute;right:24px;top:70px;width:400px;background:#12161ee6;border:1px solid #2c3445;border-radius:16px;padding:16px;z-index:3;font-size:12.5px;line-height:1.5}
+.pn h2{font-size:16px}.pn .sub{font-size:11.5px;color:#8a93a6;margin-bottom:10px}.pn .bx{background:#0f131a;border-radius:10px;padding:9px 11px;margin-bottom:7px}.pn .bx b{display:block;font-size:10.5px;color:#8a93a6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.leg{position:absolute;left:24px;bottom:22px;display:flex;gap:14px;font-size:12px;color:#8a93a6;z-index:3;flex-wrap:wrap;width:900px}.leg span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--c)}
+.lab .n{font-size:12.5px}
+.card{display:none;position:absolute;width:250px;background:#111318e8;border:1px solid #262a33;border-radius:14px;padding:11px 13px;z-index:3;font-size:12px;backdrop-filter:blur(8px)}
+.card .h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px}.card .h i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.card .h span{margin-left:auto;font-weight:500;font-size:11px;color:#8a93a6}
+.card ul{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:4px}.card li{font-size:10.5px;background:#1a1e26;color:#aeb6c6;border-radius:6px;padding:3px 7px}
+.card li.hot{background:#3a3016;color:#f0d58a;outline:1px solid #6b5a2a}
+.card.open{display:block!important}.card.hot{border-color:#6b5a2a;box-shadow:0 0 0 1px #6b5a2a,0 10px 30px #0008}
+.card .st{font-size:10.5px;color:#7fd1a0;margin-top:6px}
+.orb{position:absolute;transform:translate(-50%,-50%);z-index:3;text-align:center;cursor:pointer}
+.orb i{display:block;width:26px;height:26px;transition:transform .2s;border-radius:50%;margin:0 auto 6px;background:radial-gradient(circle at 35% 30%,#fff8,var(--c) 45%,#0008 100%);box-shadow:0 0 22px var(--c),inset 0 0 0 2px #ffffff22}
+.orb.hot i{box-shadow:0 0 0 3px #e9c46a,0 0 26px #e9c46a99}
+.orb:hover i{transform:scale(1.5)}.orb b{font-size:11.5px;display:block;text-shadow:0 2px 6px #000}.orb span{font-size:10.5px;color:#8a93a6}
+.orb.sel i{outline:2px solid #fff;outline-offset:4px}
+.tick{position:absolute;right:24px;bottom:22px;width:330px;z-index:3;display:flex;flex-direction:column;gap:6px}
+.tick div{background:#0b0e14d9;border:1px solid #2a3344;border-radius:10px;padding:7px 10px;font-size:11.5px;color:#cdd}
+.tick .up{border-left:3px solid #7fd1a0}.tick .dn{border-left:3px solid #e9c46a}
+.tick i{font-style:normal;color:#8a93a6;margin-right:6px}
+.flow{stroke-dasharray:4 10;animation:fl 1.2s linear infinite}@keyframes fl{to{stroke-dashoffset:-28}}
+.gcard{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:#1a1710e8;border:1px solid #6b5a2a;border-radius:14px;padding:9px 14px;z-index:3;font-size:12px;color:#e9d29a;text-align:center}
+.gcard b{display:block;font-size:13.5px;color:#fff}
+</style></head><body>
+<div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv">Fluxo<b>6</b></div><div class="nv">Mesa de revisão<b>6</b></div><div class="nv">Publicação<span style="margin-left:auto;font-size:10px;color:#8a93a6">em breve</span></div><div class="nv">Marcas</div><div class="nv">Produtos</div><div class="nv">Otimização</div><div class="nv on">Cérebro</div><div class="nv" style="margin-top:auto">Configurações</div></div>
+<div class="main"><canvas id="c"></canvas>
+<div class="top"><h1>Cérebro</h1><span style="flex:1"></span><span class="chip on">Cérebro</span><span class="chip">Constelação</span><span class="chip">Lista</span><span class="chip">Marca: Todas ▾</span></div>
+<div class="srch">stories de venda<span style="float:right;color:#ffc857">3 áreas acesas</span></div>
+<svg id="wires" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:2;pointer-events:none"></svg><div id="cards"></div><div id="orbs"></div><div style="position:absolute;left:24px;bottom:22px;z-index:3;font-size:12px;color:#8a93a6">Passe o mouse para destacar · clique para abrir · arraste para girar</div><div class="tick"><div class="dn"><i>agora</i>Gerente → Roteirista: "Stories de venda"</div><div class="up"><i>agora</i>Designer → Gerente: regra nova "fundo escuro"</div><div class="dn"><i>12 s</i>Gerente → Revisor de copy: checklist de stories</div><div class="up"><i>40 s</i>Agente de Notícias → Gerente: pauta "Selic sobe 0,25"</div></div><div class="leg" id="leg" style="display:none"></div><div class="orb" id="gorb" style="--c:#e9c46a"><i style="width:50px;height:50px;background:radial-gradient(circle at 35% 30%,#fff9,#e9c46a 45%,#5a4510 100%);box-shadow:0 0 0 3px #e9c46a55,0 0 40px #e9c46a88"></i><b style="font-size:14px">Gerente</b><span>controla todos os agentes</span></div><div id="labs"></div></div>
+<div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Mostra o que os stories de venda usam.</div><div class="m g">Acendi 3 áreas do cérebro: Roteirista, Designer e Revisor de copy. <small>Bolinhas douradas: o Gerente mandando tarefa e conhecimento. Losangos coloridos: o agente devolvendo o que fez e aprendeu.</small></div></div><div class="in">Fale com o gerente…</div></div>
+<script src="three.min.js"></script><script>
+const cv=document.getElementById('c'),W=cv.parentElement.clientWidth,H=1080;
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setSize(W,H);R.setPixelRatio(2);
+const S=new THREE.Scene();S.background=new THREE.Color(0x07090e);
+const cam=new THREE.PerspectiveCamera(38,W/H,.1,200);
+const root=new THREE.Group();S.add(root);
+// brain surface sample: two hemispheres + cerebellum + stem, with gyri noise
+function brainPoint(){while(true){let x=(Math.random()*2-1),y=(Math.random()*2-1),z=(Math.random()*2-1);
+ const hemi=Math.sign(x)||1;const cx=hemi*.52;const dx=(x-cx)/0.62,dy=(y-.05)/0.62,dz=z/0.95;let r=dx*dx+dy*dy*1.1+dz*dz;
+ if(y<-.35&&z>.3){const cb=((x)/0.7)**2+((y+.5)/0.28)**2+((z-.55)/0.35)**2;if(cb<1&&cb>.82)return[x,y,z,'cb']}
+ if(r<1&&r>.86&&!(Math.abs(x)<.06&&y>-.1)&&y>-.55)return[x,y,z,'cx']}}
+const N=9000,pos=new Float32Array(N*3),col=new Float32Array(N*3),reg=[];
+const regions=[{n:'Roteirista',c:[.30,.48,1],at:[-.55,.35,-.55]},{n:'Revisor de copy',c:[.6,.65,.8],at:[-.75,.05,.1]},{n:'Designer',c:[.75,.34,.88],at:[.55,.35,-.55]},{n:'Editor de vídeo',c:[.88,.42,.3],at:[.75,.05,.1]},{n:'SEO',c:[.23,.63,.78],at:[-.5,.5,.45]},{n:'Publicador',c:[.5,.55,.65],at:[.5,.5,.45]},{n:'Agente de Notícias',c:[.18,.7,.48],at:[0,-.5,.6]}];
+const hotR=['Roteirista','Designer','Revisor de copy'];
+for(let i=0;i<N;i++){let [x,y,z]=brainPoint();const g=Math.sin(x*18+Math.cos(z*14))*Math.sin(z*16+y*9)*.035;const l=Math.hypot(x,y,z)||1;x+=x/l*g;y+=y/l*g;z+=z/l*g;
+ pos.set([x*10,y*10,z*10],i*3);let best=0,bd=1e9;regions.forEach((r,k)=>{const d=(x-r.at[0])**2+(y-r.at[1])**2+(z-r.at[2])**2;if(d<bd){bd=d;best=k}});reg.push(best);
+ const r=regions[best];const hot=hotR.includes(r.n);const k=hot?.75:.32;col.set([r.c[0]*k,r.c[1]*k,r.c[2]*k],i*3)}
+const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(pos,3));gg.setAttribute('color',new THREE.BufferAttribute(col,3));
+const pm=new THREE.PointsMaterial({size:.11,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false});root.add(new THREE.Points(gg,pm));
+// inner glow shell
+const shell=new THREE.Mesh(new THREE.SphereGeometry(8.5,32,32),new THREE.MeshBasicMaterial({color:0x1a2a55,transparent:true,opacity:.08}));shell.scale.set(1.25,.75,1.05);root.add(shell);
+// neurons: synapse lines between nearby points of same region (sparse)
+const lp=[];for(let i=0;i<1400;i++){const a=Math.floor(Math.random()*N);let b=-1,bd=1e9;for(let j=0;j<40;j++){const c=Math.floor(Math.random()*N);if(reg[c]!=reg[a])continue;const d=(pos[a*3]-pos[c*3])**2+(pos[a*3+1]-pos[c*3+1])**2+(pos[a*3+2]-pos[c*3+2])**2;if(d<bd&&d>.2){bd=d;b=c}}if(b>=0&&bd<6){lp.push(pos[a*3],pos[a*3+1],pos[a*3+2],pos[b*3],pos[b*3+1],pos[b*3+2])}}
+const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));root.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x3a5aa0,transparent:true,opacity:.12,blending:THREE.AdditiveBlending})));
+// region centers & hot path
+const ctr=regions.map(r=>new THREE.Vector3(r.at[0]*10.5,r.at[1]*10,r.at[2]*10));
+const glowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'#fff');r.addColorStop(.3,'rgba(255,255,255,.5)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
+const core=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc857,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));core.scale.setScalar(5);core.position.set(0,-1,0);root.add(core);
+const sparks=[];const hotIdx=hotR.map(n=>regions.findIndex(r=>r.n==n));
+for(let s=0;s<14;s++){const from=core.position,to=ctr[hotIdx[s%3]];const mid=from.clone().lerp(to,.5);mid.y+=3;const cur=new THREE.QuadraticBezierCurve3(from.clone(),mid,to);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc857,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));sp.scale.setScalar(.01);sp.visible=false;sp.material.color.set(0xd9b25a);root.add(sp);sparks.push({sp,cur,o:s/14})}
+hotIdx.forEach(i=>{const a=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc857,transparent:true,opacity:.45,blending:THREE.AdditiveBlending,depthWrite:false}));a.scale.setScalar(4.5);a.position.copy(ctr[i]);root.add(a);sparks.push({halo:a})});
+const rings=[];if(0)hotIdx.forEach(i=>{for(let k=0;k<2;k++){const r=new THREE.Mesh(new THREE.RingGeometry(.9,1.05,48),new THREE.MeshBasicMaterial({color:0xe9c46a,transparent:true,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));r.position.copy(ctr[i]);root.add(r);rings.push({r,o:k*.5})}});
+// rule pulse (designer)
+const rule=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xff5bd0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));rule.position.copy(ctr[2]).add(new THREE.Vector3(1.6,1.2,0));root.add(rule);
+const labs=document.getElementById('labs');const L0=regions.map((r,i)=>{const d=document.createElement('div');d.className='lab';const hot=hotR.includes(r.n);d.innerHTML=`<div class="n" style="color:${hot?'#ffc857':'#cfd6e4'}">${r.n}</div>`;return{d,p:ctr[i].clone()}});const L=[];
+const gl=document.createElement('div');gl.className='lab';gl.innerHTML='<div class="n" style="color:#ffc857">Gerente</div>';/*g*/(()=>{})();(()=>{})//({d:gl,p:new THREE.Vector3(0,-2.6,0)});
+const rl=document.createElement('div');rl.className='lab';rl.innerHTML='<div class="n" style="color:#ff8be0;font-size:11px">regra nova · hoje</div>';labs.appendChild(rl);L.push({d:rl,p:rule.position.clone().add(new THREE.Vector3(0,.8,0))});
+document.getElementById('leg').innerHTML=regions.map(r=>`<span style="--c:rgb(${r.c.map(v=>v*255|0)})">${r.n}</span>`).join('')+'<span style="--c:#ffc857">Gerente / caminho aceso</span><span style="--c:#ff5bd0">regra nova</span>';
+const v=new THREE.Vector3();
+const FILES={'Roteirista':['Carrossel','Narrativa','Copy que converte','Manchetes','Ganchos','Estático','Matéria','História real','Stories de venda','Post de venda','Reels','Blog','+4'],
+'Revisor de copy':['Narrativa','Hard copy','Manchete','Padrão do dono','História real','Stories de venda','Matéria','Blog','Serviço'],
+'Designer':['Arte que para o dedo','Zonas seguras','Carrossel','Originalidade','Modelos','Estilo do dono','Fotos de notícia','Fundo dos stories'],
+'Editor de vídeo':['Retenção','Duração','Zonas seguras','Vídeo que vende','Direitos','Motion DNA','Áudio','Estilos M1 a M5'],
+'SEO':['Notícias e IA','Blog','Serviço'],'Publicador':['Legenda e hashtags','Horário e frequência','Monetização'],'Agente de Notícias':['Fontes por nicho','Nota da pauta']};
+const NF={'Roteirista':16,'Revisor de copy':9,'Designer':8,'Editor de vídeo':12,'SEO':3,'Publicador':3,'Agente de Notícias':2};
+const HOTF={'Roteirista':'Stories de venda','Revisor de copy':'Stories de venda','Designer':'Fundo dos stories'};
+const OPOS={'Roteirista':[330,250],'Revisor de copy':[260,520],'SEO':[330,790],'Agente de Notícias':[620,880],'Designer':[1030,200],'Editor de vídeo':[1110,500],'Publicador':[1040,800]};
+const POS={'Roteirista':[24,130],'Revisor de copy':[24,370],'SEO':[24,590],'Agente de Notícias':[24,780],'Designer':[W-274,130],'Editor de vídeo':[W-274,370],'Publicador':[W-274,620]};
+const cards=document.getElementById('cards');const CR={};const OR={};const orbs=document.getElementById('orbs');
+regions.forEach(r=>{const d=document.createElement('div');const hot=!!HOTF[r.n];d.className='card'+(hot?' hot':'');d.style.setProperty('--c',`rgb(${r.c.map(x=>x*255|0)})`);
+ d.style.left=POS[r.n][0]+'px';d.style.top=POS[r.n][1]+'px';
+ d.innerHTML=`<div class="h"><i></i>${r.n}<span>${NF[r.n]} arquivos</span></div><ul>${FILES[r.n].map(f=>`<li class="${HOTF[r.n]==f?'hot':''}">${f}</li>`).join('')}</ul>${r.n=='Designer'?'<div class="st" style="color:#ff8be0">+1 regra nova hoje</div>':''}`;cards.appendChild(d);CR[r.n]=d;const o=document.createElement('div');o.className='orb'+(hot?' hot':'')+(r.n=='Roteirista'?' sel':'');o.style.setProperty('--c',`rgb(${r.c.map(x=>x*255|0)})`);o.style.left=OPOS[r.n][0]+'px';o.style.top=OPOS[r.n][1]+'px';o.innerHTML=`<i></i><b>${r.n}</b><span>${NF[r.n]} arquivos</span>`;orbs.appendChild(o);OR[r.n]=o;if(r.n=='Roteirista'){d.classList.add('open');d.style.left='580px';d.style.top='130px'}});
+const wires=document.getElementById('wires');
+function frame(t){t/=1000;window.t=t;root.rotation.y=Math.PI/2+Math.sin(t*.15)*.18;root.rotation.x=.12;cam.position.set(0,2.5,46);cam.lookAt(0,-.5,0);
+ sparks.forEach(s=>{if(s.halo){s.halo.material.opacity=.22+Math.sin(t*3)*.12;s.halo.scale.setScalar(4.5+Math.sin(t*3)*1.2);return}const u=(t*.35+s.o)%1;s.sp.position.copy(s.cur.getPoint(u));s.sp.material.opacity=Math.sin(u*Math.PI)*.45});
+ rings.forEach(q=>{const u=(t*.6+q.o)%1;q.r.scale.setScalar(1+u*2.2);q.r.material.opacity=(1-u)*.5;q.r.lookAt(cam.position.clone().applyMatrix4(new THREE.Matrix4().copy(root.matrixWorld).invert()))});rule.scale.setScalar(1.6+Math.sin(t*5)*.7);core.material.opacity=.28+Math.sin(t*2)*.06;pm.size=.11+Math.sin(t*1.5)*.01;
+ R.render(S,cam);const ORB={'Roteirista':[0,1],'Designer':[1.3,1],'Revisor de copy':[2.6,1],'Editor de vídeo':[4.0,1],'SEO':[.7,0],'Publicador':[2.8,0],'Agente de Notícias':[4.9,0]};
+let sv='';v.copy(core.position).applyMatrix4(root.matrixWorld).project(cam);const gx=(v.x+1)/2*W,gy=(1-v.y)/2*H+10;const go=document.getElementById('gorb');go.style.left=gx+'px';go.style.top=gy+'px';
+const RX=[230,400],RY=[95,190];sv+=`<ellipse cx='${gx}' cy='${gy}' rx='${RX[0]}' ry='${RY[0]}' fill='none' stroke='#e9c46a' stroke-opacity='.18' stroke-dasharray='3 6'/><ellipse cx='${gx}' cy='${gy}' rx='${RX[1]}' ry='${RY[1]}' fill='none' stroke='#e9c46a' stroke-opacity='.14' stroke-dasharray='3 6'/>`;
+for(const n in ORB){const [ph,ring]=ORB[n];const a=ph+t*(ring?.06:.09);OPOS[n]=[gx+Math.cos(a)*RX[ring],gy+Math.sin(a)*RY[ring]];const o=OR[n];o.style.left=OPOS[n][0]+'px';o.style.top=OPOS[n][1]+'px';o.style.zIndex=Math.sin(a)>0?4:2;o.style.opacity=Math.sin(a)>0?1:.75}regions.forEach((r,i)=>{v.copy(ctr[i]).applyMatrix4(root.matrixWorld).project(cam);const x=(v.x+1)/2*W,y=(1-v.y)/2*H;const cx=OPOS[r.n][0],cy=OPOS[r.n][1]-8;const hot=!!HOTF[r.n];const col=hot?'#e9c46a':`rgba(${r.c.map(x=>x*255|0)},.55)`;const cc=`rgb(${r.c.map(x=>x*255|0)})`;
+sv+=`<path d='M${cx},${cy} L${x},${y}' stroke='${cc}' stroke-width='.8' stroke-dasharray='2 4' opacity='.45'/><circle cx='${x}' cy='${y}' r='3' fill='${cc}' opacity='.7'/>`;
+const mx=(cx+gx)/2+(cy-gy)*.15,my=(cy+gy)/2-(cx-gx)*.15;const P=u=>{const a=1-u;return[a*a*gx+2*a*u*mx+u*u*cx,a*a*gy+2*a*u*my+u*u*cy]};
+sv+=`<path d='M${gx},${gy} Q${mx},${my} ${cx},${cy}' fill='none' stroke='${hot?'#e9c46a':cc}' stroke-width='${hot?2:1.3}' opacity='${hot?.75:.45}'/>`;
+for(let k=0;k<3;k++){const u=((t*.3+k/3+i*.11)%1);const [ax,ay]=P(u);sv+=`<circle cx='${ax}' cy='${ay}' r='${hot?3.4:2.6}' fill='#e9c46a' opacity='${(hot?.85:.55)*Math.sin(u*Math.PI)}'/>`}
+for(let k=0;k<2;k++){const u=((t*.25+k/2+i*.17+.5)%1);const [bx,by]=P(1-u);sv+=`<rect x='${bx-3.5}' y='${by-3.5}' width='7' height='7' rx='1.5' fill='${cc}' opacity='${.9*Math.sin(u*Math.PI)}' transform='rotate(45 ${bx} ${by})'/>`}});v.copy(core.position).applyMatrix4(root.matrixWorld).project(cam);wires.innerHTML=sv;{const d=CR['Roteirista'];d.style.left=(OPOS['Roteirista'][0]+24)+'px';d.style.top=(OPOS['Roteirista'][1]-20)+'px'}L.forEach(l=>{v.copy(l.p).applyMatrix4(root.matrixWorld).project(cam);l.d.style.left=((v.x+1)/2*W)+'px';l.d.style.top=((1-v.y)/2*H)+'px'});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>
