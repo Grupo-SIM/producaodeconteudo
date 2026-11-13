@@ -175,7 +175,11 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .mlay{display:grid;grid-template-columns:460px 1fr;gap:16px;align-items:start}.mcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mc{cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:14px}.mc.on{border-color:#a8864a!important}.mc b{font-size:14px}.mc.add{border-style:dashed;align-items:center;justify-content:center;color:var(--tx2)}
 .av{width:36px;height:36px;border-radius:9px;background:#1c1c1f;display:grid;place-items:center;font-size:12px;font-weight:700;margin-bottom:8px}.av.gold{width:52px;height:52px;border:1px solid #a8864a;color:var(--gold2);background:#1a1710;margin:0}
 .mdet .mh{display:flex;gap:14px;align-items:center;margin-bottom:14px}.mdet h2{font-size:19px;font-weight:600}.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}h5{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
-.kvr{display:flex;justify-content:space-between;gap:12px;background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px}.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 4px -1px 6px;border:1px solid #ffffff22}.kvr span:last-child{color:var(--tx3);text-align:right}
+.kvr{display:flex;justify-content:space-between;gap:12px;background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px}.sec{background:#161618;border-radius:10px;padding:10px 12px;margin-bottom:8px}.sec b{display:block;font-size:12px;letter-spacing:.04em;color:var(--gold2);margin-bottom:4px}.sec p{font-size:13px;color:var(--tx2);line-height:1.5}.sec em{font-style:normal;font-size:10.5px;border-radius:5px;padding:1px 6px;margin:0 2px}.sec em.prop{background:#10241a;color:#7fd1a0}.sec em.conf{background:#2a2014;color:#e9b87a}
+.hexes{display:flex;gap:10px;margin-top:6px;font-size:11.5px;color:var(--tx2);font-family:ui-monospace,monospace}
+.arqs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.arqs figure{margin:0}.arqs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#161618}.arqs figcaption{font-size:11px;color:var(--tx3);text-align:center;margin-top:3px}
+img.av{object-fit:cover;padding:0}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 4px -1px 6px;border:1px solid #ffffff22}.kvr span:last-child{color:var(--tx3);text-align:right}
 .tagsw{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.tg{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:var(--gold2)}.tg.out{background:#1c1c1f;color:var(--tx2)}
 .learnbox{margin-top:18px;padding:10px 14px;border:1px solid var(--goldline);background:#16140e;border-radius:10px;font-size:12.5px;color:var(--gold)}
 .kps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.kp span{font-size:12px;color:var(--tx2);display:block}.kp b{font-size:24px}
@@ -584,41 +588,69 @@ async function confPostado(id) { await tryDo(() => api(`/api/v2/itens/${id}/post
 
 // ───────── Marcas
 const sigla = n => (n.match(/\d+/)?.[0]) || n.split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 3).toUpperCase();
+// lê os documentos da marca: seções em CAIXA ALTA (PAPEL DA MARCA, PÚBLICO, VOZ…) ou "## Título", e linhas "Chave: valor"
+function secoes(txt) {
+  const S0 = [], add = t => { const s = { t, l: [] }; S0.push(s); return s; }; let cur = add('');
+  for (const raw of String(txt || '').split('\n')) {
+    const l = raw.trim(); if (!l) continue;
+    const h = l.match(/^#{1,3}\s+(.+)$/) || (l.length < 70 && !/\p{Ll}/u.test(l.replace(/\[[^\]]*\]|\([^)]*\)/g, '')) && /\p{Lu}{3}/u.test(l) ? [l, l] : null);
+    if (h) cur = add(h[1].replace(/\s*\[[^\]]*\]\s*/g, ' ').replace(/\s*\([^)]*\)\s*/g, ' ').trim()); else cur.l.push(l);
+  }
+  return S0.filter(s => s.l.length);
+}
+const achaSec = (ss, ...nomes) => ss.filter(s => nomes.some(n => s.t.toUpperCase().startsWith(n)));
+const juntar = s => s.l.join(' ').replace(/\s+-\s/g, '\n- ');
+const sw = v => esc(v).replace(/#[0-9a-fA-F]{6}\b/g, h => `<i class="sw" style="background:${h}"></i>${h.toUpperCase()}`);
 VIEWS.marcas = async () => {
-  const [{ brands }, k, sty] = await Promise.all([api('/api/brands'), api('/api/knowledge').catch(() => ({ items: [] })), api('/api/art-styles').catch(() => ({ styles: [] }))]);
-  S.brands = brands; S._docs = k.items || []; S._sty = sty.styles || [];
+  const [{ brands }, k, sty] = await Promise.all([api('/api/brands'), api('/api/knowledge').catch(() => ({ items: [], assets: [] })), api('/api/art-styles').catch(() => ({ styles: [] }))]);
+  S.brands = brands; S._docs = k.items || []; S._assets = k.assets || []; S._sty = sty.styles || [];
   const sel = brands.find(b => b.id === S.marcaSel) || brands[0]; S.marcaSel = sel?.id;
-  const docsDe = (b, cats) => S._docs.filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase() && cats.includes(x.category));
-  const nicho = b => (docsDe(b, ['marca']).find(x => !/^#\s*IDENTIDADE/i.test(x.content))?.content || '').split('\n').find(l => l.trim() && !l.startsWith('#'))?.slice(0, 40) || '';
-  const linha = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(v)}</span></div>`;
+  const docsDe = b => S._docs.filter(x => (x.brand || '').toLowerCase() === b.name.toLowerCase());
+  const ehId = x => /^#?\s*IDENTIDADE VISUAL/i.test(x.content.trim()) || /^identidade visual/i.test(x.title);
+  const descr = b => docsDe(b).filter(x => x.category === 'marca' && !ehId(x));
+  const ident = b => docsDe(b).find(ehId);
+  const logo = b => S._assets.find(x => (x.brand || '').toLowerCase() === b.name.toLowerCase() && /logo/i.test(x.kind + ' ' + x.name));
+  const nicho = b => { const p = achaSec(secoes(descr(b).map(x => x.content).join('\n')), 'PAPEL')[0]; return p ? juntar(p).split(/(?<=\.)\s/)[0].slice(0, 70) : ''; };
+  const av = (b, big) => { const l = logo(b); return l ? `<img class="av ${big ? 'gold' : ''}" src="/api/assets/${l.id}/thumb" alt="">` : `<span class="av ${big ? 'gold' : ''}">${esc(sigla(b.name))}</span>`; };
+  const linha = (k, v, cls = '') => `<div class="kvr ${cls}"><span>${esc(k)}</span><span>${v}</span></div>`;
+  const bloco = s => `<div class="sec"><b>${esc(s.t.charAt(0) + s.t.slice(1).toLowerCase())}</b><p>${esc(juntar(s)).replace(/\[(PROPOSTA|CONFIRMAR)[^\]]*\]/g, m => `<em class="${m.includes('CONFIRMAR') ? 'conf' : 'prop'}">${m.slice(1, -1)}</em>`).replace(/\n/g, '<br>')}</p></div>`;
   const tab = S.marcaTab || 'id';
   let det = '';
   if (sel) {
+    const ss = secoes(descr(sel).map(x => x.content).join('\n')), idv = ident(sel), sid = secoes(idv?.content || '');
+    const campos = sid.flatMap(s => s.l.map(l => l.replace(/^[-*]\s*/, '').match(/^([^:]{2,40}):\s*(.+)$/)).filter(Boolean).map(m => [m[1].trim(), m[2].trim(), s.t]));
+    const hexes = [...new Set((idv?.content || '').match(/#[0-9a-fA-F]{6}\b/g) || [])].slice(0, 6);
     const its = S.fluxo.itens.filter(i => i.marca.toLowerCase() === sel.name.toLowerCase());
-    const aprov = its.filter(i => ['finalizado'].includes(i.estado) || (i.estado === 'esperando' && i.etapa === 'publicacao'));
+    const aprov = its.filter(i => i.estado === 'finalizado' || (i.estado === 'esperando' && i.etapa === 'publicacao'));
     const treinados = [...new Set(aprov.map(i => S.fluxo.formatos.find(f => f.id === i.raia)?.nome))].filter(Boolean), outros = S.fluxo.formatos.map(f => f.nome).filter(n => !treinados.includes(n));
-    const docs = docsDe(sel, tab === 'voz' ? ['tom_de_voz'] : ['marca', 'diretrizes', 'outros']);
-    // linhas "Chave: valor" dos documentos cadastrados (ex.: # IDENTIDADE VISUAL com ## CORES, ## TIPOGRAFIA, ## LOGO)
-    const campos = ds => ds.flatMap(dc => { let g = ''; return dc.content.split('\n').flatMap(l => { if (/^##\s/.test(l)) { g = l.replace(/^#+\s*/, ''); return []; } const m = l.replace(/^[-*]\s*/, '').match(/^([^:#]{2,40}):\s*(.+)$/); return m ? [[m[1].trim(), m[2].trim().replace(/\*\*/g, ''), g, dc.id]] : []; }); });
-    const sw = v => v.replace(/#[0-9a-fA-F]{6}\b/g, h => `<i class="sw" style="background:${h}"></i>${h}`);
-    const lin2 = ([k, v, g, id]) => `<div class="kvr" style="cursor:pointer" onclick="detMarca(${sel.id})"><span>${esc(k)}${g ? `<small class="muted"> · ${esc(g.toLowerCase())}</small>` : ''}</span><span>${sw(esc(v.slice(0, 90)))}</span></div>`;
-    const geral = (S._sty.find(x => x.brand === '') || {}).params || {}, prop = (S._sty.find(x => (x.brand || '').toLowerCase() === sel.name.toLowerCase()) || {}).params || {};
-    const est = [['Estilo visual', prop.estilo_visual || geral.estilo_visual], ['Fundo', (prop.fundo_ia || geral.fundo_ia || {}).estilo], ['Luz', (prop.fundo_ia || geral.fundo_ia || {}).iluminacao], ['Composição', [(prop.composicao || geral.composicao || {}).alinhamento, (prop.composicao || geral.composicao || {}).margens].filter(Boolean).join(' · ')], ['O que evitar', (prop.fundo_ia || geral.fundo_ia || {}).negativo]].filter(x => x[1]);
-    const voz = tab === 'voz' ? S._docs.filter(x => (x.brand || '').toLowerCase() === sel.name.toLowerCase() && x.voice_name) : [];
-    const corpo = tab === 'formatos' ? S.fluxo.formatos.map(f => linha(f.nome, `meta ${f.meta_dia}/dia · ${f.modo === 'manual' ? 'Manual' : 'Automático'} · ${its.filter(i => i.raia === f.id).length} no fluxo`)).join('')
-      : tab === 'contas' ? ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('') + '<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>'
-      : ((tab === 'id' && est.length ? `<h5>Estilo aprovado pelo dono</h5>${est.map(([k, v]) => `<div class="kvr"><span>${esc(k)}</span><span>${esc(String(v).slice(0, 80))}</span></div>`).join('')}<h5 style="margin-top:16px">Desta marca</h5>` : '')
-        + (campos(docs).slice(0, 18).map(lin2).join('') || docs.map(d => `<div class="kvr" style="cursor:pointer" onclick="detMarca(${sel.id})"><span>${esc(d.title)}</span><span>${esc(d.content.replace(/[#*]/g, '').trim().split('\n')[0].slice(0, 50))}</span></div>`).join('') || '<p class="muted small">Nada cadastrado ainda. Clique em Editar ou peça ao gerente.</p>')
-        + voz.map(x => `<div class="kvr"><span>Voz da narração</span><span>${esc(x.voice_name)} (${esc(x.voice_provider)})</span></div>`).join(''));
-    det = `<div class="box mdet"><div class="mh"><span class="av gold">${esc(sigla(sel.name))}</span><div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(nicho(sel))}</span></div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
+    const arqs = S._assets.filter(x => (x.brand || '').toLowerCase() === sel.name.toLowerCase() && ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(x.ext));
+    const geral = (S._sty.find(x => x.brand === '') || {}).params || {}, prop = (S._sty.find(x => (x.brand || '').toLowerCase() === sel.name.toLowerCase()) || {}).params || {}, fia = prop.fundo_ia || geral.fundo_ia || {};
+    const est = [['Estilo visual', prop.estilo_visual || geral.estilo_visual], ['Fundo', fia.estilo], ['Luz', fia.iluminacao], ['O que evitar', fia.negativo]].filter(x => x[1]);
+    let esq = '', dir = '';
+    if (tab === 'id') {
+      esq = (est.length ? `<h5>Estilo aprovado pelo dono</h5>${est.map(([k, v]) => linha(k, esc(String(v).slice(0, 80)))).join('')}<h5 style="margin-top:16px">Desta marca</h5>` : '<h5>Desta marca</h5>')
+        + (campos.map(([k, v, g]) => linha(k + (g && !/IDENTIDADE/i.test(g) ? ' · ' + g.toLowerCase() : ''), sw(v.slice(0, 110)))).join('') || '<p class="muted small">Identidade visual ainda não cadastrada.</p>')
+        + achaSec(ss, 'IDENTIDADE').map(bloco).join('');
+      dir = `<h5>Formatos treinados</h5><div class="tagsw">${treinados.map(n => `<span class="tg">${esc(n)}</span>`).join('')}${outros.map(n => `<span class="tg out">+ ${esc(n)}</span>`).join('')}</div>
+        <h5 style="margin-top:20px">Peças aprovadas</h5>${aprov.slice(0, 6).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhuma ainda.</p>'}
+        <h5 style="margin-top:20px">Arquivos da marca</h5><div class="arqs">${arqs.slice(0, 12).map(x => `<figure><img src="/api/assets/${x.id}/thumb" loading="lazy"><figcaption>${esc(x.kind || x.name)}</figcaption></figure>`).join('') || '<p class="muted small">Nenhum arquivo.</p>'}</div>`;
+    } else if (tab === 'voz') {
+      const L = achaSec(ss, 'PAPEL', 'PÚBLICO', 'PUBLICO', 'VOZ', 'GANCHO'), R = achaSec(ss, 'O INIMIGO', 'INIMIGO', 'DOR', 'DESEJO', 'MECANISMO', 'CTA', 'MONETIZ', 'CONCORRENTES');
+      esq = L.map(bloco).join('') || '<p class="muted small">Sem descrição de voz e público.</p>'; dir = R.map(bloco).join('');
+    } else if (tab === 'formatos') {
+      esq = `<h5>Metas por formato</h5>${S.fluxo.formatos.map(f => linha(f.nome, `meta ${f.meta_dia}/dia · ${f.modo === 'manual' ? 'Manual' : 'Automático'} · ${its.filter(i => i.raia === f.id).length} no fluxo`)).join('')}`;
+      dir = achaSec(ss, 'TIPOS', 'GANCHO').map(bloco).join('') || '';
+    } else {
+      esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('')}<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>`;
+      dir = achaSec(ss, 'CANAIS', 'CTA').map(bloco).join('');
+    }
+    det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
       <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos e metas'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
-      <div class="two"><div><h5>${tab === 'voz' ? 'Voz e público' : tab === 'formatos' ? 'Formatos e metas' : tab === 'contas' ? 'Contas' : 'Desta marca'}</h5>${corpo}</div>
-      <div><h5>Formatos treinados</h5><div class="tagsw">${treinados.map(n => `<span class="tg">${esc(n)}</span>`).join('')}${outros.map(n => `<span class="tg out">+ ${esc(n)}</span>`).join('')}</div>
-      <h5 style="margin-top:20px">Peças aprovadas</h5>${aprov.slice(0, 6).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhuma ainda.</p>'}</div></div>
+      <div class="two"><div>${esq}</div><div>${dir}</div></div>
       <div class="learnbox">O que você mudar aqui, o gerente avisa os agentes e salva no cérebro da marca. Também dá para mudar só pela conversa.</div></div>`;
   }
   $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><span style="flex:1"></span><span class="chip">${brands.length} marcas</span><button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
-    ${brands.length ? `<div class="mlay"><div class="mcards">${brands.map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()"><span class="av">${esc(sigla(b.name))}</span><b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
+    ${brands.length ? `<div class="mlay"><div class="mcards">${brands.map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()">${av(b)}<b>${esc(b.name)}</b><span class="muted small">${esc(nicho(b).replace(/^(.{0,48})\s.*/s, '$1…'))}</span></div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
 };
 async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
 async function detMarca(id) {
