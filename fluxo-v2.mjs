@@ -300,6 +300,23 @@ export function criarFluxoV2(ctx) {
       return send(res, 200, { ok: true });
     }
 
+    // ── Etapa 6: dados do Cérebro (agentes, arquivos e regras); q acende os arquivos ligados à pergunta
+    if (p === '/api/v2/cerebro' && m === 'GET') {
+      const q = String(new URL(req.url, 'http://x').searchParams.get('q') || '');
+      const pal = new Set(q.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 3));
+      const nota = t => { if (!pal.size) return 0; const w = String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); let n = 0; for (const x of pal) if (w.includes(x)) n++; return n; };
+      const agentes = all('SELECT id,name,nick,role,color,enabled FROM agents ORDER BY id').map(a => {
+        const docs = all('SELECT id,titulo,modo,origem,substr(conteudo,1,4000) c FROM agent_docs WHERE agent=? ORDER BY ordem,id', a.id).map(d => ({ id: 'd' + d.id, tipo: 'arquivo', titulo: d.titulo, modo: d.modo, origem: d.origem, n: nota(d.titulo + ' ' + d.titulo + ' ' + d.c) }));
+        const regras = all("SELECT id,text,brand FROM brain_rules WHERE status='ativa' AND agent=? ORDER BY id DESC LIMIT 60", a.id).map(r => ({ id: 'r' + r.id, tipo: 'regra', titulo: clip(r.text, 140), marca: r.brand, n: nota(r.text) }));
+        return { id: a.id, nome: a.nick || a.name, papel: a.role, cor: a.color, ativo: !!a.enabled, itens: [...docs, ...regras] };
+      });
+      const acesos = pal.size ? agentes.flatMap(a => a.itens.filter(i => i.n > 0).map(i => ({ agente: a.id, id: i.id, n: i.n }))).sort((x, y) => y.n - x.n).slice(0, 12) : [];
+      return send(res, 200, { agentes, acesos });
+    }
+    if ((mt = p.match(/^\/api\/v2\/cerebro\/(d|r)(\d+)$/)) && m === 'GET') {
+      const x = mt[1] === 'd' ? one('SELECT titulo, conteudo, agent, modo, origem, updated_at FROM agent_docs WHERE id=?', +mt[2]) : one('SELECT text conteudo, agent, brand, evidence, source origem, updated_at FROM brain_rules WHERE id=?', +mt[2]);
+      if (!x) throw fail(404, 'Não encontrado'); return send(res, 200, x);
+    }
     // ── Etapa 8: otimização (só postados)
     if (p === '/api/v2/otimizacao' && m === 'GET') return send(res, 200, otimizacao());
     if (p === '/api/v2/otimizacao/metricas' && m === 'POST') {

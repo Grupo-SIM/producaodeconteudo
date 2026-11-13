@@ -245,7 +245,7 @@ function renderSide() {
     <button class="nv ${['marcas', 'produtos', 'otimizacao', 'config', 'mais'].includes(S.view) && isMobile() ? 'on' : ''}" style="${isMobile() ? '' : 'display:none'}" onclick="go('mais')">${ico('mais')}<span>Mais</span></button>
     <div class="who">${esc(S.me?.name || '')} · <a href="#" onclick="logout();return false">sair</a></div>`;
 }
-function go(v) { S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); }
+function go(v) { if (v !== 'cerebro') { C3?.destruir(); C3 = null; } S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); }
 async function logout() { await api('/api/logout', { body: {} }).catch(() => { }); location.reload(); }
 const VIEWS = {};
 function render() { (VIEWS[S.view] || VIEWS.fluxo)(); }
@@ -256,7 +256,7 @@ async function refresh() {
   const q = S.marca ? '?marca=' + encodeURIComponent(S.marca) : '';
   S.fluxo = await api('/api/v2/fluxo' + q);
   renderSide();
-  if (!$('.ov') || S.view === 'fluxo') render();
+  if (!$('.ov') && ['fluxo', 'mesa', 'publicacao'].includes(S.view)) render();
 }
 function live() {
   try {
@@ -526,15 +526,59 @@ function metricas(id) {
 }
 async function salvaMet(id) { const b = { content_id: id }; for (const k of ['views', 'likes', 'comments', 'saves', 'shares']) b[k] = +$('#mt_' + k).value || 0; await tryDo(() => api('/api/v2/otimizacao/metricas', { body: b }), 'Métricas salvas'); fecha(); }
 
-// ───────── Cérebro (lista; o 3D chega na Etapa 6)
+// ───────── Cérebro: 3D, Constelação e Lista
+let C3 = null;
 VIEWS.cerebro = async () => {
-  const d = await api('/api/brain').catch(() => null);
-  const regras = d?.rules || d?.regras || [];
-  $('#main').innerHTML = `<div class="top"><h1>Cérebro</h1>${topo()}<div class="tog"><button class="on">Lista</button><button disabled title="Etapa 6">Constelação</button><button disabled title="Etapa 6">3D</button></div><input class="f" style="width:240px" placeholder="Buscar…" oninput="filtraCer(this.value)"></div>
-    <p class="small muted" style="margin-bottom:10px">Regras não têm tela própria: pergunte ao gerente. Aqui fica a lista do que ele sabe.</p>
-    <div id="cerl">${regras.filter(r => r.status === 'ativa').map(r => `<div class="ver" data-q="${esc((r.agent + ' ' + r.text).toLowerCase())}"><span class="pill">${esc(r.agent)}</span><span style="flex:1">${esc(r.text)}</span>${r.brand ? `<span class="small muted">${esc(r.brand)}</span>` : ''}</div>`).join('') || '<div class="empty">Sem regras ativas.</div>'}</div>`;
+  C3?.destruir(); C3 = null;
+  const d = await api('/api/v2/cerebro'); S.cer = d; S.cerModo ||= '3d';
+  const modo = S.cerModo;
+  $('#main').innerHTML = `<div class="top"><h1>Cérebro</h1>${topo()}<div class="tog">${[['3d', '3D'], ['const', 'Constelação'], ['lista', 'Lista']].map(([k, n]) => `<button class="${modo === k ? 'on' : ''}" onclick="S.cerModo='${k}';render()">${n}</button>`).join('')}</div><input class="f" style="width:220px" placeholder="Buscar e acender o caminho…" oninput="cerBusca(this.value)"></div>
+    <div style="position:relative">
+      <div id="cer" style="height:calc(100vh - 130px);min-height:420px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 45%,#1a1710,#0c0c0d 70%);border:1px solid var(--line)"></div>
+      <div id="cerTip" class="hidden" style="position:fixed;pointer-events:none;background:#111113;border:1px solid var(--line2);border-radius:8px;padding:5px 9px;font-size:12px;z-index:20"></div>
+      <div id="cerCard" class="box hidden" style="position:absolute;right:12px;top:12px;width:340px;max-height:calc(100% - 24px);overflow:auto"></div>
+    </div>
+    <p class="small muted" style="margin-top:6px">Bolinhas douradas: o Gerente mandando para os agentes. Losangos coloridos: o que volta. Arraste para girar, role para aproximar, clique para abrir. Pergunte no chat e os arquivos usados acendem.</p>`;
+  const el = $('#cer');
+  if (modo === '3d') {
+    try {
+      const { criarCerebro3D } = await import('/cerebro3d.js');
+      C3 = criarCerebro3D(el, d, { onPick: cerAbre, onHover: (u, e) => { const t = $('#cerTip'); if (!u) return t.classList.add('hidden'); t.textContent = u.titulo; t.style.left = e.clientX + 12 + 'px'; t.style.top = e.clientY + 12 + 'px'; t.classList.remove('hidden'); } });
+    } catch (e) { el.innerHTML = `<div class="empty">Não consegui abrir o 3D (${esc(e.message)}). Use Constelação ou Lista.</div>`; }
+  } else if (modo === 'const') {
+    const ags = d.agentes.filter(a => a.id !== 'chefe'), W = 1000, H = 640, cx = W / 2, cy = H / 2;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%">`;
+    ags.forEach((a, k) => {
+      const ang = k / ags.length * Math.PI * 2 - Math.PI / 2, x = cx + Math.cos(ang) * 230, y = cy + Math.sin(ang) * 210;
+      svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#3a3220" data-ag="${a.id}"/>`;
+      a.itens.forEach((it, j) => { const t = ang + (j - a.itens.length / 2) * 0.09, r = 70 + (j % 3) * 16, ix = x + Math.cos(t) * r, iy = y + Math.sin(t) * r; svg += `<g class="cn" data-id="${it.id}" style="cursor:pointer" onclick="cerAbre({tipo:'${it.tipo}',id:'${it.id}',agente:'${a.id}'})"><title>${esc(it.titulo)}</title>${it.tipo === 'regra' ? `<rect x="${ix - 4}" y="${iy - 4}" width="8" height="8" transform="rotate(45 ${ix} ${iy})" fill="${esc(a.cor || '#8fd0c0')}"/>` : `<rect x="${ix - 3}" y="${iy - 4}" width="6" height="8" fill="#cfd6e4" opacity=".8"/>`}</g>`; });
+      svg += `<g style="cursor:pointer" onclick="cerAbre({tipo:'agente',agente:'${a.id}',titulo:${esc(JSON.stringify(a.nome))}})"><circle cx="${x}" cy="${y}" r="20" fill="${esc(a.cor || '#8fd0c0')}"/><text x="${x}" y="${y + 36}" fill="#d0d0d4" font-size="13" text-anchor="middle">${esc(a.nome)}</text></g>`;
+    });
+    svg += `<circle cx="${cx}" cy="${cy}" r="30" fill="url(#gg)"/><defs><radialGradient id="gg"><stop offset="0" stop-color="#e9d8a6"/><stop offset="1" stop-color="#a8864a"/></radialGradient></defs><text x="${cx}" y="${cy + 50}" fill="#e9d29a" font-size="14" text-anchor="middle">Gerente</text></svg>`;
+    el.innerHTML = svg;
+  } else {
+    el.style.height = 'auto'; el.style.background = 'none'; el.style.border = 'none';
+    el.innerHTML = d.agentes.map(a => `<details class="box" style="margin-bottom:8px" ${a.itens.length ? '' : ''}><summary><b>${esc(a.nome)}</b> <span class="small muted">${a.itens.filter(i => i.tipo === 'arquivo').length} arquivos · ${a.itens.filter(i => i.tipo === 'regra').length} regras</span></summary>${a.itens.map(i => `<div class="ver cn" data-id="${i.id}" style="cursor:pointer" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})"><span class="pill">${i.tipo}</span><span style="flex:1">${esc(i.titulo)}</span></div>`).join('')}</details>`).join('');
+  }
 };
-function filtraCer(q) { q = q.toLowerCase(); document.querySelectorAll('#cerl [data-q]').forEach(e => e.classList.toggle('hidden', !e.dataset.q.includes(q))); }
+async function cerAbre(u) {
+  const card = $('#cerCard'); if (!card) return;
+  let html;
+  if (u.tipo === 'gerente') html = `<b>Gerente</b><p class="small muted" style="margin-top:6px">Coordena os agentes. Converse com ele no chat.</p>`;
+  else if (u.tipo === 'agente') { const a = S.cer.agentes.find(x => x.id === u.agente); html = `<b>${esc(a.nome)}</b><p class="small muted">${esc(a.papel || '')}</p>${a.itens.map(i => `<div class="ver" style="cursor:pointer" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})"><span class="pill">${i.tipo}</span><span style="flex:1">${esc(i.titulo)}</span></div>`).join('')}`; }
+  else { const x = await api('/api/v2/cerebro/' + u.id); html = `<span class="pill">${u.tipo === 'regra' ? 'Regra' : 'Arquivo'} · ${esc(x.agent)}</span><h3 style="margin:8px 0;font-size:15px">${esc(x.titulo || '')}</h3><div style="white-space:pre-wrap;font-size:12.5px;line-height:1.5">${esc(String(x.conteudo).slice(0, 8000))}</div>${x.evidence ? `<p class="small muted" style="margin-top:8px">${esc(x.evidence)}</p>` : ''}${u.tipo === 'regra' ? `<button class="btn sm dg" style="margin-top:10px" onclick="tryDo(()=>api('/api/v2/regras/${u.id.slice(1)}/desfazer',{body:{}}),'Regra desfeita').then(render)">Desfazer regra</button>` : ''}`; }
+  if (isMobile()) { modal(`<div class="hd"><h2>Cérebro</h2><button class="btn sm" onclick="$('#ovs').innerHTML=''">Fechar</button></div><div class="mb">${html}</div>`); $('.mo').style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:70vh;border-radius:18px 18px 0 0'; return; }
+  card.innerHTML = `<button class="btn sm" style="float:right" onclick="this.parentElement.classList.add('hidden')">×</button>` + html; card.classList.remove('hidden');
+}
+let cerT;
+function cerBusca(q) { clearTimeout(cerT); cerT = setTimeout(() => cerAcende(q), 300); }
+async function cerAcende(q) {
+  const { acesos } = await api('/api/v2/cerebro?q=' + encodeURIComponent(q));
+  C3?.acender(acesos);
+  document.querySelectorAll('.cn').forEach(e => { const on = acesos.some(x => x.id === e.dataset.id); e.style.filter = on ? 'drop-shadow(0 0 6px #e9d29a)' : ''; e.style.background = on && e.classList.contains('ver') ? 'var(--goldbg)' : ''; });
+  document.querySelectorAll('line[data-ag]').forEach(l => l.setAttribute('stroke', acesos.some(x => x.agente === l.dataset.ag) ? '#e9d29a' : '#3a3220'));
+  return acesos;
+}
 
 // ───────── Configurações
 VIEWS.config = async () => {
@@ -571,6 +615,7 @@ async function loadChat() {
 async function chatSend(t) {
   const text = t || $('#cin').value.trim(); if (!text) return; $('#cin').value = '';
   $('#typing').classList.remove('hidden');
+  if (S.view === 'cerebro') cerAcende(text).catch(() => { });
   try { await api('/api/gerente/chat', { body: { text } }); } catch (e) { toast(e.message); }
   await loadChat(); refresh();
 }
