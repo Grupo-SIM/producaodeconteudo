@@ -890,7 +890,7 @@ async function boot() {
   $('#login').hidden = true; $('#app').hidden = false;
   S.st = await api('/state');
   { const q = new URLSearchParams(location.search), emb = q.get('embed'), eid = +q.get('id');   // novo front (app.html): abre só o editor, sem o painel antigo em volta
-    if (emb && eid) { document.body.classList.add('embed'); const st = document.createElement('style'); st.textContent = 'body.embed #app{display:none!important} body.embed{background:#0c0c0d}'; document.head.append(st);
+    if (emb && eid) { document.body.classList.add('embed'); const st = document.createElement('style'); st.textContent = 'body.embed #app{display:none!important} body.embed{background:#0c0c0d;--bg:#0c0c0d;--panel:#0f0f10;--panel2:#141416;--acc:#d9c08a;--acc2:#a8864a} body.embed .btn.primary{background:linear-gradient(135deg,#e9d8a6,#a8864a)!important;color:#141006!important;border:none!important}'; document.head.append(st);
       const fecha = () => parent.postMessage({ tipo: 'editor-fechado', id: eid }, location.origin);
       try { if (emb === 'arte') await arteEditor(eid, fecha); else if (emb === 'video') await videoEditor(eid, fecha); }
       catch (e) { parent.postMessage({ tipo: 'editor-fechado', id: eid, erro: e.message || 'Não consegui abrir o editor' }, location.origin); }
@@ -4331,6 +4331,10 @@ async function arteEditor(id, onClose, opts = {}) {
   };
   // seleção por área (arrastar no fundo) e clique no fundo
   overlay.addEventListener('contextmenu', e => { e.preventDefault(); closeCtx(); });
+  { let pz = null; const dd = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);   // pinça no celular: aumenta ou diminui o elemento selecionado
+    overlay.addEventListener('touchstart', e => { if (e.touches.length !== 2 || !E.sel) return; const o = getObj(E.sel.kind, E.sel.k); if (!o) return; pushUndo('pinch'); pz = { d: dd(e), o, kind: E.sel.kind, size: E.sel.kind === 'text' ? effSize(o) : o.size, w: o.w, h: o.h }; e.preventDefault(); }, { passive: false });
+    overlay.addEventListener('touchmove', e => { if (!pz || e.touches.length !== 2) return; e.preventDefault(); const f = clamp(dd(e) / pz.d, .1, 20); if (pz.kind === 'shape') { pz.o.w = r2(clamp(pz.w * f, .005, 30)); pz.o.h = r2(clamp(pz.h * f, .0005, 30)); } else pz.o.size = Math.round(clamp(pz.size * f, 8, 30000)); soft(); }, { passive: false });
+    overlay.addEventListener('touchend', () => { if (pz) { pz = null; markDirty(); drawPanel(); } }); }
   overlay.addEventListener('pointerdown', e => {
     if (e.target !== overlay) return; e.preventDefault(); const r0 = stage.getBoundingClientRect(), sx = (e.clientX - r0.left) / E.k, sy = (e.clientY - r0.top) / E.k; let rect = null, moved = false; const add = e.shiftKey;
     const mv = ev => { const x = (ev.clientX - r0.left) / E.k, y = (ev.clientY - r0.top) / E.k; if (!moved && Math.hypot(x - sx, y - sy) < 4 / E.k) return; moved = true; if (!rect) { rect = h('div', { class: 'aemq' }); overlay.append(rect); } Object.assign(rect.style, { left: Math.min(x, sx) + 'px', top: Math.min(y, sy) + 'px', width: Math.abs(x - sx) + 'px', height: Math.abs(y - sy) + 'px' }); };
@@ -5290,6 +5294,10 @@ async function videoEditor(id, onClose) {
     Sx.itemEls.forEach((_, k) => mk('item', k)); Sx.blocks.forEach((_, k) => mk('text', k));
   };
   overlay.addEventListener('pointerdown', e => { if (e.target === overlay) select('scene'); });
+  { let pz = null; const dd = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);   // pinça no celular
+    overlay.addEventListener('touchstart', e => { if (e.touches.length !== 2) return; const o = getObj(); if (!o) return; pushUndo('pinch'); pz = { d: dd(e), o, it: E.sel.kind === 'item', size: o.size ?? (E.sel.kind === 'item' ? 420 : 70) }; e.preventDefault(); }, { passive: false });
+    overlay.addEventListener('touchmove', e => { if (!pz || e.touches.length !== 2) return; e.preventDefault(); const f = clamp(dd(e) / pz.d, .1, 20); pz.o.size = Math.round(clamp(pz.size * f, pz.it ? 20 : 12, pz.it ? 20000 : 2400)); soft(); }, { passive: false });
+    overlay.addEventListener('touchend', () => { if (pz) { pz = null; markDirty(); drawPanel(); } }); }
   let lastDown = {};
   const editText = k => {
     if (E.playing) return; const o = getObj('text', k) || cur().text[k], Sx = frame?.contentWindow?.SCENES?.[E.si], r = rectOf('text', Sx, k); if (!o || !r) return;

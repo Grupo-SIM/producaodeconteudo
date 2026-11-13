@@ -249,7 +249,7 @@ function renderSide() {
     <button class="nv ${['marcas', 'produtos', 'otimizacao', 'config', 'mais'].includes(S.view) && isMobile() ? 'on' : ''}" style="${isMobile() ? '' : 'display:none'}" onclick="go('mais')">${ico('mais')}<span>Mais</span></button>
     <div class="who">${esc(S.me?.name || '')} · <a href="#" onclick="logout();return false">sair</a></div>`;
 }
-function go(v) { if (v !== 'cerebro') { C3?.destruir(); C3 = null; } if (v !== 'fluxo') { E3?.destruir(); E3 = null; } S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); }
+function go(v) { if (v !== 'cerebro') { C3?.destruir(); C3 = null; } if (v !== 'fluxo') { E3?.destruir(); E3 = null; } S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); if (['fluxo', 'mesa', 'publicacao'].includes(v)) refresh().catch(() => { }); }
 async function logout() { await api('/api/logout', { body: {} }).catch(() => { }); location.reload(); }
 const VIEWS = {};
 function render() { (VIEWS[S.view] || VIEWS.fluxo)(); }
