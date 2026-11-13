@@ -7901,8 +7901,9 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/logo-agentes-sim.png') { try { const b = fs.readFileSync(path.join(__dirname, 'public', 'logo-agentes-sim.png')); res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'public, max-age=3600' }); return res.end(b); } catch { res.writeHead(404); return res.end(); } }
     if (url.pathname === '/briefing-cliente-servico.docx') { try { const b = fs.readFileSync(path.join(__dirname, 'briefing-cliente-servico.docx')); res.writeHead(200, { 'content-type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'content-disposition': 'attachment; filename="briefing-cliente-servico.docx"', 'cache-control': 'no-cache' }); return res.end(b); } catch { res.writeHead(404); return res.end(); } }
     if (url.pathname === '/arte-slide.js') { res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-cache' }); return res.end(fs.readFileSync(path.join(__dirname, 'public', 'arte-slide.js'))); }
-    if (url.pathname === '/app' || url.pathname === '/app.html') return send(res, 200, fs.readFileSync(path.join(__dirname, 'public', 'app.html'), 'utf8'));
-    if (url.pathname === '/' || url.pathname === '/index.html') return send(res, 200, fs.readFileSync(indexFile, 'utf8'));
+    // Novo front é a página principal; o painel antigo segue em /antigo e hospeda os editores de arte e vídeo (?embed=arte|video)
+    if ((url.pathname === '/' && !url.searchParams.get('embed')) || url.pathname === '/app' || url.pathname === '/app.html') return send(res, 200, fs.readFileSync(path.join(__dirname, 'public', 'app.html'), 'utf8'));
+    if (url.pathname === '/' || url.pathname === '/antigo' || url.pathname === '/index.html') return send(res, 200, fs.readFileSync(indexFile, 'utf8'));
     return send(res, 404, { error: 'Não encontrado' });
   } catch (e) {
     if (!e.status) console.error(`${new Date().toISOString()} [http] ERRO ${req.method} ${req.url}:`, e); else if (e.status >= 400) dlog('http', `${req.method} ${String(req.url).split('?')[0]} recusada ${e.status}: ${e.message}`);

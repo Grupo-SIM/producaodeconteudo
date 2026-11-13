@@ -156,7 +156,7 @@ function buildItem(it,parent,theme){
   const inner=el('div',(it.shadow===false?'':'shadow'),wrap);
   const sz=it.size||420;
   if(it.type==='emoji'){inner.classList.add('emoji');inner.style.fontSize=sz+'px';inner.textContent=it.value}
-  else if(it.type==='img'){const im=el('img','',inner);im.src=it.src;im.style.width=sz+'px';im.style.display='block'}
+  else if(it.type==='img'){const im=el('img','',inner);im.src=it.src;im.style.width=sz+'px';im.style.display='block';const cp=it.crop;if(cp)im.style.clipPath=`inset(${(cp.t||0)*100}% ${(cp.r||0)*100}% ${(cp.b||0)*100}% ${(cp.l||0)*100}%)`}
   else if(it.type==='card'){inner.innerHTML=`<div class="card" style="position:relative"><div class="pin"></div><h3>${it.title}</h3>${(it.items||[]).map(x=>`<div class="ci">${cardMark(x.icon)}<span>${x.text}</span></div>`).join('')}</div>`;inner.style.transform=`scale(${sz/420})`}
   else if(it.type==='profile'){inner.innerHTML=`<div class="profile"><div class="top"><span>${it.handle} ⌄</span><span style="opacity:.8;font-size:34px">＋ ☰</span></div><div class="row"><div class="av emoji">${it.avatar||'🙂'}</div><div><div class="nm">${it.name||''}</div><div class="st"><span><b>${it.posts||0}</b>posts</span><span><b>${it.followers||0}</b>seguidores</span><span><b>${it.following||0}</b>seguindo</span></div></div></div><div class="bio">${(it.bio||[]).join('<br>')}</div></div>`;inner.style.transform=`scale(${sz/900})`}
   else if(it.type==='gradientWord'){inner.classList.add('gword');inner.style.fontSize=sz+'px';inner.textContent=it.text}
@@ -372,11 +372,11 @@ function renderAt(t){
   document.getElementById('turb').setAttribute('seed',Math.floor(t*24)%97+1);
   let idx=SCENES.findIndex(S=>t>=S.t0&&t<S.t0+S.dur);if(idx<0)idx=SCENES.length-1;
   SCENES.forEach(S=>{S.sc.style.display='none';S.sc.style.clipPath='';S.sc.style.opacity=1;S.sc.style.filter='';S.sc.style.transform='';if(S.ring)S.ring.style.display='none'});
-  const S=SCENES[idx],lt=t-S.t0;
-  S.sc.style.display='block';renderScene(S,lt);
+  const S=SCENES[idx],lt=t-S.t0,vel=X=>Math.max(.25,Math.min(4,+X.s.speed||1));
+  S.sc.style.display='block';renderScene(S,lt*vel(S));
   const tr=S.tr,P=SCENES[idx-1];
   if(P&&tr.type!=='none'&&tr.type!=='cut'&&lt<tr.dur){
-    const p=lt/tr.dur;P.sc.style.display='block';renderScene(P,P.dur+lt);
+    const p=lt/tr.dur;P.sc.style.display='block';renderScene(P,(P.dur+lt)*vel(P));
     if(tr.type==='fade'){S.sc.style.opacity=E.inOutCubic(p);P.sc.style.filter=`blur(${p*10}px)`}
     else if(tr.type==='dim'){P.sc.style.filter=`brightness(${1-.75*E.inCubic(p)}) blur(${p*6}px)`;S.sc.style.opacity=E.inCubic(clamp((p-.45)/.55))}
     else if(tr.type==='zoom'){P.sc.style.transform=`scale(${1+.5*E.inCubic(p)})`;P.sc.style.filter=`blur(${p*18}px)`;S.sc.style.opacity=E.outCubic(clamp((p-.3)/.7));S.sc.style.transform=`scale(${lerp(1.18,1,E.outExpo(p))})`}

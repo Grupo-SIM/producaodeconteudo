@@ -54,6 +54,10 @@ execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'lavfi', '-i', 'anoise
   '-af', "highpass=f=400,lowpass=f=5000,volume='0.2+1.6*sin(PI*t/0.55)':eval=frame,afade=t=out:st=0.4:d=0.15", path.join(work, 'whoosh.wav')]);
 
 const inputs = [], filters = [], mixes = [];
+// controles de áudio do editor: volume separado de voz, música e efeitos (0 a 2), entrada/saída suave e trechos silenciados
+const AU = spec.audio || {}, vNum = (v, d) => Number.isFinite(+v) ? Math.max(0, Math.min(2, +v)) : d;
+const VV = vNum(AU.voz, 1), VM = vNum(AU.musica, 1), VE = vNum(AU.efeitos, 1), FIN = Math.max(0, Math.min(10, +AU.fade_in || 0)), FOUT = Math.max(0, Math.min(10, +AU.fade_out || 0));
+const MUTE = (Array.isArray(AU.mute) ? AU.mute : []).filter(m => Array.isArray(m) && +m[1] > +m[0]).slice(0, 20).map(([a, b]) => `volume=enable='between(t,${(+a).toFixed(2)},${(+b).toFixed(2)})':volume=0`);
 let n = 0;
 const add = f => { inputs.push('-i', f); return n++; };
 const voice = opt('--voice'), music = opt('--music');
@@ -65,22 +69,28 @@ if (!has('--no-sfx')) {
   for (const [k, ts] of Object.entries(byKind)) {
     const i = add(path.join(work, k + '.wav'));
     const labels = ts.map((_, j) => `[${k}${j}]`);
-    filters.push(`[${i}:a]volume=${vol[k]},asplit=${ts.length}${labels.join('')}`);
+    filters.push(`[${i}:a]volume=${(vol[k] * VE).toFixed(3)},asplit=${ts.length}${labels.join('')}`);
     ts.forEach((t, j) => { filters.push(`${labels[j]}adelay=${Math.round(t * 1000)}:all=1[${k}d${j}]`); mixes.push(`[${k}d${j}]`); });
   }
 }
-if (voice) { const i = add(voice); filters.push(`[${i}:a]volume=1.0[vo]`); mixes.push('[vo]'); }
+if (voice) { const i = add(voice); filters.push(`[${i}:a]volume=${VV}[vo]`); mixes.push('[vo]'); }
 if (music) {
   const i = add(music);
-  filters.push(`[${i}:a]atrim=0:${total},asetpts=N/SR/TB,volume=${voice ? 0.22 : 0.6},afade=t=in:d=0.3,afade=t=out:st=${Math.max(0, total - 1.2)}:d=1.2[mu]`);
+  filters.push(`[${i}:a]atrim=0:${total},asetpts=N/SR/TB,volume=${((voice ? 0.22 : 0.6) * VM).toFixed(3)},afade=t=in:d=0.3,afade=t=out:st=${Math.max(0, total - 1.2)}:d=1.2[mu]`);
   mixes.push('[mu]');
 }
 if (!mixes.length) { fs.copyFileSync(silent, out); }
 else {
-  filters.push(`${mixes.join('')}amix=inputs=${mixes.length}:normalize=0:dropout_transition=0,atrim=0:${total},alimiter=limit=0.8[aout]`);
+  filters.push(`${mixes.join('')}amix=inputs=${mixes.length}:normalize=0:dropout_transition=0,atrim=0:${total}${FIN ? `,afade=t=in:d=${FIN}` : ''}${FOUT ? `,afade=t=out:st=${Math.max(0, total - FOUT)}:d=${FOUT}` : ''}${MUTE.length ? ',' + MUTE.join(',') : ''},alimiter=limit=0.8[aout]`);
   const vi = n;
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-i', silent, '-filter_complex', filters.join(';'),
     '-map', `${vi}:v`, '-map', '[aout]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', out]);
+}
+const FMT = spec.formato || spec.aspect || '9:16';
+if (FMT === '1:1' || FMT === '16:9') {
+  const tmp = path.join(work, 'fmt.mp4'); fs.renameSync(out, tmp);
+  const vf = FMT === '1:1' ? `crop=iw:iw:0:'min(ih-iw,max(0,ih*${Math.max(0, Math.min(1, +spec.formato_y || 0.5))}-iw/2))'` : '[0:v]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=30:3[bg];[0:v]scale=-2:1080[fg];[bg][fg]overlay=(W-w)/2:0';
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, ...(FMT === '1:1' ? ['-vf', vf] : ['-filter_complex', vf]), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-c:a', 'copy', '-movflags', '+faststart', out]);
 }
 fs.rmSync(work, { recursive: true, force: true });
 console.log('OK →', out);

@@ -3,6 +3,25 @@
 Painel CRM + equipe de agentes (Roteirista, Designer, Editor de Vídeo, Revisor, Social Media) que trabalha sozinha no seu servidor.
 **Sem dependências:** só Node 22+ (usa SQLite e `fetch` nativos). São 2 arquivos de código: `server.js` e `public/index.html`.
 
+## Novo painel (reformulação do front)
+
+A página principal (`/`) agora é o painel novo (`public/app.html`), em grafite e champanhe, com versão de celular.
+
+- **Menu:** Fluxo, Mesa de revisão, Publicação, Marcas, Produtos, Otimização, Cérebro e Configurações. No celular, barra embaixo (Fluxo, Revisão, Publicar, Cérebro e Mais).
+- **Chat do gerente:** fixo à direita no computador; no celular, bolinha flutuante com contador e gaveta.
+- **Fluxo:** uma raia por formato (Carrossel, Estático, Stories de venda, Reels, Matéria de jornal, Post de blog), com meta por dia e Manual/Automático. O botão Escritório mostra o escritório 3D ligado ao estado real dos agentes, com telão do YouTube.
+- **Status de um item:** etapa do agente, Esperando você, Em ajuste, Parado, Na fila e Finalizado.
+- **Mesa de revisão:** aprovar no cartão ou abrir o editor (texto, arte estilo Canva, vídeo estilo CapCut). Ao aprovar uma peça que você editou, o gerente grava uma regra e oferece "Desfazer" no chat.
+- **Publicação:** manual (baixar, copiar legenda, marcar postado com link) e agenda.
+- **Otimização:** só itens postados, com ranking, lançamento de métricas e descobertas que viram regra.
+- **Cérebro:** 3D, Constelação ou Lista; a busca e as perguntas no chat acendem os arquivos usados.
+- **Extras:** notificações, busca geral, histórico de versões com "voltar" e lixeira.
+- **Treino:** os arquivos de `conhecimento/agentes` entram no sistema ao iniciar; as regras aprendidas são gravadas em `conhecimento/aprendido/` (faça commit dessa pasta para levá-las ao GitHub).
+
+API nova em `/api/v2/` (código em `fluxo-v2.mjs`). O painel antigo continua em `/antigo` e hospeda os editores de arte e vídeo, que o painel novo abre embutidos.
+
+Editor de vídeo, novidades: velocidade por cena, recorte de imagem, volume separado de voz, música e efeitos, entrada e saída suaves, silenciar a cena e formato 9:16, 1:1 ou 16:9.
+
 ## Dois jeitos de usar
 
 **Modo chat (padrão, sem API e sem custo extra):** o painel organiza tudo — pipeline, base de conhecimento, revisões, métricas — e, a cada etapa, monta o **pedido pronto** para o papel certo (Roteirista, Revisor, Designer, Editor, Social Media). Você copia o pedido, cola no chat com o Claude, e cola a resposta de volta no painel. O painel valida a resposta e cria a próxima etapa sozinho.
