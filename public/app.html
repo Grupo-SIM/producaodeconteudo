@@ -491,7 +491,7 @@ async function escritorio3d(head, ban) {
     <div class="eesp"><b>Esperando você: ${esp.length}</b><span>${esp.slice(0, 3).map(i => esc(i.titulo)).join(' · ')}${esp.length > 3 ? ' · +' + (esp.length - 3) : ''}</span><a href="#" onclick="go('mesa');return false">Abrir Mesa de revisão ›</a></div>`;
   const feed = st.activity.slice(0, 4).map(x => `<div><span>${ha(x.ts).replace('há ', '')}</span> ${esc(x.message)}</div>`).join('');
   if (E3 && $('#esc')) { $('#eshud').innerHTML = hud; $('#escfeed').innerHTML = feed; E3.atualizar(st.agents, parados, info); return; }
-  const vid = store.get('telao', 'jfKfPfyJRdk'), on = store.get('telaoOn', true);
+  const vid = store.get('telao2', 'GG1XOAZ9Vd0'), on = store.get('telaoOn', true);
   $('#main').innerHTML = `<div id="escw">${ban}${head}
     <div id="esc"></div><div id="eshud">${hud}</div><div id="escfeed" class="escf">${feed}</div></div>`;
   try {
@@ -500,8 +500,8 @@ async function escritorio3d(head, ban) {
     E3.atualizar(st.agents, parados, info); if (on) E3.telaoVideo(vid);
   } catch (e) { $('#esc').innerHTML = `<div class="empty">Sem 3D neste aparelho (${esc(e.message)}).</div>`; }
 }
-function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', on); E3?.telaoVideo(on ? store.get('telao', 'jfKfPfyJRdk') : ''); event.target.textContent = on ? 'Desligar telão' : 'Ligar telão'; }
-function trocaVideo() { const u = prompt('Link ou ID do vídeo do YouTube para o telão', store.get('telao', '')); const id = ytId(u); if (!id) return; store.set('telao', id); store.set('telaoOn', true); E3?.telaoVideo(id); }
+function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', on); E3?.telaoVideo(on ? store.get('telao2', 'GG1XOAZ9Vd0') : ''); event.target.textContent = on ? 'Desligar telão' : 'Ligar telão'; }
+function trocaVideo() { const u = prompt('Link ou ID do vídeo do YouTube para o telão', store.get('telao2', 'GG1XOAZ9Vd0')); const id = ytId(u); if (!id) return; store.set('telao2', id); store.set('telaoOn', true); E3?.telaoVideo(id); }
 function telaCheia() { const w = $('#escw'); document.fullscreenElement ? document.exitFullscreen() : w.requestFullscreen?.(); }
 
 
