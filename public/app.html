@@ -146,6 +146,9 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .pop{position:absolute;right:0;top:110%;width:340px;max-height:420px;overflow:auto;background:#111113;border:1px solid var(--line2);border-radius:12px;padding:6px;z-index:40;box-shadow:0 20px 40px #000a}
 .pop .it{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px}.pop .it:hover{background:#1a1a1d}.pop .it small{display:block;color:var(--tx3)}.pop .it.nova{border-left:2px solid var(--gold)}
 .gsearch{position:relative}.gsearch input{width:220px}
+.esch{position:absolute;display:flex;gap:6px;z-index:5;flex-wrap:wrap}.esch>div{background:#111113e0;border:1px solid var(--line2);border-radius:10px;padding:6px 10px;font-size:11.5px;color:var(--tx2)}.esch b{color:var(--tx);font-size:16px;margin-right:4px}
+.escf{position:absolute;left:12px;bottom:12px;width:300px;display:flex;flex-direction:column;gap:4px;z-index:5}.escf div{background:#111113e0;border:1px solid var(--line2);border-radius:8px;padding:5px 9px;font-size:11.5px}.escf small{display:block;color:var(--tx3);font-size:10px}
+#escw:fullscreen{border-radius:0}
 .mnav{display:none;gap:8px;justify-content:center;margin-top:10px}
 /* ---------- celular ---------- */
 @media (max-width:760px){
@@ -166,6 +169,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
   .fab .cnt{position:absolute;top:-4px;right:-4px;background:#e06060;color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
   .fab .cnt:empty{display:none}
   .grid{grid-template-columns:1fr}
+  .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
   .lstwrap{overflow-x:auto}
   .cal{display:none}
@@ -245,7 +249,7 @@ function renderSide() {
     <button class="nv ${['marcas', 'produtos', 'otimizacao', 'config', 'mais'].includes(S.view) && isMobile() ? 'on' : ''}" style="${isMobile() ? '' : 'display:none'}" onclick="go('mais')">${ico('mais')}<span>Mais</span></button>
     <div class="who">${esc(S.me?.name || '')} · <a href="#" onclick="logout();return false">sair</a></div>`;
 }
-function go(v) { if (v !== 'cerebro') { C3?.destruir(); C3 = null; } S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); }
+function go(v) { if (v !== 'cerebro') { C3?.destruir(); C3 = null; } if (v !== 'fluxo') { E3?.destruir(); E3 = null; } S.view = v; location.hash = v; renderSide(); render(); window.scrollTo(0, 0); }
 async function logout() { await api('/api/logout', { body: {} }).catch(() => { }); location.reload(); }
 const VIEWS = {};
 function render() { (VIEWS[S.view] || VIEWS.fluxo)(); }
@@ -320,10 +324,11 @@ function colunaDe(i, etapas) {
 VIEWS.fluxo = () => {
   const F = S.fluxo; if (!F) return;
   const head = `<div class="top"><h1>Fluxo</h1>${topo()}
-    <div class="tog"><button class="${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');render()">Lista</button><button class="${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button></div>
+    <div class="tog"><button class="${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');E3?.destruir();E3=null;render()">Lista</button><button class="${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button></div>
     ${marcaSel()}<button class="btn ok" onclick="novoConteudo()">+ Novo conteúdo</button></div>`;
   const ban = F.avisos.length ? `<div class="ban"><b>⚠ ${F.avisos.length} item(ns) parado(s)</b><span>${esc(F.avisos[0].titulo)}: ${esc(F.avisos[0].motivo || '')}</span><button class="btn sm" style="margin-left:auto" onclick="abrirItem(${F.avisos[0].id})">Ver</button></div>` : '';
-  if (S.modoFluxo === 'escritorio') { $('#main').innerHTML = head + ban + escritorio(); return; }
+  if (S.modoFluxo === 'escritorio') return escritorio3d(head, ban);
+  E3?.destruir(); E3 = null;
   const lanes = F.formatos.filter(f => f.ativo).map(f => {
     const its = F.itens.filter(i => i.raia === f.id), aberta = S.abertas[f.id] ?? its.length > 0;
     const etapas = f.etapas, cols = [...etapas, 'fim'];
@@ -340,12 +345,29 @@ VIEWS.fluxo = () => {
 };
 function raia(id) { const el = event.currentTarget.parentElement; el.classList.toggle('open'); S.abertas[id] = el.classList.contains('open'); store.set('raiasAbertas', S.abertas); }
 const setFormato = (id, b) => tryDo(() => api('/api/v2/formatos/' + id, { method: 'PUT', body: b }));
-function escritorio() {
-  const ag = {}; for (const i of S.fluxo.itens) if (i.estado === 'etapa' || i.estado === 'ajuste') (ag[i.etapa] ||= []).push(i);
-  const nomes = { roteirista: 'Roteirista', gerente: 'Gerente', designer: 'Designer', editor: 'Editor de vídeo', publicador: 'Social Media', radar: 'Radar' };
-  return `<div class="grid">${Object.entries(nomes).map(([k, n]) => `<div class="box"><b>${n}</b> <span class="pill ${ag[k]?.length ? 'etapa' : ''}">${ag[k]?.length ? 'trabalhando' : 'descansando'}</span><div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">${(ag[k] || []).slice(0, 4).map(cartao).join('') || '<span class="small muted">Sem tarefa agora</span>'}</div></div>`).join('')}</div>
-    <p class="small muted" style="margin-top:12px">O escritório 3D completo chega na Etapa 7. Esta visão já mostra o estado real de cada agente.</p>`;
+let E3 = null;
+const ytId = u => { u = String(u || '').trim(); const m = u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{6,})/); return m ? m[1] : /^[\w-]{6,}$/.test(u) ? u : ''; };
+async function escritorio3d(head, ban) {
+  const st = await api('/api/state');
+  const parados = new Set(S.fluxo.itens.filter(i => i.estado === 'parado' && i.etapa).map(i => i.etapa));
+  const hud = () => { const F = S.fluxo.itens; return `<div><b>${st.agents.filter(a => a.working).length}</b> trabalhando</div><div><b>${F.filter(i => i.estado === 'esperando').length}</b> esperando você</div><div><b>${F.filter(i => i.estado === 'parado').length}</b> parados</div><div><b>${F.filter(i => i.estado === 'finalizado').length}</b> finalizados</div>`; };
+  const feed = () => st.activity.slice(0, 4).map(x => `<div>${esc(x.message)}<small>${fmtD(x.ts)}</small></div>`).join('');
+  if (E3 && $('#esc')) { $('#eschud').innerHTML = hud(); $('#escfeed').innerHTML = feed(); E3.atualizar(st.agents, parados); return; }
+  const vid = store.get('telao', 'jfKfPfyJRdk'), on = store.get('telaoOn', true);
+  $('#main').innerHTML = head + ban + `<div id="escw" style="position:relative;height:calc(100vh - 140px);min-height:440px;border-radius:16px;overflow:hidden;border:1px solid var(--line)">
+    <div id="esc" style="position:absolute;inset:0"></div>
+    <div id="eschud" class="esch" style="left:12px;top:12px">${hud()}</div>
+    <div id="escfeed" class="escf">${feed()}</div>
+    <div class="esch" style="right:12px;top:12px"><button class="btn sm" onclick="telao()">${on ? 'Desligar telão' : 'Ligar telão'}</button><button class="btn sm" onclick="trocaVideo()">Vídeo</button><button class="btn sm" onclick="telaCheia()">Tela cheia</button></div></div>`;
+  try {
+    const { criarEscritorio } = await import('/escritorio-v2.js');
+    E3 = criarEscritorio($('#esc'), { onPick: id => { const its = S.fluxo.itens.filter(i => i.etapa === id && ['etapa', 'ajuste', 'parado'].includes(i.estado)); if (its[0]) abrirItem(its[0].id); else toast('Sem tarefa agora'); } });
+    E3.atualizar(st.agents, parados); if (on) E3.telaoVideo(vid);
+  } catch (e) { $('#esc').innerHTML = `<div class="empty">Sem 3D neste aparelho (${esc(e.message)}).</div>`; }
 }
+function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', on); E3?.telaoVideo(on ? store.get('telao', 'jfKfPfyJRdk') : ''); event.target.textContent = on ? 'Desligar telão' : 'Ligar telão'; }
+function trocaVideo() { const u = prompt('Link ou ID do vídeo do YouTube para o telão', store.get('telao', '')); const id = ytId(u); if (!id) return; store.set('telao', id); store.set('telaoOn', true); E3?.telaoVideo(id); }
+function telaCheia() { const w = $('#escw'); document.fullscreenElement ? document.exitFullscreen() : w.requestFullscreen?.(); }
 
 // ───────── Novo conteúdo
 function novoConteudo() {
