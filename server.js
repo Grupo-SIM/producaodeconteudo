@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import zlib from 'node:zlib';
 import os from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
+import { criarFluxoV2 } from './fluxo-v2.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import dns from 'node:dns';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -5947,6 +5948,8 @@ const PERM_PRESETS = {
 };
 const AREA_RULES = [   // [rota, áreas que podem ler, áreas que podem escrever]
   [/^\/api\/gerente/, ['chefe'], ['chefe']],
+  [/^\/api\/v2\/regras/, ['brain', 'chefe'], ['brain', 'chefe']],
+  [/^\/api\/v2\//, ['pipeline', 'dashboard', 'office', 'video', 'arte'], ['pipeline', 'video', 'dashboard']],
   [/^\/api\/(contents|jobs)/, ['pipeline', 'dashboard', 'office', 'video', 'arte'], ['pipeline', 'video', 'dashboard']],
   [/^\/api\/video-tests?/, ['video'], ['video']],
   [/^\/api\/cortes/, ['video'], ['video']],
@@ -6455,6 +6458,8 @@ function contentAct(id, act, b = {}) {
   }
 }
 
+const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro });
+
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;
   const ip = clientIp(req);
@@ -6527,6 +6532,8 @@ async function api(req, res, url) {
     return;
   }
   if (p === '/api/state' && m === 'GET') return send(res, 200, stateSnapshot());
+
+  if (p.startsWith('/api/v2/')) return fluxoV2.rota(req, res, p, m, user);
 
   // ── Conteúdos
   let mt;
@@ -7894,6 +7901,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/logo-agentes-sim.png') { try { const b = fs.readFileSync(path.join(__dirname, 'public', 'logo-agentes-sim.png')); res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'public, max-age=3600' }); return res.end(b); } catch { res.writeHead(404); return res.end(); } }
     if (url.pathname === '/briefing-cliente-servico.docx') { try { const b = fs.readFileSync(path.join(__dirname, 'briefing-cliente-servico.docx')); res.writeHead(200, { 'content-type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'content-disposition': 'attachment; filename="briefing-cliente-servico.docx"', 'cache-control': 'no-cache' }); return res.end(b); } catch { res.writeHead(404); return res.end(); } }
     if (url.pathname === '/arte-slide.js') { res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-cache' }); return res.end(fs.readFileSync(path.join(__dirname, 'public', 'arte-slide.js'))); }
+    if (url.pathname === '/app' || url.pathname === '/app.html') return send(res, 200, fs.readFileSync(path.join(__dirname, 'public', 'app.html'), 'utf8'));
     if (url.pathname === '/' || url.pathname === '/index.html') return send(res, 200, fs.readFileSync(indexFile, 'utf8'));
     return send(res, 404, { error: 'Não encontrado' });
   } catch (e) {
