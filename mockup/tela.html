@@ -1,0 +1,95 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif}
+body{background:#0e1117;color:#e7e9ee;width:1920px;height:1080px;display:flex}
+.side{width:64px;background:#0a0c11;border-right:1px solid #222836;display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:18px}
+.ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#8a93a6;font-size:18px}.ic.on{background:#1f2633;color:#fff}
+.chat{width:380px;border-right:1px solid #222836;display:flex;flex-direction:column}
+.h{padding:16px 18px;border-bottom:1px solid #222836;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.sel{font-size:12px;background:#1a202b;padding:5px 10px;border-radius:8px;color:#aab}
+.msgs{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;font-size:13.5px;line-height:1.45}
+.m{padding:10px 13px;border-radius:12px;max-width:88%}.u{background:#2b5cff;align-self:flex-end}.g{background:#1a202b}
+.g small{display:block;color:#7fd1a0;margin-top:6px;font-size:11.5px}
+.in{margin:14px;padding:12px 14px;background:#1a202b;border-radius:12px;color:#77808f;font-size:13px}
+.flow{flex:1;padding:18px 22px;overflow:hidden}
+.cols{display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;font-size:11px;color:#8a93a6;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.cols div.me{color:#ffc857}
+.row{display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;margin-bottom:10px;align-items:stretch}
+.ag{background:#151a23;border:1px solid #222836;border-radius:12px;padding:10px 12px}
+.ag b{display:block;font-size:14px}.ag span{font-size:11.5px;color:#8a93a6}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 8px #3ddc84}
+.idle{background:#555}
+.cell{background:#11151d;border:1px dashed #222836;border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:6px;min-height:76px}
+.cell.me{background:#1d1a10;border-color:#4a3f1a}
+.c{background:#1a202b;border-radius:9px;padding:7px 9px;font-size:12px;border-left:3px solid #2b5cff}
+.c i{font-style:normal;font-size:10.5px;color:#8a93a6;display:block}
+.c.w{border-color:#3ddc84}.c.y{border-color:#ffc857}.c.d{border-color:#666;opacity:.6}.c.sel{outline:2px solid #ffc857}
+.bar{height:4px;background:#2a3140;border-radius:3px;margin-top:5px}.bar u{display:block;height:4px;background:#3ddc84;border-radius:3px}
+.rev{width:640px;background:#12161e;border-left:1px solid #2c3445;display:flex;flex-direction:column}
+.ask{margin:12px 16px;display:flex;gap:8px}.ask div{flex:1;background:#1a202b;border:1px solid #2b5cff55;border-radius:10px;padding:10px 12px;font-size:13px;color:#8a93a6}
+.btn{padding:10px 14px;border-radius:10px;font-weight:700;font-size:13px}.ok{background:#3ddc84;color:#06200f}.gh{background:#1f2633;color:#ccd}
+.canvas{margin:0 16px;flex:1;display:grid;grid-template-columns:52px 1fr 170px;gap:10px}
+.tools{background:#1a202b;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:12px;color:#aab;font-size:16px}
+.art{background:#1a202b;border-radius:10px;display:grid;place-items:center}
+.post{width:330px;height:412px;border-radius:6px;background:linear-gradient(160deg,#0d2a5c,#071226);position:relative;padding:26px;overflow:hidden}
+.post .t{font-size:30px;font-weight:800;line-height:1.05;color:#fff;border:1.5px dashed #ffc857;padding:4px;position:relative}
+.post .t:after{content:"";position:absolute;right:-5px;bottom:-5px;width:8px;height:8px;background:#ffc857}
+.post p{margin-top:12px;font-size:13px;color:#bcd}
+.post .logo{position:absolute;bottom:20px;left:26px;font-weight:800;color:#ffc857}
+.post .circ{position:absolute;right:-40px;bottom:-40px;width:180px;height:180px;border-radius:50%;background:#2b5cff55}
+.props{background:#1a202b;border-radius:10px;padding:10px;font-size:11.5px;color:#9aa}
+.props b{display:block;color:#ddd;margin:8px 0 4px}.props div{background:#11151d;border-radius:6px;padding:5px 7px;margin-bottom:5px}
+.layers{margin:10px 16px;background:#1a202b;border-radius:10px;padding:8px 10px;font-size:12px;color:#aab;display:flex;gap:6px}
+.layers span{background:#11151d;padding:4px 8px;border-radius:6px}.layers span.on{background:#3a3214;color:#ffc857}
+.learn{margin:0 16px 14px;background:#0f2418;border:1px solid #1f5a36;border-radius:10px;padding:9px 12px;font-size:12px;color:#8fe0b0}
+.foot{display:flex;gap:8px;padding:0 16px 16px;justify-content:flex-end}
+.tabs{display:flex;gap:6px;padding:0 16px}.tabs span{font-size:12px;padding:6px 10px;border-radius:8px;background:#1a202b;color:#889}.tabs span.on{background:#2b5cff;color:#fff}
+</style></head><body>
+<div class="side"><div class="ic on">▦</div><div class="ic">🧠</div><div class="ic" style="margin-top:auto;margin-bottom:18px">⚙</div></div>
+<div class="chat"><div class="h">Gerente <span class="sel">Todas as marcas ▾</span></div>
+<div class="msgs">
+<div class="m u">Faz 3 carrosséis da PagaTG sobre renda extra e 1 vídeo de 30s.</div>
+<div class="m g">Feito. Roteirista já começou os 3 roteiros e o editor pegou o vídeo. Te aviso quando chegar na sua aprovação.</div>
+<div class="m g">👀 Vi que você trocou o título da arte "5 erros…" de 42 para 30 caracteres e subiu o contraste do texto.<small>✓ Regra salva: Designer · PagaTG · "Títulos até 32 caracteres, texto sempre com contraste alto"</small></div>
+<div class="m u">Isso. E o roteirista tá usando muito "você sabia".</div>
+<div class="m g">Anotado.<small>✓ Regra salva: Roteirista · Todas · "Evitar abrir com 'você sabia'"</small></div>
+</div><div class="in">Fale com o gerente…</div></div>
+<div class="flow">
+<div class="h" style="padding:0 0 14px;border:0">Fluxo ao vivo <span class="sel"><span class="live"></span>atualizando em tempo real</span></div>
+<div class="cols"><div>Agente</div><div>Fazendo agora</div><div class="me">✋ Minha aprovação</div><div>Próxima etapa</div><div class="me">✋ Aprovação final</div><div>Postagem</div><div>✅ Finalizado</div></div>
+<div class="row"><div class="ag"><b><span class="live"></span>Roteirista</b><span>escrevendo 2 de 3</span></div>
+<div class="cell"><div class="c w">Renda extra: 5 ideias<i>PagaTG · escrevendo</i><div class="bar"><u style="width:62%"></u></div></div><div class="c w">Pix parcelado<i>PagaTG · na fila</i></div></div>
+<div class="cell me"><div class="c y">Corte dos Ricos #12<i>roteiro pronto · editar</i></div></div>
+<div class="cell"><div class="c">→ Designer</div></div><div class="cell"></div><div class="cell"></div><div class="cell"><div class="c d">Juros compostos<i>postado 12/11</i></div></div></div>
+<div class="row"><div class="ag"><b><span class="live"></span>Designer</b><span>montando carrossel</span></div>
+<div class="cell"><div class="c w">Cartão sem anuidade<i>PagaTG · slide 4/7</i><div class="bar"><u style="width:55%"></u></div></div></div>
+<div class="cell"></div><div class="cell"></div>
+<div class="cell me"><div class="c y sel">5 erros com cartão<i>arte pronta · revisando ←</i></div><div class="c y">Meta de 2027<i>arte pronta</i></div></div>
+<div class="cell"><div class="c">Reserva de emergência<i>aguardando postar</i></div></div><div class="cell"><div class="c d">Score alto<i>postado · link</i></div></div></div>
+<div class="row"><div class="ag"><b><span class="live"></span>Editor de vídeo</b><span>renderizando</span></div>
+<div class="cell"><div class="c w">Renda extra 30s<i>cortando · 00:18/00:30</i><div class="bar"><u style="width:60%"></u></div></div></div>
+<div class="cell"></div><div class="cell"></div>
+<div class="cell me"><div class="c y">Reels: 3 dicas<i>vídeo pronto · revisar</i></div></div>
+<div class="cell"></div><div class="cell"><div class="c d">Shorts Pix<i>postado 11/11</i></div></div></div>
+<div class="row"><div class="ag"><b><span class="live"></span>Agente de Notícias</b><span>lendo 14 fontes</span></div>
+<div class="cell"><div class="c w">Selic subiu 0,25<i>matéria · escrevendo</i></div></div>
+<div class="cell me"><div class="c y">Novo Pix automático<i>matéria pronta · editar</i></div></div>
+<div class="cell"></div><div class="cell"></div><div class="cell"><div class="c">Taxa do cartão<i>aguardando site</i></div></div><div class="cell"><div class="c d">IR 2027<i>publicado no site</i></div></div></div>
+<div class="row"><div class="ag"><b><span class="live"></span>Revisor / SEO</b><span>checando título</span></div>
+<div class="cell"><div class="c w">Selic subiu 0,25<i>SEO · palavras-chave</i></div></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+<div class="row"><div class="ag"><b><span class="live idle"></span>Publicador</b><span>próxima: 18h</span></div>
+<div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"><div class="c">2 itens na fila<i>Instagram · Pinterest</i></div></div><div class="cell"></div></div>
+</div>
+<div class="rev">
+<div class="h">Revisão · "5 erros com cartão" <span class="sel">Designer · PagaTG · ✕</span></div>
+<div class="ask"><div>💬 Pedir ajuste ao gerente: "troca a cor do fundo para verde e refaz o slide 3"…</div><span class="btn gh">Enviar</span></div>
+<div class="tabs"><span class="on">Slide 1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+<div style="height:10px"></div>
+<div class="canvas">
+<div class="tools"><span>T</span><span>▭</span><span>◯</span><span>🖼</span><span>↶</span><span>↷</span></div>
+<div class="art"><div class="post"><div class="circ"></div><div class="t">5 erros que<br>travam seu cartão</div><p>Arrasta pro lado e confere se você comete algum →</p><div class="logo">PagaTG</div></div></div>
+<div class="props"><b>Texto selecionado</b><div>Montserrat ExtraBold</div><div>Tamanho 30 · ⬅ era 34</div><div>Cor #FFFFFF</div><b>Posição</b><div>X 26 · Y 26</div><b>Fundo</b><div>Gradiente azul</div></div>
+</div>
+<div class="layers">Camadas: <span class="on">Título</span><span>Subtítulo</span><span>Logo</span><span>Círculo</span><span>Fundo</span></div>
+<div class="learn">🧠 O gerente está observando: "tamanho do título 34 → 30" vai virar regra ao aprovar.</div>
+<div class="foot"><span class="btn gh">Descartar</span><span class="btn gh">Voltar ao designer</span><span class="btn ok">Aprovar → Postagem</span></div>
+</div></body></html>
