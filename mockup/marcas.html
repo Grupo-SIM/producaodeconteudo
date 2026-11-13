@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:560px}
+.wrap{display:flex;gap:20px}
+.b{background:#131821;border:1px solid #222836;border-radius:14px;padding:12px}.b.on{outline:2px solid #facc15}
+.b .lg{height:54px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px;margin-bottom:8px}
+.b b{font-size:13px;display:block}.b span{font-size:11px;color:#8a93a6}
+.sw{display:flex;gap:4px;margin-top:7px}.sw i{width:16px;height:16px;border-radius:4px;border:1px solid #333}
+.add{border:1px dashed #333c4f;display:grid;place-items:center;color:#8a93a6;font-size:13px}
+.ed{flex:1;background:#131821;border:1px solid #222836;border-radius:14px;padding:18px 20px}
+.eh{display:flex;align-items:center;gap:12px;margin-bottom:14px}.eh .lg{width:52px;height:52px;border-radius:12px;background:#0a0a0a;border:1px solid #facc15;display:grid;place-items:center;color:#facc15;font-weight:900}
+.eh h2{font-size:18px}.eh span{font-size:12px;color:#8a93a6}
+.tabs{display:flex;gap:6px;margin-bottom:14px}.tabs span{font-size:12.5px;padding:7px 12px;border-radius:8px;background:#1a202b;color:#99a}.tabs span.on{background:#facc15;color:#111;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.box{background:#0f131a;border-radius:12px;padding:12px}.box h4{font-size:12px;color:#8a93a6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.cols{display:flex;gap:10px}.cl{text-align:center;font-size:11px;color:#aab}.cl i{display:block;width:58px;height:58px;border-radius:12px;margin-bottom:5px;border:1px solid #333}
+.f{display:flex;justify-content:space-between;align-items:center;background:#1a202b;border-radius:8px;padding:9px 11px;margin-bottom:6px;font-size:13px}.f span{color:#8a93a6;font-size:11.5px}
+.prev{display:flex;gap:10px}.pv{width:150px;height:188px;border-radius:8px;background:#0a0a0a;padding:14px;position:relative;overflow:hidden}
+.pv b{color:#fff;font-size:17px;line-height:1.1;font-weight:900;text-transform:uppercase}.pv b em{color:#facc15;font-style:normal}
+.pv small{position:absolute;bottom:10px;left:14px;font-size:9px;color:#facc15;font-weight:800}
+.pv.q{background:linear-gradient(#333,#000)}
+.tag{display:inline-block;background:#1a202b;border-radius:999px;padding:5px 10px;font-size:12px;margin:0 6px 6px 0}.tag.on{background:#173322;color:#7fe0a5}
+.note{margin-top:14px;font-size:12.5px;color:#8fe0b0;background:#0f2418;border:1px solid #1f5a36;border-radius:10px;padding:10px 12px}
+</style></head><body>
+<div class="side"><div class="logo">Produção</div><div class="nv">▦ Fluxo <b>5</b></div><div class="nv">🛠 Mesa de revisão <b>5</b></div><div class="nv on">🏷 Marcas</div><div class="nv">🧠 Cérebro</div><div class="nv" style="margin-top:auto">⚙ Configurações</div></div>
+<div class="main"><div class="top"><h1>Marcas</h1><span class="chip">7 marcas</span></div>
+<div class="wrap"><div class="grid">
+<div class="b on"><div class="lg" style="background:#0a0a0a;color:#facc15">CENTRAL DO MKT</div><b>Central do Marketing</b><span>Marketing digital · 4 formatos</span><div class="sw"><i style="background:#0a0a0a"></i><i style="background:#facc15"></i><i style="background:#fff"></i></div></div>
+<div class="b"><div class="lg" style="background:#0d2a5c;color:#fff">PagaTG</div><b>PagaTG</b><span>Finanças · 3 formatos</span><div class="sw"><i style="background:#0d2a5c"></i><i style="background:#2b5cff"></i><i style="background:#ffc857"></i></div></div>
+<div class="b"><div class="lg" style="background:#111;color:#d4af37">CORTE DOS RICOS</div><b>Corte dos Ricos</b><span>Empreendedorismo · 3</span><div class="sw"><i style="background:#111"></i><i style="background:#d4af37"></i><i style="background:#fff"></i></div></div>
+<div class="b"><div class="lg" style="background:#06140c;color:#34d399">007 SPYHACKER</div><b>007 SpyHacker</b><span>Tecnologia · 2</span><div class="sw"><i style="background:#06140c"></i><i style="background:#34d399"></i><i style="background:#22d3ee"></i></div></div>
+<div class="b"><div class="lg" style="background:#2a0f22;color:#f472b6">MARKETING RAIZ</div><b>Marketing Raiz</b><span>Marketing digital · 2</span><div class="sw"><i style="background:#2a0f22"></i><i style="background:#f472b6"></i><i style="background:#fff"></i></div></div>
+<div class="b"><div class="lg" style="background:#0c1f3a;color:#6aa3ff">SEGUIDORES</div><b>Seguidores em Alta</b><span>Redes sociais · 2</span><div class="sw"><i style="background:#0c1f3a"></i><i style="background:#6aa3ff"></i><i style="background:#fff"></i></div></div>
+<div class="b"><div class="lg" style="background:#10230f;color:#a3e635">VIVENDO DE BET</div><b>Vivendo de Bet</b><span>Esportes · 1</span><div class="sw"><i style="background:#10230f"></i><i style="background:#a3e635"></i></div></div>
+<div class="b add">+ Nova marca<br><span style="font-size:11px">ou peça ao gerente</span></div>
+</div>
+<div class="ed"><div class="eh"><div class="lg">CM</div><div><h2>Central do Marketing</h2><span>@centraldomarketing · marketing digital · tom: direto, provocador</span></div></div>
+<div class="tabs"><span class="on">Identidade visual</span><span>Voz e público</span><span>Formatos</span><span>Contas e postagem</span></div>
+<div class="two"><div>
+<div class="box"><h4>Cores</h4><div class="cols"><div class="cl"><i style="background:#0a0a0a"></i>Fundo<br>#0A0A0A</div><div class="cl"><i style="background:#facc15"></i>Destaque<br>#FACC15</div><div class="cl"><i style="background:#fff"></i>Texto<br>#FFFFFF</div><div class="cl"><i style="background:#1a202b;border-style:dashed;display:grid;place-items:center;color:#889">+</i>Nova</div></div></div>
+<div class="box" style="margin-top:12px"><h4>Fontes e logo</h4><div class="f">Títulos <b>Anton · caixa alta</b></div><div class="f">Texto <b>Inter Regular</b></div><div class="f">Logo <span>logo-central.png · trocar</span></div><div class="f">Fio + @ no topo <span>ligado</span></div></div>
+</div><div>
+<div class="box"><h4>Prévia ao vivo</h4><div class="prev"><div class="pv"><b>O funil que <em>ninguém</em> te ensinou</b><small>CENTRAL DO MKT</small></div><div class="pv q"><b style="font-size:13px;position:absolute;bottom:34px">"QUEM NÃO É VISTO NÃO É <em>LEMBRADO</em>"</b><small>CENTRAL DO MKT</small></div></div></div>
+<div class="box" style="margin-top:12px"><h4>Formatos ativos</h4><span class="tag on">✓ Carrossel</span><span class="tag on">✓ Citação</span><span class="tag on">✓ Reels</span><span class="tag on">✓ Matéria</span><span class="tag">+ Stories</span></div>
+</div></div>
+<div class="note">🧠 Tudo aqui também muda pela conversa. O que você alterar nesta tela, o gerente avisa os agentes e salva no cérebro da marca.</div>
+</div></div></div>
+<div class="chat"><div class="ch">💬 Gerente</div><div class="msgs">
+<div class="m u">Na Central do Marketing o amarelo tá muito forte, usa um tom mais queimado.</div>
+<div class="m g">Troquei o destaque de #FACC15 para #EAB308. A prévia ao lado já mostra.<small>✓ Salvo em Marcas › Central do Marketing › Cores</small></div>
+<div class="m u">Cria a marca nova "Bolso Cheio", finanças, cores verde e branco.</div>
+<div class="m g">Criada com os formatos Carrossel e Reels. Falta a logo: arrasta ela aqui ou na tela de Marcas.</div>
+</div><div class="in">Fale com o gerente…</div></div>
+</body></html>
