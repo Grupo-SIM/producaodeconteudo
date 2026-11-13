@@ -82,12 +82,24 @@ Regra geral: cada etapa é feita num branch, testada localmente, mostrada ao don
 ### Etapa 6: editor de arte (estilo Canva)
 - Abrir a arte do Designer já em camadas. O motor já compõe por camadas (`motor/camadas.mjs`).
 - Mexer em texto, fonte, cor, posição e imagem, com as miniaturas dos slides e a biblioteca da marca com sugestões.
+- Requisitos básicos: trocar uma imagem por outra, aumentar ou diminuir e recortar elementos, mover, alinhar, duplicar, apagar, mudar a ordem das camadas, reordenar, duplicar ou apagar slides, e desfazer ou refazer.
 - Salvar regera o PNG final.
 - **Pronto quando:** você corrige um detalhe e o arquivo final sai igual ao que está na tela.
 
 ### Etapa 7: editor de vídeo (estilo CapCut)
 - Linha do tempo a partir do roteiro de cena que o Editor de vídeo já gera (cenas, legendas, voz, música e efeitos).
-- Cortar, mover, editar legenda e mudar volumes.
+- Requisitos básicos de edição, todos obrigatórios:
+  - **Cortar:** dividir um trecho em dois no ponto da agulha, apagar um trecho e encurtar ou alongar o começo e o fim de cada cena arrastando a borda.
+  - **Reordenar:** arrastar cenas e trechos para mudar a ordem.
+  - **Trocar mídia:** trocar uma imagem ou um vídeo de uma cena por outro (da biblioteca da marca, enviado do computador ou do celular, ou pedido ao gerente), mantendo a duração.
+  - **Tamanho e posição:** aumentar, diminuir, mover, girar e recortar (enquadrar) imagens, vídeos, legendas e logo dentro do quadro, respeitando as zonas seguras.
+  - **Texto e legenda:** editar o texto, a fonte, o tamanho, a cor, o destaque de palavra e o tempo em que entra e sai.
+  - **Áudio:** volume separado de voz, música e efeitos; silenciar um trecho; trocar a música; entrada e saída suaves (fade).
+  - **Velocidade:** acelerar ou desacelerar um trecho.
+  - **Transições:** escolher a transição entre cenas (corte seco, fade, zoom) dentro dos estilos de motion da marca.
+  - **Navegação:** desfazer e refazer, zoom na linha do tempo, ímã para encaixar os cortes e prévia em tempo real.
+  - **Formato:** trocar entre 9:16, 1:1 e 16:9 quando o formato permitir.
+- No celular: as mesmas ações com toque (segurar para mover, pinça para aumentar ou diminuir) e a linha do tempo rolando para o lado.
 - Salvar renderiza de novo pelo `motor/render.mjs`.
 - **Pronto quando:** um ajuste simples sai no vídeo final sem precisar pedir ao agente.
 
