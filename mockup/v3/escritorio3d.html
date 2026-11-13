@@ -1,0 +1,103 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="shell.css"><style>
+.you{position:absolute;right:24px;bottom:22px;background:#1d1a10dd;border:1px solid #4a3f1a;border-radius:12px;padding:12px 14px;font-size:12.5px;width:260px;z-index:3}.you b{color:#ffc857;font-size:14px}.you div{margin-top:6px;color:#ddd}
+.feed{position:absolute;right:24px;top:70px;width:300px;z-index:3;display:flex;flex-direction:column;gap:6px}
+.feed div{background:#0b0e14cc;border:1px solid #2a3344;border-radius:10px;padding:7px 10px;font-size:11.5px;color:#cdd;backdrop-filter:blur(6px);animation:in .6s ease}
+.feed div i{font-style:normal;color:#8a93a6;margin-right:6px}
+@keyframes in{from{opacity:0;transform:translateX(20px)}to{opacity:1}}
+.lv{position:absolute;left:24px;top:70px;z-index:3;background:#0b0e14cc;border:1px solid #2a3344;border-radius:12px;padding:10px 14px;font-size:12px;width:260px}
+.lv b{font-size:13px}.xp{height:8px;background:#222836;border-radius:5px;margin:6px 0 4px;overflow:hidden}.xp u{display:block;height:8px;width:62%;background:linear-gradient(90deg,#2b5cff,#a855f7);border-radius:5px}
+</style></head><body>
+<div class="side"><div class="logo">Produção de Conteúdo</div><div class="nv on">Fluxo<b>6</b></div><div class="nv">Mesa de revisão<b>6</b></div><div class="nv">Marcas</div><div class="nv">Produtos</div><div class="nv">Otimização</div><div class="nv">Cérebro</div><div class="nv" style="margin-top:auto">Configurações</div></div>
+<div class="main"><canvas id="c"></canvas>
+<div class="top"><h1>Fluxo</h1><span class="chip">Lista</span><span class="chip on">Escritório</span><span style="flex:1"></span><span class="chip" style="border:1px solid #2b5cff">Marca: <b style="color:#fff">Todas (7)</b> ▾</span><span class="chip">Tela cheia</span></div>
+<div class="lv"><b>Dia de produção</b> · 8 de 13 entregas<div class="xp"><u></u></div><span style="color:#8a93a6">Sequência: 4 dias batendo a meta</span></div>
+<div class="feed" id="feed"></div>
+<div class="hud"><div><b>6</b>trabalhando</div><div><b style="color:#ff6b6b">1</b>parado</div><div><b>142</b>entregas no mês</div></div>
+<div class="you"><b>Esperando você: 6</b><div>Moldura de preço · Efeito isca · Atlas Hosting · +3</div><div style="color:#ffc857;margin-top:8px">Abrir Mesa de revisão ›</div></div>
+<div id="labs"></div></div>
+<div class="chat"><div class="ch">Gerente</div><div class="msgs"><div class="m u">Como tá o time agora?</div><div class="m g">6 trabalhando, o Editor de vídeo parado (precisa de login) e o Publicador esperando o horário. O Roteirista acabou de entregar "Delivery e comissão" para o Revisor.</div></div><div class="in">Fale com o gerente…</div></div>
+<script src="three.min.js"></script><script>
+const cv=document.getElementById('c'),W=cv.parentElement.clientWidth,H=1080;
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setSize(W,H);R.setPixelRatio(2);R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const S=new THREE.Scene();S.background=new THREE.Color(0x0b0f17);S.fog=new THREE.Fog(0x0b0f17,40,80);
+const cam=new THREE.PerspectiveCamera(34,W/H,.1,200);
+S.add(new THREE.HemisphereLight(0x8fb0ff,0x0b0f17,.55));
+const sun=new THREE.DirectionalLight(0xffffff,.9);sun.position.set(12,22,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20});S.add(sun);
+const M=(c,e=0,ei=1)=>new THREE.MeshStandardMaterial({color:c,roughness:.55,metalness:.1,emissive:e,emissiveIntensity:ei});
+// floor
+const fl=new THREE.Mesh(new THREE.BoxGeometry(30,.6,22),M(0x1a2232));fl.position.y=-.3;fl.receiveShadow=true;S.add(fl);
+const grid=new THREE.GridHelper(30,30,0x2b3a57,0x202a3d);grid.position.y=.01;S.add(grid);
+// glowing floor paths
+const pathMat=new THREE.MeshBasicMaterial({color:0x2b5cff,transparent:true,opacity:.35});
+const agents=[
+ {n:'Roteirista',c:0x4d7cff,p:[-8,0,-4],st:'work',t:'Escrevendo "Delivery e comissão"',s:'Corte dos Ricos · Carrossel',pg:62},
+ {n:'Revisor de copy',c:0x8b9bb8,p:[-2.5,0,-6],st:'work',t:'Checklist de história real: "Fyre Festival"',s:'Seguidores em Alta',pg:40},
+ {n:'Designer',c:0xc056e0,p:[4,0,-6],st:'work',t:'Slide 6 de 10: "Toy Story 2 quase apagado"',s:'007 Spyhacker · Carrossel',pg:60},
+ {n:'Editor de vídeo',c:0xe06a4d,p:[9,0,-3],st:'err',t:'Parado: a assinatura do Claude saiu do login',s:'"Atlas, pico de acesso" · Reels'},
+ {n:'Agente de Notícias',c:0x2fb37a,p:[-9,0,3.5],st:'work',t:'Lendo ge, ESPN e CNN Esportes',s:'Vivendo de Bet · pauta do dia',pg:70},
+ {n:'SEO',c:0x3aa0c8,p:[-3,0,6],st:'work',t:'Palavras-chave: "IA do Instagram para adolescentes"',s:'Seguidores em Alta · Matéria',pg:35},
+ {n:'Publicador',c:0x6b7590,p:[8,0,5],st:'idle',t:'Esperando o horário de postar',s:'1 item pronto para postagem'},
+ {n:'Gerente',c:0xe0b23a,p:[1.5,0,1],st:'boss',t:'Designer, "Aluno profissional" foi aprovado. É contigo.',s:'distribuindo 6 tarefas'}];
+const bots=[];
+function bot(a){const g=new THREE.Group();g.position.set(...a.p);
+ const desk=new THREE.Mesh(new THREE.BoxGeometry(2.6,.15,1.4),M(0x3a4a66));desk.position.set(0,1.05,.2);desk.castShadow=desk.receiveShadow=true;g.add(desk);
+ for(const x of[-1.15,1.15])for(const z of[-.4,.8]){const l=new THREE.Mesh(new THREE.BoxGeometry(.1,1,.1),M(0x2b3850));l.position.set(x,.5,z);g.add(l)}
+ const sc=a.st=='err'?0xff4b4b:a.st=='idle'?0x223:(a.st=='boss'?0xffc857:0x3ddc84);
+ const mon=new THREE.Mesh(new THREE.BoxGeometry(1.3,.8,.08),M(0x0b0e14,sc,a.st=='idle'?.1:1.2));mon.position.set(0,1.65,-.25);g.add(mon);
+ const st=new THREE.Mesh(new THREE.BoxGeometry(.1,.4,.1),M(0x4b5b7a));st.position.set(0,1.25,-.25);g.add(st);
+ const lt=new THREE.PointLight(sc,a.st=='idle'?0:1.4,4);lt.position.set(0,1.7,.3);g.add(lt);
+ const body=new THREE.Group();body.position.set(0,0,1.3);g.add(body);
+ const chair=new THREE.Mesh(new THREE.CylinderGeometry(.45,.45,.12,20),M(0x222a3a));chair.position.y=.65;body.add(chair);
+ const torso=new THREE.Mesh(new THREE.CylinderGeometry(.35,.38,.9,16),M(a.c));torso.position.y=1.2;torso.castShadow=true;body.add(torso);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.36,24,24),M(a.c));head.position.y=1.95;head.castShadow=true;body.add(head);
+ const visor=new THREE.Mesh(new THREE.BoxGeometry(.5,.14,.1),M(0x0b0e14,a.st=='err'?0xff4b4b:0x8fe3ff,1.5));visor.position.set(0,1.98,-.32);body.add(visor);
+ const ant=new THREE.Mesh(new THREE.SphereGeometry(.08,12,12),M(sc,sc,2));ant.position.y=2.45;body.add(ant);
+ const arms=[];for(const s of[-1,1]){const arm=new THREE.Mesh(new THREE.BoxGeometry(.14,.14,.6),M(a.c));arm.position.set(s*.42,1.35,-.35);body.add(arm);arms.push(arm)}
+ body.rotation.y=0;S.add(g);
+ const o={a,g,body,head,arms,mon,ant,lt,top:new THREE.Vector3(a.p[0],3.2,a.p[2]+1.3)};bots.push(o);return o}
+agents.forEach(bot);
+// rug & plants
+const rug=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,.03,48),M(0x2a2410,0xffc857,.15));rug.position.set(1.5,.02,1.8);S.add(rug);
+for(const[x,z]of[[-13,-9],[13,-9],[-13,9],[13,9],[0,-9.5]]){const p=new THREE.Mesh(new THREE.ConeGeometry(.6,1.6,8),M(0x2f8a5a));p.position.set(x,1.1,z);p.castShadow=true;S.add(p);const v=new THREE.Mesh(new THREE.CylinderGeometry(.4,.3,.6,12),M(0x3a4a66));v.position.set(x,.3,z);S.add(v)}
+// big wall screen
+const wall=new THREE.Mesh(new THREE.BoxGeometry(10,4,.3),M(0x0b0e14,0x1c2a4a,.6));wall.position.set(0,2.4,-10.6);S.add(wall);
+const bars=[];for(let i=0;i<13;i++){const b=new THREE.Mesh(new THREE.BoxGeometry(.5,1,.1),M(i<8?0x3ddc84:0x2a3344,i<8?0x3ddc84:0,i<8?.9:0));b.position.set(-4.2+i*.7,1.2,-10.4);b.scale.y=.4+Math.random()*2;b.position.y=.6+b.scale.y/2;S.add(b);bars.push(b)}
+// routes & packets
+const byN=n=>bots.find(b=>b.a.n==n);
+const routes=[['Roteirista','Revisor de copy'],['Revisor de copy','Gerente'],['Gerente','Designer'],['Agente de Notícias','Roteirista'],['SEO','Gerente'],['Designer','Gerente'],['Gerente','Publicador'],['Gerente','Editor de vídeo']];
+const packets=[];
+routes.forEach(([f,t],i)=>{const A=byN(f).g.position.clone().add(new THREE.Vector3(0,1.7,.6)),B=byN(t).g.position.clone().add(new THREE.Vector3(0,1.7,.6));
+ const mid=A.clone().lerp(B,.5);mid.y+=3;const cur=new THREE.QuadraticBezierCurve3(A,mid,B);
+ const tube=new THREE.Mesh(new THREE.TubeGeometry(cur,40,.025,6),new THREE.MeshBasicMaterial({color:t=='Editor de vídeo'?0xff4b4b:0x2b5cff,transparent:true,opacity:.45}));S.add(tube);
+ if(t!='Editor de vídeo'){const pk=new THREE.Mesh(new THREE.BoxGeometry(.32,.42,.05),M(0xffffff,0xffffff,.6));const gl=new THREE.PointLight(0x7aa2ff,1.2,3);pk.add(gl);S.add(pk);packets.push({pk,cur,o:i*.17})}});
+// particles
+const pg=new THREE.BufferGeometry(),N=400,pa=new Float32Array(N*3);for(let i=0;i<N;i++){pa[i*3]=(Math.random()-.5)*30;pa[i*3+1]=Math.random()*10;pa[i*3+2]=(Math.random()-.5)*22}pg.setAttribute('position',new THREE.BufferAttribute(pa,3));
+const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0x7aa2ff,size:.06,transparent:true,opacity:.6}));S.add(pts);
+// walker: Roteirista carries doc to Gerente
+const walker=bot({n:'Roteirista (entregando)',c:0x4d7cff,p:[-6,0,-1],st:'walk'});walker.g.children.slice(0,8).forEach(m=>m.visible=false);walker.mon.visible=false;walker.lt.intensity=0;walker.body.children[0].visible=false;
+const wdoc=new THREE.Mesh(new THREE.BoxGeometry(.4,.5,.05),M(0xffffff,0xffffff,.5));wdoc.position.set(0,1.4,-.5);walker.body.add(wdoc);
+// labels
+const labs=document.getElementById('labs');
+bots.forEach(b=>{if(b===walker)return;const d=document.createElement('div');d.className='lab';const a=b.a;
+ d.innerHTML=`<div class="b" style="${a.st=='err'?'border-color:#ff5b5b;background:#2a1214d9':a.st=='boss'?'border-color:#ffc857':''}">${a.t}<small>${a.s}</small>${a.pg?`<div class="pg"><u style="width:${a.pg}%"></u></div>`:''}</div><div class="n" style="color:${a.st=='err'?'#ff8b8b':'#fff'}">${a.n}${a.st=='idle'?' · zz':''}</div>`;labs.appendChild(d);b.lab=d});
+const feedTxt=[['agora','Roteirista entregou "Delivery e comissão" ao Revisor'],['1 min','Gerente passou "Aluno profissional" ao Designer'],['3 min','Agente de Notícias achou "Selic sobe 0,25" (nota 8)'],['6 min','Editor de vídeo parou: login da assinatura']];
+const feed=document.getElementById('feed');feedTxt.forEach(([t,x])=>{const d=document.createElement('div');d.innerHTML=`<i>${t}</i>${x}`;feed.appendChild(d)});
+const v=new THREE.Vector3();
+function frame(t){t/=1000;
+ const ang=.6+Math.sin(t*.12)*.35;cam.position.set(Math.sin(ang)*26,17,Math.cos(ang)*26);cam.lookAt(0,1,0);
+ bots.forEach((b,i)=>{const st=b.a.st;
+  if(st=='work'||st=='boss'){b.arms.forEach((a,k)=>a.position.y=1.35+Math.abs(Math.sin(t*14+k*1.6+i))*.07);b.head.rotation.y=Math.sin(t*1.3+i)*.25;b.body.position.y=Math.sin(t*3+i)*.02;b.mon.material.emissiveIntensity=1+Math.sin(t*9+i)*.25}
+  if(st=='boss'){b.body.rotation.y=Math.sin(t*.7)*.8}
+  if(st=='err'){const k=(Math.sin(t*6)+1)/2;b.mon.material.emissiveIntensity=.3+k*1.5;b.lt.intensity=k*2;b.head.rotation.z=Math.sin(t*2)*.15}
+  if(st=='idle'){b.head.rotation.x=.35+Math.sin(t*1.5)*.06;b.body.position.y=Math.sin(t*1.2)*.04}
+  b.ant.scale.setScalar(1+Math.sin(t*5+i)*.25)});
+ // walker path
+ const A=new THREE.Vector3(-6.5,0,-1),B=new THREE.Vector3(.5,0,2.4);const k=(Math.sin(t*.5)+1)/2;walker.g.position.lerpVectors(A,B,k);walker.g.rotation.y=Math.cos(t*.5)>0?-Math.atan2(B.x-A.x,B.z-A.z)+Math.PI:-Math.atan2(A.x-B.x,A.z-B.z)+Math.PI;walker.body.position.y=Math.abs(Math.sin(t*8))*.12;walker.arms.forEach((a,j)=>a.rotation.x=Math.sin(t*8+j*Math.PI)*.5);
+ packets.forEach(p=>{const u=((t*.18+p.o)%1);p.pk.position.copy(p.cur.getPoint(u));p.pk.rotation.y=t*3});
+ bars.forEach((b,i)=>{if(i<8){b.scale.y=1.2+Math.sin(t*2+i)*.6;b.position.y=.6+b.scale.y/2}});
+ pts.rotation.y=t*.02;
+ R.render(S,cam);
+ bots.forEach(b=>{if(!b.lab)return;v.copy(b.g.position).add(new THREE.Vector3(0,3.3,1.3)).project(cam);b.lab.style.left=((v.x+1)/2*W)+'px';b.lab.style.top=((1-v.y)/2*H)+'px'});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>
