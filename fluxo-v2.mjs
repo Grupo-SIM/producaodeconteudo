@@ -199,6 +199,14 @@ export function criarFluxoV2(ctx) {
       contentAct(id, 'posted', { post_url: link });
       return { ok: true };
     }
+    if (nome === 'resolver') {   // o dono resolveu a causa (login, limite, ajuste): limpa o erro e a etapa recomeça de onde parou
+      if (['posted', 'discarded'].includes(c.status)) throw fail(400, 'Este item não está parado');
+      run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id);
+      setContent(id, { error: '' });
+      contentAct(id, 'reprocess');
+      log(null, `Você marcou "${c.title}" como resolvido: a produção recomeçou`, id);
+      return { ok: true };
+    }
     if (nome === 'editar') return salvarEdicao(id, b, autor);
     if (nome === 'voltar_versao') {
       const v = one('SELECT * FROM content_versions WHERE content_id=? AND n=?', id, +b.n); if (!v) throw fail(404, 'Versão não encontrada');
@@ -288,7 +296,7 @@ export function criarFluxoV2(ctx) {
       return send(res, 200, { ...item(c), roteiro: c.script, legenda: c.caption, materia: c.materia, brief: c.brief, art_spec: c.art_spec, spec: c.spec, video: c.video, versoes: all('SELECT n,ts,autor,motivo,campos,resumo FROM content_versions WHERE content_id=? ORDER BY n DESC', c.id).map(v => ({ ...v, campos: JSON.parse(v.campos) })) });
     }
     if ((mt = p.match(/^\/api\/v2\/itens\/(\d+)\/versoes$/)) && m === 'GET') return send(res, 200, { versoes: all('SELECT * FROM content_versions WHERE content_id=? ORDER BY n DESC', +mt[1]).map(v => ({ ...v, campos: JSON.parse(v.campos), antes: JSON.parse(v.antes), depois: JSON.parse(v.depois) })) });
-    if ((mt = p.match(/^\/api\/v2\/itens\/(\d+)\/(aprovar|ajuste|descartar|restaurar|postado|editar|voltar_versao)$/)) && m === 'POST') {
+    if ((mt = p.match(/^\/api\/v2\/itens\/(\d+)\/(aprovar|ajuste|descartar|restaurar|postado|editar|voltar_versao|resolver)$/)) && m === 'POST') {
       const b = await readBody(req, 4e5);
       const r = acao(+mt[1], mt[2], b, user); changed();
       return send(res, 200, r);

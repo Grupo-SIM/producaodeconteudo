@@ -22,7 +22,7 @@ a{color:var(--gold2)}a.btn{text-decoration:none}
 /* menu */
 .side{width:232px;background:var(--side);border-right:1px solid #1f1f22;padding:22px 14px;display:flex;flex-direction:column;gap:4px;flex:none}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;margin:0 8px 24px}
-.logo:before{content:"";width:26px;height:26px;border-radius:8px;background:var(--grad);box-shadow:0 0 0 1px #ffffff22 inset}
+.logo{font-size:19px!important;font-weight:700!important;letter-spacing:-.01em;line-height:1.2}
 .nv{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#8b8b90;font-size:13.5px;border:1px solid transparent;text-align:left;width:100%}
 .nv svg{width:17px;height:17px;flex:none}
 .nv:hover{color:var(--tx)}
@@ -217,6 +217,9 @@ img.av{object-fit:cover;padding:0}
 .agc{display:flex;gap:12px;align-items:center;margin-bottom:6px}.agc b{width:40px;color:var(--gold);font-size:13px}.agc span{flex:1;background:#161618;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px}
 .csheet{position:fixed;left:0;right:0;bottom:64px;z-index:20;background:#111113;border-top:1px solid var(--line2);border-radius:16px 16px 0 0;padding:10px 16px 16px}.csheet .grab{display:block;width:36px;height:4px;border-radius:2px;background:#3a3a40;margin:0 auto 10px}.csheet b{font-size:16px}
 .cfg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.cfg .kvr span:last-child{display:flex;gap:8px;align-items:center}
+.prob2{background:#161618;border:1px solid var(--line2);border-radius:12px;padding:12px 14px;margin-bottom:10px}.prob2 summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}.prob2 summary b{flex:1;font-size:14.5px}.prob2[open] summary{margin-bottom:10px}
+.pfaca{background:#16140e;border:1px solid var(--goldline);color:var(--gold2);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:10px}.prob2 .kvr span:last-child{display:flex;gap:6px}
+.vermais{display:block;margin:0 auto 6px;font-size:12px;color:var(--tx3);text-decoration:underline}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -381,6 +384,33 @@ function abreNotif() {
 }
 document.addEventListener('click', () => { $('#bpop')?.classList.add('hidden'); $('#npop')?.classList.add('hidden'); });
 
+// ───────── problemas em linguagem simples: o que aconteceu e o que depende de você
+function explica(motivo) {
+  const m = String(motivo || '');
+  if (/limite de uso/i.test(m)) return { causa: 'limite', titulo: 'A assinatura do Claude atingiu o limite de uso', faca: 'Espere o limite renovar (algumas horas) e clique em Resolvido. Se quiser evitar, diminua as metas por dia.' };
+  if (/dangerously-skip-permissions|root\/sudo/i.test(m)) return { causa: 'config', titulo: 'Erro de configuração do servidor (já corrigido)', faca: 'Nada a fazer além de clicar em Resolvido: o item volta para a fila e roda de novo.' };
+  if (/login|logad|autentic|credencia|401/i.test(m)) return { causa: 'login', titulo: 'A assinatura do Claude saiu do login', faca: 'Vá em Configurações → Conectar ou trocar a conta, entre de novo e depois clique em Resolvido.' };
+  if (/sem resposta|código 1|timeout|tempo/i.test(m)) return { causa: 'falha', titulo: 'O Claude parou sem responder', faca: 'Clique em Resolvido para tentar de novo. Se repetir, confira a assinatura em Configurações.' };
+  if (/sem tarefa/i.test(m)) return { causa: 'fila', titulo: 'O item ficou sem a próxima etapa', faca: 'Clique em Resolvido para a produção recomeçar de onde parou.' };
+  if (/revis|reprov|travou|bloque/i.test(m)) return { causa: 'revisao', titulo: 'O revisor reprovou várias vezes', faca: 'Abra o item e decida: peça um ajuste dizendo o que mudar, aprove assim mesmo ou clique em Resolvido para refazer.' };
+  if (/fal\.ai|imagem|saldo|crédit/i.test(m)) return { causa: 'imagem', titulo: 'A geração de imagem falhou', faca: 'Confira o saldo da fal.ai em Configurações avançadas e clique em Resolvido.' };
+  return { causa: 'outro', titulo: 'O agente parou com um erro', faca: 'Clique em Resolvido para tentar de novo. Se repetir, me pergunte no chat o que houve.' };
+}
+function abreProblemas() {
+  const L = S.fluxo.itens.filter(i => i.estado === 'parado'), grupos = {};
+  for (const i of L) { const e = explica(i.motivo); (grupos[e.causa] ||= { ...e, itens: [] }).itens.push(i); }
+  const G = Object.values(grupos);
+  modal(`<div class="hd"><h2>${L.length} problema${L.length === 1 ? '' : 's'} para resolver</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
+    ${G.map((g, k) => `<details class="prob2" ${k === 0 ? 'open' : ''}><summary><b>${esc(g.titulo)}</b><span class="pill parado">${g.itens.length} ${g.itens.length === 1 ? 'item' : 'itens'}</span></summary>
+      <div class="pfaca"><b>O que fazer:</b> ${esc(g.faca)}</div>
+      ${g.itens.map(i => `<div class="kvr"><span style="cursor:pointer" onclick="abrirItem(${i.id})">${esc(i.titulo)} <small class="muted">${esc(i.marca)} · ${esc(S.fluxo.formatos.find(f => f.id === i.raia)?.nome || '')}</small></span><span><button class="btn sm" onclick="abrirItem(${i.id})">Abrir</button><button class="btn sm ok" onclick="resolver([${i.id}])">Resolvido</button></span></div>`).join('')}
+      ${g.itens.length > 1 ? `<button class="btn ok" style="margin-top:8px" onclick="resolver([${g.itens.map(i => i.id)}])">Marcar os ${g.itens.length} como resolvidos</button>` : ''}</details>`).join('') || '<div class="empty">Nenhum problema agora.</div>'}</div>`);
+}
+async function resolver(ids) {
+  try { for (const id of ids) await api(`/api/v2/itens/${id}/resolver`, { body: {} }); toast(ids.length > 1 ? `${ids.length} itens voltaram para a produção` : 'Resolvido: o item voltou para a produção'); } catch (e) { toast(e.message); }
+  await refresh(); if ($('.ov')) { if (S.fluxo.itens.some(i => i.estado === 'parado')) abreProblemas(); else fecha(); }
+}
+
 // ───────── Fluxo
 const COR = { etapa: 'var(--ok)', esperando: 'var(--gold)', ajuste: 'var(--warn)', parado: 'var(--err)', fila: 'var(--q)' };
 const LEG = { etapa: 'agente trabalhando', esperando: 'esperando você', ajuste: 'em ajuste', parado: 'parado', fila: 'na fila (ainda não começou)' };
@@ -402,14 +432,14 @@ function colunaDe(i) {
   return e === 'roteirista' || e === 'radar' ? 'roteiro' : e === 'revisorcopy' || e === 'gerente' || e === 'seo' ? 'copy' : e === 'designer' || e === 'editor' ? 'arte' : e === 'publicador' ? 'postagem' : 'roteiro';
 }
 function cartao(i) {
-  const sub = i.estado === 'parado' ? 'parou: ' + (i.motivo || 'sem motivo') : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '') : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : (i.aguardando ? 'aguardando' : 'trabalhando');
+  const sub = i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '') : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : (i.aguardando ? 'aguardando' : 'trabalhando');
   return `<button class="c ${CLS[i.estado]}${i.em_ajuste ? ' aj' : ''}" onclick="abrirItem(${i.id})">${esc(i.titulo)}<i>${[i.marca, sub].filter(Boolean).map(esc).join(' · ')}</i></button>`;
 }
 VIEWS.fluxo = () => {
   const F = S.fluxo; if (!F) return;
   if (isMobile() && S.modoFluxo !== 'escritorio') return fluxoCel();
   const nM = S.brands.length, aviso = F.avisos[0];
-  const ban = F.avisos.length ? `<div class="prob"><b>${F.avisos.length} problema${F.avisos.length > 1 ? 's' : ''}</b><span>${esc(aviso.titulo)}: ${esc(aviso.motivo || 'parado')}</span><button onclick="abrirItem(${aviso.id})">Resolver</button></div>` : '';
+  const ban = F.avisos.length ? `<div class="prob"><b>${F.avisos.length} problema${F.avisos.length > 1 ? 's' : ''}</b><span>${esc(explica(aviso.motivo).titulo)} · ${esc(aviso.titulo)}${F.avisos.length > 1 ? ` e mais ${F.avisos.length - 1}` : ''}</span><button onclick="abreProblemas()">Resolver</button></div>` : '';
   const head = `<div class="top"><h1>Fluxo</h1><button class="chip ${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');E3?.destruir();E3=null;render()">Lista</button><button class="chip ${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span>
     ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}${S.modoFluxo === 'escritorio' ? `<button class="chip" onclick="telao()">${store.get('telaoOn', true) ? 'Desligar telão' : 'Ligar telão'}</button><button class="chip" onclick="trocaVideo()">Vídeo</button><button class="chip" onclick="telaCheia()">Tela cheia</button>` : `<button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button>`}</div>`;
   if (S.modoFluxo === 'escritorio') return escritorio3d(head, ban);
@@ -480,7 +510,7 @@ function fluxoCel() {
       ${ab && cols.length ? `<div class="stc">${cols.map(([id, nome, quem, cs]) => `<div class="s ${!quem ? 'me' : ''}"><div class="sh">${esc(nome)}${quem ? ' · ' + esc(quem) : ''}</div>${cs.map(cartao).join('')}</div>`).join('')}</div><div class="dots">${cols.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>` : ''}</div>`;
   }).join('');
   $('#main').innerHTML = topCel('Fluxo', `<div class="msel">${marcaCel()}</div>`) + `<div class="tabs"><button class="on">Lista</button><button onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span><button onclick="novoConteudo()">+ Novo</button></div>
-    ${av ? `<div class="pcel" onclick="abrirItem(${av.id})"><i></i><span>${esc(av.titulo)}: ${esc(av.motivo || 'parado')}</span><b>Resolver</b></div>` : ''}${lanes}`;
+    ${av ? `<div class="pcel" onclick="abreProblemas()"><i></i><span>${esc(explica(av.motivo).titulo)}</span><b>Resolver</b></div>` : ''}${lanes}`;
 }
 function mesaCel() {
   const F = S.fluxo, todos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'revisao'), cont = { texto: 0, arte: 0, video: 0 }; for (const i of todos) cont[TIPO(i)]++;
@@ -543,10 +573,10 @@ async function abrirItem(id) {
   if (i && i.estado === 'esperando' && i.etapa === 'revisao') return abrirEditor(id);
   const d = await api('/api/v2/itens/' + id);
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="pill ${d.estado}">${esc(d.estado_nome)}${d.estado === 'etapa' ? ' · ' + esc(d.etapa_nome) : ''}</span><button class="btn sm" onclick="fecha()">Fechar</button></div>
-    <div class="mb"><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(d.raia)}</dd>${d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
+    <div class="mb"><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(d.raia)}</dd>${d.estado === 'parado' ? `<dt>O que houve</dt><dd>${esc(explica(d.motivo).titulo)}</dd><dt>O que fazer</dt><dd>${esc(explica(d.motivo).faca)}</dd><dt>Detalhe técnico</dt><dd class="small muted">${esc(d.motivo || '')}</dd>` : d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
     ${d.roteiro ? `<h3 style="margin:16px 0 6px;font-size:13px" class="muted">Roteiro</h3><div class="doc" style="min-height:0">${esc(d.roteiro)}</div>` : ''}
     ${versoesHtml(d)}</div>
-    <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}</div>`);
+    <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}${d.estado === 'parado' ? `<button class="btn ok" style="margin-left:auto" onclick="resolver([${id}])">Resolvido</button>` : ''}</div>`);
 }
 function versoesHtml(d) {
   if (!d.versoes?.length) return '';
@@ -880,10 +910,18 @@ async function loadChat() {
   const sig = d.msgs.map(m => m.id).join() + d.pending.length;
   $('#typing').classList.toggle('hidden', !d.pending.length);
   if (sig === S.chatSig) return; S.chatSig = sig; S.chat = d.msgs;
-  $('#msgs').innerHTML = d.msgs.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${esc(m.text)}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>';
+  if (S.chatDesde == null) S.chatDesde = d.msgs.at(-1)?.id || 0;   // a conversa começa zerada a cada vez que o sistema abre (o histórico continua no servidor)
+  const vis = S.chatTudo ? d.msgs : d.msgs.filter(m => m.id > S.chatDesde), antigas = d.msgs.length - vis.length;
+  $('#msgs').innerHTML = (antigas ? `<button class="vermais" onclick="S.chatTudo=true;S.chatSig='';loadChat()">ver conversa anterior (${antigas})</button>` : '') + vis.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${esc(textoChat(m))}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || (antigas ? '' : '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>');
   $('#msgs').scrollTop = 1e9;
   const ult = d.msgs.at(-1)?.id || 0, novas = d.msgs.filter(m => m.role !== 'user' && m.id > S.lidas).length;
   if ($('#chat').classList.contains('open') || !isMobile()) { S.lidas = ult; store.set('chatLidas', ult); $('#fabcnt').textContent = ''; } else $('#fabcnt').textContent = novas || '';
+}
+// o gerente às vezes devolve as ordens em JSON: na tela vira uma frase curta (as ações aparecem embaixo)
+function textoChat(m) {
+  const t = String(m.text || '').trim(), sem = t.replace(/```json[\s\S]*?```/g, '').trim();
+  if (/^[\[{]/.test(sem)) { try { const j = JSON.parse(sem), n = [].concat(j).length; return n ? `Pronto, executei ${n} ação(ões).` : 'Pronto.'; } catch { const fora = sem.replace(/\[[\s\S]*\]|\{[\s\S]*\}/g, '').trim(); return fora || 'Pronto, executei o pedido.'; } }
+  return sem || t;
 }
 async function chatSend(t) {
   const text = t || $('#cin').value.trim(); if (!text) return; $('#cin').value = '';
