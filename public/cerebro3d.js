@@ -72,7 +72,7 @@ export function criarCerebro3D(el, dados, { onPick, onHover } = {}) {
 
   // interação
   const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
-  let hover = null, rotY = 0, rotX = 0.15, arr = null, auto = true, dist = 22, acesos = new Set();
+  let hover = null, rotY = 0, rotX = 0.15, arr = null, auto = true, dist = el.clientWidth < 600 ? 19 : 22, acesos = new Set();
   const destaca = (obj, on) => { if (!obj) return; obj.scale.setScalar(on ? 1.6 : 1); if (obj.material.emissive) obj.material.emissive.setHex(on ? 0x6a5420 : obj === gerente ? 0x6a5420 : 0); };
   function pega(e) { const r = renderer.domElement.getBoundingClientRect(); mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(mouse, cam); return ray.intersectObjects(pickables)[0]?.object || null; }
   const cv = renderer.domElement;

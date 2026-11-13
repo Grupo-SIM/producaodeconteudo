@@ -207,6 +207,15 @@ img.av{object-fit:cover;padding:0}
 .eask{display:flex;gap:10px;padding:12px 20px}.eask input{flex:1;background:#18181b;border:1px solid var(--line2);border-radius:10px;padding:11px 14px;outline:none}
 .emod iframe{flex:1;border:0;width:100%;background:#0c0c0d}
 .eft{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--line)}.eft .learn{margin-right:auto}
+.tcel{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}.tcel h1{font-size:24px;font-weight:600}.chip.sm{font-size:12px;padding:5px 10px}
+.pcel{display:flex;align-items:center;gap:10px;background:#2a1214;border:1px solid #6b2a2e;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#f2c4c4}.pcel i{width:8px;height:8px;border-radius:50%;background:#ff6b6b;flex:none}.pcel span{flex:1}.pcel b{color:#fff;font-size:13px}
+.lcel{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}.lcel .lh{display:flex;align-items:center;gap:8px}.lcel .lh b{font-size:15px}.lcel .hj{margin-left:auto;font-size:12px;color:var(--tx3)}.lcel .car{transition:transform .15s}.lcel.open .car{transform:rotate(90deg)}.lcel .sum{margin-top:8px}.lcel .sum span{font-size:11.5px}
+.stc{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:10px}.stc .s{min-width:62%;scroll-snap-align:start}.dots{display:flex;gap:4px;justify-content:center;margin-top:8px}.dots i{width:5px;height:5px;border-radius:3px;background:#3a3a40}.dots i.on{width:14px;background:var(--gold)}
+.ccel{margin-bottom:12px}.ccel .pv{height:240px;aspect-ratio:auto;background:linear-gradient(160deg,#141416,#2a2210 60%,#0c0c0d)}.ccel .pv.video{background:#0c0c0d}.ccel .pv .head{position:absolute;left:16px;right:16px;bottom:16px;font-size:19px;font-weight:700;line-height:1.25;color:#fff}.ccel .play{width:52px;height:52px;border-radius:50%;background:#ffffffd0;color:#111;display:grid;place-items:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.redesc{display:flex;gap:8px}.redesc div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;color:var(--tx3)}.redesc i{width:44px;height:44px;border-radius:12px}
+.ppc{display:flex;gap:12px;align-items:center;background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}.ppc .th{width:52px;height:64px;border-radius:8px;background:linear-gradient(160deg,#1d1a12,#000);overflow:hidden;flex:none}.ppc .th img{width:100%;height:100%;object-fit:cover}.ppc b{display:block;font-size:14px}.ppc span{font-size:12px;color:var(--tx3)}
+.agc{display:flex;gap:12px;align-items:center;margin-bottom:6px}.agc b{width:40px;color:var(--gold);font-size:13px}.agc span{flex:1;background:#161618;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px}
+.csheet{position:fixed;left:0;right:0;bottom:64px;z-index:20;background:#111113;border-top:1px solid var(--line2);border-radius:16px 16px 0 0;padding:10px 16px 16px}.csheet .grab{display:block;width:36px;height:4px;border-radius:2px;background:#3a3a40;margin:0 auto 10px}.csheet b{font-size:16px}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -227,6 +236,8 @@ img.av{object-fit:cover;padding:0}
   .fab .cnt:empty{display:none}
   .cbusca{width:100%}.cfeed{display:none}.cerw{margin:-14px;padding:14px}
   .eov{padding:0}.emod{border-radius:0}.epills,.ehd>span{display:none}.eft{flex-wrap:wrap}.eft .learn{width:100%}
+  .gasto{display:none}.cmodes{display:none!important}#cer{position:relative!important;inset:auto!important;height:300px;margin-top:6px;overflow:hidden}#cer span{font-size:10px!important}.cerw .top{flex-wrap:nowrap}.cerw .top h1{width:auto}.cbusca{margin-top:4px}
+  .fab svg{display:block}.fab .cnt{top:-4px;left:-4px;right:auto}
   .grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
   .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
@@ -248,7 +259,7 @@ img.av{object-fit:cover;padding:0}
     <div class="sugs" id="sugs"></div>
     <div class="cin"><textarea id="cin" placeholder="Fale com o gerente…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea><button class="btn ok sm" onclick="chatSend()">Enviar</button></div>
   </aside>
-  <button class="fab" id="fab" onclick="chatToggle(true)">Gerente<span class="dot"></span><span class="cnt" id="fabcnt"></span></button>
+  <button class="fab" id="fab" onclick="chatToggle(true)" aria-label="Gerente"><svg viewBox="0 0 24 24" width="22" height="22" fill="#141006"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H9l-5 4v-4a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg><span class="dot"></span><span class="cnt" id="fabcnt"></span></button>
 </div>
 <div id="loginv" class="hidden" style="display:flex;width:100%;height:100%">
   <form class="box login" onsubmit="event.preventDefault();doLogin()">
@@ -395,6 +406,7 @@ function cartao(i) {
 }
 VIEWS.fluxo = () => {
   const F = S.fluxo; if (!F) return;
+  if (isMobile() && S.modoFluxo !== 'escritorio') return fluxoCel();
   const nM = S.brands.length, aviso = F.avisos[0];
   const ban = F.avisos.length ? `<div class="prob"><b>${F.avisos.length} problema${F.avisos.length > 1 ? 's' : ''}</b><span>${esc(aviso.titulo)}: ${esc(aviso.motivo || 'parado')}</span><button onclick="abrirItem(${aviso.id})">Resolver</button></div>` : '';
   const head = `<div class="top"><h1>Fluxo</h1><button class="chip ${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');E3?.destruir();E3=null;render()">Lista</button><button class="chip ${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span>
@@ -452,6 +464,40 @@ function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', 
 function trocaVideo() { const u = prompt('Link ou ID do vídeo do YouTube para o telão', store.get('telao', '')); const id = ytId(u); if (!id) return; store.set('telao', id); store.set('telaoOn', true); E3?.telaoVideo(id); }
 function telaCheia() { const w = $('#escw'); document.fullscreenElement ? document.exitFullscreen() : w.requestFullscreen?.(); }
 
+
+// ───────── telas de celular (como no protótipo mockup/celular)
+const topCel = (t, dir) => `<div class="tcel"><h1>${t}</h1>${dir || ''}</div>`;
+const marcaCel = () => `<button class="chip sm" onclick="togglePop(event)">${esc(S.marca || 'Todas as marcas')} ▾</button><div class="mpop hidden" id="mpop"><input class="f" placeholder="Buscar marca…" oninput="fillPop(this.value)" style="margin-bottom:6px"><div id="mlist"></div></div>`;
+function fluxoCel() {
+  const F = S.fluxo, av = F.avisos[0], hoje = new Date().toISOString().slice(0, 10);
+  const lanes = F.formatos.filter(f => f.ativo).map(f => {
+    const its = F.itens.filter(i => i.raia === f.id), ab = S.abertas[f.id] ?? false, c = f.contagem;
+    const feitos = its.filter(i => ['finalizado', 'esperando'].includes(i.estado) && (i.atualizado || '').slice(0, 10) === hoje).length;
+    const pills = [['g', (c.etapa || 0) + (c.ajuste || 0), 'trabalhando'], ['r', c.parado || 0, 'parado'], ['y', c.esperando || 0, 'esperando você']].filter(x => x[1]).map(([k, v, t]) => `<span class="${k}">${v} ${t}</span>`).join('');
+    const cols = (COLS[f.id] || COLS.carrossel).map(([id, nome, quem]) => [id, nome, quem, its.filter(i => colunaDe(i) === id)]).filter(x => x[3].length && x[0] !== 'fim');
+    return `<div class="lcel ${ab ? 'open' : ''}"><div class="lh" onclick="S.abertas['${f.id}']=!${ab};store.set('raiasAbertas',S.abertas);render()"><span class="car">›</span><b>${esc(f.nome)}</b><span class="hj">${feitos} de ${f.meta_dia}${ab ? ' hoje' : ''}</span></div>${pills ? `<div class="sum">${pills}</div>` : ''}
+      ${ab && cols.length ? `<div class="stc">${cols.map(([id, nome, quem, cs]) => `<div class="s ${!quem ? 'me' : ''}"><div class="sh">${esc(nome)}${quem ? ' · ' + esc(quem) : ''}</div>${cs.map(cartao).join('')}</div>`).join('')}</div><div class="dots">${cols.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>` : ''}</div>`;
+  }).join('');
+  $('#main').innerHTML = topCel('Fluxo', `<div class="msel">${marcaCel()}</div>`) + `<div class="tabs"><button class="on">Lista</button><button onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span><button onclick="novoConteudo()">+ Novo</button></div>
+    ${av ? `<div class="pcel" onclick="abrirItem(${av.id})"><i></i><span>${esc(av.titulo)}: ${esc(av.motivo || 'parado')}</span><b>Resolver</b></div>` : ''}${lanes}`;
+}
+function mesaCel() {
+  const F = S.fluxo, todos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'revisao'), cont = { texto: 0, arte: 0, video: 0 }; for (const i of todos) cont[TIPO(i)]++;
+  const its = cont.hasOwnProperty(S.filtro) ? todos.filter(i => TIPO(i) === S.filtro) : todos, nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
+  $('#main').innerHTML = topCel('Revisão', `<span class="chip sm">${todos.length} esperando</span>`) + `<div class="tabs">${[['todos', 'Tudo'], ['texto', 'Textos'], ['arte', 'Artes'], ['video', 'Vídeos']].map(([k, n]) => `<button class="${(S.filtro === k || (k === 'todos' && !cont.hasOwnProperty(S.filtro))) ? 'on' : ''}" onclick="S.filtro='${k}';render()">${n}</button>`).join('')}</div>
+    ${its.map(i => `<div class="card ccel"><div class="pv ${TIPO(i)}">${TIPO(i) === 'video' ? '<span class="play">▶</span>' : i.thumb && TIPO(i) === 'arte' ? `<img src="${i.thumb}">` : `<div class="head" id="pv${i.id}">${esc(i.titulo)}</div>`}<span class="tp">${TIPO(i) === 'video' ? 'Vídeo' : TIPO(i) === 'arte' ? 'Arte · ' + esc(nomeR(i.raia).toLowerCase()) : 'Texto · ' + esc(nomeR(i.raia).toLowerCase())}</span><span class="age">${ha(i.atualizado)}</span></div>
+      <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${esc(i.marca || 'Sem marca')} · ${esc(nomeR(i.raia))}</span><div class="ac"><button class="btn" onclick="${TIPO(i) === 'texto' ? `abrirEditor(${i.id})` : `abreEstudio('${TIPO(i)}',${i.id})`}">Editar</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('') || '<div class="empty">Nada esperando você agora.</div>'}`;
+  for (const i of its.filter(i => !i.thumb && TIPO(i) !== 'video')) api('/api/v2/itens/' + i.id).then(d => { const el = $('#pv' + i.id); const l = (d.materia || d.roteiro || '').split('\n').filter(Boolean)[0]; if (el && l) el.textContent = l.replace(/^[^:]{2,20}:\s*/, ''); }).catch(() => { });
+}
+function publicarCel() {
+  const F = S.fluxo, prontos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao'), nomeR = id => F.formatos.find(f => f.id === id)?.nome || id;
+  const cores = ['linear-gradient(135deg,#f58529,#dd2a7b,#8134af)', '#1877f2', '#111;border:1px solid #444', '#ff0000', '#e60023', '#c9a86a'];
+  const amanha = ['09h', '12h', '18h'].map(h => [h, prontos.filter(i => RHORA[i.raia] === h)]);
+  $('#main').innerHTML = topCel('Publicar', '<span class="chip sm on">Manual</span>') + `<div class="redesc">${cores.map(c => `<div><i style="background:${c}"></i><span>em breve</span></div>`).join('')}</div>
+    <h5 style="margin:14px 0 8px">Prontos para postar · hoje</h5>${prontos.map(i => `<div class="ppc"><div class="th">${i.thumb ? `<img src="${i.thumb}">` : ''}</div><div style="flex:1;min-width:0"><b>${esc(i.titulo)}</b><span>${esc(i.marca || '')} · ${['materia', 'blog'].includes(i.raia) ? 'site' : 'Instagram'} ${RHORA[i.raia]}</span></div><button class="btn sm ok" onclick="marcarPostado(${i.id})">${['materia', 'blog'].includes(i.raia) ? 'Publicado' : 'Postado'}</button></div>`).join('') || '<p class="muted small">Nada pronto agora.</p>'}
+    <h5 style="margin:16px 0 8px">Agenda de amanhã</h5>${amanha.map(([h, L]) => `<div class="agc"><b>${h}</b><span>${L.map(i => `${esc(nomeR(i.raia))} · ${esc(i.marca)}`).join(', ') || '—'}</span></div>`).join('')}`;
+}
+
 // ───────── Novo conteúdo
 function novoConteudo() {
   modal(`<div class="hd"><h2>Novo conteúdo</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb" style="display:grid;gap:10px">
@@ -473,6 +519,7 @@ const TIPO = i => i.raia === 'reels' ? 'video' : i.roteiro || ['blog', 'materia'
 const QUEM = { carrossel: 'Designer', estatico: 'Designer', stories: 'Designer', reels: 'Editor de vídeo', materia: 'Roteirista + SEO', blog: 'Roteirista' };
 VIEWS.mesa = () => {
   const F = S.fluxo; if (!F) return;
+  if (isMobile()) return mesaCel();
   const todos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'revisao');
   const cont = { texto: 0, arte: 0, video: 0 }; for (const i of todos) cont[TIPO(i)]++;
   const its = S.filtro === 'todos' || !cont.hasOwnProperty(S.filtro) ? todos : todos.filter(i => TIPO(i) === S.filtro);
@@ -564,6 +611,7 @@ const RCOR = { carrossel: '#c2347a', estatico: '#5a5a5f', stories: '#e07a1f', re
 const RHORA = { materia: '09h', blog: '09h', carrossel: '12h', reels: '18h', stories: '18h', estatico: '20h' };
 VIEWS.publicacao = () => {
   const F = S.fluxo; if (!F) return;
+  if (isMobile()) return publicarCel();
   const prontos = F.itens.filter(i => i.estado === 'esperando' && i.etapa === 'publicacao'), feitos = F.itens.filter(i => i.estado === 'finalizado');
   const nomeR = id => F.formatos.find(f => f.id === id)?.nome || id, curta = m => (m || 'Sem marca').split(' ').filter(w => w.length > 2)[0] || m;
   const redes = [['Instagram', 'feed, carrossel, stories, reels', 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)'], ['Facebook', 'página da marca', '#1877f2'], ['TikTok', 'vídeo vertical', '#111;border:1px solid #444'], ['YouTube', 'shorts e vídeo longo', '#ff0000'], ['Pinterest', 'pins com link', '#e60023'], ['Site e blog', 'matérias e posts de blog', '#c9a86a']];
@@ -742,11 +790,11 @@ VIEWS.cerebro = async () => {
   const [d, st] = await Promise.all([api('/api/v2/cerebro'), api('/api/state')]); S.cer = d; S.cerModo ||= '3d';
   const modo = S.cerModo;
   const feed = st.activity.filter(x => x.agent).slice(0, 4).map(x => `<div><span>${ha(x.ts).replace('há ', '')}</span> ${esc(x.message)}</div>`).join('');
-  $('#main').innerHTML = `<div class="cerw"><div class="top"><h1>Cérebro</h1><span style="flex:1"></span>${[['3d', 'Cérebro'], ['const', 'Constelação'], ['lista', 'Lista']].map(([k, n]) => `<button class="chip ${modo === k ? 'on' : ''}" onclick="S.cerModo='${k}';render()">${n}</button>`).join('')}${marcaSel(`Marca: ${esc(S.marca || 'Todas')} ▾`)}</div>
+  $('#main').innerHTML = `<div class="cerw"><div class="top"><h1>Cérebro</h1><span style="flex:1"></span>${isMobile() ? `<div class="msel">${marcaCel()}</div>` : ''}<span class="cmodes" style="display:contents">${[['3d', 'Cérebro'], ['const', 'Constelação'], ['lista', 'Lista']].map(([k, n]) => `<button class="chip ${modo === k ? 'on' : ''}" onclick="S.cerModo='${k}';render()">${n}</button>`).join('')}${marcaSel(`Marca: ${esc(S.marca || 'Todas')} ▾`)}</span></div>
     <div class="cbusca"><input placeholder="Buscar e acender o caminho… (ex.: stories de venda)" oninput="cerBusca(this.value)"><span id="cerN"></span></div>
     <div id="cer" class="${modo}"></div>
     <div id="cerTip" class="hidden"></div><div id="cerCard" class="hidden"></div>
-    ${modo !== 'lista' ? `<div class="cfeed">${feed}</div><div class="chint">Passe o mouse para destacar · clique para abrir · arraste para girar</div>` : ''}</div>`;
+    ${isMobile() ? (() => { const a0 = [...d.agentes].sort((x, y) => y.itens.length - x.itens.length)[0]; return a0 ? `<div class="csheet" id="csheet"><i class="grab"></i><b>${esc(a0.nome)}</b> <span class="muted small">${a0.itens.length} arquivos</span><div class="tagsw">${a0.itens.slice(0, 8).map(i => `<span class="tg out" onclick="cerAbre({tipo:'${i.tipo}',id:'${i.id}'})">${esc(i.titulo.split(/[:(—-]/)[0].slice(0, 20))}</span>`).join('')}${a0.itens.length > 8 ? `<span class="tg out">+${a0.itens.length - 8}</span>` : ''}</div></div>` : ''; })() : ''}${modo !== 'lista' ? `<div class="cfeed">${feed}</div><div class="chint">Passe o mouse para destacar · clique para abrir · arraste para girar</div>` : ''}</div>`;
   const el = $('#cer');
   if (modo === '3d') {
     try {
