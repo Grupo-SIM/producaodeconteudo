@@ -892,6 +892,10 @@ async function boot() {
   { const q = new URLSearchParams(location.search), emb = q.get('embed'), eid = +q.get('id');   // novo front (app.html): abre só o editor, sem o painel antigo em volta
     if (emb && eid) { document.body.classList.add('embed'); const st = document.createElement('style'); st.textContent = 'body.embed #app{display:none!important} body.embed{background:#0c0c0d;--bg:#0c0c0d;--panel:#0f0f10;--panel2:#141416;--acc:#d9c08a;--acc2:#a8864a} body.embed .btn.primary{background:linear-gradient(135deg,#e9d8a6,#a8864a)!important;color:#141006!important;border:none!important}'; document.head.append(st);
       const fecha = () => parent.postMessage({ tipo: 'editor-fechado', id: eid }, location.origin);
+      st.textContent += ' body.embed .aet{display:none!important} body.embed .ae,body.embed .ve{inset:0!important;border-radius:0!important}';
+      addEventListener('message', ev => { if (ev.origin !== location.origin || ev.data?.acao !== 'salvar') return;   // o rodapé do novo front pede para salvar
+        const b = [...document.querySelectorAll('#layer .aet button')].find(x => x.textContent.trim() === 'Salvar');
+        if (b && !b.disabled) b.click(); setTimeout(() => parent.postMessage({ tipo: 'editor-salvo', id: eid }, location.origin), b ? 2500 : 0); });
       try { if (emb === 'arte') await arteEditor(eid, fecha); else if (emb === 'video') await videoEditor(eid, fecha); }
       catch (e) { parent.postMessage({ tipo: 'editor-fechado', id: eid, erro: e.message || 'Não consegui abrir o editor' }, location.origin); }
       return; } }

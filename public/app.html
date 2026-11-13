@@ -197,6 +197,12 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .econt{position:absolute;left:26px;bottom:22px;display:flex;gap:8px}.econt div{background:#0b0e16e8;border:1px solid #2a3350;border-radius:10px;padding:8px 14px;font-size:12px;color:#aab}.econt b{display:block;font-size:20px;color:#fff}.econt b.r{color:#ff6b6b}
 .eesp{position:absolute;right:26px;bottom:22px;width:260px;background:#0b0e16e8;border:1px solid #2a3350;border-radius:12px;padding:12px 14px;font-size:12.5px;display:flex;flex-direction:column;gap:6px}.eesp b{color:var(--gold2);font-size:14px}.eesp a{color:var(--gold2);text-decoration:none}
 #escw .escf{position:absolute;right:26px;top:140px;left:auto;bottom:auto;width:300px;z-index:5}.escf span{color:#8a93a6;margin-right:4px}
+.eov{position:fixed;inset:0;z-index:95;background:#000c;display:flex;padding:36px 60px}.emod{flex:1;display:flex;flex-direction:column;background:#111113;border:1px solid var(--line2);border-radius:18px;overflow:hidden}
+.ehd{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}.ehd b{font-size:17px}.ehd>span{font-size:13px;color:var(--tx3)}.ehd .x{margin-left:auto;font-size:20px;color:var(--tx3)}
+.epills{display:flex;gap:6px;margin-left:16px}.epills em{font-style:normal;font-size:11.5px;padding:3px 9px;border-radius:999px;background:#18181b;color:var(--tx3)}.epills em.ok{color:#9fd3b2}.epills em.now{background:var(--goldbg);color:var(--gold2)}
+.eask{display:flex;gap:10px;padding:12px 20px}.eask input{flex:1;background:#18181b;border:1px solid var(--line2);border-radius:10px;padding:11px 14px;outline:none}
+.emod iframe{flex:1;border:0;width:100%;background:#0c0c0d}
+.eft{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--line)}.eft .learn{margin-right:auto}
 /* ---------- celular ---------- */
 @media (max-width:760px){
   body{display:block;overflow:auto}
@@ -216,6 +222,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
   .fab .cnt{position:absolute;top:-4px;right:-4px;background:#e06060;color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
   .fab .cnt:empty{display:none}
   .cbusca{width:100%}.cfeed{display:none}.cerw{margin:-14px;padding:14px}
+  .eov{padding:0}.emod{border-radius:0}.epills,.ehd>span{display:none}.eft{flex-wrap:wrap}.eft .learn{width:100%}
   .grid,.mgrid,.redes,.pub2,.mlay,.mcards,.two,.kps{grid-template-columns:1fr!important}.cal2{display:none}.note{flex-direction:column;align-items:flex-start}.sidetools{display:none}.lh .sub{display:none}
   .escf{display:none}.esch{font-size:10px}
   .ov{padding:0}.mo{border-radius:0;height:100%}
@@ -472,7 +479,7 @@ VIEWS.mesa = () => {
     <div class="top" style="margin-top:-4px"><div class="tabs" style="margin:0">${[['todos', `Tudo (${todos.length})`], ['texto', `Textos (${cont.texto})`], ['arte', `Artes (${cont.arte})`], ['video', `Vídeos (${cont.video})`]].map(([k, n]) => `<button class="${(S.filtro === k || (k === 'todos' && !cont.hasOwnProperty(S.filtro))) ? 'on' : ''}" onclick="S.filtro='${k}';render()">${n}</button>`).join('')}</div><span style="flex:1"></span>${marcaSel()}</div>
     ${its.length ? `<div class="mgrid mesa1">${its.map((i, k) => `<div class="card ${k === (S.mi = Math.min(S.mi || 0, its.length - 1)) ? 'cur' : ''}"><div class="pv ${TIPO(i)}">${TIPO(i) === 'arte' ? (i.thumb ? `<img src="${i.thumb}" loading="lazy">` : `<div class="head" id="pv${i.id}">…</div>`) : TIPO(i) === 'video' ? `${i.thumb ? `<img src="${i.thumb}">` : ''}<span class="play">▶</span>` : `<div class="txt" id="pv${i.id}">…</div>`}<span class="tp">${esc(lbl(i))}</span><span class="age">${ha(i.atualizado)}</span></div>
       <div class="bd"><b>${esc(i.titulo)}</b><span class="small muted">${[i.marca || 'Sem marca', nomeR(i.raia), i.roteiro ? 'Roteirista' : QUEM[i.raia]].map(esc).join(' · ')}</span>
-      <div class="ac"><button class="btn" onclick="abrirEditor(${i.id})">Abrir editor</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('')}</div><div class="mnav"><button class="btn" onclick="S.mi=Math.max(0,(S.mi||0)-1);render()">‹ Anterior</button><span class="small muted" style="align-self:center">${(S.mi || 0) + 1} de ${its.length}</span><button class="btn" onclick="S.mi=(S.mi||0)+1;render()">Próximo ›</button></div>` : '<div class="empty">Nada esperando você agora.</div>'}`;
+      <div class="ac"><button class="btn" onclick="${TIPO(i) === 'texto' ? `abrirEditor(${i.id})` : `abreEstudio('${TIPO(i)}',${i.id})`}">Abrir editor</button><button class="btn ok" onclick="aprovar(${i.id})">Aprovar</button></div></div></div>`).join('')}</div><div class="mnav"><button class="btn" onclick="S.mi=Math.max(0,(S.mi||0)-1);render()">‹ Anterior</button><span class="small muted" style="align-self:center">${(S.mi || 0) + 1} de ${its.length}</span><button class="btn" onclick="S.mi=(S.mi||0)+1;render()">Próximo ›</button></div>` : '<div class="empty">Nada esperando você agora.</div>'}`;
   const g = $('.mesa1'); if (g) { let x0 = null; g.ontouchstart = e => x0 = e.touches[0].clientX; g.ontouchend = e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) { S.mi = Math.max(0, (S.mi || 0) + (dx < 0 ? 1 : -1)); render(); } x0 = null; }; }
   for (const i of its.filter(i => TIPO(i) === 'texto' || (TIPO(i) === 'arte' && !i.thumb))) api('/api/v2/itens/' + i.id).then(d => { const el = $('#pv' + i.id); if (!el) return; const t = (d.materia || d.roteiro || d.legenda || '').trim(), l = t.split('\n').filter(Boolean); el.innerHTML = el.classList.contains('head') ? esc(l[0] || i.titulo) : i.raia === 'materia' ? `<h4>${esc(l[0] || '')}</h4><p>${esc(l.slice(1, 4).join(' '))}</p>` : l.slice(0, 4).map(x => `<p>${esc(x).replace(/^([^:]{2,20}):/, '<b>$1:</b>')}</p>`).join(''); }).catch(() => { });
 };
@@ -515,10 +522,24 @@ async function abrirEditor(id) {
   $('#doc').addEventListener('input', () => { $('#learn').textContent = 'Você está editando: ao aprovar, o gerente transforma a mudança em regra.'; });
 }
 function abreEstudio(tipo, id) {
-  const f = document.createElement('iframe'); f.src = `/?embed=${tipo}&id=${id}`; f.id = 'estudio';
-  f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;z-index:95;background:#0c0c0d'; document.body.appendChild(f);
+  const i = S.fluxo.itens.find(x => x.id === id) || {}, F = S.fluxo, raia = F.formatos.find(f => f.id === i.raia);
+  const cols = (COLS[i.raia] || COLS.carrossel).map(c => c[2] ? c[1] : c[0] === 'fim' ? 'Finalizado' : c[0] === 'ap_roteiro' ? 'Aprovado' : 'Sua aprovação'), atual = cols.indexOf('Sua aprovação');
+  const quem = tipo === 'video' ? 'Editor de vídeo' : 'Designer', alvo = tipo === 'video' ? 'editor' : 'designer';
+  const ex = tipo === 'video' ? '"a música está alta na parte da explicação, abaixa e refaz a legenda do final"' : '"no slide 7, destaca a resposta da marca forte em amarelo"';
+  const d = document.createElement('div'); d.id = 'estudio'; d.className = 'eov';
+  d.innerHTML = `<div class="emod"><div class="ehd"><b>${esc(i.titulo || '')}</b><span>${[i.marca, raia?.nome, quem, i.atualizado ? ha(i.atualizado) : ''].filter(Boolean).map(esc).join(' · ')}</span>
+    <div class="epills">${cols.map((c, k) => `<em class="${k < atual ? 'ok' : k === atual ? 'now' : ''}">${esc(c)}</em>`).join('')}</div><button class="x" onclick="fechaEstudio()">×</button></div>
+    <div class="eask"><input id="eajm" placeholder="Pedir ajuste ao gerente: ${esc(ex)}…" onkeydown="if(event.key==='Enter')ajusteEstudio(${id},'${alvo}')"><button class="btn bl" onclick="ajusteEstudio(${id},'${alvo}')">Mandar ajustar</button></div>
+    <iframe src="/?embed=${tipo}&id=${id}"></iframe>
+    <div class="eft"><span class="learn">O gerente está observando suas edições. O que você mudar vira regra do ${quem} ao aprovar.</span><button class="btn" onclick="acao(${id},'descartar').then(fechaEstudio)">Descartar</button><button class="btn" onclick="salvaEstudio(${id})">Salvar e fechar</button><button class="btn ok" onclick="salvaEstudio(${id},true)">Aprovar e mandar para postagem</button></div></div>`;
+  document.body.appendChild(d);
 }
-addEventListener('message', e => { if (e.origin !== location.origin || e.data?.tipo !== 'editor-fechado') return; $('#estudio')?.remove(); const id = e.data.id; if (e.data.erro) toast(e.data.erro); refresh().then(() => { if (ED?.id === id) abrirEditor(id); }); });
+function fechaEstudio() { $('#estudio')?.remove(); refresh(); }
+async function ajusteEstudio(id, alvo) { const m = $('#eajm').value.trim(); if (!m) return toast('Diga o que ajustar'); await tryDo(() => api(`/api/v2/itens/${id}/ajuste`, { body: { motivo: m, alvo } }), 'Pedido enviado: volta para o agente com a tag de ajuste'); fechaEstudio(); fecha(); }
+function salvaEstudio(id, aprova) { S.estAprova = aprova ? id : null; $('#estudio iframe').contentWindow.postMessage({ acao: 'salvar' }, location.origin); toast('Salvando…'); }
+addEventListener('message', async e => { if (e.origin !== location.origin) return;
+  if (e.data?.tipo === 'editor-salvo') { const id = e.data.id; if (S.estAprova === id) { await tryDo(() => api(`/api/v2/itens/${id}/aprovar`, { body: { forcar: true } }), 'Aprovado e enviado para postagem'); fecha(); } else toast('Salvo'); fechaEstudio(); return; }
+  if (e.data?.tipo !== 'editor-fechado') return; $('#estudio')?.remove(); const id = e.data.id; if (e.data.erro) toast(e.data.erro); refresh().then(() => { if (ED?.id === id) abrirEditor(id); }); });
 function edTab(t) { document.querySelectorAll('.mb [data-t]').forEach(e => e.classList.toggle('hidden', e.dataset.t !== t)); document.querySelectorAll('.mb .tabs button').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase().startsWith(t.slice(0, 4)))); }
 async function salvarEd(aprova) {
   const campos = {}, txt = $('#doc').innerText.replace(/\n$/, '');
