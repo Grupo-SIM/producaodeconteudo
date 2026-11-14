@@ -1746,8 +1746,11 @@ function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter =
 }
 const getContent = id => one('SELECT * FROM contents WHERE id=?', id);
 for (const col of ['materia_em', 'post_em']) if (!db.prepare('PRAGMA table_info(contents)').all().some(x => x.name === col)) db.exec(`ALTER TABLE contents ADD COLUMN ${col} TEXT DEFAULT ''`);
+db.exec('CREATE TABLE IF NOT EXISTS art_hist(id INTEGER PRIMARY KEY AUTOINCREMENT, content_id INTEGER NOT NULL, ts TEXT NOT NULL, spec TEXT NOT NULL)');
 const setContent = (id, fields) => {
   const keys = Object.keys(fields);
+  // histórico da arte: guarda a versão anterior sempre que a arte muda (para “volta como estava” funcionar); fica só as 30 últimas
+  if ('art_spec' in fields) { try { const ant = one('SELECT art_spec FROM contents WHERE id=?', id)?.art_spec; if (ant && ant !== fields.art_spec) { run('INSERT INTO art_hist(content_id,ts,spec) VALUES(?,?,?)', id, T(), ant); run('DELETE FROM art_hist WHERE content_id=? AND id NOT IN (SELECT id FROM art_hist WHERE content_id=? ORDER BY id DESC LIMIT 30)', id, id); } } catch { /* sem histórico */ } }
   if ('status' in fields) dlog('conteudo', `#${id} status -> ${fields.status}${fields.error ? ' | ' + String(fields.error).slice(0, 200) : ''}`);
   // notícia: a matéria do site e o post (texto/arte) têm hora própria, para o "há X min" de um não mudar quando você mexe no outro
   const mexeMateria = keys.includes('materia'), mexePost = keys.some(k => ['script', 'caption', 'art', 'art_spec', 'art_status', 'video', 'spec'].includes(k));
@@ -5507,6 +5510,20 @@ const HANDLERS = {
   async arte(job, c) {
     const input = JSON.parse(job.input || '{}');
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
+    // “volta como estava”: devolve a página pedida (ou a arte inteira) da versão anterior guardada no histórico, sem refazer nada
+    if (input.from === 'dono' && c.art_spec && /\b(volt[ae]|desfa[zç]|como estava|vers[ãa]o anterior)/i.test(input.feedback || '')) {
+      const fb = String(input.feedback), cur = jparse(c.art_spec, {}), pg = /contra-?capa/i.test(fb) ? 1 : /\bcapa\b/i.test(fb) ? 0 : (fb.match(/(?:p[áa]gina|slide)\s*(\d+)/i) || [])[1] ? +(fb.match(/(?:p[áa]gina|slide)\s*(\d+)/i)[1]) - 1 : -1;
+      const H = all('SELECT spec FROM art_hist WHERE content_id=? ORDER BY id DESC', c.id).map(x => jparse(x.spec, null)).filter(Boolean);
+      const alvo = H.find(h => pg < 0 ? JSON.stringify(h.slides) !== JSON.stringify(cur.slides) : h.slides?.[pg] && JSON.stringify(h.slides[pg]) !== JSON.stringify(cur.slides?.[pg]));
+      if (alvo) {
+        const novo = pg < 0 ? alvo : { ...cur, slides: cur.slides.map((x, i) => i === pg ? alvo.slides[pg] : x) };
+        setContent(c.id, { art_spec: JSON.stringify(novo), art_status: '' }); await renderArte(c.id);
+        addChat('gerente', `Voltei ${pg < 0 ? 'a arte' : pg === 0 ? 'a capa' : pg === 1 ? 'a contracapa' : 'a página ' + (pg + 1)} de “${c.title}” para a versão anterior, como você pediu. O resto não mudou.`);
+        return { text: 'Versão anterior restaurada', tin: 0, tout: 0 };
+      }
+      addChat('gerente', `Não achei uma versão anterior ${pg === 1 ? 'da contracapa' : pg === 0 ? 'da capa' : 'da arte'} de “${c.title}” guardada no histórico (ele começou a ser guardado agora). Se quiser, monte de novo pelo editor, em Templates.`);
+      return { text: 'Sem versão anterior no histórico', tin: 0, tout: 0 };
+    }
     // notícia: pedido do dono para trocar a foto de fundo vai direto na foto (a arte de notícia é montada pelo painel e ignoraria o pedido)
     if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && /\b(foto|imagem|fundo)\b/i.test(input.feedback || '') && /\b(troc|mud|outr|substitu|alter)/i.test(input.feedback || '')) {
       const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
