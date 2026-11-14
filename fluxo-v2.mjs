@@ -102,14 +102,17 @@ export function criarFluxoV2(ctx) {
     const s = ctx.settings();   // a grade de Produção diária é o único gatilho: tudo zerado = nada é criado sozinho
     const hora = +new Date().toLocaleString('en-US', { timeZone: s.tz || 'America/Sao_Paulo', hour: 'numeric', hour12: false }); if (hora < +(s.start_hour || 0)) return;
     const hoje = diaLocal(Date.now()), F = novoFormatos();
-    const feitos = all("SELECT * FROM contents WHERE teste=0 AND created_by='autopilot' AND created_at>=?", new Date(Date.now() - 40 * 3600e3).toISOString()).filter(c => diaLocal(c.created_at) === hoje);
+    const feitos = all("SELECT * FROM contents WHERE teste=0 AND created_by IN ('autopilot','grade_aprovada') AND created_at>=?", new Date(Date.now() - 40 * 3600e3).toISOString()).filter(c => diaLocal(c.created_at) === hoje);
     for (const m of all('SELECT * FROM brand_metas WHERE qtd>0')) {
       const f = F.find(x => x.id === m.raia); if (!f) continue;
       const falta = m.qtd - feitos.filter(c => (c.brand || '').toLowerCase() === m.brand.toLowerCase() && raiaDe(c, ctx) === m.raia).length; if (falta <= 0) continue;
+      // primeiro a copy já aprovada (nada de copy nova enquanto houver aprovada para o formato); só sem nenhuma o Gerente pede pauta nova
+      let usadas = 0; for (let k = 0; k < falta; k++) { const pc = aprovadaPara(m.brand, m.raia); if (!pc) break; criarDeAprovada(pc, m.brand, 'grade_aprovada'); usadas++; }
+      if (usadas >= falta) continue;
       const tag = `"meta":"${m.brand}|${m.raia}"`;
       if (one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running') AND input LIKE ?", '%' + tag + '%')) continue;
       if (one("SELECT COUNT(*) n FROM jobs WHERE kind='pautas' AND cday=? AND input LIKE ?", hoje, '%' + tag + '%').n >= 3) continue;
-      ctx.enqueue(null, 'chefe', 'pautas', { auto: true, brand: m.brand, quota: { [f.format]: falta }, kinds: f.tipos.map(t => t[0]), meta: `${m.brand}|${m.raia}` }, 'auto');
+      ctx.enqueue(null, 'chefe', 'pautas', { auto: true, brand: m.brand, quota: { [f.format]: falta - usadas }, kinds: f.tipos.map(t => t[0]), meta: `${m.brand}|${m.raia}` }, 'auto');
     }
   }
   // Itens parados por causa técnica que se resolve sozinha (limite da assinatura, resposta vazia, erro antigo): tenta de novo a cada hora
@@ -119,6 +122,14 @@ export function criarFluxoV2(ctx) {
     if (L.length) { log(null, `${L.length} item(ns) parados por limite ou falha do Claude voltaram para a fila sozinhos`); changed(); }
   }
   ctx.temMetasMarca = () => !!one('SELECT 1 x FROM brand_metas WHERE qtd>0');
+  // uma vez só: tira da fila as sobras da versão antiga (pautas automáticas e notícias criadas sozinhas que não chegaram na Mesa); vão para a lixeira
+  setTimeout(() => { try { if (one("SELECT 1 x FROM settings WHERE key='sobras_limpas_v1'")) return;
+    const L = all("SELECT id,status FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer','grade_aprovada') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')");
+    for (const c of L) { run("DELETE FROM jobs WHERE content_id=? AND status='queued'", c.id); setContent(c.id, { status: 'discarded', status_antes: c.status, em_ajuste: 0 }); }
+    run("DELETE FROM jobs WHERE status='queued' AND content_id IS NULL AND kind IN ('pautas','radar') AND origin='auto'");
+    run("INSERT OR REPLACE INTO settings(key,value) VALUES('sobras_limpas_v1','1')");
+    if (L.length) { log(null, `${L.length} peça(s) criadas sozinhas pela versão antiga saíram da fila (estão na lixeira)`); changed(); }
+  } catch (e) { console.error('limpar sobras:', e.message); } }, 4000).unref?.();
   ctx.metaDe = (brand, raia) => one('SELECT qtd FROM brand_metas WHERE brand=? COLLATE NOCASE AND raia=?', brand, raia)?.qtd || 0;
   // começa tudo zerado (decisão do dono, em treino): uma vez só, zera as metas que já existiam
   if (!one("SELECT 1 x FROM settings WHERE key='metas_zeradas_v1'")) { run('UPDATE brand_metas SET qtd=0'); run("INSERT OR REPLACE INTO settings(key,value) VALUES('metas_zeradas_v1','1')"); }
@@ -147,7 +158,7 @@ export function criarFluxoV2(ctx) {
     const itens = rows.map(c => item(c, porC.get(c.id) || []));
     // por que está aguardando: posição na fila (mesma ordem do agendador) e quem está rodando agora
     const fila = all("SELECT j.id,j.content_id,j.kind,j.agent FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id", T());
-    const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0, limite = usadas >= +st.max_jobs_day ? +st.max_jobs_day : 0;
+    const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0, limite = 0;
     const rodando = all("SELECT j.agent, c.title FROM jobs j LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='running'");
     const vagas = Math.max(1, +ctx.settings().concurrency || 1), manual = !!ctx.manual?.();
     for (const i of itens) if (i.aguardando) {   // posição na fila do próprio agente
@@ -329,11 +340,27 @@ export function criarFluxoV2(ctx) {
   }
   setInterval(() => { try { if (new Date().getDay() === 1 && new Date().getHours() === 8) gerarDescobertas(); exportarAprendido(); } catch (e) { console.error('fluxo-v2 rotina:', e.message); } }, 3600e3).unref();
 
+  function criarDeAprovada(pc, marca, origem) {
+    const leg = (pc.texto.match(/^Legenda:\s*([\s\S]*?)(?:\n\s*\n|$)/m) || [])[1] || '', script = pc.texto.replace(/^Legenda:[\s\S]*?(?:\n\s*\n|$)/m, '').trim();
+    const r = run("INSERT INTO contents(title,format,kind,platform,brief,goal,brand,status,script,caption,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      pc.titulo, pc.format, pc.kind, 'instagram', `${origem === 'treino_designer' ? 'Treino do Designer' : 'Produção diária'}: copy aprovada nº ${pc.n} (${pc.secao}). Não reescreva a copy: dê vida a ela.`, '', marca, 'producing', script, leg.trim(), origem, T(), T());
+    const id = +r.lastInsertRowid, ag = pc.format === 'video_vertical' ? 'editor' : 'designer';
+    ctx.enqueue(id, ag, ag === 'designer' ? 'arte' : 'video', {}, 'manual');
+    log(null, `${origem === 'treino_designer' ? 'Treino do Designer' : 'Produção diária'}: copy aprovada nº ${pc.n} "${pc.titulo}" foi para ${ag === 'designer' ? 'o Designer' : 'o Editor'} (${marca})`, id); changed();
+    return id;
+  }
+  // copy aprovada ainda não usada para a marca e o formato da grade (primeiro as feitas para a marca, depois as sem marca definida)
+  const RAIA_FMT = { carrossel: p => p.format === 'carrossel', estatico: p => p.format === 'feed' && p.kind !== 'noticia', materia: p => p.format === 'feed' && p.kind === 'noticia', stories: p => p.format === 'stories', reels: p => p.format === 'video_vertical' };
+  function aprovadaPara(marca, raia) {
+    const ok = RAIA_FMT[raia]; if (!ok) return null;
+    const L = pecasAprovadas().filter(p => !p.enviado && ok(p));
+    return L.find(p => p.marca.toLowerCase() === marca.toLowerCase()) || L.find(p => !p.marca) || null;
+  }
   // lê as peças aprovadas no treino do Roteirista, com o formato de cada seção
   function pecasAprovadas() {
     let md = ''; try { md = fsx.readFileSync(path.join(ctx.dirname, 'carrosseis-aprovados-producao.md'), 'utf8'); } catch { return []; }
     const SEC = [[/^Educativo/i, 'carrossel', 'educativo'], [/^Hist[óo]ria real/i, 'carrossel', 'historia_real'], [/^Est[áa]tico/i, 'feed', 'educativo'], [/^Stories/i, 'stories', 'venda'], [/^Posts? de venda/i, 'carrossel', 'venda'], [/^Educativos aprovados/i, 'carrossel', 'educativo'], [/^Reels/i, 'video_vertical', 'educativo'], [/^Mat[ée]rias?/i, 'feed', 'noticia'], [/^Posts? de blog/i, '', 'texto']];
-    const marcas = all('SELECT name FROM brands').map(x => x.name), usados = new Map(all("SELECT id, brief, status FROM contents WHERE created_by='treino_designer'").map(c => [(c.brief.match(/nº (\w+)/) || [])[1], c]));
+    const marcas = all('SELECT name FROM brands').map(x => x.name), usados = new Map(all("SELECT id, brief, status FROM contents WHERE created_by IN ('treino_designer','grade_aprovada') AND status<>'discarded'").map(c => [(c.brief.match(/nº (\w+)/) || [])[1], c]));
     const out = []; let sec = null, cur = null;
     for (const l of md.split('\n')) {
       const h2 = l.match(/^## (.+)/), h3 = l.match(/^### (\w+)\.\s*(.+)/);
@@ -357,14 +384,14 @@ export function criarFluxoV2(ctx) {
       const J = all(`SELECT j.id,j.agent,j.kind,j.status,j.origin,j.run_after,j.started_at,j.content_id,c.title,c.brand,c.created_by,c.status cst FROM jobs j LEFT JOIN contents c ON c.id=j.content_id
         WHERE j.status IN ('queued','running') ORDER BY (j.status='running') DESC, (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id`);
       const ag = all('SELECT id,name,enabled FROM agents ORDER BY rowid');
-      const voce = j => j.origin === 'manual' || ['manual', 'treino_designer'].includes(j.created_by) || ['chat', 'teste'].includes(j.kind);
+      const voce = j => j.origin === 'manual' || ['manual', 'treino_designer', 'grade_aprovada'].includes(j.created_by) || ['chat', 'teste'].includes(j.kind);
       const f = j => ({ job: j.id, id: j.content_id, titulo: j.title || ({ chat: 'Respondendo você no chat', pautas: 'Criando pautas', radar: 'Buscando notícias', cerebro: 'Consolidando o Cérebro', relatorio: 'Lendo as métricas' })[j.kind] || j.kind, marca: j.brand || '', voce: voce(j), sozinho: !voce(j) && !!j.content_id, quando: j.run_after && new Date(j.run_after) > new Date() ? j.run_after : null, desde: j.started_at });
       return send(res, 200, { usadas, limite: +st.max_jobs_day, vagas: Math.max(1, +st.concurrency || 1), agentes: ag.map(a => ({ id: a.id, nome: a.name, ligado: !!a.enabled, agora: J.filter(j => j.agent === a.id && j.status === 'running').map(f), fila: J.filter(j => j.agent === a.id && j.status === 'queued').map(f) })).filter(a => a.agora.length || a.fila.length),
-        sozinhos: one(`SELECT COUNT(*) n FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`).n });
+        sozinhos: one(`SELECT COUNT(*) n FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer','grade_aprovada') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`).n });
     }
     // descarta de uma vez o que foi criado sozinho e ainda não chegou na Mesa do dono (vai para a lixeira, dá para restaurar)
     if (p === '/api/v2/fila/limpar-sozinhos' && m === 'POST') {
-      const L = all(`SELECT id,status,title FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`);
+      const L = all(`SELECT id,status,title FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer','grade_aprovada') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`);
       for (const c of L) { run("DELETE FROM jobs WHERE content_id=? AND status='queued'", c.id); setContent(c.id, { status: 'discarded', status_antes: c.status, em_ajuste: 0 }); }
       if (L.length) log(null, `Você descartou ${L.length} peça(s) criadas sozinhas que ainda não tinham chegado para você (ficam na lixeira)`); changed();
       return send(res, 200, { descartados: L.length });
@@ -375,14 +402,7 @@ export function criarFluxoV2(ctx) {
       const b = await readBody(req, 20000), pc = pecasAprovadas().find(x => x.n === String(b.n)); if (!pc) throw fail(404, 'Peça aprovada não encontrada');
       if (!pc.format) throw fail(400, 'Este formato não tem arte (post de blog)');
       const br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || pc.marca || '')); if (!br) throw fail(400, 'Escolha a marca');
-      const leg = (pc.texto.match(/^Legenda:\s*([\s\S]*?)(?:\n\s*\n|$)/m) || [])[1] || '';
-      const script = pc.texto.replace(/^Legenda:[\s\S]*?(?:\n\s*\n|$)/m, '').trim();
-      const r = run("INSERT INTO contents(title,format,kind,platform,brief,goal,brand,status,script,caption,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        pc.titulo, pc.format, pc.kind, 'instagram', `Treino do Designer: copy aprovada nº ${pc.n} (${pc.secao}). Não reescreva a copy: dê vida a ela.`, '', br.name, 'producing', script, leg.trim(), 'treino_designer', T(), T());
-      const id = +r.lastInsertRowid, ag = pc.format === 'video_vertical' ? 'editor' : 'designer';
-      ctx.enqueue(id, ag, ag === 'designer' ? 'arte' : 'video', {}, 'manual');
-      log(null, `Treino do Designer: copy aprovada nº ${pc.n} "${pc.titulo}" enviada para ${ag === 'designer' ? 'o Designer' : 'o Editor'} (${br.name})`, id); changed();
-      return send(res, 200, { id });
+      return send(res, 200, { id: criarDeAprovada(pc, br.name, 'treino_designer') });
     }
     if (p === '/api/v2/metas' && m === 'GET') return send(res, 200, { metas: all('SELECT * FROM brand_metas'), formatos: novoFormatos(), marcas: all('SELECT name FROM brands ORDER BY name').map(x => x.name), autopilot: ctx.settings().autopilot === '1', hora: +(ctx.settings().start_hour || 0) });
     if (p === '/api/v2/metas' && m === 'PUT') {

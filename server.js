@@ -5810,7 +5810,7 @@ function nextJob(onlyChat = false) {
   return one(`SELECT j.* FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id
     WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ${onlyChat ? "AND j.kind IN ('chat','teste')" : ''}
     ${agentesOcupados.size ? `AND j.agent NOT IN (${[...agentesOcupados].map(() => '?').join(',')})` : ''}
-    ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id LIMIT 1`, T(), ...agentesOcupados);
+    ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer','grade_aprovada')) DESC, j.id LIMIT 1`, T(), ...agentesOcupados);
 }
 // modo chat: a arte de roteiro no modelo do dono é montada pelo painel na hora, sem pedido para colar (a revisão segue normal)
 let localRodando = false;
@@ -5845,7 +5845,7 @@ function pump() {
   const s = settings();
   const day = today();
   const used = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", day).n;
-  const limitHit = used >= +s.max_jobs_day;
+  const limitHit = false;   // sem teto diário: o volume vem só da grade de Produção diária e do que o dono pede
   if (limitHit) {
     if (limitWarnedDay !== day && one("SELECT COUNT(*) n FROM jobs WHERE status='queued'").n) {
       limitWarnedDay = day; log(null, `Limite diário de ${s.max_jobs_day} tarefas atingido — a fila retoma amanhã (ou aumente o limite em Configurações)`);
@@ -6365,7 +6365,7 @@ function saude() {
     const fila = one("SELECT COUNT(*) n FROM jobs WHERE status='queued' AND (run_after IS NULL OR run_after<=?)", T()).n;
     if (!MANUAL && fila > 10) add('warn', `Fila grande: ${fila} tarefas esperando`, 'Aumente a simultaneidade em Configurações se a sua chave da API aguenta.', 'settings');
     const usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", today()).n;
-    if (!MANUAL && usadas >= +s.max_jobs_day) add('warn', 'Limite diário de tarefas atingido', `${usadas}/${s.max_jobs_day}: o resto fica para amanhã (ou aumente o limite em Configurações).`, 'settings');
+    if (false && !MANUAL && usadas >= +s.max_jobs_day) add('warn', 'Limite diário de tarefas atingido', `${usadas}/${s.max_jobs_day}: o resto fica para amanhã (ou aumente o limite em Configurações).`, 'settings');
     const off = all('SELECT name FROM agents WHERE enabled=0').map(a => a.name);
     if (off.length) add('warn', `Agentes desligados: ${off.join(', ')}`, 'Enquanto estiverem desligados, essa etapa do fluxo não roda.', 'agents');
     const prop = one("SELECT COUNT(*) n FROM brain_rules WHERE status='proposta'").n;
