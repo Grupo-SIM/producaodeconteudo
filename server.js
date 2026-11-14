@@ -5064,12 +5064,20 @@ function salvaFotoRadar(it, melhor, origem, real, suf = '') {
   fs.writeFileSync(path.join(ASSET_DIR, +r.lastInsertRowid + '.' + melhor.ext), melhor.buf);
   return { name, credito };
 }
+// fotos dos bancos de imagem para a notícia: só as grandes (alta qualidade), na ordem que os bancos devolvem (mais relevantes primeiro)
+async function radarBancos(it) {
+  const q = radarQuery(it.titulo); if (q.length < 3) return [];
+  try { const r = await buscaImagens(q, 1); return (r.itens || r.items || r.fotos || []).filter(x => (x.w || 0) >= 1600 && (x.h || 0) >= 900 && x.full).slice(0, 12).map(x => ({ u: x.full, credito: [x.autor, x.banco || x.licenca].filter(Boolean).join(' · ') })); }
+  catch { return []; }
+}
 async function radarFotoBusca(it, contentId) {
   const info = m => { try { run('UPDATE radar_items SET foto_info=? WHERE id=?', String(m).slice(0, 300), it.id); } catch { /* sem registro */ } return null; };
   try {
     const real = await radarLinkReal(it.url || ''); let motivo = '', melhor = null, origem = 'matéria';
     const ents = radarEntidades(it.titulo), versus = ents.length >= 2;
     if (versus) { const w0 = await radarImagensWeb(it); if (w0.lista.length) { const r0 = await radarEscolheImagem(w0.lista, '', ents, 6, [1200, 630]); if (r0.buf) { melhor = r0; origem = 'busca na internet'; } } }   // assunto "A contra B": procura na internet uma imagem com os dois
+    // assunto geral (sem pessoa, time ou marca citada): primeiro os bancos de imagem (Pexels, Unsplash, Pixabay), foto grande e de qualidade
+    if (!melhor && !ents.length) { const b = await radarBancos(it); if (b.length) { const rb = await radarEscolheImagem(b, '', ents, 6, [1600, 900]); if (rb.buf) { melhor = rb; origem = 'banco de imagens'; } } }
     if (melhor) { /* já achou */ }
     else if (!real && !it.img_url) motivo = 'não achei o endereço real da matéria';
     else {
@@ -5077,6 +5085,7 @@ async function radarFotoBusca(it, contentId) {
       if (!cands.length) motivo = errPg ? `não consegui abrir a matéria (${errPg})` : 'a matéria não traz imagem de capa';
       else { const r = await radarEscolheImagem(cands.map(u => ({ u })), real || it.url, ents); if (r.buf) melhor = r; else motivo = r.erro ? `achei a imagem da matéria, mas não consegui baixar (${r.erro})` : 'as imagens da matéria são pequenas demais (mínimo 800 x 450 px)'; }
     }
+    if (!melhor && ents.length) { const b = await radarBancos(it); if (b.length) { const rb = await radarEscolheImagem(b, '', [], 6, [1600, 900]); if (rb.buf) { melhor = rb; origem = 'banco de imagens'; } } }   // foto da matéria não serviu: tenta os bancos antes da internet aberta
     if (!melhor) {   // foto da matéria não serviu: busca na internet por imagens do assunto
       const w = await radarImagensWeb(it);
       if (w.lista.length) { let r = await radarEscolheImagem(w.lista, '', ents, 6, [1200, 630]); if (!r.buf) r = await radarEscolheImagem(w.lista, '', ents, 6, [1000, 560]); if (r.buf) { melhor = r; origem = 'busca na internet'; } else motivo += `; busca na internet: ${w.lista.length} imagem(ns) achada(s), nenhuma boa o bastante${r.erro ? ' (' + r.erro + ')' : ''}`; }
