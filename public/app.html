@@ -457,6 +457,8 @@ function porQueAguarda(i) {
   const f = i.fila, quem = FAZENDO(i.etapa).split(' ')[0] === 'Agente' ? FAZENDO(i.etapa).split(' ').slice(0, 3).join(' ') : FAZENDO(i.etapa).split(' ')[0];
   if (!f) return `passando para ${quem}`;
   if (f.manual) return `${quem}: esperando você levar o pedido ao chat`;
+  if (f.limite) return `fila parada: o limite de ${f.limite} tarefas por dia acabou · volta amanhã (ou aumente em Configurações)`;
+  if (!f.rodando && f.pos > 0) return `${quem} começa em seguida · ${f.pos}º da fila (fila parada agora: nenhum agente rodando)`;
   if (f.pos <= 0) return `passando para ${quem}`;
   return `${quem} começa em seguida · ${f.pos}º da fila (${f.rodando} de ${f.vagas} tarefas rodando ao mesmo tempo)`;
 }

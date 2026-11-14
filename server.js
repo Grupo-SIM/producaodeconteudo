@@ -5804,8 +5804,9 @@ function checkProduction(contentId) {
 let running = 0;
 let limitWarnedDay = '';
 function nextJob(onlyChat = false) {
-  return one(`SELECT j.* FROM jobs j JOIN agents a ON a.id=j.agent
-    WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ${onlyChat ? "AND j.kind IN ('chat','teste')" : ''} ORDER BY (j.kind IN ('chat','teste')) DESC, j.id LIMIT 1`, T());
+  // o que o dono pede (Novo conteúdo, Treino, chat) passa na frente do que foi criado sozinho (pautas automáticas, notícias)
+  return one(`SELECT j.* FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id
+    WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ${onlyChat ? "AND j.kind IN ('chat','teste')" : ''} ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id LIMIT 1`, T());
 }
 // modo chat: a arte de roteiro no modelo do dono é montada pelo painel na hora, sem pedido para colar (a revisão segue normal)
 let localRodando = false;
