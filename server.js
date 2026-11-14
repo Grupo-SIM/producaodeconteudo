@@ -5498,7 +5498,7 @@ const HANDLERS = {
     if (j.contracapa) sc = sc.replace(/(Contracapa:\s*)[^\n]+/i, (m, a) => a + String(j.contracapa).trim() + (j.chamada ? ' Chamada: ' + String(j.chamada).trim() : ''));
     setContent(c.id, { script: sc });
     log('roteirista', `Encurtou o texto do post para caber na arte: capa ${String(j.capa).length} caracteres`, c.id);
-    enqueue(c.id, 'designer', 'arte', { encurtado: true }, 'manual');
+    enqueue(c.id, 'designer', 'arte', { encurtado: true, ...(i.feedback ? { feedback: i.feedback, from: i.from } : {}) }, 'manual');   // o seu pedido de ajuste segue junto
     return r;
   },
   async arte(job, c) {
@@ -5513,9 +5513,8 @@ const HANDLERS = {
       setContent(c.id, { art_note: `Pedido de nova foto: ${r.erro}. Envie a foto pela Biblioteca no editor.` });
       return { text: r.erro, tin: 0, tout: 0 };
     }
-    // ajuste pedido por você na arte não chama o Copy: encurtar o texto só na primeira montagem
-    if (c.kind === 'noticia' && !input.encurtado && input.from !== 'dono') { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
-      if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada }, 'manual'); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
+    if (c.kind === 'noticia' && !input.encurtado) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
+      if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada, ...(input.feedback ? { feedback: input.feedback, from: input.from } : {}) }, 'manual'); addChat('gerente', `O Designer pediu ao Copy para encurtar o texto da arte de “${c.title}”: ${p.capa.length > LIM_CAPA_NOTICIA ? `o título da capa tem ${p.capa.length} caracteres e cabem ${LIM_CAPA_NOTICIA}` : `a contracapa tem ${card.length} caracteres e cabem ${LIM_CARD_NOTICIA}`}. Não é erro: só o texto da arte muda (a matéria do site não), e depois a arte volta para o Designer${input.feedback ? ' com o seu pedido' : ''}.`); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
     if (input.feedback && (c.art || c.art_spec)) user += `\n\n# VERSÃO ANTERIOR\n${c.art}${c.art_spec ? '\n\n# ESPECIFICAÇÃO VISUAL ANTERIOR (JSON)\n```json\n' + c.art_spec + '\n```\nMantenha tudo o que não foi pedido para mudar (textos, cores, prompts de fundo "gen" idênticos) e altere somente o que os ajustes pedem.' : ''}\n\n# AJUSTES PEDIDOS ${input.from === 'dono' ? 'PELO DONO (prioridade máxima; o roteiro e os textos continuam os mesmos, ajuste a diagramação e os elementos visuais)' : input.from === 'sistema' ? 'PELO SISTEMA' : 'PELO REVISOR'} (aplique todos e entregue a direção de arte completa de novo, com a especificação visual em JSON)\n${input.feedback}`;

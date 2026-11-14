@@ -199,7 +199,7 @@ export function criarFluxoV2(ctx) {
     for (const i of itens) if (i.parte === 'materia' && rows.find(r => r.id === i.id)?.materia_aprovada === 'pendente' && !['finalizado', 'descartado'].includes(i.estado)) Object.assign(i, { estado: 'esperando', etapa: 'revisao', aguardando: false, em_ajuste: 0 });   // post aprovado, matéria ainda não: ela fica na Mesa
     for (const i of itens) if (i.parte === 'materia' && (rows.find(r => r.id === i.id)?.materia_aprovada || '').replace('pendente', '') && !['finalizado', 'descartado'].includes(i.estado)) Object.assign(i, { estado: 'esperando', etapa: 'publicacao', aguardando: false, em_ajuste: 0, materia_ok: true });   // matéria já aprovada: sai da Mesa e espera a publicação
     for (const i of itens) if (i.parte && ['etapa', 'ajuste', 'fila'].includes(i.estado)) {
-      const js = porC.get(i.id) || [], soMateria = js.length && js.every(j => j.kind === 'materia_ajuste'), soArte = js.every(j => j.agent !== 'roteirista');   // Designer, Revisor da arte, render: nada disso mexe na matéria
+      const js = porC.get(i.id) || [], soMateria = js.length && js.every(j => j.kind === 'materia_ajuste'), soArte = js.every(j => j.agent !== 'roteirista' || j.kind === 'encurtar');   // Designer, Revisor da arte, render: nada disso mexe na matéria
       if ((i.parte === 'materia' && soArte) || (i.parte === 'post' && soMateria)) Object.assign(i, { estado: 'esperando', etapa: 'revisao', aguardando: false, em_ajuste: 0 });
     }
     // por que está aguardando: posição na fila (mesma ordem do agendador) e quem está rodando agora
