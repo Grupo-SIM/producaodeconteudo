@@ -12,5 +12,9 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - [ ] 6. Feed estático (17; venda ainda sem copy aprovada: Copy escreve antes)
 - [ ] 7. Carrossel de notícia (sem copy aprovada: Copy escreve antes)
 
+## Como cada correção entra
+- Vira regra na base do Designer (`conhecimento/agentes/designer/`) e, ao mesmo tempo, item de conferência na base do Revisor (`conhecimento/agentes/gerente/`), igual ao treino do Copy: o Revisor passa a cobrar do Designer o que o dono corrigiu.
+- No treino, a peça vai direto para a Mesa do dono: uma chamada do Designer, sem inspeção visual, sem refazer automático e sem as rodadas do Revisor.
+
 ## Correções do dono
 (registrar aqui e na base do Designer a cada rodada)

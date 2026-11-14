@@ -5389,9 +5389,10 @@ const HANDLERS = {
     log('designer', `Direção de arte pronta: "${c.title}"`, c.id);
     if (sp) {
       await renderArte(c.id);   // gera as imagens aqui, antes de a peça ir para o Revisor
-      if (!MANUAL && !als.getStore()?.dry && visualLigado() && getContent(c.id)?.art_status === 'ok') { try { await inspecionaArte(c.id); } catch (e) { console.error('inspeção visual da arte:', e.message); } }
+      const treino = c.created_by === 'treino_designer';   // treino: uma chamada só, sem inspeção nem refazer automático (o dono corrige)
+      if (!treino && !MANUAL && !als.getStore()?.dry && visualLigado() && getContent(c.id)?.art_status === 'ok') { try { await inspecionaArte(c.id); } catch (e) { console.error('inspeção visual da arte:', e.message); } }
       const falhas = checksLer(getContent(c.id)?.art_checks).filter(x => !x.corrigido && x.sev === 'erro');
-      if (falhas.length && !MANUAL && !input.autocheck && !als.getStore()?.dry) enqueue(c.id, 'designer', 'arte', { feedback: 'A checagem automática mediu a arte e encontrou problemas que o painel não conseguiu corrigir sozinho. Refaça a arte resolvendo todos:\n' + checksTexto(falhas), from: 'sistema', autocheck: true });
+      if (falhas.length && !treino && !MANUAL && !input.autocheck && !als.getStore()?.dry) enqueue(c.id, 'designer', 'arte', { feedback: 'A checagem automática mediu a arte e encontrou problemas que o painel não conseguiu corrigir sozinho. Refaça a arte resolvendo todos:\n' + checksTexto(falhas), from: 'sistema', autocheck: true });
     }
     else if (!als.getStore()?.dry && (settings().arte_do_roteiro !== 'nunca' || c.kind === 'noticia') && await arteDoRoteiro(c.id, 'o Designer não entregou o bloco JSON')) { brainEvent('designer', 'spec_arte_invalido', c, 'Direção de arte entregue sem especificação visual válida: o painel montou a arte pelo roteiro', 'O bloco JSON dos slides veio ausente ou inválido; o painel usou o roteiro no modelo do dono.'); }
     else {
@@ -5796,6 +5797,8 @@ function checkProduction(contentId) {
   const active = one("SELECT COUNT(*) n FROM jobs WHERE content_id=? AND status IN ('queued','running')", contentId).n;
   if (!active) {
     setContent(c.id, { error: '' });
+    // Treino do Designer: o dono revisa tudo, então a peça vai direto para a Mesa dele (sem a revisão automática do Revisor)
+    if (c.created_by === 'treino_designer') { paraAprovacao(c.id, `Treino do Designer: "${c.title}" pronta para você revisar`); return; }
     enqueue(c.id, 'gerente', 'gerencia');
     log('gerente', `Entrega de "${c.title}" pronta — entrou na revisão do Revisor`, c.id);
   }
