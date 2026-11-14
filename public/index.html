@@ -5233,8 +5233,8 @@ async function arteEditor(id, onClose, opts = {}) {
       const f = h('iframe', { scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', transform: `scale(${ks})` } });
       const on = t.custom ? E.tplEd?.id === t.id : tplAtual(t.m, t.e);
       const editar = () => { if (t.custom) usaCustom(t); else { usaTpl(t.m, t.e).then(() => { E.tplEd = { base: tplChave(t), nome: t.nome }; tpl.paint(); }); } toast('Mude o que quiser na página e clique em “Salvar alterações” aqui em Templates'); };
-      const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f, h('div', { class: 'aethb' }, ib(svg(AI.pen, 13), 'Editar este template', editar), ib(svg(AI.trash, 13), 'Excluir', () => apagaTpl(t), '#ff8a8a')));
-      const b = h('div', { title: t.nome + (t.ds ? ' — ' + t.ds : ''), onclick: () => t.custom ? usaCustom(t) : usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', cursor: 'pointer' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
+      const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f, h('div', { class: 'aethb' }, ib(svg(AI.pen, 13), 'Editar template: aplica na página para você ajustar; depois clique em “Salvar alterações” no topo de Templates', editar), ib(svg(AI.trash, 13), t.custom ? 'Excluir template: vai para a lixeira' : 'Excluir template: some da lista (dá para mostrar de novo no fim da lista)', () => apagaTpl(t), '#ff8a8a')));
+      const b = h('div', { title: 'Clique para aplicar “' + t.nome + '” nesta página' + (t.ds ? ' — ' + t.ds : ''), onclick: () => t.custom ? usaCustom(t) : usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', cursor: 'pointer' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
       const pinta = sl => { f.srcdoc = AS.slideHtml(view(), sl, si, n); };
       if (t.custom) pinta(tplCustom(t.slide));
       else { const k = sig + '|' + tplChave(t);
@@ -5248,7 +5248,7 @@ async function arteEditor(id, onClose, opts = {}) {
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
       h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Passe o mouse para editar ou excluir.'),
       ed ? h('button', { class: 'btn primary sm', onclick: () => salvaTpl('sobre') }, 'Salvar alterações em “' + ed.nome + '”') : null,
-      h('button', { class: 'btn sm', onclick: () => salvaTpl('novo') }, '+ Salvar esta página como template'),
+      h('button', { class: 'btn sm', title: 'Adicionar template: guarda a página do jeito que está agora em “Meus templates”, para usar em outras artes', onclick: () => salvaTpl('novo') }, '+ Salvar esta página como template'),
       ...grade('Meus templates'), ...grade('Notícia'), ...grade('Todos os formatos'),
       oc.size ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: guard(async () => { await api('/tpl-paginas/restaurar', 'POST', {}); TPLS = null; tpl.paint(); }) }, 'Mostrar de novo os prontos escondidos (' + oc.size + ')') : null);
   };

@@ -5107,6 +5107,30 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
   if (!bons.length) return { erro: errImg || (descartadas ? `${descartadas} imagem(ns) sem detalhe/sem graça, descartada(s)` : '') };
   return { ...bons[0], outras: bons.slice(1) };
 }
+// O dono pediu outra foto de fundo numa notícia (capa ou contracapa): busca uma foto NOVA do assunto (internet e bancos), diferente das que já foram usadas,
+// troca só o fundo daquela página e mantém o resto da arte como está (template, textos, posições)
+async function trocaFotoNoticia(c, pagina) {
+  const sp = jparse(c.art_spec); if (!sp?.slides?.[pagina]) return { erro: 'a arte ainda não tem essa página' };
+  let it = one('SELECT * FROM radar_items WHERE content_id=?', c.id);
+  if (!it) { run("INSERT INTO radar_items(brand,titulo,origem,content_id) VALUES(?,?,?,?)", c.brand || '', (String(c.script || '').match(/Capa:\s*([^\n]+)/i) || [])[1] || c.title, 'manual', c.id); it = one('SELECT * FROM radar_items WHERE content_id=?', c.id); }
+  const usadas = all("SELECT * FROM assets WHERE name LIKE ? AND brand=? COLLATE NOCASE", 'noticia-' + it.id + '%', c.brand || ''), urls = new Set(usadas.flatMap(a => String(a.note || '').match(/https?:\/\/\S+/g) || []).map(u => u.replace(/[).,]+$/, '')));
+  const bufs = usadas.map(a => { try { return fs.readFileSync(path.join(ASSET_DIR, a.id + '.' + a.ext)); } catch { return null; } }).filter(Boolean);
+  const ents = radarEntidades(it.titulo), w = await radarImagensWeb(it), b = await radarBancos(it);
+  const cands = [...w.lista, ...b].filter(x => x.u && !urls.has(x.u) && !(x.pagina && urls.has(x.pagina)));
+  if (!cands.length) return { erro: 'a busca não achou outra foto do assunto' };
+  const r = await radarEscolheImagem(cands, '', ents, 10, [1000, 560]);
+  const nova = [r, ...(r.outras || [])].find(x => x?.buf && !bufs.some(bb => fotosParecidas(bb, x.buf)));
+  if (!nova) return { erro: 'só achei fotos iguais às que já foram usadas' };
+  try { await acabaFotoCapa(nova); } catch { /* sem acabamento: fica a original */ }
+  const salvo = salvaFotoRadar(it, nova, 'busca na internet', '', '-t' + (usadas.length + 1));
+  const sl = sp.slides[pagina]; sl.bg = { ...(sl.bg || {}), asset: salvo.name }; delete sl.bg.gen; delete sl.bg.banco;
+  if (sl.dados && typeof sl.dados === 'object' && sl.dados.foto) sl.dados = { ...sl.dados, foto: salvo.name };
+  if (pagina === 0) run('UPDATE radar_items SET foto_asset=? WHERE id=?', salvo.name, it.id); else run('UPDATE radar_items SET foto2_asset=? WHERE id=?', salvo.name, it.id);
+  setContent(c.id, { art_spec: JSON.stringify(sp), art_status: '' });
+  log('designer', `Trocou a foto de fundo da ${pagina === 0 ? 'capa' : 'página ' + (pagina + 1)} como você pediu: "${c.title}" (${salvo.credito})`, c.id);
+  await renderArte(c.id);
+  return { ok: true, nome: salvo.name };
+}
 // Grava a foto escolhida na Biblioteca da marca (com o crédito) e devolve o nome do arquivo
 function salvaFotoRadar(it, melhor, origem, real, suf = '') {
   const b = String(it.brand || '').trim(), base = 'noticia-' + it.id + suf; let name = base, n = 2; while (one('SELECT id FROM assets WHERE brand=? AND name=?', b, name)) name = base + '-' + n++;
@@ -5466,6 +5490,15 @@ const HANDLERS = {
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
     if (c.kind === 'noticia' && !input.encurtado) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
       if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada }, 'manual'); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
+    // notícia: pedido do dono para trocar a foto de fundo vai direto na foto (a arte de notícia é montada pelo painel e ignoraria o pedido)
+    if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && /\b(foto|imagem|fundo)\b/i.test(input.feedback || '') && /\b(troc|mud|outr|substitu|alter)/i.test(input.feedback || '')) {
+      const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
+      const r = await trocaFotoNoticia(c, pg);
+      if (r.ok) return { text: `Foto de fundo da ${pg ? 'contracapa' : 'capa'} trocada (${r.nome})`, tin: 0, tout: 0 };
+      log('designer', `Não consegui trocar a foto de "${c.title}": ${r.erro}. Envie a foto pela Biblioteca no editor.`, c.id);
+      setContent(c.id, { art_note: `Pedido de nova foto: ${r.erro}. Envie a foto pela Biblioteca no editor.` });
+      return { text: r.erro, tin: 0, tout: 0 };
+    }
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
     if (input.feedback && (c.art || c.art_spec)) user += `\n\n# VERSÃO ANTERIOR\n${c.art}${c.art_spec ? '\n\n# ESPECIFICAÇÃO VISUAL ANTERIOR (JSON)\n```json\n' + c.art_spec + '\n```\nMantenha tudo o que não foi pedido para mudar (textos, cores, prompts de fundo "gen" idênticos) e altere somente o que os ajustes pedem.' : ''}\n\n# AJUSTES PEDIDOS ${input.from === 'dono' ? 'PELO DONO (prioridade máxima; o roteiro e os textos continuam os mesmos, ajuste a diagramação e os elementos visuais)' : input.from === 'sistema' ? 'PELO SISTEMA' : 'PELO REVISOR'} (aplique todos e entregue a direção de arte completa de novo, com a especificação visual em JSON)\n${input.feedback}`;
