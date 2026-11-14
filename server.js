@@ -1731,6 +1731,7 @@ if (!one("SELECT 1 x FROM settings WHERE key='rev_v1'")) {
   run("INSERT INTO settings(key,value) VALUES('rev_v1','1')");
 }
 
+db.exec(`CREATE TABLE IF NOT EXISTS tpl_paginas(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, brand TEXT DEFAULT '', format TEXT DEFAULT '', slide TEXT NOT NULL, base TEXT DEFAULT '', created_at TEXT, updated_at TEXT)`);
 // ───────────────────────── Fila e pipeline ─────────────────────────
 function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter = null) {
   // copy já aprovada pelo dono (Treino do Designer, Produção diária com copy aprovada): nunca volta para o Roteirista nem para a revisão da copy; segue para a arte
@@ -6069,7 +6070,7 @@ const AREA_RULES = [   // [rota, áreas que podem ler, áreas que podem escrever
   [/^\/api\/(art-studio|art-layouts|lixeira)/, ['arte', 'video', 'pipeline'], ['arte', 'video']],
   [/^\/api\/motion-styles/, ['video', 'pipeline', 'dashboard'], ['video']],
   [/^\/api\/biblioteca-central/, ['settings'], ['settings']],
-  [/^\/api\/(arte-modelos|art-templates)/, ['arte', 'pipeline', 'video'], ['arte']],
+  [/^\/api\/(arte-modelos|art-templates|tpl-paginas)/, ['arte', 'pipeline', 'video'], ['arte']],
   [/^\/api\/imagens/, ['media', 'video', 'arte', 'pipeline'], ['media', 'video', 'arte']],
   [/^\/api\/(assets|poses)/, ['media', 'video', 'knowledge', 'products', 'pipeline', 'agents', 'arte'], ['media', 'video', 'knowledge', 'products', 'arte']],
   [/^\/api\/manuais/, ['knowledge', 'agents', 'pipeline', 'brain', 'dashboard'], ['knowledge']],
@@ -7262,6 +7263,23 @@ async function api(req, res, url) {
 
   // ── Entrega: imagens da arte
   if (p === '/api/arte-modelos' && m === 'GET') return send(res, 200, { modelos: MODELOS_ARTE });
+  // Templates de página do editor: os seus (página salva do jeito que você deixou) e quais dos prontos você escondeu
+  if (p === '/api/tpl-paginas' && m === 'GET') return send(res, 200, { itens: all('SELECT id,nome,brand,format,slide,base,updated_at FROM tpl_paginas ORDER BY id DESC').map(x => ({ ...x, slide: jparse(x.slide, {}) })), ocultos: jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, []) });
+  if (p === '/api/tpl-paginas' && m === 'POST') {
+    const b = await readBody(req, 4e5), sl = sanitizeArteSpec({ slides: [b.slide] }, 'carrossel').slides[0]; if (!sl) throw fail(400, 'Página vazia');
+    const nome = String(b.nome || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'Meu template', fmt = String(b.format || '').slice(0, 30), base = String(b.base || '').slice(0, 120);
+    let id = +b.id || 0;
+    if (id && one('SELECT 1 x FROM tpl_paginas WHERE id=?', id)) run('UPDATE tpl_paginas SET nome=?, slide=?, format=?, updated_at=? WHERE id=?', nome, JSON.stringify(sl), fmt, T(), id);
+    else id = +run('INSERT INTO tpl_paginas(nome,brand,format,slide,base,created_at,updated_at) VALUES(?,?,?,?,?,?,?)', nome, String(b.brand || '').slice(0, 80), fmt, JSON.stringify(sl), base, T(), T()).lastInsertRowid;
+    if (base) { const oc = new Set(jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, [])); oc.add(base); run("INSERT INTO settings(key,value) VALUES('tpl_ocultos',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify([...oc])); }   // editou um pronto: a sua versão toma o lugar dele
+    log('designer', `Template de página salvo: ${nome}`); return send(res, 200, { id });
+  }
+  { const mt = p.match(/^\/api\/tpl-paginas\/(\d+|pronto:[\w:.-]+)$/); if (mt && m === 'DELETE') {
+    if (/^\d+$/.test(mt[1])) { const x = one('SELECT * FROM tpl_paginas WHERE id=?', +mt[1]); if (x) { try { lixeiraGuarda('tpl_pagina', x, 'Template de página apagado'); } catch { /* sem lixeira */ } run('DELETE FROM tpl_paginas WHERE id=?', x.id); } }
+    else { const oc = new Set(jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, [])); oc.add(mt[1].slice(7)); run("INSERT INTO settings(key,value) VALUES('tpl_ocultos',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify([...oc])); }
+    return send(res, 200, { ok: true });
+  } }
+  if (p === '/api/tpl-paginas/restaurar' && m === 'POST') { run("DELETE FROM settings WHERE key='tpl_ocultos'"); return send(res, 200, { ok: true }); }
   if (p === '/api/art-templates' && m === 'GET') return send(res, 200, { templates: templatesDaMarca(url.searchParams.get('brand') || ''), todos: templatesVisiveis('').map(t => ({ id: t.id, nome: t.nome, brand: t.brand || '', formatos: t.formatos, tema: t.tema, casa: !!t.casa })), padrao: estilosPadrao(), apagados: (ap => TEMPLATES_CASA.filter(t => !t.oculto && ap.has(t.id)))(tplApagados(url.searchParams.get('brand') || '')).map(t => ({ id: t.id, nome: t.nome, formatos: t.formatos })) });
   if ((mt = p.match(/^\/api\/art-templates\/([^/]+)\/estrutura$/)) && m === 'GET') {   // o que cada página do estilo comporta (a galeria mostra; os agentes de copy recebem o mesmo)
     const bn = String(url.searchParams.get('brand') || '').trim(), marca = bn ? (one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', bn)?.name || '') : '';

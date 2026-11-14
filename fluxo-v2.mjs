@@ -192,6 +192,11 @@ export function criarFluxoV2(ctx) {
     // notícia tem 2 entregas: o post do Instagram (cards) aparece na raia Carrossel e a matéria do site na raia Matéria de jornal
     // regra do treino: toda notícia tem as duas entregas; sem a matéria a peça está incompleta (fica marcada, não vira outro formato)
     for (const i of [...itens]) if (i.raia === 'materia' && i.tem_arte) { const c0 = rows.find(r => r.id === i.id); i.parte = 'materia'; if (!c0?.materia) i.sem_materia = true; itens.push({ ...i, raia: 'carrossel', parte: 'post', sem_materia: false }); }
+    // as duas entregas andam separadas: arte em ajuste não põe a matéria (já pronta) em ajuste, e ajuste da matéria não mexe no post
+    for (const i of itens) if (i.parte && ['etapa', 'ajuste', 'fila'].includes(i.estado)) {
+      const js = porC.get(i.id) || [], soMateria = js.length && js.every(j => j.kind === 'materia_ajuste'), soArte = js.length && js.every(j => ['designer', 'editor'].includes(j.agent));
+      if ((i.parte === 'materia' && soArte) || (i.parte === 'post' && soMateria)) Object.assign(i, { estado: 'esperando', etapa: 'revisao', aguardando: false, em_ajuste: 0 });
+    }
     // por que está aguardando: posição na fila (mesma ordem do agendador) e quem está rodando agora
     const fila = all("SELECT j.id,j.content_id,j.kind,j.agent FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id", T());
     const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0, limite = 0;

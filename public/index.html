@@ -5185,7 +5185,10 @@ async function arteEditor(id, onClose, opts = {}) {
     ['noticia', { estilo: 'nuvo' }, 'Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
     const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).find(t => t.role === r && !t.decor)?.value;
-    if (!s.modelo) { d.titulo ??= T('title'); d.texto ??= T('body'); d.cta ??= T('cta'); d.kicker ??= T('label'); d.selo ??= T('badge'); if (s.bg?.asset) d.foto ??= { asset: s.bg.asset }; else if (s.bg?.gen) d.foto ??= { gen: s.bg.gen }; }
+    // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram
+    const tt = T('title'), tb = T('body'); if (tt) d.titulo = tt; if (tb && !s.modelo) d.texto = tb;
+    if (!s.modelo) { d.cta ??= T('cta'); d.kicker ??= T('label'); d.selo ??= T('badge'); }
+    if (s.bg?.asset) d.foto = { asset: s.bg.asset }; else if (s.bg?.gen) d.foto = { gen: s.bg.gen };
     for (const k of Object.keys(d)) if (d[k] == null) delete d[k];
     delete d.estilo; delete d.pb; return d;
   };
@@ -5199,29 +5202,55 @@ async function arteEditor(id, onClose, opts = {}) {
     toast('Template aplicado na página ' + (E.si + 1) + '. Ao aprovar, o Gerente estuda o que melhorou (não vira regra da marca).', 'ok');
   });
   const tpl = { el: h('div', { class: 'aelp', hidden: true }) };
-  // cada template aparece como miniatura da própria página montada nele (com o título e a foto desta página)
-  const tplCache = new Map();
+  // cada template aparece como miniatura da própria página montada nele. Os seus (salvos) vêm primeiro; dá para editar, excluir e salvar a página como template
+  const tplCache = new Map(); let TPLS = null;
+  const tplChave = t => t.m + (Object.keys(t.e)[0] ? ':' + Object.keys(t.e)[0] : '');
+  const tplCustom = sl0 => {   // template salvo aplicado nesta página: troca título, texto e foto de fundo pelos daqui
+    const s = cur(), sl = JSON.parse(JSON.stringify(sl0)), T = r => (s.texts || []).find(t => t.role === r && !t.decor);
+    for (const r of ['title', 'body']) { const v = T(r), alvo = (sl.texts || []).find(t => t.role === r && !t.decor); if (v && alvo) alvo.value = v.value; }
+    if ((s.bg?.asset || s.bg?.gen) && (sl.bg?.asset || sl.bg?.gen)) { sl.bg = { ...sl.bg }; delete sl.bg.asset; delete sl.bg.gen; if (s.bg.asset) sl.bg.asset = s.bg.asset; else sl.bg.gen = s.bg.gen; }
+    delete sl.modelo; delete sl.dados; return sl;
+  };
+  const usaCustom = t => { pushUndo(); E.spec.slides[E.si] = tplCustom(t.slide); E.tplEd = { id: t.id, nome: t.nome }; E.sel = null; E.multi = null; markDirty(); repaint(); drawStrip(); drawPanel(); tpl.paint(); toast('Template “' + t.nome + '” aplicado'); };
+  const salvaTpl = guard(async (modo) => {
+    const ed = E.tplEd, sobre = modo === 'sobre' && ed;
+    const nome = sobre ? ed.nome : prompt('Nome do template', ed?.nome ? ed.nome + ' (cópia)' : 'Meu template'); if (!nome) return;
+    const sl = JSON.parse(JSON.stringify(cur())); delete sl.modelo; delete sl.dados;
+    const r = await api('/tpl-paginas', 'POST', { id: sobre && ed.id ? ed.id : 0, base: sobre && ed.base ? ed.base : '', nome, slide: sl, format: data.format, brand: data.brand || '' });
+    E.tplEd = { id: r.id, nome }; TPLS = null; toast(sobre ? 'Template “' + nome + '” atualizado' : 'Página salva como template “' + nome + '”', 'ok'); tpl.paint();
+  });
+  const apagaTpl = guard(async t => { if (!confirm('Excluir o template “' + t.nome + '”? ' + (t.custom ? 'Ele vai para a lixeira.' : 'Ele some da lista (dá para restaurar os prontos).'))) return; await api('/tpl-paginas/' + (t.custom ? t.id : 'pronto:' + tplChave(t)), 'DELETE'); if (E.tplEd && ((t.custom && E.tplEd.id === t.id) || E.tplEd.base === tplChave(t))) E.tplEd = null; TPLS = null; tpl.paint(); toast('Template excluído'); });
   tpl.paint = async () => {
     if (!MODS) { try { MODS = (await api('/arte-modelos')).modelos; } catch { MODS = []; } }
-    const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si;
+    if (!TPLS) { try { TPLS = await api('/tpl-paginas'); } catch { TPLS = { itens: [], ocultos: [] }; } }
+    const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si, oc = new Set(TPLS.ocultos || []);
     const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
-    const LST = [...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia').map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))];
+    const stories = x => /stories|vertical/.test(x || ''), meus = (TPLS.itens || []).filter(t => stories(t.format) === stories(data.format)).map(t => ({ ...t, custom: true, g: 'Meus templates' }));
+    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia').map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
     const tw = 104, th = Math.round(tw * H / W), ks = tw / W;
+    const ib = (txt, tt, fn, cor) => h('button', { type: 'button', title: tt, onclick: e => { e.stopPropagation(); fn(); }, style: { width: '24px', height: '24px', borderRadius: '6px', border: '1px solid #3a3a42', background: 'rgba(10,10,12,.85)', color: cor || '#fff', cursor: 'pointer', padding: 0, fontSize: '12px' } }, txt);
     const card = t => {
       const f = h('iframe', { scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', transform: `scale(${ks})` } });
-      const box = h('div', { class: 'aeth' + (tplAtual(t.m, t.e) ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f);
-      const b = h('button', { type: 'button', title: t.nome + ' — ' + t.ds, onclick: () => usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', background: 'none', border: 0, padding: 0, cursor: 'pointer', color: 'inherit' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
-      const k = sig + '|' + t.m + JSON.stringify(t.e);
-      const pinta = sl => { const v = view(); f.srcdoc = AS.slideHtml(v, sl, si, n); };
-      if (tplCache.has(k)) pinta(tplCache.get(k));
-      else { const d = { ...base, ...t.e }; if (t.e.foto2) d.foto2 = base.foto2 || base.foto; if (t.e.circulo) d.circulo = base.circulo || base.foto;
-        api(`/contents/${id}/arte/modelo`, 'POST', { modelo: t.m, dados: d, i: si, total: n }).then(r => { tplCache.set(k, r.slide); pinta(r.slide); }).catch(() => box.style.opacity = .3); }
+      const on = t.custom ? E.tplEd?.id === t.id : tplAtual(t.m, t.e);
+      const editar = () => { if (t.custom) usaCustom(t); else { usaTpl(t.m, t.e).then(() => { E.tplEd = { base: tplChave(t), nome: t.nome }; tpl.paint(); }); } toast('Mude o que quiser na página e clique em “Salvar alterações” aqui em Templates'); };
+      const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f, h('div', { class: 'aethb' }, ib('✎', 'Editar este template', editar), ib('🗑', 'Excluir', () => apagaTpl(t), '#ff8a8a')));
+      const b = h('div', { title: t.nome + (t.ds ? ' — ' + t.ds : ''), onclick: () => t.custom ? usaCustom(t) : usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', cursor: 'pointer' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
+      const pinta = sl => { f.srcdoc = AS.slideHtml(view(), sl, si, n); };
+      if (t.custom) pinta(tplCustom(t.slide));
+      else { const k = sig + '|' + tplChave(t);
+        if (tplCache.has(k)) pinta(tplCache.get(k));
+        else { const d = { ...base, ...t.e }; if (t.e.foto2) d.foto2 = base.foto2 || base.foto; if (t.e.circulo) d.circulo = base.circulo || base.foto;
+          api(`/contents/${id}/arte/modelo`, 'POST', { modelo: t.m, dados: d, i: si, total: n }).then(r => { tplCache.set(k, r.slide); pinta(r.slide); }).catch(() => box.style.opacity = .3); } }
       return b;
     };
-    const grade = g => h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(2, ${tw}px)`, gap: '12px 10px', justifyContent: 'space-between' } }, LST.filter(t => t.g === g).map(card));
+    const grade = g => { const L = LST.filter(t => t.g === g); return L.length ? [h('h4', null, g), h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(2, ${tw}px)`, gap: '12px 10px', justifyContent: 'space-between' } }, L.map(card))] : []; };
+    const ed = E.tplEd;
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
-      h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + ' (mantém textos e fotos).'),
-      h('h4', null, 'Notícia'), grade('Notícia'), h('h4', null, 'Todos os formatos'), grade('Todos os formatos'));
+      h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Passe o mouse para editar ou excluir.'),
+      ed ? h('button', { class: 'btn primary sm', onclick: () => salvaTpl('sobre') }, 'Salvar alterações em “' + ed.nome + '”') : null,
+      h('button', { class: 'btn sm', onclick: () => salvaTpl('novo') }, '+ Salvar esta página como template'),
+      ...grade('Meus templates'), ...grade('Notícia'), ...grade('Todos os formatos'),
+      oc.size ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: guard(async () => { await api('/tpl-paginas/restaurar', 'POST', {}); TPLS = null; tpl.paint(); }) }, 'Mostrar de novo os prontos escondidos (' + oc.size + ')') : null);
   };
   const toggleTpl = on => { tpl.el.hidden = !on; tplB.classList.toggle('on', on); if (on) { lib.el.hidden = true; libB.classList.remove('on'); elp.el.hidden = true; elB.classList.remove('on'); tpl.paint(); } setTimeout(fit, 30); };
   const tplB = h('button', { title: 'Templates aprovados: troca o layout desta página', onclick: () => toggleTpl(tpl.el.hidden) }, svg(AI.layout), 'Templates');
