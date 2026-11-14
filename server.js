@@ -4719,6 +4719,7 @@ async function radarGarantiFoto2(c) {   // REGRA: puxa 5-6 imagens do assunto, e
   } catch { /* sem 2ª foto: a contracapa usa o fundo da marca */ }
 }
 // partes do post de notícia escritas pelo Copy: "Capa: ...", "Contracapa: ... Chamada: ..."
+const MANCHETES_TREINO = () => { try { return fs.readFileSync(path.join(__dirname, 'conhecimento', 'agentes', 'roteirista', '04-manchetes-de-noticia-estilo-do-dono.md'), 'utf8').replace(/<!--[\s\S]*?-->/g, '').trim(); } catch { return ''; } };
 const LIM_CAPA_NOTICIA = 100, LIM_CARD_NOTICIA = 130;   // medidos na arte (capa em até 4 linhas; cartão da contracapa sem cortar frase)
 function partesNoticia(script) {
   const t = String(script || ''), capa = (t.match(/Capa:\s*([^\n]+)/i) || [])[1] || '', cc = (t.match(/Contracapa:\s*([^\n]+)/i) || [])[1] || '';
@@ -5415,7 +5416,7 @@ const HANDLERS = {
   // o Copy diz a mesma coisa com menos palavras para caber na arte (pedido do Designer); depois a arte é refeita
   async encurtar(job, c) {
     const i = JSON.parse(job.input || '{}');
-    const user = `# TAREFA\nO Designer não conseguiu encaixar o texto do post desta notícia na arte. Reescreva dizendo EXATAMENTE a mesma coisa, com os mesmos fatos, em menos palavras. Não invente nada, não mude o sentido, mantenha o tom de manchete.\n\nLimites (contando espaços):\n- capa: no máximo ${LIM_CAPA_NOTICIA} caracteres\n- contracapa + chamada juntas: no máximo ${LIM_CARD_NOTICIA} caracteres\n\nCAPA ATUAL (${i.capa.length}): ${i.capa}\nCONTRACAPA ATUAL: ${i.contra}\nCHAMADA ATUAL: ${i.chamada}\n\nResponda só com o bloco:\n\`\`\`json\n{"capa":"...","contracapa":"...","chamada":"..."}\n\`\`\``;
+    const user = `# TAREFA\nO Designer não conseguiu encaixar o texto do post desta notícia na arte. Reescreva com os mesmos fatos em menos palavras. Isso vale SÓ para o texto da arte (capa, contracapa, chamada): a matéria do site e a legenda não mudam. Não invente nada, não mude o sentido.\n\nA capa encurtada continua sendo manchete forte, no estilo treinado abaixo: já conta o fato, verbo no presente, nome próprio no começo, o detalhe que dá peso (número, prazo, risco, primeira vez) e deixa claro o perigo ou a novidade para quem lê. Corte palavras de ligação e detalhes secundários, nunca o gatilho. Não pode ficar morna nem genérica.\n\n# ESTILO DE MANCHETE TREINADO\n${MANCHETES_TREINO()}\n\nLimites (contando espaços):\n- capa: no máximo ${LIM_CAPA_NOTICIA} caracteres\n- contracapa + chamada juntas: no máximo ${LIM_CARD_NOTICIA} caracteres\n\nCAPA ATUAL (${i.capa.length}): ${i.capa}\nCONTRACAPA ATUAL: ${i.contra}\nCHAMADA ATUAL: ${i.chamada}\n\nResponda só com o bloco:\n\`\`\`json\n{"capa":"...","contracapa":"...","chamada":"..."}\n\`\`\``;
     const r = await callClaude({ agent: agentRow('roteirista'), user, maxTokens: 800 });
     const j = jparse((String(r.text).match(/\{[\s\S]*\}/) || [])[0], null); if (!j?.capa) throw new Error('O Copy não devolveu o texto curto no formato pedido');
     let sc = String(c.script || '');

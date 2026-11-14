@@ -699,7 +699,7 @@ async function abrirEditor(id, parte) {
         <h3 class="muted small" style="margin:12px 0 6px">Legenda</h3><textarea class="f" id="leg" rows="4"></textarea>
         <input class="f" id="porque" placeholder="Por que mudou? (opcional, ajuda o gerente a criar a regra)" style="margin-top:10px"></div>
       <div data-t="versoes" class="hidden">${versoesHtml(d) || '<p class="muted">Ainda sem edições.</p>'}</div></div>
-    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
+    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn" onclick="salvarEd(false)">Salvar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
   $('#doc').textContent = ED.orig[campo]; $('#leg').value = ED.orig.caption;
   $('#doc').addEventListener('input', () => { $('#learn').textContent = 'Você está editando: ao aprovar, o gerente transforma a mudança em regra.'; });
 }
@@ -732,7 +732,7 @@ async function abrirMateria(id, d) {
     <div class="ask"><input class="f" id="ajm" placeholder="Pedir ajuste ao gerente: diga o que mudar na matéria…" onkeydown="if(event.key==='Enter')pedirAjuste()"><button class="btn" onclick="pedirAjuste()">Pedir ajuste</button></div>
     <div class="mb"><article id="mtLer" class="leitura" style="max-width:760px;margin:0 auto;text-align:justify;font-size:16px;line-height:1.75;hyphens:auto">${materiaHtml(d.materia)}</article>
       <div id="mtTxt" class="hidden"><div class="doc" id="doc" contenteditable="plaintext-only" spellcheck="true"></div><input class="f" id="porque" placeholder="Por que mudou? (opcional, ajuda o gerente a criar a regra)" style="margin-top:10px"><textarea id="leg" class="hidden"></textarea></div></div>
-    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
+    <div class="ft"><span class="learn" id="learn">O gerente vai registrar o que você mudar.</span><button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button><button class="btn" onclick="salvarEd(false)">Salvar</button><button class="btn ok" onclick="salvarEd(true)">Aprovar</button></div>`);
   $('#doc').textContent = ED.orig.materia; $('#leg').value = ED.orig.caption;
 }
 function edTab(t) { document.querySelectorAll('.mb [data-t]').forEach(e => e.classList.toggle('hidden', e.dataset.t !== t)); document.querySelectorAll('.mb .tabs button').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase().startsWith(t.slice(0, 4)))); }
