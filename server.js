@@ -1729,6 +1729,10 @@ if (!one("SELECT 1 x FROM settings WHERE key='rev_v1'")) {
 
 // ───────────────────────── Fila e pipeline ─────────────────────────
 function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter = null) {
+  // copy já aprovada pelo dono (Treino do Designer, Produção diária com copy aprovada): nunca volta para o Roteirista nem para a revisão da copy; segue para a arte
+  if (contentId && ((agent === 'roteirista' && kind === 'roteiro') || (agent === 'gerente' && kind === 'revisao') || agent === 'revisorcopy' || agent === 'seo')) {
+    const cc = getContent(contentId); if (cc && ['treino_designer', 'grade_aprovada'].includes(cc.created_by) && cc.script) { agent = cc.format === 'video_vertical' ? 'editor' : 'designer'; kind = agent === 'designer' ? 'arte' : 'video'; input = {}; }
+  }
   const r = run('INSERT INTO jobs(content_id,agent,kind,status,input,origin,cday,created_at,run_after) VALUES(?,?,?,?,?,?,?,?,?)',
     contentId, agent, kind, 'queued', JSON.stringify(input), origin, today(), T(), runAfter);
   dlog('fila', `novo pedido #${r.lastInsertRowid}: ${agent}/${kind}${contentId ? ' do conteúdo #' + contentId : ''}${input?.feedback ? ' (devolvido: ' + String(input.feedback).replace(/\s+/g, ' ').slice(0, 160) + ')' : ''}${origin && origin !== 'auto' ? ' origem=' + origin : ''}`);
@@ -6483,7 +6487,8 @@ function contentAct(id, act, b = {}) {
   } else if (act === 'reprocess') {
     setContent(id, { status: 'producing', error: '', revisions: 0, prod_revisions: 0 });
     log(null, `Reprocessando "${c.title}"`, id);
-    if (c.script) enqueue(id, 'gerente', 'revisao'); else enqueue(id, 'roteirista', 'roteiro');
+    if (['treino_designer', 'grade_aprovada'].includes(c.created_by) && c.script) { const ag = c.format === 'video_vertical' ? 'editor' : 'designer'; enqueue(id, ag, ag === 'designer' ? 'arte' : 'video'); }   // copy já aprovada pelo dono: recomeça na arte, nunca reescreve nem revisa a copy
+    else if (c.script) enqueue(id, 'gerente', 'revisao'); else enqueue(id, 'roteirista', 'roteiro');
   } else {
     if (c.status !== 'approved') throw fail(400, 'Só conteúdos aprovados podem ser marcados como postados');
     setContent(id, { status: 'posted', posted_at: T(), post_url: str(b.post_url, 500, 'Link', false) });
