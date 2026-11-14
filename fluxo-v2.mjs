@@ -193,7 +193,8 @@ export function criarFluxoV2(ctx) {
     // regra do treino: toda notícia tem as duas entregas; sem a matéria a peça está incompleta (fica marcada, não vira outro formato)
     for (const i of [...itens]) if (i.raia === 'materia' && i.tem_arte) { const c0 = rows.find(r => r.id === i.id); i.parte = 'materia'; if (!c0?.materia) i.sem_materia = true; itens.push({ ...i, raia: 'carrossel', parte: 'post', sem_materia: false }); }
     // as duas entregas andam separadas: arte em ajuste não põe a matéria (já pronta) em ajuste, e ajuste da matéria não mexe no post
-    for (const i of itens) if (i.parte === 'materia' && rows.find(r => r.id === i.id)?.materia_aprovada && !['finalizado', 'descartado'].includes(i.estado)) Object.assign(i, { estado: 'esperando', etapa: 'publicacao', aguardando: false, em_ajuste: 0, materia_ok: true });   // matéria já aprovada: sai da Mesa e espera a publicação
+    for (const i of itens) if (i.parte === 'materia' && rows.find(r => r.id === i.id)?.materia_aprovada === 'pendente' && !['finalizado', 'descartado'].includes(i.estado)) Object.assign(i, { estado: 'esperando', etapa: 'revisao', aguardando: false, em_ajuste: 0 });   // post aprovado, matéria ainda não: ela fica na Mesa
+    for (const i of itens) if (i.parte === 'materia' && (rows.find(r => r.id === i.id)?.materia_aprovada || '').replace('pendente', '') && !['finalizado', 'descartado'].includes(i.estado)) Object.assign(i, { estado: 'esperando', etapa: 'publicacao', aguardando: false, em_ajuste: 0, materia_ok: true });   // matéria já aprovada: sai da Mesa e espera a publicação
     for (const i of itens) if (i.parte && ['etapa', 'ajuste', 'fila'].includes(i.estado)) {
       const js = porC.get(i.id) || [], soMateria = js.length && js.every(j => j.kind === 'materia_ajuste'), soArte = js.every(j => j.agent !== 'roteirista');   // Designer, Revisor da arte, render: nada disso mexe na matéria
       if ((i.parte === 'materia' && soArte) || (i.parte === 'post' && soMateria)) Object.assign(i, { estado: 'esperando', etapa: 'revisao', aguardando: false, em_ajuste: 0 });
@@ -274,6 +275,8 @@ export function criarFluxoV2(ctx) {
     const autor = user?.name || 'dono';
     if (nome === 'aprovar') {
       // matéria do site é aprovada sozinha: não depende da arte (que pode estar em ajuste) nem muda o estado do post
+      // aprovar o post aprova só o post: a matéria que você ainda não aprovou continua na Mesa
+      if (b.parte !== 'materia' && c.materia && !c.materia_aprovada) setContent(id, { materia_aprovada: 'pendente' });
       if (b.parte === 'materia' && c.materia) { setContent(id, { materia_aprovada: T() }); log(null, `Você aprovou a matéria do site de "${c.title}"`, id); changed(); return { ok: true }; }
       if (c.status === 'awaiting_script') contentAct(id, 'approve_script', b);
       else contentAct(id, 'approve', b);
@@ -307,6 +310,7 @@ export function criarFluxoV2(ctx) {
       const link = str(b.link ?? b.post_url, 500, 'Link', false);
       if (link && !/^https?:\/\//i.test(link)) throw fail(400, 'O link precisa começar com http:// ou https://');
       const rede = REDES_POST.includes(b.rede) ? b.rede : 'instagram', parte = rede === 'site' ? 'materia' : 'post';
+      if (parte === 'materia' && c.materia_aprovada === 'pendente') throw fail(400, 'A matéria do site ainda não foi aprovada: aprove na Mesa de revisão antes de publicar');
       run('INSERT OR REPLACE INTO postagens(content_id,rede,parte,url,ts) VALUES(?,?,?,?,?)', id, rede, parte, link || '', T());
       log(null, `"${c.title}" postado em ${REDE_NOME[rede]}`, id);
       const ps = all('SELECT DISTINCT parte FROM postagens WHERE content_id=?', id).map(x => x.parte), partes = c.materia && (c.art_status === 'ok') ? ['post', 'materia'] : c.materia && raiaDe(c, ctx) === 'materia' && c.art_status !== 'ok' ? ['materia'] : ['post'];
