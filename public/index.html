@@ -5199,14 +5199,29 @@ async function arteEditor(id, onClose, opts = {}) {
     toast('Template aplicado na página ' + (E.si + 1) + '. Ao aprovar, o Gerente estuda o que melhorou (não vira regra da marca).', 'ok');
   });
   const tpl = { el: h('div', { class: 'aelp', hidden: true }) };
+  // cada template aparece como miniatura da própria página montada nele (com o título e a foto desta página)
+  const tplCache = new Map();
   tpl.paint = async () => {
     if (!MODS) { try { MODS = (await api('/arte-modelos')).modelos; } catch { MODS = []; } }
-    const s = cur(), card = (nome, desc, uso, on, fn) => h('button', { type: 'button', class: 'aemod' + (on ? ' on' : ''), title: desc, style: { textAlign: 'left', width: '100%' }, onclick: fn }, h('b', null, nome), h('small', null, uso ? uso + ' · ' + desc : desc));
+    const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si;
     const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
+    const LST = [...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia').map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))];
+    const tw = 104, th = Math.round(tw * H / W), ks = tw / W;
+    const card = t => {
+      const f = h('iframe', { scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', transform: `scale(${ks})` } });
+      const box = h('div', { class: 'aeth' + (tplAtual(t.m, t.e) ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f);
+      const b = h('button', { type: 'button', title: t.nome + ' — ' + t.ds, onclick: () => usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', background: 'none', border: 0, padding: 0, cursor: 'pointer', color: 'inherit' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
+      const k = sig + '|' + t.m + JSON.stringify(t.e);
+      const pinta = sl => { const v = view(); f.srcdoc = AS.slideHtml(v, sl, si, n); };
+      if (tplCache.has(k)) pinta(tplCache.get(k));
+      else { const d = { ...base, ...t.e }; if (t.e.foto2) d.foto2 = base.foto2 || base.foto; if (t.e.circulo) d.circulo = base.circulo || base.foto;
+        api(`/contents/${id}/arte/modelo`, 'POST', { modelo: t.m, dados: d, i: si, total: n }).then(r => { tplCache.set(k, r.slide); pinta(r.slide); }).catch(() => box.style.opacity = .3); }
+      return b;
+    };
+    const grade = g => h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(2, ${tw}px)`, gap: '12px 10px', justifyContent: 'space-between' } }, LST.filter(t => t.g === g).map(card));
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
-      h('div', { class: 'small mut' }, 'Troca o layout da página ' + (E.si + 1) + ' mantendo os textos e as fotos.'),
-      h('h4', null, 'Notícia'), ...TPL_NOTICIA.map(([m, e, n, ds]) => card(n, ds, '', tplAtual(m, e), () => usaTpl(m, e))),
-      h('h4', null, 'Todos os formatos'), ...MODS.filter(m => m.id !== 'noticia').map(m => card(m.nome, m.desc, m.uso, s.modelo === m.id, () => usaTpl(m.id, {}))));
+      h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + ' (mantém textos e fotos).'),
+      h('h4', null, 'Notícia'), grade('Notícia'), h('h4', null, 'Todos os formatos'), grade('Todos os formatos'));
   };
   const toggleTpl = on => { tpl.el.hidden = !on; tplB.classList.toggle('on', on); if (on) { lib.el.hidden = true; libB.classList.remove('on'); elp.el.hidden = true; elB.classList.remove('on'); tpl.paint(); } setTimeout(fit, 30); };
   const tplB = h('button', { title: 'Templates aprovados: troca o layout desta página', onclick: () => toggleTpl(tpl.el.hidden) }, svg(AI.layout), 'Templates');
