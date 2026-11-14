@@ -5337,6 +5337,11 @@ const HANDLERS = {
       L.veredito = 'ajustes';
       L.correcoes = `FORÇA INSUFICIENTE (GANCHO ${L.forca.gancho}, ESPECIFICIDADE ${L.forca.especificidade}; para aprovar os dois precisam ser 4 ou mais). Entregue 2 títulos alternativos concretos que passem no teste do concorrente e inclua um exemplo concreto (pessoa fictícia rotulada, lugar, situação com detalhe) no trecho do miolo onde hoje só há conselho genérico.\n` + (L.correcoes || '');
     }
+    // tamanho do post da notícia (medido na arte): passou, volta para o Copy encurtar antes de chegar ao Designer
+    if (c.kind === 'noticia') { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' '), err = [];
+      if (p.capa.length > LIM_CAPA_NOTICIA) err.push(`CAPA com ${p.capa.length} caracteres: o máximo é ${LIM_CAPA_NOTICIA} (contando espaços). Diga o mesmo em menos palavras.`);
+      if (card.length > LIM_CARD_NOTICIA) err.push(`CONTRACAPA + CHAMADA com ${card.length} caracteres: o máximo é ${LIM_CARD_NOTICIA}. Diga o mesmo em menos palavras.`);
+      if (err.length) { if (L.veredito === 'aprovada') L.veredito = 'ajustes'; L.correcoes = 'TAMANHO QUE NÃO CABE NA ARTE:\n' + err.join('\n') + '\n' + (L.correcoes || ''); } }
     const ok = L.veredito === 'aprovada', ev = { veredito: L.veredito, nota: L.nota, forca: L.forca, laudo: r.text, ts: T() };
     setContent(c.id, { copy_review: JSON.stringify(ev) });
     const fmtc = `${c.format}/${c.kind}${c.goal ? '/' + c.goal : ''}`, det = `${L.correcoes ? 'Correções: ' + L.correcoes.slice(0, 900) + '\n' : ''}${L.licao ? 'Lição: ' + L.licao.slice(0, 400) : ''}`;

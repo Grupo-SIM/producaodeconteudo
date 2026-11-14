@@ -30,3 +30,8 @@ Revise a matéria do site com o olhar de um editor. Cada falha vira correção o
 15. Cada informação aparece uma vez; linha fina não repete o corpo.
 16. Datas no formato "na terça-feira (10)", nunca "nesta".
 17. Interpretação só quando os números provam, junto do dado. Sem opinião, conselho ou tomar partido.
+
+## Tamanho do post da notícia (correção do dono, 14/11/2026)
+- [ ] Capa do post com no máximo 100 caracteres (contando espaços).
+- [ ] Contracapa + chamada com no máximo 130 caracteres.
+- Passou: veredito "ajustes", com a correção "diga o mesmo em menos palavras". O painel também mede e devolve sozinho. Se ainda assim passar batido, o Designer devolve ao Copy.
