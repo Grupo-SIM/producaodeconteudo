@@ -4198,7 +4198,7 @@ function libDrawer(o) {
       h('div', { class: 'mut small', style: { gridColumn: '1/-1', padding: '6px 4px' } }, web.info)];
   };
   const paint = () => {
-    tabsB.replaceChildren(...[...o.kinds, ...(o.web ? [['web', '🔎 Explorar bancos de imagem']] : [])].map(([k, l]) => h('button', { class: kind === k ? 'on' : '', onclick: () => { kind = k; search.placeholder = k === 'web' ? 'Explorar: escreva o que procura (Pexels, Unsplash, Pixabay, Openverse) e aperte Enter…' : 'Buscar pelo nome…'; paint(); } }, l)));
+    tabsB.replaceChildren(...[...o.kinds, ...(o.web ? [['web', '🔎 Explorar biblioteca']] : [])].map(([k, l]) => h('button', { class: kind === k ? 'on' : '', onclick: () => { kind = k; search.placeholder = k === 'web' ? 'Explorar: escreva o que procura (Pexels, Unsplash, Pixabay, Openverse) e aperte Enter…' : 'Buscar pelo nome…'; paint(); } }, l)));
     if (kind === 'web') { grid.replaceChildren(...paintWeb()); return; }
     const ls = o.list().filter(a => (kind === 'todos' || o.match(a, kind)) && (!q || a.name.includes(q.toLowerCase())));
     grid.replaceChildren(...(ls.length ? ls.map(a => {
@@ -4442,7 +4442,7 @@ async function arteEditor(id, onClose, opts = {}) {
     }, moved => { if (moved) afterGeo(); else drawOverlay(); });
   };
   let pickCb = null;   // escolha de imagem (trocar fundo, trocar imagem): abre a mesma Biblioteca, com Meus arquivos e Explorar
-  const pickImage = (titulo, onPick) => { pickCb = onPick; toggleLib(true); toast(titulo + ': escolha em Meus arquivos ou em Explorar'); };
+  const pickImage = (titulo, onPick) => { pickCb = onPick; toggleLib(true); toast(titulo + ': escolha em Minha biblioteca ou em Explorar biblioteca'); };
   const pickImageAntigo = (titulo, onPick) => {
     let kind = 'todos', q = ''; const grid = h('div', { class: 'aelib' }), file = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', hidden: true });
     const kinds = [['todos', 'Tudo'], ['logo', 'Logos'], ['mascote', 'Mascote'], ['foto', 'Fotos'], ['fundo', 'Fundos'], ['textura', 'Texturas']];
@@ -4461,7 +4461,7 @@ async function arteEditor(id, onClose, opts = {}) {
   };
   const addAssetAt = (a, x, y) => { if (!need('items', 30, 'imagens')) return; pushUndo(); (cur().items ||= []).push({ asset: a.name, x: r2(clamp(x ?? .5, 0, 1)), y: r2(clamp(y ?? .5, 0, 1)), size: Math.round(W * (a.kind === 'logo' ? .22 : .3)), rot: 0 }); E.multi = null; E.sel = { kind: 'item', k: cur().items.length - 1 }; afterAdd(); };
   const bgAsset = a => { pushUndo(); const s = cur(); s.bg ||= {}; delete s.bg.gen; delete s.__ia; s.bg.asset = a.name; markDirty(); drawPanel(); repaint(); drawStrip(); toast('Fundo do slide ' + (E.si + 1) + ' trocado', 'ok'); };
-  const lib = libDrawer({ list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Meus arquivos']], match: () => true,
+  const lib = libDrawer({ list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Minha biblioteca']], match: () => true,
     onAdd: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } addAssetAt(a); }, onBg: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } bgAsset(a); }, onClose: () => toggleLib(false), onUpload: (j, f) => E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }) });
   const toggleLib = on => { lib.el.hidden = !on; libB.classList.toggle('on', on); if (on) { lib.paint(); elp.el.hidden = true; elB.classList.remove('on'); } setTimeout(fit, 30); };
   const libB = h('button', { title: 'Biblioteca de imagens da marca', onclick: () => toggleLib(lib.el.hidden) }, svg(AI.image), 'Biblioteca');
