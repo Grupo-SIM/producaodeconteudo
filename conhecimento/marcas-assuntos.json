@@ -28,6 +28,23 @@
     ],
     "SimIntPay": [
       "SimIntPay"
+    ],
+    "Sim Intermediações": [
+      "Sim Intermediações",
+      "SIM Intermediações"
+    ],
+    "Teron": [
+      "Teron"
+    ],
+    "PagaTG": [
+      "PagaTG"
     ]
+  },
+  "_institucionais_sobre": {
+    "Atlas Hosting": "hospedagem de sites",
+    "SimIntPay": "pagamentos",
+    "Sim Intermediações": "venda de serviços de marketing e tecnologia",
+    "Teron": "gestão online, tipo Notion (https://teron.app)",
+    "PagaTG": "checkout no Telegram"
   }
 }
