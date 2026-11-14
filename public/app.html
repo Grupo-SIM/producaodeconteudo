@@ -747,7 +747,7 @@ async function salvarEd(aprova) {
     await refresh(); loadChat();
   } catch (e) { toast(e.message); }
 }
-async function pedirAjuste() { const m = $('#ajm').value.trim(); if (!m) return toast('Diga o que ajustar'); await tryDo(() => api(`/api/v2/itens/${ED.id}/ajuste`, { body: { motivo: m, alvo: ED.tab === 'arte' ? 'designer' : ED.tab === 'video' ? 'editor' : 'roteirista' } }), 'Pedido enviado: o item volta para o agente com a tag de ajuste'); fecha(); }
+async function pedirAjuste() { const m = $('#ajm').value.trim(); if (!m) return toast('Diga o que ajustar'); await tryDo(() => api(`/api/v2/itens/${ED.id}/ajuste`, { body: { motivo: m, alvo: ED.tab === 'arte' ? 'designer' : ED.tab === 'video' ? 'editor' : 'roteirista', campo: ED.campo } }), 'Pedido enviado: o item volta para o agente com a tag de ajuste'); fecha(); }
 function confirmaDescarte(id) {
   return new Promise(ok => {
     S._desc = ok;

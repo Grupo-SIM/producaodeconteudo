@@ -5437,6 +5437,16 @@ const HANDLERS = {
   },
 
   // o Copy diz a mesma coisa com menos palavras para caber na arte (pedido do Designer); depois a arte é refeita
+  async materia_ajuste(job, c) {
+    const i = JSON.parse(job.input || '{}');
+    const user = `# TAREFA\nO dono pediu um ajuste na MATÉRIA DO SITE desta notícia. Aplique só o que ele pediu e mantenha todo o resto igual (fatos, fontes, citações, ordem). Não mexa no post nem na arte.\n\n# PEDIDO DO DONO\n${i.feedback || ''}\n\n# MATÉRIA ATUAL\n${c.materia}\n\n# SAÍDA\nDevolva só a matéria completa, no mesmo formato: primeira linha "# Manchete", depois linha fina, lide, intertítulos com "## " e a linha de Fontes no fim. Sem comentários antes ou depois.`;
+    const r = await callClaude({ agent: agentRow('roteirista'), user, maxTokens: 6000 });
+    const txt = String(r.text || '').replace(/^```[a-z]*\n?|```\s*$/g, '').trim(); if (txt.length < 200 || !/^#\s/m.test(txt)) throw new Error('O Copy não devolveu a matéria completa');
+    setContent(c.id, { materia: txt });
+    log('roteirista', `Ajustou a matéria do site como você pediu: "${c.title}"`, c.id);
+    paraAprovacao(c.id, `"${c.title}": matéria ajustada, aguardando sua aprovação`);
+    return r;
+  },
   async encurtar(job, c) {
     const i = JSON.parse(job.input || '{}');
     const user = `# TAREFA\nO Designer não conseguiu encaixar o texto do post desta notícia na arte. Reescreva com os mesmos fatos em menos palavras. Isso vale SÓ para o texto da arte (capa, contracapa, chamada): a matéria do site e a legenda não mudam. Não invente nada, não mude o sentido.\n\nA capa encurtada continua sendo manchete forte, no estilo treinado abaixo: já conta o fato, verbo no presente, nome próprio no começo, o detalhe que dá peso (número, prazo, risco, primeira vez) e deixa claro o perigo ou a novidade para quem lê. Corte palavras de ligação e detalhes secundários, nunca o gatilho. Não pode ficar morna nem genérica.\n\n# ESTILO DE MANCHETE TREINADO\n${MANCHETES_TREINO()}\n\nLimites (contando espaços):\n- capa: no máximo ${LIM_CAPA_NOTICIA} caracteres\n- contracapa + chamada juntas: no máximo ${LIM_CARD_NOTICIA} caracteres\n\nCAPA ATUAL (${i.capa.length}): ${i.capa}\nCONTRACAPA ATUAL: ${i.contra}\nCHAMADA ATUAL: ${i.chamada}\n\nResponda só com o bloco:\n\`\`\`json\n{"capa":"...","contracapa":"...","chamada":"..."}\n\`\`\``;
@@ -6544,7 +6554,9 @@ function contentAct(id, act, b = {}) {
     if (target !== 'roteirista') brainAprendeDoDono(target, c, fbRaw);
     registraPedido(c, target, fbRaw || tagsAj.map(id => motivoRotulo(target, id)).join('; '));
     // Ajuste de arte ou de vídeo volta só para quem produziu (o roteiro aprovado não é refeito); depois o Revisor revisa a entrega de novo
-    if (target === 'roteirista') enqueue(id, 'roteirista', 'roteiro', { feedback });
+    // ajuste pedido na tela da matéria do site: só o Copy, só a matéria (o post e a arte ficam como estão)
+    if (target === 'roteirista' && b.campo === 'materia' && c.materia) enqueue(id, 'roteirista', 'materia_ajuste', { feedback }, 'manual');
+    else if (target === 'roteirista') enqueue(id, 'roteirista', 'roteiro', { feedback });
     else enqueue(id, target, target === 'designer' ? 'arte' : 'video', { feedback, from: 'dono' });
   } else if (act === 'reprocess') {
     setContent(id, { status: 'producing', error: '', revisions: 0, prod_revisions: 0 });
