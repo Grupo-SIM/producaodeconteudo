@@ -5208,7 +5208,8 @@ async function arteEditor(id, onClose, opts = {}) {
   const tplCustom = sl0 => {   // template salvo aplicado nesta página: troca título, texto e foto de fundo pelos daqui
     const s = cur(), sl = JSON.parse(JSON.stringify(sl0)), T = r => (s.texts || []).find(t => t.role === r && !t.decor);
     for (const r of ['title', 'body']) { const v = T(r), alvo = (sl.texts || []).find(t => t.role === r && !t.decor); if (v && alvo) alvo.value = v.value; }
-    if ((s.bg?.asset || s.bg?.gen) && (sl.bg?.asset || sl.bg?.gen)) { sl.bg = { ...sl.bg }; delete sl.bg.asset; delete sl.bg.gen; if (s.bg.asset) sl.bg.asset = s.bg.asset; else sl.bg.gen = s.bg.gen; }
+    // template salvo não tem foto: entra a foto desta página
+    if (s.bg?.asset || s.bg?.gen) { sl.bg = { ...sl.bg }; delete sl.bg.asset; delete sl.bg.gen; if (s.bg.asset) sl.bg.asset = s.bg.asset; else sl.bg.gen = s.bg.gen; }
     delete sl.modelo; delete sl.dados; return sl;
   };
   const usaCustom = t => { pushUndo(); E.spec.slides[E.si] = tplCustom(t.slide); E.tplEd = { id: t.id, nome: t.nome }; E.sel = null; E.multi = null; markDirty(); repaint(); drawStrip(); drawPanel(); tpl.paint(); toast('Template “' + t.nome + '” aplicado'); };
@@ -5219,6 +5220,15 @@ async function arteEditor(id, onClose, opts = {}) {
     const r = await api('/tpl-paginas', 'POST', { id: sobre && ed.id ? ed.id : 0, base: sobre && ed.base ? ed.base : '', nome, slide: sl, format: data.format, brand: data.brand || '' });
     E.tplEd = { id: r.id, nome }; TPLS = null; toast(sobre ? 'Template “' + nome + '” atualizado' : 'Página salva como template “' + nome + '”', 'ok'); tpl.paint();
   });
+  // “Virar template” (rodapé): a página aberta vira template, sem a imagem de fundo (o resto fica igual)
+  const virarTemplate = guard(async () => {
+    const sl = JSON.parse(JSON.stringify(cur())); delete sl.modelo; delete sl.dados; delete sl.__ia;
+    if (sl.bg) { delete sl.bg.asset; delete sl.bg.gen; delete sl.bg.banco; delete sl.bg.src; }
+    const nome = (String(data.title || 'Template').replace(/\s*\(.*?\)\s*$/, '').slice(0, 40) + ' · pág. ' + (E.si + 1)).trim();
+    await api('/tpl-paginas', 'POST', { nome, slide: sl, format: data.format, brand: data.brand || '' });
+    TPLS = null; toast('Pronto: a página ' + (E.si + 1) + ' virou o template “' + nome + '” (está em Templates › Meus templates)', 'ok'); toggleTpl(true);
+  });
+  addEventListener('message', ev => { if (ev.origin === location.origin && ev.data?.acao === 'virarTemplate') virarTemplate(); });
   const apagaTpl = guard(async t => { if (!confirm('Excluir o template “' + t.nome + '”? ' + (t.custom ? 'Ele vai para a lixeira.' : 'Ele some da lista (dá para restaurar os prontos).'))) return; await api('/tpl-paginas/' + (t.custom ? t.id : 'pronto:' + tplChave(t)), 'DELETE'); if (E.tplEd && ((t.custom && E.tplEd.id === t.id) || E.tplEd.base === tplChave(t))) E.tplEd = null; TPLS = null; tpl.paint(); toast('Template excluído'); });
   tpl.paint = async () => {
     if (!MODS) { try { MODS = (await api('/arte-modelos')).modelos; } catch { MODS = []; } }
@@ -5233,7 +5243,7 @@ async function arteEditor(id, onClose, opts = {}) {
       const f = h('iframe', { scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', transform: `scale(${ks})` } });
       const on = t.custom ? E.tplEd?.id === t.id : tplAtual(t.m, t.e);
       const editar = () => { if (t.custom) usaCustom(t); else { usaTpl(t.m, t.e).then(() => { E.tplEd = { base: tplChave(t), nome: t.nome }; tpl.paint(); }); } toast('Mude o que quiser na página e clique em “Salvar alterações” aqui em Templates'); };
-      const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f, h('div', { class: 'aethb' }, ib(svg(AI.pen, 13), 'Editar template: aplica na página para você ajustar; depois clique em “Salvar alterações” no topo de Templates', editar), ib(svg(AI.trash, 13), t.custom ? 'Excluir template: vai para a lixeira' : 'Excluir template: some da lista (dá para mostrar de novo no fim da lista)', () => apagaTpl(t), '#ff8a8a')));
+      const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f, h('div', { class: 'aethb' }, ib(svg(AI.trash, 13), t.custom ? 'Excluir template: vai para a lixeira' : 'Excluir template: some da lista (dá para mostrar de novo no fim da lista)', () => apagaTpl(t), '#ff8a8a')));
       const b = h('div', { title: 'Clique para aplicar “' + t.nome + '” nesta página' + (t.ds ? ' — ' + t.ds : ''), onclick: () => t.custom ? usaCustom(t) : usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', cursor: 'pointer' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
       const pinta = sl => { f.srcdoc = AS.slideHtml(view(), sl, si, n); };
       if (t.custom) pinta(tplCustom(t.slide));
@@ -5246,9 +5256,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const grade = g => { const L = LST.filter(t => t.g === g); return L.length ? [h('h4', null, g), h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(2, ${tw}px)`, gap: '12px 10px', justifyContent: 'space-between' } }, L.map(card))] : []; };
     const ed = E.tplEd;
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
-      h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Passe o mouse para editar ou excluir.'),
-      ed ? h('button', { class: 'btn primary sm', onclick: () => salvaTpl('sobre') }, 'Salvar alterações em “' + ed.nome + '”') : null,
-      h('button', { class: 'btn sm', title: 'Adicionar template: guarda a página do jeito que está agora em “Meus templates”, para usar em outras artes', onclick: () => salvaTpl('novo') }, '+ Salvar esta página como template'),
+      h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Para excluir, passe o mouse e clique na lixeira. Para criar um template, use “Virar template” no rodapé.'),
       ...grade('Meus templates'), ...grade('Notícia'), ...grade('Todos os formatos'),
       oc.size ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: guard(async () => { await api('/tpl-paginas/restaurar', 'POST', {}); TPLS = null; tpl.paint(); }) }, 'Mostrar de novo os prontos escondidos (' + oc.size + ')') : null);
   };
