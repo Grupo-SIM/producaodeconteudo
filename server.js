@@ -5957,11 +5957,13 @@ function schedulerTick() {
     if (rc.auto && hour >= rc.hora && agenteLigado('radar')) for (const [b, m] of Object.entries(rc.marcas)) {
       if (!m.ativo || !(ctx_metaMateria(b) > 0) || !radarEstiloDaMarca(b) || one("SELECT 1 x FROM jobs WHERE kind='radar' AND cday=? AND input LIKE ?", date, '%' + JSON.stringify({ brand: b }).slice(1, -1) + '%')) continue;
       radarEnfileira(b, 'auto'); } }
-  if (s.brain_daily === '1' && hour >= +s.brain_hour && (brainPendingEvents() || brainNewMetrics().length)
+  if (false && s.brain_daily === '1' && hour >= +s.brain_hour   // desligado (dono, 14/11/2026): nada começa sozinho; o Cérebro consolida quando o dono pedir
+ && (brainPendingEvents() || brainNewMetrics().length)
     && !one("SELECT 1 x FROM jobs WHERE kind='cerebro' AND (cday=? OR status IN ('queued','running'))", date)) {
     enqueue(null, 'chefe', 'cerebro', {}, 'auto');
   }
-  if (s.autopilot === '1' && hour >= +s.report_hour && one('SELECT COUNT(*) n FROM metrics').n
+  if (false && s.autopilot === '1' && hour >= +s.report_hour   // desligado: relatório só quando o dono pedir
+ && one('SELECT COUNT(*) n FROM metrics').n
     && !one("SELECT 1 x FROM jobs WHERE kind='relatorio' AND origin='auto' AND cday=?", date)) {
     enqueue(null, 'chefe', 'relatorio');
   }

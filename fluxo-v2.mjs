@@ -103,7 +103,7 @@ export function criarFluxoV2(ctx) {
   } catch (e) { if (e.code !== 'ENOENT') console.error('marcas do mapa:', e.message); }
   // Itens parados pelo erro antigo de configuração (já corrigido no servidor): voltam sozinhos para a fila, sem aparecer como problema
   setTimeout(() => { try {
-    const presos = all("SELECT DISTINCT c.id FROM contents c LEFT JOIN jobs j ON j.content_id=c.id WHERE c.status NOT IN ('posted','discarded','approved') AND (c.error LIKE '%dangerously-skip-permissions%' OR c.error LIKE '%root/sudo%' OR j.error LIKE '%dangerously-skip-permissions%' OR j.error LIKE '%root/sudo%')");
+    const presos = all("SELECT DISTINCT c.id FROM contents c LEFT JOIN jobs j ON j.content_id=c.id WHERE COALESCE(c.pausado,0)=0 AND c.status NOT IN ('posted','discarded','approved') AND (c.error LIKE '%dangerously-skip-permissions%' OR c.error LIKE '%root/sudo%' OR j.error LIKE '%dangerously-skip-permissions%' OR j.error LIKE '%root/sudo%')");
     for (const { id } of presos) { run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id); setContent(id, { error: '' }); try { contentAct(id, 'reprocess'); } catch { /* segue */ } }
     if (presos.length) { log(null, `${presos.length} item(ns) parados pelo erro antigo de configuração voltaram para a fila`); changed(); }
   } catch (e) { console.error('reprocessar presos:', e.message); } }, 3000).unref?.();
@@ -130,7 +130,7 @@ export function criarFluxoV2(ctx) {
   }
   // Itens parados por causa técnica que se resolve sozinha (limite da assinatura, resposta vazia, erro antigo): tenta de novo a cada hora
   function retentaTick() {
-    const L = all("SELECT DISTINCT c.id FROM contents c JOIN jobs j ON j.content_id=c.id WHERE c.teste=0 AND c.status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script') AND j.status='error' AND (j.error LIKE '%limite de uso%' OR j.error LIKE '%sem resposta%' OR j.error LIKE '%dangerously-skip%' OR j.error LIKE '%root/sudo%') AND (j.finished_at IS NULL OR j.finished_at < ?)", new Date(Date.now() - 3600e3).toISOString());
+    const L = all("SELECT DISTINCT c.id FROM contents c JOIN jobs j ON j.content_id=c.id WHERE c.teste=0 AND COALESCE(c.pausado,0)=0 AND c.status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script') AND j.status='error' AND (j.error LIKE '%limite de uso%' OR j.error LIKE '%sem resposta%' OR j.error LIKE '%dangerously-skip%' OR j.error LIKE '%root/sudo%') AND (j.finished_at IS NULL OR j.finished_at < ?)", new Date(Date.now() - 3600e3).toISOString());
     for (const { id } of L) { run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id); setContent(id, { error: '' }); try { contentAct(id, 'reprocess'); } catch { /* segue */ } }
     if (L.length) { log(null, `${L.length} item(ns) parados por limite ou falha do Claude voltaram para a fila sozinhos`); changed(); }
   }
