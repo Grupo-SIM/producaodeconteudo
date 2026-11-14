@@ -143,6 +143,15 @@ export function criarFluxoV2(ctx) {
     run("INSERT OR REPLACE INTO settings(key,value) VALUES('sobras_limpas_v1','1')");
     if (L.length) { log(null, `${L.length} peça(s) criadas sozinhas pela versão antiga saíram da fila (estão na lixeira)`); changed(); }
   } catch (e) { console.error('limpar sobras:', e.message); } }, 4000).unref?.();
+  // uma vez só (decisão do dono, 14/11/2026: "começar de agora em diante"): tira da produção tudo o que foi pedido até hoje e ainda está em andamento
+  // (fica o que já chegou para ele: Mesa de revisão e Publicação; fica o Treino do Designer e a Produção diária); vai para a lixeira, dá para restaurar
+  setTimeout(() => { try { if (one("SELECT 1 x FROM settings WHERE key='recomeco_v1'")) return;
+    const L = all("SELECT id,status FROM contents WHERE teste=0 AND created_by NOT IN ('treino_designer','grade_aprovada') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')");
+    for (const c of L) { run("DELETE FROM jobs WHERE content_id=? AND status='queued'", c.id); setContent(c.id, { status: 'discarded', status_antes: c.status, em_ajuste: 0 }); }
+    run("DELETE FROM jobs WHERE status='queued' AND content_id IS NULL AND kind NOT IN ('chat','teste')");
+    run("INSERT OR REPLACE INTO settings(key,value) VALUES('recomeco_v1','1')");
+    if (L.length) { log(null, `Recomeço: ${L.length} pedido(s) antigos em andamento saíram da produção (estão na lixeira)`); changed(); }
+  } catch (e) { console.error('recomeço:', e.message); } }, 5000).unref?.();
   ctx.metaDe = (brand, raia) => one('SELECT qtd FROM brand_metas WHERE brand=? COLLATE NOCASE AND raia=?', brand, raia)?.qtd || 0;
   // começa tudo zerado (decisão do dono, em treino): uma vez só, zera as metas que já existiam
   if (!one("SELECT 1 x FROM settings WHERE key='metas_zeradas_v1'")) { run('UPDATE brand_metas SET qtd=0'); run("INSERT OR REPLACE INTO settings(key,value) VALUES('metas_zeradas_v1','1')"); }
