@@ -61,6 +61,8 @@ export function estadoDe(c, jobs = []) {
   return { estado: 'parado', etapa: '', motivo: 'Sem tarefa na fila' };
 }
 
+const REDES_POST = ['instagram', 'facebook', 'tiktok', 'youtube', 'pinterest', 'site'];
+const REDE_NOME = { instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', youtube: 'YouTube', pinterest: 'Pinterest', site: 'site' };
 export function criarFluxoV2(ctx) {
   const { db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip } = ctx;
   const path = ctx.path, fsx = ctx.fs;
@@ -159,6 +161,7 @@ export function criarFluxoV2(ctx) {
     run("INSERT OR REPLACE INTO settings(key,value) VALUES('recomeco_v2','1')");
     if (L.length) { log(null, `Recomeço do zero: ${L.length} peça(s) não postadas foram para a lixeira (dá para restaurar)`); changed(); }
   } catch (e) { console.error('recomeço do zero:', e.message); } }, 5500).unref?.();
+  db.exec('CREATE TABLE IF NOT EXISTS postagens(content_id INTEGER NOT NULL, rede TEXT NOT NULL, parte TEXT NOT NULL, url TEXT DEFAULT \'\', ts TEXT NOT NULL, PRIMARY KEY(content_id, rede))');
   ctx.metaDe = (brand, raia) => one('SELECT qtd FROM brand_metas WHERE brand=? COLLATE NOCASE AND raia=?', brand, raia)?.qtd || 0;
   // começa tudo zerado (decisão do dono, em treino): uma vez só, zera as metas que já existiam
   if (!one("SELECT 1 x FROM settings WHERE key='metas_zeradas_v1'")) { run('UPDATE brand_metas SET qtd=0'); run("INSERT OR REPLACE INTO settings(key,value) VALUES('metas_zeradas_v1','1')"); }
@@ -171,7 +174,8 @@ export function criarFluxoV2(ctx) {
 
   function item(c, jobs) {
     const e = estadoDe(c, jobs ?? jobsDe(c.id));
-    return {
+    let postadas = []; try { postadas = all('SELECT rede,parte,url FROM postagens WHERE content_id=?', c.id); } catch { }
+    return { postadas,
       id: c.id, titulo: c.title, marca: c.brand || '', produto_id: c.product_id || null, formato: c.format, tipo: c.kind, raia: raiaDe(c, ctx),
       status: c.status, ...e, estado_nome: ESTADOS[e.estado], etapa_nome: ETAPA_NOME[e.etapa] || e.etapa,
       pausado: !!c.pausado, em_ajuste: !!c.em_ajuste, ajuste_motivo: c.ajuste_motivo || '', nota: c.score, post_url: c.post_url || '', postado_em: c.posted_at,
@@ -291,11 +295,16 @@ export function criarFluxoV2(ctx) {
       log(null, `Você restaurou "${c.title}" da lixeira`, id);
       return { ok: true };
     }
-    if (nome === 'postado') {
+    if (nome === 'postado') {   // postagem é por rede: cada rede marcada separada; a peça só vai para Finalizado quando todas as partes tiverem sido postadas em pelo menos uma rede
       const link = str(b.link ?? b.post_url, 500, 'Link', false);
       if (link && !/^https?:\/\//i.test(link)) throw fail(400, 'O link precisa começar com http:// ou https://');
-      contentAct(id, 'posted', { post_url: link });
-      return { ok: true };
+      const rede = REDES_POST.includes(b.rede) ? b.rede : 'instagram', parte = rede === 'site' ? 'materia' : 'post';
+      run('INSERT OR REPLACE INTO postagens(content_id,rede,parte,url,ts) VALUES(?,?,?,?,?)', id, rede, parte, link || '', T());
+      log(null, `"${c.title}" postado em ${REDE_NOME[rede]}`, id);
+      const ps = all('SELECT DISTINCT parte FROM postagens WHERE content_id=?', id).map(x => x.parte), partes = c.materia && (c.art_status === 'ok') ? ['post', 'materia'] : c.materia && raiaDe(c, ctx) === 'materia' && c.art_status !== 'ok' ? ['materia'] : ['post'];
+      if (partes.every(x => ps.includes(x)) && c.status === 'approved') contentAct(id, 'posted', { post_url: link || (one("SELECT url FROM postagens WHERE content_id=? AND url<>'' ORDER BY ts LIMIT 1", id)?.url || '') });
+      else changed();
+      return { ok: true, postadas: all('SELECT rede,parte,url,ts FROM postagens WHERE content_id=?', id) };
     }
     if (nome === 'resolver') {   // o dono resolveu a causa (login, limite, ajuste): limpa o erro e a etapa recomeça de onde parou
       if (['posted', 'discarded'].includes(c.status)) throw fail(400, 'Este item não está parado');

@@ -468,7 +468,8 @@ function porQueAguarda(i) {
 // nome do formato para o dono: a notícia tem 2 partes (post de 2 cards no Instagram + matéria no site)
 const RAIA_NOME = d => ({ materia: 'Feed jornalístico + matéria (Instagram: capa e contracapa · site: matéria completa)', carrossel: 'Carrossel', estatico: 'Feed estático', stories: 'Stories de venda', reels: 'Reels', blog: 'Post de blog' })[d.raia] || d.raia || d.formato || '—';
 function cartao(i) {
-  const sub = i.sem_materia ? 'falta a matéria do site' : i.pausado ? 'PAUSADA por você · nenhum agente mexe nela até você mandar continuar' : i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';
+  const redesP = (i.postadas || []).filter(x => (i.parte || 'post') === x.parte || !i.parte).map(x => ({ instagram: 'IG', facebook: 'FB', tiktok: 'TT', youtube: 'YT', pinterest: 'PIN', site: 'site' })[x.rede]);
+  const sub = redesP.length ? 'postado: ' + redesP.join(', ') : i.sem_materia ? 'falta a matéria do site' : i.pausado ? 'PAUSADA por você · nenhum agente mexe nela até você mandar continuar' : i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';
   const vivo = (i.estado === 'etapa' || i.estado === 'ajuste') && !i.aguardando && !i.pausado;   // agente trabalhando agora: ponto pulsando e barra correndo
   return `<button class="c ${CLS[i.estado]}${i.em_ajuste ? ' aj' : ''}${vivo ? ' vivo' : ''}${i.pausado ? ' pausa' : ''}" onclick="abrirItem(${i.id}${i.parte ? `,'${i.parte}'` : ''})">${i.parte === 'post' ? '<b style="color:#9ec5ff;font-weight:600">Post · </b>' : i.parte === 'materia' ? '<b style="color:#9ec5ff;font-weight:600">Matéria · </b>' : ''}${esc(i.titulo)}<i>${vivo ? '<b class="pulso"></b>' : ''}${i.pausado ? '<b class="pausa-ic">❚❚</b>' : ''}${[i.marca, sub].filter(Boolean).map(esc).join(' · ')}</i>${vivo ? '<u class="corre"></u>' : ''}</button>`;
 }
@@ -781,7 +782,7 @@ async function verPronto(id, parte) {
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca)} · ${esc(RAIA_NOME(d))}</span>
     ${ic('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', 'Baixar em PDF', 'baixaPdf()')}${ic('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/>', 'Copiar texto', 'copiaVp()')}${d.tem_video ? ic('<path d="m10 9 5 3-5 3z"/><rect x="3" y="5" width="18" height="14" rx="2"/>', 'Baixar vídeo', `location.href='/api/contents/${id}/render/file'`) : ''}${ic('<path d="M18 6 6 18M6 6l12 12"/>', 'Fechar', 'fecha()')}</div>
     <div class="mb"><article class="leitura"><p>${html || '<span class="muted">Sem texto.</span>'}</p></article></div>
-    <div class="ft"><span class="muted small" style="margin-right:auto">Depois de publicar, marque aqui e cole o link.</span><button class="btn ok" onclick="marcarPostado(${id})">${['materia', 'blog'].includes(d.raia) ? 'Marcar como publicado' : 'Marcar como postado'}</button></div>`);
+    <div class="ft"><span class="muted small" style="margin-right:auto">Depois de publicar, marque aqui e cole o link.</span><button class="btn ok" onclick="marcarPostado(${id},'${parte === 'materia' ? 'materia' : 'post'}')">${parte === 'materia' ? 'Marcar publicado no site' : 'Marcar onde postei'}</button></div>`);
 }
 // post pronto (carrossel, estático, cards da notícia): só os slides aprovados e a legenda, para baixar e postar
 async function verPost(id, d) {
@@ -790,7 +791,7 @@ async function verPost(id, d) {
   const slides = Array.from({ length: n }, (_, k) => `<figure style="margin:0"><img src="/api/contents/${id}/arte/file/${k + 1}?review=1&t=${encodeURIComponent(d.atualizado || '')}" style="width:100%;border-radius:8px;display:block" loading="lazy"><figcaption class="muted small" style="text-align:center;margin-top:4px">${k + 1}/${n}</figcaption></figure>`).join('');
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca)} · Post do Instagram</span><a class="btn sm" href="/api/contents/${id}/arte/zip">Baixar imagens</a>${leg ? `<button class="btn sm" onclick="copiaVp()">Copiar legenda</button>` : ''}<button class="btn sm" onclick="fecha()">Fechar</button></div>
     <div class="mb"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">${slides}</div>${leg ? `<h5 style="margin:16px 0 6px">Legenda</h5><div class="doc" style="min-height:0;white-space:pre-wrap">${esc(leg)}</div>` : ''}</div>
-    <div class="ft"><span class="muted small" style="margin-right:auto">Baixe as imagens, copie a legenda e poste. Depois marque aqui e cole o link.</span><button class="btn ok" onclick="marcarPostado(${id})">Marcar como postado</button></div>`);
+    <div class="ft"><span class="muted small" style="margin-right:auto">Baixe as imagens, copie a legenda e poste. Depois marque aqui e cole o link.</span><button class="btn ok" onclick="marcarPostado(${id},'post')">Marcar onde postei</button></div>`);
 }
 async function copiaVp() { try { await navigator.clipboard.writeText(S._vp.txt); toast('Texto copiado'); } catch { toast('Não consegui copiar'); } }
 // baixa um PDF de verdade (sem abrir a impressão): texto da peça e, se houver, as artes no fim
@@ -820,10 +821,16 @@ async function baixaPdf() {
   } catch (e) { toast('Não consegui gerar o PDF: ' + e.message); }
 }
 async function copiaLegenda(id) { const d = await api('/api/v2/itens/' + id); try { await navigator.clipboard.writeText(d.legenda || d.materia || d.roteiro || ''); toast('Legenda copiada'); } catch { toast('Não consegui copiar'); } }
-function marcarPostado(id) {
-  modal(`<div class="hd"><h2>Marcar como postado</h2></div><div class="mb"><input class="f" id="plink" placeholder="Link do post (opcional)"></div><div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="confPostado(${id})">Confirmar</button></div>`, 'sm');
+// postagem é por rede: cada rede marcada separada (o post nas redes sociais, a matéria no site)
+const REDES_PARTE = { post: [['instagram', 'Instagram'], ['facebook', 'Facebook'], ['tiktok', 'TikTok'], ['youtube', 'YouTube'], ['pinterest', 'Pinterest']], materia: [['site', 'Site']] };
+async function marcarPostado(id, parte = 'post') {
+  const d = await api('/api/v2/itens/' + id), feitas = new Set((d.postadas || []).map(x => x.rede));
+  modal(`<div class="hd"><h2>Onde você postou?</h2><span class="muted small">${esc(d.titulo)}</span></div><div class="mb">
+    ${REDES_PARTE[parte].map(([k, n]) => `<div class="kvr"><span>${n}${feitas.has(k) ? ' <b style="color:#3ddc84">· postado</b>' : ''}</span><span style="display:flex;gap:6px"><input class="f" id="pl_${k}" placeholder="Link (opcional)" style="width:230px;padding:4px 8px"><button class="btn sm ${feitas.has(k) ? '' : 'ok'}" onclick="confPostado(${id},'${k}','${parte}')">${feitas.has(k) ? 'Atualizar' : 'Marcar'}</button></span></div>`).join('')}
+    <p class="small muted" style="margin-top:10px">Cada rede é marcada separada. A peça vai para Finalizado quando o post e a matéria (se houver) tiverem sido postados.</p></div>
+    <div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Fechar</button></div>`, 'sm');
 }
-async function confPostado(id) { await tryDo(() => api(`/api/v2/itens/${id}/postado`, { body: { link: $('#plink').value.trim() } }), 'Finalizado'); fecha(); }
+async function confPostado(id, rede, parte) { const r = await tryDo(() => api(`/api/v2/itens/${id}/postado`, { body: { rede, link: ($('#pl_' + rede)?.value || '').trim() } }), 'Marcado'); if (r) marcarPostado(id, parte); }
 
 // ───────── Produção diária: quantos posts de cada formato, por marca, os agentes fazem sozinhos por dia (tudo zerado = só o que você pedir)
 VIEWS.producao = async () => {
