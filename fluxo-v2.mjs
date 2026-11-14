@@ -186,7 +186,8 @@ export function criarFluxoV2(ctx) {
     const rows = all(`SELECT * FROM contents WHERE teste=0 ${marca ? 'AND brand=? COLLATE NOCASE' : ''} ${incluirDescartados ? '' : "AND status<>'discarded'"} AND (status<>'posted' OR posted_at>=?) ORDER BY updated_at DESC LIMIT 600`, ...(marca ? [marca] : []), new Date(Date.now() - 14 * 864e5).toISOString());
     const itens = rows.map(c => item(c, porC.get(c.id) || []));
     // notícia tem 2 entregas: o post do Instagram (cards) aparece na raia Carrossel e a matéria do site na raia Matéria de jornal
-    for (const i of [...itens]) if (i.raia === 'materia' && i.tem_arte) { const c0 = rows.find(r => r.id === i.id); if (c0?.materia) { i.parte = 'materia'; itens.push({ ...i, raia: 'carrossel', parte: 'post' }); } else { i.raia = 'carrossel'; i.parte = 'post'; } }
+    // regra do treino: toda notícia tem as duas entregas; sem a matéria a peça está incompleta (fica marcada, não vira outro formato)
+    for (const i of [...itens]) if (i.raia === 'materia' && i.tem_arte) { const c0 = rows.find(r => r.id === i.id); i.parte = 'materia'; if (!c0?.materia) i.sem_materia = true; itens.push({ ...i, raia: 'carrossel', parte: 'post', sem_materia: false }); }
     // por que está aguardando: posição na fila (mesma ordem do agendador) e quem está rodando agora
     const fila = all("SELECT j.id,j.content_id,j.kind,j.agent FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id", T());
     const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0, limite = 0;
