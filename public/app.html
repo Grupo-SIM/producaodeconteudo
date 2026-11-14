@@ -458,9 +458,10 @@ function porQueAguarda(i) {
   if (!f) return `passando para ${quem}`;
   if (f.manual) return `${quem}: esperando você levar o pedido ao chat`;
   if (f.limite) return `fila parada: o limite de ${f.limite} tarefas por dia acabou · volta amanhã (ou aumente em Configurações)`;
-  if (!f.rodando && f.pos > 0) return `${quem} começa em seguida · ${f.pos}º da fila (fila parada agora: nenhum agente rodando)`;
+  if (f.pos === 1 && !f.ocupado) return f.rodando >= f.vagas ? `${quem} é o próximo · começa quando abrir vaga (${f.rodando} de ${f.vagas} agentes trabalhando ao mesmo tempo)` : `${quem} começa agora`;
+  if (f.pos === 1) return `${quem} começa assim que terminar a tarefa atual`;
   if (f.pos <= 0) return `passando para ${quem}`;
-  return `${quem} começa em seguida · ${f.pos}º da fila (${f.rodando} de ${f.vagas} tarefas rodando ao mesmo tempo)`;
+  return `${f.pos}º na fila do ${quem}${f.ocupado ? ' (trabalhando em outra agora)' : ''}`;
 }
 function cartao(i) {
   const sub = i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';

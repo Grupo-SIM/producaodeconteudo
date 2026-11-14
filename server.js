@@ -5803,10 +5803,14 @@ function checkProduction(contentId) {
 
 let running = 0;
 let limitWarnedDay = '';
+// fila por agente: cada agente faz uma tarefa por vez e tem a própria fila (o Designer não espera atrás do Roteirista)
+const agentesOcupados = new Set();
 function nextJob(onlyChat = false) {
   // o que o dono pede (Novo conteúdo, Treino, chat) passa na frente do que foi criado sozinho (pautas automáticas, notícias)
   return one(`SELECT j.* FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id
-    WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ${onlyChat ? "AND j.kind IN ('chat','teste')" : ''} ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id LIMIT 1`, T());
+    WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ${onlyChat ? "AND j.kind IN ('chat','teste')" : ''}
+    ${agentesOcupados.size ? `AND j.agent NOT IN (${[...agentesOcupados].map(() => '?').join(',')})` : ''}
+    ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id LIMIT 1`, T(), ...agentesOcupados);
 }
 // modo chat: a arte de roteiro no modelo do dono é montada pelo painel na hora, sem pedido para colar (a revisão segue normal)
 let localRodando = false;
@@ -5851,8 +5855,8 @@ function pump() {
     const job = nextJob(limitHit);   // com o limite diário batido, só o chat e os testes do dono continuam
     if (!job) break;
     run("UPDATE jobs SET status='running', started_at=?, day=?, attempts=attempts+1 WHERE id=?", T(), day, job.id);
-    running++; changed();
-    runJob(job).finally(() => { running--; changed(); setImmediate(pump); });
+    running++; agentesOcupados.add(job.agent); changed();
+    runJob(job).finally(() => { running--; agentesOcupados.delete(job.agent); changed(); setImmediate(pump); });
   }
 }
 
