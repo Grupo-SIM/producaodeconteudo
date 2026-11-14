@@ -5142,6 +5142,8 @@ function radarEscolhe(itens, brand, cfgM) {
       angulo: `Conte o que aconteceu${x.origem === 'trends' ? ', por que está em alta' : ''} e o que muda para quem acompanha ${brand}, em linguagem simples, sem sair dos fatos da matéria.`,
       fatos: [limpo, x.snippet ? x.snippet.slice(0, 240) : '', `Fonte: ${x.fonte || x.termo || 'não informada'}${x.publicado ? ', ' + x.publicado : ''}`].filter(Boolean), porque: 'Combina com: ' + (c.acerto.slice(0, 4).join(', ') || 'o assunto da marca') + (x.trafego ? ` · ${x.trafego} buscas` : '') }; });
 }
+// o Agente de Notícias só busca sozinho para a marca que tem matéria por dia na grade de Produção diária
+const ctx_metaMateria = b => { try { return fluxoV2.metaDe?.(b, 'materia') || 0; } catch { return 0; } };
 function radarEnfileira(brand, origem = 'auto') { return enqueue(null, 'radar', 'radar', { brand }, origem); }
 
 // O que a arte RENDERIZADA realmente contém (textos e imagens por página): o Revisor não aprova página vazia só porque a direção em texto estava boa
@@ -5904,14 +5906,15 @@ function schedulerTick() {
   if (s.autopilot === '1' && hour >= +s.start_hour) {
     // Produz até bater a meta do dia e para: sem meta pendente, nenhum pedido novo (e nenhum crédito gasto). Máx. 3 tentativas por dia.
     const q = quotaHoje();
-    if (q.ativo && q.faltaTotal > 0 && !fluxoV2.temMetasMarca?.() && !one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running')")
+    if (false && q.ativo && q.faltaTotal > 0 && !fluxoV2.temMetasMarca?.()   // desligado: quem decide o volume é a grade de Produção diária (por marca e formato)
+ && !one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running')")
       && one("SELECT COUNT(*) n FROM jobs WHERE kind='pautas' AND origin='auto' AND cday=?", date).n < 3) {
       enqueue(null, 'chefe', 'pautas', { auto: true, quota: q.falta });
     }
   }
   { const rc = radarCfg();   // Radar: uma busca por marca ativa, uma vez por dia, a partir da hora escolhida
     if (rc.auto && hour >= rc.hora && agenteLigado('radar')) for (const [b, m] of Object.entries(rc.marcas)) {
-      if (!m.ativo || !radarEstiloDaMarca(b) || one("SELECT 1 x FROM jobs WHERE kind='radar' AND cday=? AND input LIKE ?", date, '%' + JSON.stringify({ brand: b }).slice(1, -1) + '%')) continue;
+      if (!m.ativo || !(ctx_metaMateria(b) > 0) || !radarEstiloDaMarca(b) || one("SELECT 1 x FROM jobs WHERE kind='radar' AND cday=? AND input LIKE ?", date, '%' + JSON.stringify({ brand: b }).slice(1, -1) + '%')) continue;
       radarEnfileira(b, 'auto'); } }
   if (s.brain_daily === '1' && hour >= +s.brain_hour && (brainPendingEvents() || brainNewMetrics().length)
     && !one("SELECT 1 x FROM jobs WHERE kind='cerebro' AND (cday=? OR status IN ('queued','running'))", date)) {

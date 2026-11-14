@@ -99,7 +99,7 @@ export function criarFluxoV2(ctx) {
   const diaLocal = t => new Date(t).toLocaleDateString('en-CA', { timeZone: ctx.settings().tz || 'America/Sao_Paulo' });
   // Modo autônomo por marca: a cada minuto confere a meta de cada marca × formato e pede ao Gerente só as pautas que faltam
   function metasTick() {
-    const s = ctx.settings(); if (s.autopilot !== '1') return;
+    const s = ctx.settings();   // a grade de Produção diária é o único gatilho: tudo zerado = nada é criado sozinho
     const hora = +new Date().toLocaleString('en-US', { timeZone: s.tz || 'America/Sao_Paulo', hour: 'numeric', hour12: false }); if (hora < +(s.start_hour || 0)) return;
     const hoje = diaLocal(Date.now()), F = novoFormatos();
     const feitos = all("SELECT * FROM contents WHERE teste=0 AND created_by='autopilot' AND created_at>=?", new Date(Date.now() - 40 * 3600e3).toISOString()).filter(c => diaLocal(c.created_at) === hoje);
@@ -119,6 +119,9 @@ export function criarFluxoV2(ctx) {
     if (L.length) { log(null, `${L.length} item(ns) parados por limite ou falha do Claude voltaram para a fila sozinhos`); changed(); }
   }
   ctx.temMetasMarca = () => !!one('SELECT 1 x FROM brand_metas WHERE qtd>0');
+  ctx.metaDe = (brand, raia) => one('SELECT qtd FROM brand_metas WHERE brand=? COLLATE NOCASE AND raia=?', brand, raia)?.qtd || 0;
+  // começa tudo zerado (decisão do dono, em treino): uma vez só, zera as metas que já existiam
+  if (!one("SELECT 1 x FROM settings WHERE key='metas_zeradas_v1'")) { run('UPDATE brand_metas SET qtd=0'); run("INSERT OR REPLACE INTO settings(key,value) VALUES('metas_zeradas_v1','1')"); }
   setInterval(() => { try { metasTick(); } catch (e) { console.error('metas por marca:', e.message); } }, 60e3).unref();
   setInterval(() => { try { retentaTick(); } catch (e) { console.error('retentativa:', e.message); } }, 15 * 60e3).unref();
 
@@ -360,7 +363,7 @@ export function criarFluxoV2(ctx) {
       log(null, `Treino do Designer: copy aprovada nº ${pc.n} "${pc.titulo}" enviada para ${ag === 'designer' ? 'o Designer' : 'o Editor'} (${br.name})`, id); changed();
       return send(res, 200, { id });
     }
-    if (p === '/api/v2/metas' && m === 'GET') return send(res, 200, { metas: all('SELECT * FROM brand_metas'), formatos: novoFormatos(), autopilot: ctx.settings().autopilot === '1' });
+    if (p === '/api/v2/metas' && m === 'GET') return send(res, 200, { metas: all('SELECT * FROM brand_metas'), formatos: novoFormatos(), marcas: all('SELECT name FROM brands ORDER BY name').map(x => x.name), autopilot: ctx.settings().autopilot === '1', hora: +(ctx.settings().start_hour || 0) });
     if (p === '/api/v2/metas' && m === 'PUT') {
       const b = await readBody(req, 20000), br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || '')); if (!br) throw fail(400, 'Marca não encontrada');
       if (!novoFormatos().some(f => f.id === b.raia)) throw fail(400, 'Formato inválido');
@@ -464,5 +467,5 @@ export function criarFluxoV2(ctx) {
     throw fail(404, 'Rota não encontrada');
   }
 
-  return { rota, fluxo, acao, formatos, item, temMetasMarca: ctx.temMetasMarca };
+  return { rota, fluxo, acao, formatos, item, temMetasMarca: ctx.temMetasMarca, metaDe: ctx.metaDe };
 }

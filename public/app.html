@@ -263,6 +263,7 @@ img.av{object-fit:cover;padding:0}
   .kv{grid-template-columns:1fr}
   .mesa1 .card{display:none}.card .pv{aspect-ratio:1}.mesa1 .card.cur{display:flex}.mnav{display:flex}.gsearch input{width:140px}.pop{position:fixed;left:8px;right:8px;width:auto;top:60px}
 }
+.grade{border-collapse:collapse;width:100%;min-width:720px}.grade th,.grade td{padding:9px 10px;border-bottom:1px solid var(--ln,#262a33);text-align:center;font-size:13px}.grade th{font-weight:600;color:var(--tx2,#9aa3b2);font-size:12px}.grade td:first-child,.grade th:first-child{text-align:left}.grade .metain{width:58px;text-align:center}
 </style>
 </head>
 <body>
@@ -308,13 +309,13 @@ const isMobile = () => matchMedia('(max-width:760px)').matches;
 
 const I = {
   fluxo: '<path d="M3 6h18M3 12h12M3 18h7"/>', mesa: '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="m8 11 3 3 5-6"/>', pub: '<path d="M4 12v7h16v-7M12 3v12M7 8l5-5 5 5"/>',
-  marcas: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/>', prod: '<path d="m3 7 9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/>', otim: '<path d="M3 20h18M6 16l4-5 3 3 6-8"/>',
+  agenda: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/>', marcas: '<circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/>', prod: '<path d="m3 7 9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/>', otim: '<path d="M3 20h18M6 16l4-5 3 3 6-8"/>',
   cerebro: '<circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="m7 7 3 3m4 0 3-3M7 17l3-3m4 0 3 3"/>',
   cfg: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>', mais: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'
 };
 const ico = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
 const MENU = [
-  ['fluxo', 'Fluxo', 'fluxo', 1], ['mesa', 'Mesa de revisão', 'mesa', 1, 'Revisão'], ['publicacao', 'Publicação', 'pub', 1, 'Publicar'], ['marcas', 'Marcas', 'marcas', 0],
+  ['fluxo', 'Fluxo', 'fluxo', 1], ['mesa', 'Mesa de revisão', 'mesa', 1, 'Revisão'], ['publicacao', 'Publicação', 'pub', 1, 'Publicar'], ['producao', 'Produção diária', 'agenda', 0], ['marcas', 'Marcas', 'marcas', 0],
   ['produtos', 'Produtos', 'prod', 0], ['otimizacao', 'Otimização', 'otim', 0], ['cerebro', 'Cérebro', 'cerebro', 1], ['config', 'Configurações', 'cfg', 0]
 ];
 
@@ -786,6 +787,17 @@ function marcarPostado(id) {
 }
 async function confPostado(id) { await tryDo(() => api(`/api/v2/itens/${id}/postado`, { body: { link: $('#plink').value.trim() } }), 'Finalizado'); fecha(); }
 
+// ───────── Produção diária: quantos posts de cada formato, por marca, os agentes fazem sozinhos por dia (tudo zerado = só o que você pedir)
+VIEWS.producao = async () => {
+  const MT = await api('/api/v2/metas'), F = MT.formatos || [], M = MT.marcas || [];
+  const q = (b, f) => (MT.metas || []).find(x => x.brand.toLowerCase() === b.toLowerCase() && x.raia === f)?.qtd || 0;
+  const tot = M.reduce((a, b) => a + F.reduce((c, f) => c + q(b, f.id), 0), 0);
+  $('#main').innerHTML = `<div class="top"><h1>Produção diária</h1><span style="flex:1"></span><span class="chip ${tot ? 'gold' : ''}">${tot ? tot + ' posts por dia' : 'Tudo zerado: só faz o que você pedir'}</span></div>
+    <div class="box" style="overflow:auto"><p class="small muted" style="margin:0 0 12px">Coloque quantos posts de cada formato os agentes fazem sozinhos por dia para cada marca. Com 0, nada é criado sozinho: só o que você pedir em <b>+ Novo conteúdo</b> ou no Treino. A cada dia, a partir das ${String(MT.hora || 0).padStart(2, '0')}h, o Gerente cria as pautas que faltam para bater o número, e as peças chegam na Mesa de revisão. Matéria por dia também liga a busca diária do Agente de Notícias para a marca.</p>
+    <table class="grade"><thead><tr><th>Marca</th>${F.map(f => `<th title="${esc(f.desc || '')}">${esc(f.nome)}</th>`).join('')}<th>Total</th></tr></thead><tbody>
+    ${M.map(b => `<tr><td><b>${esc(b)}</b></td>${F.map(f => `<td><input class="metain" type="number" min="0" max="20" value="${q(b, f.id)}" onchange="salvaMeta(${esc(JSON.stringify(b))},'${f.id}',this.value).then(()=>render())"></td>`).join('')}<td class="muted">${F.reduce((c, f) => c + q(b, f.id), 0)}</td></tr>`).join('') || `<tr><td colspan="${F.length + 2}" class="muted">Nenhuma marca cadastrada.</td></tr>`}
+    </tbody></table></div>`;
+};
 // ───────── Marcas
 const sigla = n => (n.match(/\d+/)?.[0]) || n.split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 3).toUpperCase();
 // lê os documentos da marca: seções em CAIXA ALTA (PAPEL DA MARCA, PÚBLICO, VOZ…) ou "## Título", e linhas "Chave: valor"
@@ -842,9 +854,9 @@ VIEWS.marcas = async () => {
       esq = L.map(blocoL).join('') || '<p class="muted small">Sem descrição de voz e público.</p>'; dir = R.map(blocoL).join('');
     } else if (tab === 'formatos') {
       const MT = S._metas || { metas: [], formatos: [] };
-      esq = `<h5>Quantos posts por dia (modo autônomo)</h5><div class="kvr"><span>Modo autônomo</span><span><button class="chip ${MT.autopilot ? 'gold' : ''}" onclick="tryDo(()=>api('/api/v2/autonomo',{method:'PUT',body:{ligado:${!MT.autopilot}}}),'${MT.autopilot ? 'Desligado' : 'Ligado'}').then(()=>{S._metas=null;render()})">${MT.autopilot ? 'Ligado' : 'Desligado'}</button></span></div>
+      esq = `<h5>Quantos posts por dia</h5>
         ${MT.formatos.map(f => { const q = MT.metas.find(x => x.brand.toLowerCase() === sel.name.toLowerCase() && x.raia === f.id)?.qtd || 0; return `<div class="kvr"><span>${esc(f.nome)}</span><span><input class="metain" style="width:56px" type="number" min="0" max="20" value="${q}" onchange="salvaMeta(${JSON.stringify(esc(sel.name))},'${f.id}',this.value)"> por dia</span></div>`; }).join('')}
-        <p class="small muted" style="margin-top:8px">Com o modo autônomo ligado, o Gerente cria sozinho as pautas que faltam para bater essas metas, todo dia, a partir da hora de início. Os posts chegam para você revisar na Mesa.</p>`;
+        <p class="small muted" style="margin-top:8px">0 = nada é criado sozinho. A grade com todas as marcas fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p>`;
       dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
       esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('')}<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>`;
@@ -887,7 +899,7 @@ async function salvaEd() {
   doc.content = content; toast('Salvo'); fecha(); render();
 }
 function verCampo(t, v, html) { modal(`<div class="hd"><h2>${t}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><div class="leitura">${html ? v : `<p>${sw(v)}</p>`}</div></div><div class="ft"><span class="muted small" style="margin-right:auto">Para mudar, use Editar ou peça ao gerente no chat.</span></div>`, 'sm'); }
-async function salvaMeta(brand, raia, qtd) { await tryDo(() => api('/api/v2/metas', { method: 'PUT', body: { brand, raia, qtd: +qtd } }), 'Meta salva'); S._metas = null; }
+async function salvaMeta(brand, raia, qtd) { qtd = Math.max(0, Math.min(20, +qtd || 0)); await tryDo(() => api('/api/v2/metas', { method: 'PUT', body: { brand, raia, qtd: +qtd } }), 'Meta salva'); S._metas = null; }
 async function novaMarca() { const n = prompt('Nome da marca'); if (n) await tryDo(() => api('/api/brands', { body: { name: n } }), 'Marca criada'); if (S.view === 'marcas') render(); }
 async function detMarca(id) {
   const b = S.brands.find(x => x.id === id); const fs = S.fluxo.formatos;
@@ -899,7 +911,7 @@ async function detMarca(id) {
     <div class="tabs"><button class="on" onclick="mTab(this,'v')">Visual</button><button onclick="mTab(this,'z')">Voz</button><button onclick="mTab(this,'o')">Público, produto e outros</button><button onclick="mTab(this,'f')">Formatos e metas</button><button onclick="mTab(this,'c')">Contas</button></div>
     <div data-m="v">${sec(['marca', 'diretrizes'])}</div><div data-m="z" class="hidden">${sec(['tom_de_voz'])}</div>
     <div data-m="o" class="hidden">${sec([...new Set(['publico', 'nicho', 'produto', ...docs.map(x => x.category).filter(c => !['marca', 'diretrizes', 'tom_de_voz'].includes(c))])])}</div>
-    <div data-m="f" class="hidden">${(MT.formatos || fs).map(f => { const q = (MT.metas || []).find(x => x.brand.toLowerCase() === b.name.toLowerCase() && x.raia === f.id)?.qtd || 0; return `<div class="ver"><b style="width:160px">${esc(f.nome)}</b><span><input class="metain" style="width:56px" type="number" min="0" max="20" value="${q}" onchange="salvaMeta(${JSON.stringify(esc(b.name))},'${f.id}',this.value)"> por dia</span></div>`; }).join('')}<p class="small muted" style="margin-top:8px">Quantos posts desta marca por dia em cada formato (vale com o modo autônomo ligado).</p></div>
+    <div data-m="f" class="hidden">${(MT.formatos || fs).map(f => { const q = (MT.metas || []).find(x => x.brand.toLowerCase() === b.name.toLowerCase() && x.raia === f.id)?.qtd || 0; return `<div class="ver"><b style="width:160px">${esc(f.nome)}</b><span><input class="metain" style="width:56px" type="number" min="0" max="20" value="${q}" onchange="salvaMeta(${JSON.stringify(esc(b.name))},'${f.id}',this.value)"> por dia</span></div>`; }).join('')}<p class="small muted" style="margin-top:8px">Quantos posts desta marca por dia em cada formato (0 = nada sozinho). A grade de todas as marcas fica em Produção diária.</p></div>
     <div data-m="c" class="hidden"><p class="muted">Conexão com as redes: em breve. Hoje a publicação é manual.</p></div></div>`);
 }
 function mTab(b, k) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('[data-m]').forEach(e => e.classList.toggle('hidden', e.dataset.m !== k)); }
