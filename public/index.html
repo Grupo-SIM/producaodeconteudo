@@ -4203,7 +4203,7 @@ function libDrawer(o) {
     const ls = o.list().filter(a => (kind === 'todos' || o.match(a, kind)) && (!q || a.name.includes(q.toLowerCase())));
     grid.replaceChildren(...(ls.length ? ls.map(a => {
       const it = h('div', { class: 'aeli', draggable: 'true', title: a.name + ' — clique para adicionar ou arraste para a tela' }, h('img', { src: o.thumb(a), alt: a.name, loading: 'lazy', draggable: 'false' }), h('span', null, a.name),
-        h('div', { class: 'aeli-b' }, h('button', { type: 'button', onclick: e => { e.stopPropagation(); o.onAdd(a); } }, 'Adicionar'), o.onBg ? h('button', { type: 'button', onclick: e => { e.stopPropagation(); o.onBg(a); } }, 'Fundo') : null));
+        h('div', { class: 'aeli-b' }, h('button', { type: 'button', onclick: e => { e.stopPropagation(); o.onAdd(a); } }, 'Adicionar'), o.onCirc ? h('button', { type: 'button', title: 'Põe a imagem dentro de um círculo (como na capa Zyrion); depois dá para mudar para quadrado em Elemento › Recorte da imagem', onclick: e => { e.stopPropagation(); o.onCirc(a); } }, 'Círculo') : null, o.onBg ? h('button', { type: 'button', onclick: e => { e.stopPropagation(); o.onBg(a); } }, 'Fundo') : null));
       it.addEventListener('dragstart', e => { e.dataTransfer.setData('text/x-asset', a.name); e.dataTransfer.effectAllowed = 'copy'; });
       it.addEventListener('click', () => o.onAdd(a)); return it;
     }) : [h('div', { class: 'mut small', style: { gridColumn: '1/-1', padding: '10px' } }, 'Nada por aqui. Envie um arquivo do seu computador ou arraste-o para esta área.')]));
@@ -4342,7 +4342,7 @@ async function arteEditor(id, onClose, opts = {}) {
       for (const [l, t] of [[0, 0], ['100%', 0], [0, '100%'], ['100%', '100%']]) fr.append(h('div', { class: 'aeh c', style: { left: l, top: t, width: hs + 'px', height: hs + 'px', marginLeft: -hs / 2 + 'px', marginTop: -hs / 2 + 'px', borderWidth: Math.max(2, 1.6 / E.k) + 'px' } }));
       overlay.append(fr);
       const nb = (txt, fn, st) => h('button', { type: 'button', style: st || {}, onpointerdown: ev => ev.stopPropagation(), onclick: ev => { ev.stopPropagation(); fn(); } }, txt);
-      overlay.append(h('div', { class: 'aetb below', style: { left: '12px', top: '12px', bottom: 'auto', transformOrigin: 'left top', transform: `scale(${1 / E.k})` } }, h('span', { style: { padding: '0 8px', opacity: .8 } }, 'Fundo'), temImg ? nb('Trocar imagem', () => { lib.el.hidden && toggleLib(true); }) : nb('Pôr imagem', () => { lib.el.hidden && toggleLib(true); }), temImg ? nb('Excluir', () => apagaFundo(), { color: '#ff8a8a' }) : null));
+      overlay.append(h('div', { class: 'aetb below', style: { left: '12px', top: '12px', bottom: 'auto', transformOrigin: 'left top', transform: `scale(${1 / E.k})` } }, temImg ? nb('Trocar imagem', () => { lib.el.hidden && toggleLib(true); }) : nb('Pôr imagem', () => { lib.el.hidden && toggleLib(true); }), temImg ? nb('Excluir', () => apagaFundo(), { color: '#ff8a8a' }) : null));
     }
     { const tb = overlay.querySelector('.aetb'); if (tb) { const cabe = () => { if (!tb.isConnected) return; const r = tb.getBoundingClientRect(), c = cv.getBoundingClientRect(); let dx = 0; if (r.right > c.right - 8) dx = c.right - 8 - r.right; if (r.left + dx < c.left + 8) dx = c.left + 8 - r.left; if (dx) tb.style.left = (parseFloat(tb.style.left) + dx / E.k) + 'px'; }; requestAnimationFrame(cabe); setTimeout(cabe, 120); } }
     if (E.rul) overlay.append(...rulerEls()); if (E.gd.v.length || E.gd.h.length) overlay.append(...guideEls());
@@ -4463,7 +4463,7 @@ async function arteEditor(id, onClose, opts = {}) {
   const addAssetAt = (a, x, y) => { if (!need('items', 30, 'imagens')) return; pushUndo(); (cur().items ||= []).push({ asset: a.name, x: r2(clamp(x ?? .5, 0, 1)), y: r2(clamp(y ?? .5, 0, 1)), size: Math.round(W * (a.kind === 'logo' ? .22 : .3)), rot: 0 }); E.multi = null; E.sel = { kind: 'item', k: cur().items.length - 1 }; afterAdd(); };
   const bgAsset = a => { pushUndo(); const s = cur(); s.bg ||= {}; delete s.bg.gen; delete s.__ia; s.bg.asset = a.name; markDirty(); drawPanel(); repaint(); drawStrip(); toast('Fundo do slide ' + (E.si + 1) + ' trocado', 'ok'); };
   const lib = libDrawer({ list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Minha biblioteca']], match: () => true,
-    onAdd: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } addAssetAt(a); }, onBg: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } bgAsset(a); }, onClose: () => toggleLib(false), onUpload: (j, f) => E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }) });
+    onAdd: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } addAssetAt(a); }, onBg: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } bgAsset(a); }, onCirc: a => { addAssetAt(a, .72, .24); const it = cur().items[cur().items.length - 1]; if (it) { it.round = true; it.size = Math.round(W * .42); it.shadow = 1; it.front = true; } markDirty(); drawPanel(); repaint(); drawStrip(); }, onClose: () => toggleLib(false), onUpload: (j, f) => E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }) });
   const toggleLib = on => { lib.el.hidden = !on; libB.classList.toggle('on', on); if (on) { lib.paint(); elp.el.hidden = true; elB.classList.remove('on'); tpl.el.hidden = true; tplB.classList.remove('on'); } setTimeout(fit, 30); };
   const libB = h('button', { title: 'Biblioteca de imagens da marca', onclick: () => toggleLib(lib.el.hidden) }, svg(AI.image), 'Biblioteca');
   cv.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('text/x-asset') || e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
@@ -4517,6 +4517,7 @@ async function arteEditor(id, onClose, opts = {}) {
   };
   // ── zoom
   const setZoom = z => { E.zm = clamp(z, .25, 5); fit(); drawOverlay(); };
+  cv.addEventListener('pointerdown', e => { if (e.target === cv || e.target === wrap) { E.sys = null; select(null); } });   // clique no espaço escuro em volta da arte: tira a seleção
   cv.addEventListener('wheel', ev => { if (!(ev.ctrlKey || ev.metaKey)) return; ev.preventDefault(); setZoom((E.zm || 1) * (ev.deltaY < 0 ? 1.1 : 1 / 1.1)); }, { passive: false });
   // ── réguas e guias (arrastar da régua cria a guia; levar de volta para fora da página apaga)
   const guideDrag = (ev, axis, idx) => {
