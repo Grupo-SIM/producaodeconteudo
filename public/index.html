@@ -4173,7 +4173,7 @@ async function uploadAsset(f, brand) {
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j;
 }
 function libDrawer(o) {
-  let kind = 'todos', q = ''; const grid = h('div', { class: 'aeli-grid' }), tabsB = h('div', { class: 'tabs', style: { margin: 0, flexWrap: 'wrap' } }), search = h('input', { type: 'text', placeholder: 'Buscar pelo nome…' });
+  let kind = 'todos', q = ''; const grid = h('div', { class: 'aeli-grid' }), tabsB = h('div', { class: 'tabs', style: { margin: 0, flexWrap: 'wrap', flex: 'none' } }), search = h('input', { type: 'text', placeholder: 'Buscar pelo nome…' });
   const file = h('input', { type: 'file', accept: o.accept, multiple: true, hidden: true });
   const el = h('div', { class: 'aelp', hidden: true });
   // aba Internet: fotos de bancos com uso comercial liberado (Pexels, Unsplash, Pixabay com chave; Openverse sem chave)
