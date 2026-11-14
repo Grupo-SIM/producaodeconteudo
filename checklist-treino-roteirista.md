@@ -17,7 +17,8 @@ Peças aprovadas para produção: `carrosseis-aprovados-producao.md`.
 - [x] Stories de venda aprovados: ÁreaFlix (marketing), Atlas (tecnologia), SimIntPay (empreendedorismo e finanças), PagaTG (redes sociais), Corte dos Ricos com vários produtos (modelo de naturalidade)
 
 ## Stories
-- [ ] 1. Continuar testando stories de venda: humor (ponto mais fraco; mandar referência) e os produtos que ainda não apareceram (PagaTG, Teron, Controle de Motorista, Controle Patrimonial, EbookSIM), incluindo a página de redes sociais
+- [x] 1. Stories de venda testados e salvos: humor (regras e exemplos aprovados na base 10), PagaTG na página de redes sociais (item 43), Controle de Motorista e Controle Patrimonial (item 44)
+- [ ] 1b. Stories de venda com Teron e EbookSIM (ainda sem sequência aprovada; a base atual já vale para eles)
 - [ ] 2. Stories de serviço: briefing do cliente pronto em `briefing-cliente-servico.docx` (o cliente responde no próprio documento; a versão `.md` tem a parte interna do time); treino em espera até ter um cliente real (decisão de 11/11/2026). Depende do nicho (restaurante, igreja, clínica...) e de material gravado no local. Quando chegar o cliente: ficha do cliente, o que ele precisa mandar (fotos, vídeos, cardápio ou agenda) e os formatos que o time faz sem estar lá (enquete, quiz, dúvida da semana, arte com texto, ocasião do momento)
 
 ## Formatos de arte
