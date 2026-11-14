@@ -9,6 +9,7 @@ Vale para toda notícia (capa + contracapa). Só arte: a copy não muda. Modelos
   1. **Tela dividida** (`foto` + `foto2`): duas fotos lado a lado. Esquerda: o protagonista (pessoa, fato, lugar). Direita: o complemento que explica a notícia (símbolo, local, troféu ou a LOGO da empresa sobre a cor dela, ex.: Caixa no azul, NVIDIA no verde).
   2. **Foto + círculo** (`foto` + `circulo`): uma foto grande de alta qualidade e um círculo com borda branca no alto à direita com a referência do assunto (personagem, produto, pessoa citada).
   3. **Foto única** (`foto`): uma foto forte de página inteira (grupo de pessoas, cena).
+- **Foto de fundo SEM texto (regra do dono):** a capa já tem logo e título; foto com palavras, letreiro, legenda, manchete, marca d'água ou print com escrita polui. Sempre prefira foto sem texto. O painel confere as finalistas e joga para o fim as que têm texto.
 - Acima do título: o NOME DA MARCA em letras pequenas, brancas, negrito, caixa alta (ex.: "SEGUIDORES EM ALTA"). Só notícia urgente leva a pílula vermelha "NOTÍCIA URGENTE" (`urgente: true`).
 - Manchete: fonte condensada e bem pesada, caixa alta, branca, centralizada, 3 a 5 linhas, entrelinha apertada, ocupando a largura. É o maior elemento da metade de baixo.
 - Rodapé: linha fina com a LOGO da marca no meio e "Leia a legenda" bem pequeno embaixo. Nada mais (sem contador, sem moldura).

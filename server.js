@@ -5103,6 +5103,17 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
       bons.push({ ...x, buf, ext, d, nota: nota + notaQ + notaI, qualidade: ql, porque }); } catch (e) { errImg = e.message; }
   }
   bons.sort((a, b) => b.nota - a.nota);
+  // REGRA DO DONO: foto de capa sem texto (já tem logo e título por cima). O "olho" do Designer confere as finalistas e joga para o fim as que têm texto
+  if (bons.length > 1 && !MANUAL && !als.getStore()?.dry) { try {
+    const top = bons.slice(0, 5), imgs = [];
+    for (const b of top) { const ent = arquivoTemp(b.ext === 'jpeg' ? 'jpg' : b.ext), out = arquivoTemp('jpg'); try { fs.writeFileSync(ent, b.buf); execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', ent, '-vf', 'scale=512:-2', '-frames:v', '1', out], { timeout: 20000 }); imgs.push(visionImg(out)); } catch { imgs.push(null); } finally { for (const t of [ent, out]) try { fs.unlinkSync(t); } catch { /* já removido */ } } }
+    const ok = imgs.map((v, i) => v ? i : -1).filter(i => i >= 0);
+    if (ok.length > 1) {
+      const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: ok.map(i => imgs[i]), user: `São ${ok.length} fotos candidatas para FUNDO de capa de notícia, na ordem. Para cada uma, diga se tem TEXTO visível (palavras, letreiros, legendas, manchetes, marca d'água, print de tela com escrita, placas). Logo pequena sem palavras não conta. Responda só com um JSON: lista de true (tem texto) ou false (sem texto), na mesma ordem.` });
+      const L = extrairJSON(r.text, '['); if (Array.isArray(L)) ok.forEach((i, k) => { if (L[k] === true) { top[i].nota -= 20; top[i].temTexto = true; top[i].porque = [top[i].porque, 'tem texto na foto'].filter(Boolean).join(', '); } });
+      bons.sort((a, b) => b.nota - a.nota);
+    }
+  } catch (e) { console.error('foto sem texto:', e.message); } }
   for (const b of bons.slice(0, 2)) b.acabada = await acabaFotoCapa(b);   // só as 2 finalistas (capa e contracapa) recebem acabamento
   if (!bons.length) return { erro: errImg || (descartadas ? `${descartadas} imagem(ns) sem detalhe/sem graça, descartada(s)` : '') };
   return { ...bons[0], outras: bons.slice(1) };
