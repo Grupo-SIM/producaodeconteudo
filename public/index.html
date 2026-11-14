@@ -4220,6 +4220,7 @@ function libDrawer(o) {
 
 /* ───────── Editor visual de arte (estilo Canva) ───────── */
 async function arteEditor(id, onClose, opts = {}) {
+  const EMB_ED = document.body.classList.contains('embed');   // dentro do painel novo: editor enxuto (o dono pediu o essencial)
   const AS = await import('/arte-slide.js');
   const data = await api('/art-studio/' + id + '/editor');
   const W = data.w, H = data.h, brandLc = (data.brand || '').toLowerCase(); let fmtCur = data.format; const maxSlF = () => AT_MAX[fmtCur] || 10;
@@ -4846,11 +4847,15 @@ async function arteEditor(id, onClose, opts = {}) {
     if (sel.kind === 'text') {
       const ta = h('textarea', { rows: 3, value: o.value }); ta.addEventListener('input', () => edit('v', () => { o.value = ta.value; }));
       const ehBtn = ['cta', 'badge'].includes(o.role);
+      const tg = (rot, on, fn, st) => h('button', { class: 'btn sm' + (on ? ' primary' : ''), style: { minWidth: '38px', ...st }, title: rot, onclick: () => edit('', fn) }, rot[0]);
+      const estiloSimples = EMB_ED ? h('div', { class: 'g' }, h('h4', null, 'Estilo'),
+        h('label', { class: 'c' }, 'Fonte', h('select', { onchange: e => edit('', () => { o.font = e.target.value || undefined; delete o.weight; }) }, [h('option', { value: '', selected: !o.font }, 'Fonte da marca'), ...Object.entries(AS.FONTES).map(([k, f]) => h('option', { value: k, selected: o.font === k }, f.nome || k))])),
+        h('div', { class: 'row', style: { gap: '6px' } }, tg('Negrito', (o.weight || 0) >= 700, () => { o.weight = (o.weight || 0) >= 700 ? 400 : 800; }, { fontWeight: 800 }), tg('Itálico', !!o.italic, () => { o.italic = o.italic ? undefined : true; }, { fontStyle: 'italic' }), tg('Sublinhado', o.deco === 'sublinhado', () => { o.deco = o.deco === 'sublinhado' ? undefined : 'sublinhado'; }, { textDecoration: 'underline' }))) : null;
       panel.append(h('div', { class: 'g' }, h('h4', null, 'Texto'), h('label', { class: 'c' }, 'Conteúdo', ta, h('span', { class: 'small mut' }, 'Use | para quebrar a linha e *palavra* para destacar com a cor de destaque.')), h('label', { class: 'c' }, 'Função do texto', h('select', { onchange: e => { edit('', () => { o.role = e.target.value; delete o.size; }); drawPanel(); } }, AT_ROLES.map(([k, l]) => h('option', { value: k, selected: o.role === k }, l))))),
-        sec('Tamanho e alinhamento', true, slideF('Tamanho da letra', () => effSize(o), v => { o.size = Math.round(v); }, 12, 420, 1, v => Math.round(v) + ' px', [8, 3000]), h('label', { class: 'c' }, 'Peso da letra', h('select', { onchange: e => edit('', () => { o.weight = +e.target.value || undefined; }) }, [['', 'Padrão'], [400, 'Normal'], [500, 'Médio'], [600, 'Semi-negrito'], [700, 'Negrito'], [800, 'Extra negrito'], [900, 'Preto']].map(([k, l]) => h('option', { value: k, selected: (o.weight || '') == k }, l)))), h('div', { class: 'c small mut' }, 'Alinhamento', seg([['left', 'Esquerda'], ['center', 'Centro'], ['right', 'Direita']], () => o.align || 'center', k => edit('', () => { o.align = k; })))),
+        estiloSimples, sec('Tamanho e alinhamento', true, slideF('Tamanho da letra', () => effSize(o), v => { o.size = Math.round(v); }, 12, 420, 1, v => Math.round(v) + ' px', [8, 3000]), h('label', { class: 'c' }, 'Peso da letra', h('select', { onchange: e => edit('', () => { o.weight = +e.target.value || undefined; }) }, [['', 'Padrão'], [400, 'Normal'], [500, 'Médio'], [600, 'Semi-negrito'], [700, 'Negrito'], [800, 'Extra negrito'], [900, 'Preto']].map(([k, l]) => h('option', { value: k, selected: (o.weight || '') == k }, l)))), h('div', { class: 'c small mut' }, 'Alinhamento', seg([['left', 'Esquerda'], ['center', 'Centro'], ['right', 'Direita']], () => o.align || 'center', k => edit('', () => { o.align = k; })))),
         sec('Cor', true, colorF('Cor do texto', () => o.color, v => { o.color = v; }, E.spec.ink || data.defaults.ink), ['cta', 'badge'].includes(o.role) ? colorF(o.role === 'cta' ? 'Cor do botão' : 'Cor do contorno', () => o.bg, v => { o.bg = v; }, data.defaults.accent) : null),
         sec('Caixa e forma', false, slideF('Largura da caixa', () => o.w ?? (ROLES[o.role] || ROLES.title).w, v => { o.w = r2(v); }, .2, 1, .01, v => Math.round(v * 100) + '%', [.05, 4]), ['cta', 'badge'].includes(o.role) ? null : h('label', { class: 'row', style: { gap: '10px', alignItems: 'center', cursor: 'pointer' } }, h('label', { class: 'switch' }, h('input', { type: 'checkbox', checked: !!o.reflow, onchange: e => { edit('', () => { if (e.target.checked) { o.reflow = true; delete o.nowrap; o.value = String(o.value ?? '').replace(/\s*\|\s*/g, ' '); } else delete o.reflow; }); drawPanel(); } }), h('span')), h('span', { class: 'small' }, 'Quebra automática de linha ', h('span', { class: 'mut' }, '(o texto se ajusta à largura da caixa)'))), ['cta', 'badge'].includes(o.role) ? null : slideF('Curvar o texto', () => o.curva ?? 0, v => { o.curva = Math.abs(v) < 2 ? undefined : Math.round(v); }, -100, 100, 1, v => v ? (v > 0 ? 'arco para cima ' : 'arco para baixo ') + Math.abs(Math.round(v)) + '%' : 'reto')),
-        efeitosTexto(o), iconeTexto(o, sel.k), h('div', { class: 'g' }, posBlock(), actions()));
+        EMB_ED ? null : efeitosTexto(o), EMB_ED ? null : iconeTexto(o, sel.k), h('div', { class: 'g' }, posBlock(), actions()));
     } else if (sel.kind === 'item') {
       panel.append(h('div', { class: 'g' }, h('h4', null, 'Imagem'), h('div', { class: 'small mut' }, o.asset + (o.pose ? ' · pose gerada por IA' : '')), h('button', { class: 'btn sm', onclick: () => pickImage('Trocar imagem', a => { pushUndo(); o.asset = a.name; delete o.pose; markDirty(); drawPanel(); repaint(); drawStrip(); }) }, svg(AI.image, 15), 'Trocar imagem'),
         h('button', { class: 'btn sm', title: 'Recorta o assunto e tira o fundo (IA). A original continua na biblioteca.', onclick: async ev => { const bt = ev.currentTarget; if (bt.disabled) return; bt.disabled = true; const t0 = bt.textContent; bt.textContent = 'Removendo o fundo…'; try { const j = await api('/assets/remover-fundo', 'POST', { brand: data.brand || '', name: o.asset }); E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }); pushUndo(); o.asset = j.name; delete o.pose; markDirty(); drawPanel(); repaint(); drawStrip(); toast('Fundo removido', 'ok'); } catch (e) { toast(e.message || 'Não consegui remover o fundo', 'bad'); bt.disabled = false; bt.textContent = t0; } } }, svg(AI.shape, 15), 'Remover fundo'),
@@ -5048,6 +5053,11 @@ async function arteEditor(id, onClose, opts = {}) {
   ];
   const TXT = (n, box, o, extra) => ({ n, box, mk: (c, x, y) => ({ t: [T0({ role: 'title', value: n === 'Número gigante' ? '07' : o.v || 'Seu texto aqui', color: c.ink, w: .86, ...o.p }, x, y)], ...(extra ? extra(c, x, y) : {}) }) });
   const COMBO = (n, a, b) => ({ n, box: [.8, .22], mk: (c, x, y) => ({ t: [T0({ role: 'title', value: a.v, color: c.ink, w: .86, ...a.p }, x, y - .03), T0({ role: 'body', value: b.v, color: c.ink, w: .8, opacity: .85, ...b.p }, x, y + .05)] }) });
+  const TEXTOS_SIMPLES = [   // editor enxuto: como o Canva (título, subtítulo, texto); fonte, negrito, itálico e sublinhado no painel da direita
+    TXT('Título', [.9, .14], { v: 'Título', p: { size: 120, weight: 800 } }),
+    TXT('Subtítulo', [.85, .1], { v: 'Subtítulo', p: { role: 'body', size: 72, weight: 700 } }),
+    TXT('Texto', [.8, .08], { v: 'Texto do corpo', p: { role: 'body', size: 46, weight: 400 } }),
+    TXT('Texto pequeno', [.7, .06], { v: 'Texto pequeno', p: { role: 'body', size: 32, weight: 400 } })];
   const TEXTOS = [
     TXT('Título impactante', [.9, .14], { v: 'TÍTULO FORTE', p: { size: 140, font: 'anton', caixa: 'alta' } }),
     TXT('Título elegante', [.9, .14], { v: 'Título elegante', p: { size: 112, font: 'playfair', weight: 700 } }),
@@ -5124,9 +5134,9 @@ async function arteEditor(id, onClose, opts = {}) {
   const b3d = { dados: null, carregando: false };
   const carrega3d = async () => { if (b3d.dados || b3d.carregando) return; b3d.carregando = true; try { b3d.dados = await api('/banco3d'); } catch (e) { toast(e.message || 'Não consegui abrir o banco 3D', 'bad'); } finally { b3d.carregando = false; if (EL.tab === '3d') paintEl(); } };
   const paintEl = () => {
-    carregaFontesPainel(); const el = elp.el, tabs = [['icones', 'Ícones'], ['3d', '3D'], ['formas', 'Formas'], ['selos', 'Selos'], ['texto', 'Texto'], ['cores', 'Cores']];
+    carregaFontesPainel(); const el = elp.el, tabs = EMB_ED ? [] : [['icones', 'Ícones'], ['3d', '3D'], ['formas', 'Formas'], ['selos', 'Selos'], ['texto', 'Texto'], ['cores', 'Cores']]; if (EMB_ED) EL.tab = 'texto';
     const tb = h('div', { class: 'tabs', style: { margin: 0, flexWrap: 'wrap' } }, tabs.map(([k, l]) => h('button', { class: EL.tab === k ? 'on' : '', onclick: () => { EL.tab = k; paintEl(); } }, l)));
-    const head = h('div', { class: 'aelp-h' }, h('b', null, 'Elementos'), h('button', { class: 'btn sm', title: 'Fechar', onclick: () => toggleEl(false) }, 'Fechar'));
+    const head = h('div', { class: 'aelp-h' }, h('b', null, EMB_ED ? 'Texto' : 'Elementos'), h('button', { class: 'btn sm', title: 'Fechar', onclick: () => toggleEl(false) }, 'Fechar'));
     const dica = t => h('div', { class: 'small mut' }, t);
     let body;
     if (EL.tab === 'icones') {
@@ -5154,7 +5164,7 @@ async function arteEditor(id, onClose, opts = {}) {
     } else if (EL.tab === 'formas') {
       body = h('div', { class: 'g' }, h('div', { class: 'aelp-fm' }, MENU_FORMAS.map(([k, l]) => { const b = h('button', { type: 'button', title: l + ' — clique ou arraste' }, formaPrev(k), h('span', null, l)); b.addEventListener('click', () => addForma(k)); dragElem(b, { t: 'forma', k }); return b; })), dica('Clique ou arraste para o slide. Cor, degradê, contorno e brilho ficam no painel da direita.'));
     } else if (EL.tab === 'selos' || EL.tab === 'texto') {
-      const L = EL.tab === 'selos' ? SELOS : TEXTOS;
+      const L = EL.tab === 'selos' ? SELOS : EMB_ED ? TEXTOS_SIMPLES : TEXTOS;
       body = h('div', { class: 'g' }, h('div', { class: 'aelp-pr' }, L.map((p, i) => { const b = h('button', { type: 'button', title: p.n + ' — clique ou arraste' }, miniPrev(p), h('span', null, p.n)); b.addEventListener('click', () => addPreset(p)); dragElem(b, { t: 'preset', l: EL.tab, i }); return b; })), dica(EL.tab === 'selos' ? 'Grupos prontos: já vêm com as cores da arte e agrupados, então movem juntos. O texto você troca com dois cliques.' : 'Estilos de texto e duplas de fontes que combinam. Troque o texto com dois cliques; a fonte fica em "Efeitos do texto".'));
     } else {
       const usadas = coresDaArte();
@@ -5175,7 +5185,7 @@ async function arteEditor(id, onClose, opts = {}) {
     if (d.t === 'icon' && AS.ICONES[d.n]) addIconAt(d.n, x, y); else if (d.t === 'forma' && MENU_FORMAS.some(f => f[0] === d.k)) addForma(d.k, x, y); else if (d.t === '3d' && /^[a-z0-9-]{1,80}$/.test(d.id)) usar3d(d.id, x, y); else if (d.t === 'preset') { const p = (d.l === 'selos' ? SELOS : TEXTOS)[d.i]; if (p) addPreset(p, x, y); }
   }, true);
   const EMB = document.body.classList.contains('embed');   // dentro do novo painel: só o essencial (texto, biblioteca e formas)
-  rail.append(flyBtn(AI.text, 'Texto', [['Título', () => addText('title')], ['Texto de apoio', () => addText('body')], ['Selo', () => addText('badge')], ['Número grande', () => addText('number')], ['Botão (CTA)', () => addText('cta')], ['Estilos e duplas de fonte…', () => abreEl('texto')]]),
+  rail.append(EMB ? h('button', { onclick: () => abreEl('texto') }, svg(AI.text), 'Texto') : flyBtn(AI.text, 'Texto', [['Título', () => addText('title')], ['Texto de apoio', () => addText('body')], ['Selo', () => addText('badge')], ['Número grande', () => addText('number')], ['Botão (CTA)', () => addText('cta')], ['Estilos e duplas de fonte…', () => abreEl('texto')]]),
     libB, EMB ? null : elB, EMB ? null : h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), 
     EMB ? null : h('button', { onclick: () => select(null) }, svg(AI.bg), 'Fundo'), EMB ? null : h('button', { onclick: aplicarLayout }, svg(AI.layout), 'Layouts'), ...(EMB ? [] : [ h('button', { title: 'Ímã: gruda no centro e nas bordas dos outros elementos (segure Alt para ignorar)', class: 'on', onclick: e => { E.snap = !E.snap; e.currentTarget.classList.toggle('on', E.snap); } }, svg(AI.shape), 'Ímã'), h('button', { onclick: e => { E.guides = !E.guides; e.currentTarget.classList.toggle('on', E.guides); drawOverlay(); } }, svg(AI.grid), 'Guias')]));
   const nomeEst = opts.estilo ? h('input', { type: 'text', class: 'ttl', value: opts.estilo.nome, 'aria-label': 'Nome do estilo', style: { background: 'transparent', border: '1px solid var(--bd)', borderRadius: '8px', padding: '4px 8px', color: 'inherit', font: 'inherit', minWidth: '200px' } }) : null;
