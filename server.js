@@ -5429,8 +5429,7 @@ const HANDLERS = {
   async arte(job, c) {
     const input = JSON.parse(job.input || '{}');
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
-    // copy aprovada pelo dono (Treino do Designer, Produção diária) não volta ao Copy: o Designer encaixa o texto como está
-    if (c.kind === 'noticia' && !input.encurtado && !['treino_designer', 'grade_aprovada'].includes(c.created_by)) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
+    if (c.kind === 'noticia' && !input.encurtado) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
       if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada }, 'manual'); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
