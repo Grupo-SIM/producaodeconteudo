@@ -4902,10 +4902,10 @@ async function arteEditor(id, onClose, opts = {}) {
     if (n0 === 1 && sl.length > 1) sl.forEach(x => { x.pager = true; }); E.si = clamp(E.si, 0, sl.length - 1); reSl();
   };
   const pedirPaginas = (titulo, sub) => {
-    const atual = E.spec.slides.length, max = maxSlF(), pick = h('div', { class: 'aepgs' }); let esc = Math.max(atual, Math.min(5, max));
-    const draw = () => pick.replaceChildren(...Array.from({ length: max - 1 }, (_, i) => i + 2).map(n => h('button', { class: n === esc ? 'on' : '', onclick: () => { esc = n; draw(); } }, String(n))));
+    const postOuCarr = ['feed', 'carrossel'].includes(fmtCur), atual = E.spec.slides.length, max = postOuCarr ? (AT_MAX.carrossel || 10) : maxSlF(), pick = h('div', { class: 'aepgs' }); let esc = postOuCarr ? atual : Math.max(atual, Math.min(5, max));
+    const draw = () => pick.replaceChildren(...Array.from({ length: postOuCarr ? max : max - 1 }, (_, i) => i + (postOuCarr ? 1 : 2)).map(n => h('button', { class: n === esc ? 'on' : '', onclick: () => { esc = n; draw(); } }, String(n))));
     draw(); modal(titulo, h('div', { class: 'stack' }, h('div', { class: 'small mut' }, sub), pick, h('div', { class: 'small mut' }, 'Dá para mudar depois: arraste as páginas para reordenar, duplique ou apague na faixa de páginas.')),
-      [h('button', { class: 'btn', onclick: closeModal }, 'Agora não'), h('button', { class: 'btn primary', onclick: () => { closeModal(); setPaginas(esc); } }, 'Criar as páginas')]);
+      [h('button', { class: 'btn', onclick: closeModal }, 'Agora não'), h('button', { class: 'btn primary', onclick: () => { closeModal(); if (postOuCarr) { if (esc > 1 && fmtCur === 'feed') virarCarrossel(); if (esc === 1) fmtCur = 'feed'; } setPaginas(esc); if (postOuCarr) { markDirty(); drawStrip(true); } } }, 'Pronto')]);
   };
   let dragSl = null;
   const drawStrip = force => {
@@ -4914,8 +4914,8 @@ async function arteEditor(id, onClose, opts = {}) {
       stripBuilt = true; thumbSig.length = 0; strip.replaceChildren();
       const ib = (ico, t, fn) => h('button', { type: 'button', title: t, onclick: e => { e.stopPropagation(); fn(); } }, svg(ico, 13));
       const head = h('div', { class: 'aepgh' }, h('b', null, 'Páginas'), h('span', { class: 'small mut' }, `${E.si + 1} de ${n}` + (max > 1 ? ` · até ${max}` : '')),
-        ['feed', 'carrossel'].includes(fmtCur) ? h('div', { class: 'aeseg', style: { marginTop: '6px' } }, h('button', { class: fmtCur === 'feed' ? 'on' : '', title: 'Post único (1 página)', onclick: () => { if (fmtCur === 'feed') return; if (n > 1) return toast('Apague as páginas extras antes de voltar a post único', 'bad'); fmtCur = 'feed'; markDirty(); drawStrip(true); } }, 'Post'), h('button', { class: fmtCur === 'carrossel' ? 'on' : '', title: 'Carrossel (até 10 páginas)', onclick: () => { if (fmtCur === 'carrossel') return pedirPaginas('Quantas páginas?', 'Escolha quantas páginas o carrossel deve ter.'); virarCarrossel(); markDirty(); drawStrip(true); pedirPaginas('Quantas páginas o carrossel vai ter?', 'As páginas novas repetem a estrutura desta arte. Depois é só trocar os textos.'); } }, 'Carrossel')) : null,
-        max > 1 ? h('button', { class: 'btn sm', style: { marginTop: '6px' }, onclick: () => pedirPaginas('Quantas páginas?', 'Escolha o total de páginas. Páginas a mais repetem a estrutura do meio; a menos são tiradas do fim (a última fica).') }, 'Quantidade') : null);
+        !EMB_ED && ['feed', 'carrossel'].includes(fmtCur) ? h('div', { class: 'aeseg', style: { marginTop: '6px' } }, h('button', { class: fmtCur === 'feed' ? 'on' : '', title: 'Post único (1 página)', onclick: () => { if (fmtCur === 'feed') return; if (n > 1) return toast('Apague as páginas extras antes de voltar a post único', 'bad'); fmtCur = 'feed'; markDirty(); drawStrip(true); } }, 'Post'), h('button', { class: fmtCur === 'carrossel' ? 'on' : '', title: 'Carrossel (até 10 páginas)', onclick: () => { if (fmtCur === 'carrossel') return pedirPaginas('Quantas páginas?', 'Escolha quantas páginas o carrossel deve ter.'); virarCarrossel(); markDirty(); drawStrip(true); pedirPaginas('Quantas páginas o carrossel vai ter?', 'As páginas novas repetem a estrutura desta arte. Depois é só trocar os textos.'); } }, 'Carrossel')) : null,
+        max > 1 || ['feed', 'carrossel'].includes(fmtCur) ? h('button', { class: 'btn sm', style: { marginTop: '6px' }, onclick: () => pedirPaginas('Quantas páginas? (1 = post único, 2 ou mais = carrossel)', 'Escolha o total de páginas. Páginas a mais repetem a estrutura do meio; a menos são tiradas do fim (a última fica).') }, 'Quantidade') : null);
       const list = h('div', { class: 'aepgl' });
       v.slides.forEach((s, i) => {
         const f = h('iframe', { scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', transform: `scale(${ks})` } });
