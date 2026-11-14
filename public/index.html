@@ -4283,6 +4283,7 @@ async function arteEditor(id, onClose, opts = {}) {
   const apply = (kind, k) => {
     const o = getObj(kind, k), el = elOf(kind, k); if (!o || !el) return; const st = el.style; st.left = pctS(o.x); st.top = pctS(o.y); st.transform = trOf(o, kind);
     if (kind === 'text') { st.fontSize = effSize(o) + 'px'; if (o.w && st.width !== 'auto') st.width = pctS(o.w); st.opacity = o.opacity ?? ''; }
+    else if (kind === 'item' && o.box) { st.width = Math.round(o.box.w * W) + 'px'; st.height = Math.round(o.box.h * H) + 'px'; st.objectFit = 'cover'; st.objectPosition = o.box.pos || 'center 30%'; st.opacity = o.opacity ?? ''; }   // foto em quadro (tela dividida, círculo, ajustada com dois cliques)
     else if (kind === 'item') { st.width = o.size + 'px'; if (o.round) st.height = o.size + 'px'; st.opacity = o.opacity ?? ''; }
     else { st.width = Math.round(o.w * W) + 'px'; st.height = (o.kind === 'line' ? Math.max(2, Math.round(o.h * W)) : Math.round(o.h * H)) + 'px'; st.opacity = o.opacity ?? 1; }
   };
@@ -4318,6 +4319,8 @@ async function arteEditor(id, onClose, opts = {}) {
       b.addEventListener('contextmenu', e => ctxMenu(e, kind, k));
       b.addEventListener('pointerdown', e => {
         const now = Date.now(); if (kind === 'text' && !e.shiftKey && lastDown.kind === kind && lastDown.k === k && now - lastDown.t < 380) { e.preventDefault(); e.stopPropagation(); lastDown = { t: 0 }; select(kind, k); return editText(k); }
+        if (kind === 'item' && !e.shiftKey && lastDown.kind === kind && lastDown.k === k && now - lastDown.t < 380) { e.preventDefault(); e.stopPropagation(); lastDown = { t: 0 }; select(kind, k); E.pan = k; toast('Arraste para mexer a foto dentro do quadro. Clique fora para terminar.'); return; }
+        if (kind === 'item' && E.pan === k) return panImg(e, k);
         lastDown = { kind, k, t: now }; startMove(e, kind, k);
       });
       if (on && single && same(kind, k) && !getObj(kind, k).lock) {
@@ -4398,6 +4401,13 @@ async function arteEditor(id, onClose, opts = {}) {
     addEventListener('pointermove', mv); addEventListener('pointerup', up);
   };
   const stagePt = ev => { const r = stage.getBoundingClientRect(); return { x: (ev.clientX - r.left) / E.k, y: (ev.clientY - r.top) / E.k }; };
+  // dois cliques na imagem: arrasta a foto DENTRO do quadro (como no Canva); o quadro fica parado
+  const panImg = (e, k) => {
+    const o = getObj('item', k), el = elOf('item', k); if (!o || !el) return;
+    if (!o.box) { const w = el.offsetWidth, hh = el.offsetHeight; o.box = { w: r2(w / W), h: r2(hh / H), pos: '50% 50%' }; delete o.round; }
+    const [px0, py0] = String(o.box.pos || '50% 50%').split(/\s+/).map(v => parseFloat(v) || 50), bw = (o.box.w || .5) * W, bh = (o.box.h || .5) * H;
+    track(e, (dx, dy) => { o.box.pos = `${Math.round(clamp(px0 - dx / bw * 100, 0, 100))}% ${Math.round(clamp(py0 - dy / bh * 100, 0, 100))}%`; apply('item', k); }, moved => { if (moved) { markDirty(); repaint(); drawStrip(); } });
+  };
   const startMove = (e, kind, k) => {
     if (e.shiftKey) { e.preventDefault(); e.stopPropagation(); return select(kind, k, true); }
     if (getObj(kind, k)?.lock) { e.preventDefault(); e.stopPropagation(); if (!same(kind, k) || E.multi) { E.multi = null; E.sel = { kind, k }; drawPanel(); drawOverlay(); } return; }   // elemento travado: só seleciona
@@ -4420,7 +4430,7 @@ async function arteEditor(id, onClose, opts = {}) {
     track(e, (_, __, ev) => {
       const p = stagePt(ev); let f = ((p.x - P.x) * dv.x + (p.y - P.y) * dv.y) / D2; f = clamp(f, .03, 400);
       o.x = r2(clamp((P.x + (A0.x - P.x) * f) / W, -4, 5)); o.y = r2(clamp((P.y + (A0.y - P.y) * f) / H, -4, 5));
-      if (kind === 'item') o.size = Math.round(clamp(snap.size * f, 8, 30000)); else if (kind === 'shape') { o.w = r2(clamp(snap.w * f, .005, 30)); o.h = r2(clamp(snap.h * f, .0005, 30)); } else { o.size = Math.round(clamp(eff0 * f, 8, 3000)); if (!auto) o.w = r2(clamp(w0 * f, .05, 4)); }
+      if (kind === 'item') { o.size = Math.round(clamp(snap.size * f, 8, 30000)); if (snap.box) o.box = { ...o.box, w: r2(clamp(snap.box.w * f, .02, 2)), h: r2(clamp(snap.box.h * f, .02, 2)) }; } else if (kind === 'shape') { o.w = r2(clamp(snap.w * f, .005, 30)); o.h = r2(clamp(snap.h * f, .0005, 30)); } else { o.size = Math.round(clamp(eff0 * f, 8, 3000)); if (!auto) o.w = r2(clamp(w0 * f, .05, 4)); }
       apply(kind, k); const gg = geom(kind, k); if (gg) place(gg);
     }, moved => { if (moved) afterGeo(); else drawOverlay(); });
   };
@@ -4519,7 +4529,7 @@ async function arteEditor(id, onClose, opts = {}) {
   };
   // ── zoom
   const setZoom = z => { E.zm = clamp(z, .25, 5); fit(); drawOverlay(); };
-  cv.addEventListener('pointerdown', e => { if (e.target === cv || e.target === wrap) { E.sys = null; select(null); } });   // clique no espaço escuro em volta da arte: tira a seleção
+  cv.addEventListener('pointerdown', e => { if (e.target === cv || e.target === wrap) { E.sys = null; E.pan = null; select(null); } });   // clique no espaço escuro em volta da arte: tira a seleção
   cv.addEventListener('wheel', ev => { if (!(ev.ctrlKey || ev.metaKey)) return; ev.preventDefault(); setZoom((E.zm || 1) * (ev.deltaY < 0 ? 1.1 : 1 / 1.1)); }, { passive: false });
   // ── réguas e guias (arrastar da régua cria a guia; levar de volta para fora da página apaga)
   const guideDrag = (ev, axis, idx) => {
@@ -5187,7 +5197,7 @@ async function arteEditor(id, onClose, opts = {}) {
     ['noticia', { pb: 1 }, 'Notícia Zyrion: preto e branco', 'Igual à foto inteira, em preto e branco, para notícia triste.'],
     ['noticia', { estilo: 'nuvo' }, 'Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
-    const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).find(t => t.role === r && !t.decor)?.value;
+    const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
     // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram
     const tt = T('title'), tb = T('body'); if (tt) d.titulo = tt; if (tb && !s.modelo) d.texto = tb;
     if (!s.modelo) { d.cta ??= T('cta'); d.kicker ??= T('label'); d.selo ??= T('badge'); }
@@ -5248,7 +5258,7 @@ async function arteEditor(id, onClose, opts = {}) {
       const editar = () => { if (t.custom) usaCustom(t); else { usaTpl(t.m, t.e).then(() => { E.tplEd = { base: tplChave(t), nome: t.nome }; tpl.paint(); }); } toast('Mude o que quiser na página e clique em “Salvar alterações” aqui em Templates'); };
       const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px' } }, f, h('div', { class: 'aethb' }, ib(svg(AI.trash, 13), t.custom ? 'Excluir template: vai para a lixeira' : 'Excluir template: some da lista (dá para mostrar de novo no fim da lista)', () => apagaTpl(t), '#ff8a8a')));
       const b = h('div', { title: 'Clique para aplicar “' + t.nome + '” nesta página' + (t.ds ? ' — ' + t.ds : ''), onclick: () => t.custom ? usaCustom(t) : usaTpl(t.m, t.e), style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', cursor: 'pointer' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t.nome));
-      const pinta = sl => { f.srcdoc = AS.slideHtml(view(), sl, si, n); };
+      const pinta = sl => { const old = E.spec.slides[si]; E.spec.slides[si] = sl; let v; try { v = view(); } finally { E.spec.slides[si] = old; } f.srcdoc = AS.slideHtml(v, v.slides[si], si, n); };   // fotos resolvidas como na arte (a prévia mostra círculo, tela dividida e fotos)
       if (t.custom) pinta(tplCustom(t.slide));
       else { const k = sig + '|' + tplChave(t);
         if (tplCache.has(k)) pinta(tplCache.get(k));
