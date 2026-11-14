@@ -75,7 +75,7 @@ export function criarFluxoV2(ctx) {
     id INTEGER PRIMARY KEY AUTOINCREMENT, content_id INTEGER NOT NULL, n INTEGER NOT NULL, ts TEXT NOT NULL,
     autor TEXT NOT NULL DEFAULT 'dono', motivo TEXT DEFAULT '', campos TEXT NOT NULL, antes TEXT NOT NULL, depois TEXT NOT NULL, resumo TEXT DEFAULT '', aprendido INTEGER DEFAULT 0)`);
   db.exec('CREATE INDEX IF NOT EXISTS content_versions_c ON content_versions(content_id, n)');
-  for (const [col, def] of [['em_ajuste', 'INTEGER DEFAULT 0'], ['ajuste_motivo', "TEXT DEFAULT ''"], ['status_antes', "TEXT DEFAULT ''"], ['raia', "TEXT DEFAULT ''"], ['avulso', 'INTEGER DEFAULT 0'], ['pausado', 'INTEGER DEFAULT 0']]) {
+  for (const [col, def] of [['em_ajuste', 'INTEGER DEFAULT 0'], ['ajuste_motivo', "TEXT DEFAULT ''"], ['status_antes', "TEXT DEFAULT ''"], ['raia', "TEXT DEFAULT ''"], ['avulso', 'INTEGER DEFAULT 0'], ['pausado', 'INTEGER DEFAULT 0'], ['materia_aprovada', "TEXT DEFAULT ''"]]) {
     if (!db.prepare('PRAGMA table_info(contents)').all().some(x => x.name === col)) db.exec(`ALTER TABLE contents ADD COLUMN ${col} ${def}`);
   }
   FORMATOS_PADRAO.forEach((f, i) => run('INSERT OR IGNORE INTO formatos(id,nome,etapas,meta_dia,modo,ordem,updated_at) VALUES(?,?,?,?,?,?,?)', f.id, f.nome, JSON.stringify(f.etapas), f.meta, 'manual', i, T()));
@@ -193,6 +193,7 @@ export function criarFluxoV2(ctx) {
     // regra do treino: toda notícia tem as duas entregas; sem a matéria a peça está incompleta (fica marcada, não vira outro formato)
     for (const i of [...itens]) if (i.raia === 'materia' && i.tem_arte) { const c0 = rows.find(r => r.id === i.id); i.parte = 'materia'; if (!c0?.materia) i.sem_materia = true; itens.push({ ...i, raia: 'carrossel', parte: 'post', sem_materia: false }); }
     // as duas entregas andam separadas: arte em ajuste não põe a matéria (já pronta) em ajuste, e ajuste da matéria não mexe no post
+    for (const i of itens) if (i.parte === 'materia' && rows.find(r => r.id === i.id)?.materia_aprovada && !['finalizado', 'descartado'].includes(i.estado)) Object.assign(i, { estado: 'esperando', etapa: 'publicacao', aguardando: false, em_ajuste: 0, materia_ok: true });   // matéria já aprovada: sai da Mesa e espera a publicação
     for (const i of itens) if (i.parte && ['etapa', 'ajuste', 'fila'].includes(i.estado)) {
       const js = porC.get(i.id) || [], soMateria = js.length && js.every(j => j.kind === 'materia_ajuste'), soArte = js.length && js.every(j => ['designer', 'editor'].includes(j.agent));
       if ((i.parte === 'materia' && soArte) || (i.parte === 'post' && soMateria)) Object.assign(i, { estado: 'esperando', etapa: 'revisao', aguardando: false, em_ajuste: 0 });
@@ -272,6 +273,8 @@ export function criarFluxoV2(ctx) {
     const c = getContent(id); if (!c) throw fail(404, 'Conteúdo não encontrado');
     const autor = user?.name || 'dono';
     if (nome === 'aprovar') {
+      // matéria do site é aprovada sozinha: não depende da arte (que pode estar em ajuste) nem muda o estado do post
+      if (b.parte === 'materia' && c.materia) { setContent(id, { materia_aprovada: T() }); log(null, `Você aprovou a matéria do site de "${c.title}"`, id); changed(); return { ok: true }; }
       if (c.status === 'awaiting_script') contentAct(id, 'approve_script', b);
       else contentAct(id, 'approve', b);
       setContent(id, { em_ajuste: 0, ajuste_motivo: '' });

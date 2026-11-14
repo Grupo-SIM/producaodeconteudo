@@ -727,7 +727,7 @@ addEventListener('message', async e => { if (e.origin !== location.origin) retur
 // matéria do site: abre como o leitor vai ver (título, parágrafos, intertítulos, texto justificado); Editar troca para o texto cru
 function materiaHtml(t) { return String(t || '').split(/\n{2,}/).map(b => { b = b.trim(); const h1 = b.match(/^#\s+(.+)/), h2 = b.match(/^##\s+(.+)/); if (h1) return `<h1 style="font-size:26px;line-height:1.25;margin:0 0 14px;text-align:left">${esc(h1[1])}</h1>`; if (h2) { const [tt, ...rest] = b.replace(/^##\s+/, '').split('\n'); return `<h2 style="font-size:19px;margin:22px 0 8px;text-align:left">${esc(tt)}</h2>${rest.join(' ').trim() ? `<p>${esc(rest.join(' ').trim())}</p>` : ''}`; }   // o intertítulo é a linha inteira, com dois-pontos e tudo return `<p>${esc(b).replace(/\n/g, '<br>')}</p>`; }).join(''); }
 async function abrirMateria(id, d) {
-  ED = { id, campo: 'materia', orig: { materia: d.materia || '', caption: d.legenda || '' }, d, tab: 'texto' };
+  ED = { id, campo: 'materia', orig: { materia: d.materia || '', caption: d.legenda || '' }, d, tab: 'texto', mt: true };
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca || '')} · Matéria do site</span><button class="btn sm" id="mtEd" onclick="$('#mtLer').classList.toggle('hidden');$('#mtTxt').classList.toggle('hidden');this.textContent=this.textContent==='Editar'?'Ver como o leitor':'Editar'">Editar</button><button class="btn sm" onclick="fecha()">Fechar</button></div>
     <div class="ask"><input class="f" id="ajm" placeholder="Pedir ajuste ao gerente: diga o que mudar na matéria…" onkeydown="if(event.key==='Enter')pedirAjuste()"><button class="btn" onclick="pedirAjuste()">Pedir ajuste</button></div>
     <div class="mb"><article id="mtLer" class="leitura" style="max-width:760px;margin:0 auto;text-align:justify;font-size:16px;line-height:1.75;hyphens:auto">${materiaHtml(d.materia)}</article>
@@ -742,7 +742,7 @@ async function salvarEd(aprova) {
   if ($('#leg').value !== ED.orig.caption) campos.caption = $('#leg').value;
   try {
     if (Object.keys(campos).length) await api(`/api/v2/itens/${ED.id}/editar`, { body: { campos, motivo: $('#porque').value } });
-    if (aprova) { const r = await api(`/api/v2/itens/${ED.id}/aprovar`, { body: {} }); toast(r.regra ? 'Aprovado. O gerente salvou uma regra (veja no chat).' : 'Aprovado'); fecha(); if (r.regra) chatToggle(true); }
+    if (aprova) { const r = await api(`/api/v2/itens/${ED.id}/aprovar`, { body: ED.mt ? { parte: 'materia' } : {} }); toast(r.regra ? 'Aprovado. O gerente salvou uma regra (veja no chat).' : 'Aprovado'); fecha(); if (r.regra) chatToggle(true); }
     else { toast(Object.keys(campos).length ? 'Edição salva como nova versão' : 'Nada mudou'); ED.orig = { ...ED.orig, ...campos }; }
     await refresh(); loadChat();
   } catch (e) { toast(e.message); }

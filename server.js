@@ -5444,9 +5444,8 @@ const HANDLERS = {
     const user = `# TAREFA\nO dono pediu um ajuste na MATÉRIA DO SITE desta notícia. Aplique só o que ele pediu e mantenha todo o resto igual (fatos, fontes, citações, ordem). Não mexa no post nem na arte.\n\n# PEDIDO DO DONO\n${i.feedback || ''}\n\n# MATÉRIA ATUAL\n${c.materia}\n\n${treino ? `# MATÉRIA APROVADA NO TREINO (texto completo que o dono aprovou; se ele pedir para voltar ao aprovado/treinado, devolva exatamente este texto)\n${treino}\n\n` : ''}# SAÍDA\nDevolva só a matéria completa, no mesmo formato: primeira linha "# Manchete", depois linha fina, lide, intertítulos com "## " e a linha de Fontes no fim. Sem comentários antes ou depois.`;
     const r = await callClaude({ agent: agentRow('roteirista'), user, maxTokens: 6000 });
     const txt = String(r.text || '').replace(/^```[a-z]*\n?|```\s*$/g, '').trim(); if (txt.length < 200 || !/^#\s/m.test(txt)) throw new Error('O Copy não devolveu a matéria completa');
-    setContent(c.id, { materia: txt });
-    log('roteirista', `Ajustou a matéria do site como você pediu: "${c.title}"`, c.id);
-    paraAprovacao(c.id, `"${c.title}": matéria ajustada, aguardando sua aprovação`);
+    setContent(c.id, { materia: txt, materia_aprovada: '' });   // volta para a Mesa só a matéria; o post e a arte não mudam de etapa
+    log('roteirista', `Ajustou a matéria do site como você pediu: "${c.title}" (está na Mesa para você aprovar)`, c.id);
     return r;
   },
   async encurtar(job, c) {
@@ -6547,7 +6546,8 @@ function contentAct(id, act, b = {}) {
     const feedback = (fbRaw ? fbRaw + (marcados.length ? '\n\n' : '') : '') + (marcados.length ? 'Motivos marcados pelo dono (corrija todos):\n' + marcados.map(id => `- ${motivoRotulo(target, id)}: ${motivoInfo(target, id).regra}`).join('\n') : '');
     if (target === 'designer' && !c.art) throw fail(400, 'Ainda não há arte para ajustar');
     if (target === 'editor' && !c.video) throw fail(400, 'Ainda não há vídeo para ajustar');
-    setContent(id, { status: 'producing', error: '', revisions: 0, prod_revisions: 0 });   // novo ciclo de revisões a partir do pedido do dono
+    const soMateria = target === 'roteirista' && b.campo === 'materia' && !!c.materia;   // ajuste só da matéria do site: o post e a arte seguem onde estão
+    if (!soMateria) setContent(id, { status: 'producing', error: '', revisions: 0, prod_revisions: 0 });   // novo ciclo de revisões a partir do pedido do dono
     const quem = { roteirista: 'o texto/roteiro', designer: 'a arte', editor: 'o vídeo' }[target];
     log(null, `Você pediu ajustes em ${quem} de "${c.title}"`, id);
     brainEvent(target, 'ajuste_dono', c, `O dono pediu ajustes em ${quem} (${c.format}/${c.kind})`, `Motivo (por que não foi aprovado): ${fbRaw || '(só motivos marcados)'}${tagsAj.length ? '\nMotivos categorizados: ' + tagsAj.map(id => motivoRotulo(target, id)).join('; ') : ''}`, tagsAj);
@@ -6557,7 +6557,7 @@ function contentAct(id, act, b = {}) {
     registraPedido(c, target, fbRaw || tagsAj.map(id => motivoRotulo(target, id)).join('; '));
     // Ajuste de arte ou de vídeo volta só para quem produziu (o roteiro aprovado não é refeito); depois o Revisor revisa a entrega de novo
     // ajuste pedido na tela da matéria do site: só o Copy, só a matéria (o post e a arte ficam como estão)
-    if (target === 'roteirista' && b.campo === 'materia' && c.materia) enqueue(id, 'roteirista', 'materia_ajuste', { feedback }, 'manual');
+    if (soMateria) enqueue(id, 'roteirista', 'materia_ajuste', { feedback }, 'manual');
     else if (target === 'roteirista') enqueue(id, 'roteirista', 'roteiro', { feedback });
     else enqueue(id, target, target === 'designer' ? 'arte' : 'video', { feedback, from: 'dono' });
   } else if (act === 'reprocess') {
