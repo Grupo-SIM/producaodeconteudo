@@ -4198,7 +4198,7 @@ function libDrawer(o) {
       h('div', { class: 'mut small', style: { gridColumn: '1/-1', padding: '6px 4px' } }, web.info)];
   };
   const paint = () => {
-    tabsB.replaceChildren(...[...o.kinds, ...(o.web ? [['web', '🔎 Buscar na internet']] : [])].map(([k, l]) => h('button', { class: kind === k ? 'on' : '', onclick: () => { kind = k; search.placeholder = k === 'web' ? 'Buscar foto na internet e apertar Enter…' : 'Buscar pelo nome…'; paint(); } }, l)));
+    tabsB.replaceChildren(...[...o.kinds, ...(o.web ? [['web', '🔎 Explorar bancos de imagem']] : [])].map(([k, l]) => h('button', { class: kind === k ? 'on' : '', onclick: () => { kind = k; search.placeholder = k === 'web' ? 'Explorar: escreva o que procura (Pexels, Unsplash, Pixabay, Openverse) e aperte Enter…' : 'Buscar pelo nome…'; paint(); } }, l)));
     if (kind === 'web') { grid.replaceChildren(...paintWeb()); return; }
     const ls = o.list().filter(a => (kind === 'todos' || o.match(a, kind)) && (!q || a.name.includes(q.toLowerCase())));
     grid.replaceChildren(...(ls.length ? ls.map(a => {
@@ -4450,7 +4450,7 @@ async function arteEditor(id, onClose, opts = {}) {
   };
   const addAssetAt = (a, x, y) => { if (!need('items', 30, 'imagens')) return; pushUndo(); (cur().items ||= []).push({ asset: a.name, x: r2(clamp(x ?? .5, 0, 1)), y: r2(clamp(y ?? .5, 0, 1)), size: Math.round(W * (a.kind === 'logo' ? .22 : .3)), rot: 0 }); E.multi = null; E.sel = { kind: 'item', k: cur().items.length - 1 }; afterAdd(); };
   const bgAsset = a => { pushUndo(); const s = cur(); s.bg ||= {}; delete s.bg.gen; delete s.__ia; s.bg.asset = a.name; markDirty(); drawPanel(); repaint(); drawStrip(); toast('Fundo do slide ' + (E.si + 1) + ' trocado', 'ok'); };
-  const lib = libDrawer({ list: () => E.assets, thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Tudo'], ['logo', 'Logos'], ['mascote', 'Mascote'], ['foto', 'Fotos'], ['fundo', 'Fundos'], ['textura', 'Texturas']], match: (a, k) => a.kind === k,
+  const lib = libDrawer({ list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Tudo'], ['logo', 'Logos'], ['mascote', 'Mascote'], ['foto', 'Fotos'], ['fundo', 'Fundos'], ['textura', 'Texturas']], match: (a, k) => a.kind === k,
     onAdd: a => addAssetAt(a), onBg: bgAsset, onClose: () => toggleLib(false), onUpload: (j, f) => E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }) });
   const toggleLib = on => { lib.el.hidden = !on; libB.classList.toggle('on', on); if (on) { lib.paint(); elp.el.hidden = true; elB.classList.remove('on'); } setTimeout(fit, 30); };
   const libB = h('button', { title: 'Biblioteca de imagens da marca', onclick: () => toggleLib(lib.el.hidden) }, svg(AI.image), 'Biblioteca');
@@ -5165,7 +5165,7 @@ async function arteEditor(id, onClose, opts = {}) {
   }, true);
   const EMB = document.body.classList.contains('embed');   // dentro do novo painel: só o essencial (texto, biblioteca e formas)
   rail.append(flyBtn(AI.text, 'Texto', [['Título', () => addText('title')], ['Texto de apoio', () => addText('body')], ['Selo', () => addText('badge')], ['Número grande', () => addText('number')], ['Botão (CTA)', () => addText('cta')], ['Estilos e duplas de fonte…', () => abreEl('texto')]]),
-    libB, EMB ? null : elB, EMB ? null : h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), flyBtn(AI.shape, 'Forma', MENU_FORMAS.map(([k, l]) => [l, () => addForma(k)])),
+    libB, EMB ? null : elB, EMB ? null : h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), 
     EMB ? null : h('button', { onclick: () => select(null) }, svg(AI.bg), 'Fundo'), EMB ? null : h('button', { onclick: aplicarLayout }, svg(AI.layout), 'Layouts'), ...(EMB ? [] : [ h('button', { title: 'Ímã: gruda no centro e nas bordas dos outros elementos (segure Alt para ignorar)', class: 'on', onclick: e => { E.snap = !E.snap; e.currentTarget.classList.toggle('on', E.snap); } }, svg(AI.shape), 'Ímã'), h('button', { onclick: e => { E.guides = !E.guides; e.currentTarget.classList.toggle('on', E.guides); drawOverlay(); } }, svg(AI.grid), 'Guias')]));
   const nomeEst = opts.estilo ? h('input', { type: 'text', class: 'ttl', value: opts.estilo.nome, 'aria-label': 'Nome do estilo', style: { background: 'transparent', border: '1px solid var(--bd)', borderRadius: '8px', padding: '4px 8px', color: 'inherit', font: 'inherit', minWidth: '200px' } }) : null;
   const salvarEstilo = guard(async () => {
