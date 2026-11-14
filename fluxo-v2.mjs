@@ -290,7 +290,7 @@ export function criarFluxoV2(ctx) {
     }
     if (nome === 'ajuste') {
       const motivo = str(b.motivo, 3500, 'Motivo');
-      contentAct(id, 'changes', { feedback: motivo, target: b.alvo, motivos: b.motivos, campo: b.campo });
+      contentAct(id, 'changes', { feedback: motivo, target: b.alvo, motivos: b.motivos, campo: b.campo, refazer: !!b.refazer });
       setContent(id, { em_ajuste: 1, ajuste_motivo: motivo });
       return { ok: true };
     }

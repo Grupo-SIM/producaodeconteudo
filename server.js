@@ -5509,6 +5509,14 @@ const HANDLERS = {
   },
   async arte(job, c) {
     const input = JSON.parse(job.input || '{}');
+    // “Refazer a arte”: o dono não gostou de nada. O texto fica; a arte é feita de novo do zero (notícia: remonta pelo roteiro e busca foto nova para a capa)
+    if (input.refazer) {
+      addChat('gerente', `Recebi: refazer a arte de “${c.title}” do zero. O texto continua o mesmo. Leva alguns minutos; aviso quando estiver na Mesa.`);
+      if (c.kind === 'noticia' && !als.getStore()?.dry) {
+        if (await arteDoRoteiro(c.id, 'refazer a arte do zero (pedido do dono)')) { const c2 = getContent(c.id); try { await trocaFotoNoticia(c2, 0, 'foto nova, forte, nítida, sem texto, diferente da anterior'); } catch { /* fica a foto da remontagem */ } addChat('gerente', `A arte de “${c.title}” foi refeita do zero, com foto nova na capa. Está na Mesa.`); return { text: 'Arte refeita do zero', tin: 0, tout: 0 }; }
+      }
+      input.feedback = ''; input.from = '';   // fora da notícia: o Designer cria de novo, sem partir da versão que você recusou
+    }
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
     // “volta como estava”: devolve a página pedida (ou a arte inteira) da versão anterior guardada no histórico, sem refazer nada
     if (input.from === 'dono' && c.art_spec && /\b(volt[ae]|desfa[zç]|como estava|vers[ãa]o anterior)/i.test(input.feedback || '')) {
@@ -6631,7 +6639,7 @@ function contentAct(id, act, b = {}) {
     // ajuste pedido na tela da matéria do site: só o Copy, só a matéria (o post e a arte ficam como estão)
     if (soMateria) enqueue(id, 'roteirista', 'materia_ajuste', { feedback }, 'manual');
     else if (target === 'roteirista') enqueue(id, 'roteirista', 'roteiro', { feedback });
-    else enqueue(id, target, target === 'designer' ? 'arte' : 'video', { feedback, from: 'dono' });
+    else enqueue(id, target, target === 'designer' ? 'arte' : 'video', { feedback, from: 'dono', ...(b.refazer ? { refazer: true } : {}) });
   } else if (act === 'reprocess') {
     setContent(id, { status: 'producing', error: '', revisions: 0, prod_revisions: 0 });
     log(null, `Reprocessando "${c.title}"`, id);
