@@ -307,6 +307,9 @@ async function assinaturaLoginConclui(code) {
   return assinaturaStatus();   // o código de saída não prova nada: vale o "auth status"
 }
 // Um pedido: `claude -p` sem nenhuma ferramenta (só busca na web quando o pedido pede), com o prompt do agente no lugar do prompt do Claude Code
+// agente trabalhando em cada peça (para o botão Parar interromper na hora)
+const procsConteudo = new Map();
+function paraAgoraConteudo(id) { const ch = procsConteudo.get(+id); if (ch) { try { ch.kill('SIGTERM'); } catch { } return true; } return false; }
 async function callAssinatura({ system, content, images = [], model, search }) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdc-turno-')), sys = path.join(dir, 'system.md');
   fs.writeFileSync(sys, system);
@@ -315,6 +318,7 @@ async function callAssinatura({ system, content, images = [], model, search }) {
   try {
     return await new Promise((ok, ko) => {
       const ch = spawn('claude', args, { cwd: dir, env: claudeEnv() }); let err = '', res = null, buf = '';
+      const cid = als.getStore()?.cid; if (cid) { procsConteudo.set(cid, ch); ch.on('exit', () => { if (procsConteudo.get(cid) === ch) procsConteudo.delete(cid); }); }
       const t = setTimeout(() => ch.kill('SIGTERM'), 600000);
       ch.stderr.on('data', d => { err = (err + d).slice(-3000); });
       ch.stdout.on('data', d => { buf += d; let i; while ((i = buf.indexOf('\n')) >= 0) { const ln = buf.slice(0, i); buf = buf.slice(i + 1); try { const ev = JSON.parse(ln); if (ev.type === 'result') res = ev; } catch { /* linha parcial */ } } });
@@ -5895,11 +5899,13 @@ async function runJob(job) {
   const c = job.content_id ? getContent(job.content_id) : null;
   try {
     if (job.content_id && !c) throw new Error('Conteúdo removido');
-    const r = await als.run({ brand: jobBrand(job, c), scoped: !!c, ctx: ctxDe(c), fmt: fmtGrupo(c?.format) }, () => HANDLERS[job.kind](job, c));
+    const r = await als.run({ cid: c?.id, brand: jobBrand(job, c), scoped: !!c, ctx: ctxDe(c), fmt: fmtGrupo(c?.format) }, () => HANDLERS[job.kind](job, c));
     run("UPDATE jobs SET status='done', finished_at=?, output=?, tokens_in=?, tokens_out=? WHERE id=?",
       T(), (r?.text || '').slice(0, 20000), r?.tin || 0, r?.tout || 0, job.id);
     if (c && (job.kind === 'arte' || job.kind === 'video')) checkProduction(c.id);
   } catch (e) {
+    // o dono mandou parar no meio: a tarefa volta para a fila, parada, sem virar erro (continua quando ele mandar)
+    if (c && getContent(c.id)?.pausado) { run("UPDATE jobs SET status='queued', error='', attempts=? WHERE id=?", Math.max(0, job.attempts), job.id); log(job.agent, `Parado por você no meio: "${c.title}"`, c.id); changed(); return; }
     const attempts = job.attempts + 1;
     console.error(`job ${job.id} (${job.kind}) falhou:`, e.message);
     if (attempts < 2) {
@@ -6497,7 +6503,7 @@ function contentAct(id, act, b = {}) {
   }
 }
 
-const fluxoV2 = criarFluxoV2({ agentesPausados: () => agentesPausados(), pump: () => setImmediate(pump), db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
+const fluxoV2 = criarFluxoV2({ paraAgora: id => paraAgoraConteudo(id), agentesPausados: () => agentesPausados(), pump: () => setImmediate(pump), db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;

@@ -440,8 +440,9 @@ export function criarFluxoV2(ctx) {
     if (p === '/api/v2/fila/item-pausa' && m === 'POST') {
       const b = await readBody(req, 5000), c = getContent(+b.id); if (!c) throw fail(404, 'Item não encontrado');
       run('UPDATE contents SET pausado=? WHERE id=?', b.pausar ? 1 : 0, c.id);
+      const interrompeu = b.pausar ? !!ctx.paraAgora?.(c.id) : false;   // se um agente está no meio desta peça, para na hora
       log(null, `Você ${b.pausar ? 'parou' : 'mandou continuar'} "${c.title}"`, c.id); changed(); ctx.pump?.();
-      return send(res, 200, { ok: true });
+      return send(res, 200, { ok: true, interrompeu });
     }
     // descarta de uma vez o que foi criado sozinho e ainda não chegou na Mesa do dono (vai para a lixeira, dá para restaurar)
     if (p === '/api/v2/fila/limpar-sozinhos' && m === 'POST') {

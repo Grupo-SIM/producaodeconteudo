@@ -540,6 +540,7 @@ async function verFila() {
   </div>`);
 }
 async function pausaAg(agente, pausar) { await tryDo(() => api('/api/v2/fila/pausa', { body: { agente, pausar } }), pausar ? 'Pausado' : 'Retomado'); verFila(); }
+async function pausaItemModal(id, pausar) { const r = await tryDo(() => api('/api/v2/fila/item-pausa', { body: { id, pausar } })); if (r) toast(pausar ? (r.interrompeu ? 'Agente parado na hora. A peça fica aqui até você mandar continuar.' : 'Parada: fica onde está até você mandar continuar') : 'Continuando'); abrirItem(id); }
 async function pausaItem(id, pausar) { await tryDo(() => api('/api/v2/fila/item-pausa', { body: { id, pausar } }), pausar ? 'Parada: fica onde está até você mandar continuar' : 'Continuando'); verFila(); }
 async function descFila(id) { await tryDo(() => api(`/api/v2/itens/${id}/descartar`, { body: {} }), 'Descartado (fica na lixeira)'); verFila(); }
 async function limparSozinhos(n) { if (!confirm(`Descartar ${n} peça(s) criadas sozinhas? Vão para a lixeira; as que já chegaram para você revisar ficam.`)) return; const r = await tryDo(() => api('/api/v2/fila/limpar-sozinhos', { body: {} })); if (r) toast(r.descartados + ' descartada(s)'); verFila(); }
@@ -663,7 +664,7 @@ async function abrirItem(id) {
     <div class="mb"><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(d.raia)}</dd>${d.estado === 'parado' ? `<dt>O que houve</dt><dd>${esc(explica(d.motivo).titulo)}</dd><dt>O que fazer</dt><dd>${esc(explica(d.motivo).faca)}</dd><dt>Detalhe técnico</dt><dd class="small muted">${esc(d.motivo || '')}</dd>` : d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
     ${d.roteiro ? `<h3 style="margin:16px 0 6px;font-size:13px" class="muted">Roteiro</h3><div class="doc" style="min-height:0">${esc(d.roteiro)}</div>` : ''}
     ${versoesHtml(d)}</div>
-    <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}${d.estado === 'parado' ? `<button class="btn ok" style="margin-left:auto" onclick="resolver([${id}])">Resolvido</button>` : ''}</div>`);
+    <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}${d.status !== 'discarded' && ['etapa', 'ajuste', 'fila'].includes(d.estado) ? (d.pausado ? `<button class="btn ok" onclick="pausaItemModal(${id},false)">Continuar</button><span class="muted small" style="align-self:center">parada por você</span>` : `<button class="btn" style="border-color:#6b2a2e;color:#ff9b9b" onclick="pausaItemModal(${id},true)" title="Para o agente agora; a peça fica onde está até você mandar continuar">Parar agente</button>`) : ''}${d.estado === 'parado' ? `<button class="btn ok" style="margin-left:auto" onclick="resolver([${id}])">Resolvido</button>` : ''}</div>`);
 }
 function versoesHtml(d) {
   if (!d.versoes?.length) return '';
