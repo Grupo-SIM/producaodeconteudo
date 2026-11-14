@@ -5128,6 +5128,39 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
   if (!bons.length) return { erro: errImg || (descartadas ? `${descartadas} imagem(ns) sem detalhe/sem graça, descartada(s)` : '') };
   return { ...bons[0], outras: bons.slice(1) };
 }
+// A arte em elementos com nome (como o dono fala): página, fundo, cada texto, cada imagem, cada forma. É isso que o Gerente lê para entender o pedido
+function descreveArte(sp) {
+  const nomeP = (i, n) => i === 0 ? 'capa (página 1)' : i === n - 1 && n === 2 ? 'contracapa (página 2)' : 'página ' + (i + 1);
+  return (sp?.slides || []).map((sl, i, L) => {
+    const bg = sl.bg?.asset ? 'foto “' + sl.bg.asset + '”' : sl.bg?.gen ? 'imagem por IA' : sl.bg?.grad ? 'degradê' : 'cor ' + (sl.bg?.color || 'da marca');
+    const tx = (sl.texts || []).map((t, k) => `  - texto#${k} (${({ ...ROLE_PT, label: 'rótulo pequeno', footer: 'rodapé' })[t.role] || t.role}${t.decor ? ', decorativo' : ''}): “${String(t.value || '').replace(/\s+/g, ' ').slice(0, 90)}”`);
+    const im = (sl.items || []).map((t, k) => `  - imagem#${k}: ${t.asset || 'gerada'}${t.round || t.box?.circle ? ' (em círculo)' : t.box ? ' (em quadro)' : ''}${t.moldura ? ' (logo/moldura)' : ''}`);
+    const fm = (sl.shapes || []).map((t, k) => `  - forma#${k}: ${t.kind}${t.moldura ? ' (moldura)' : ''}`);
+    return `${nomeP(i, L.length)}${sl.modelo ? ' · template ' + sl.modelo : ''}\n  - fundo: ${bg}\n${[...tx, ...im, ...fm].join('\n')}`;
+  }).join('\n');
+}
+// O Gerente lê o pedido do dono e diz exatamente o que mudar (ação, página, elementos). Sem resposta válida, volta null e vale a leitura por palavras
+async function entendePedidoArte(c, fb, sp) {
+  if (MANUAL || als.getStore()?.dry) return null;
+  try {
+    const r = await callClaude({ agent: agentRow('gerente'), maxTokens: 500, user: `O dono pediu um ajuste nesta arte. Diga EXATAMENTE o que ele quer mudar, elemento por elemento, sem ampliar o pedido.\n\n# ARTE (páginas e elementos)\n${descreveArte(sp)}\n\n# PEDIDO DO DONO\n${String(fb).slice(0, 1500)}\n\n# SAÍDA\nSó um JSON: {"acao":"trocar_foto|voltar|editar|refazer","paginas":[índices começando em 0],"elementos":[{"pagina":0,"tipo":"fundo|texto|imagem|forma|novo","indice":0}],"entendi":"uma frase curta, em português, do que vai mudar"}\n- trocar_foto: quer outra foto de fundo (ou "trocar a capa" sem dizer outra coisa).\n- voltar: quer a versão anterior.\n- editar: mudar elementos específicos (liste cada um em "elementos"; "novo" = acrescentar algo).\n- refazer: não gostou de nada.\nCapa = página 0. Contracapa = última página quando são 2.` });
+    const j = extrairJSON(r.text, '{'); if (!j || !['trocar_foto', 'voltar', 'editar', 'refazer'].includes(j.acao)) return null;
+    const n = (sp?.slides || []).length, pg = (Array.isArray(j.paginas) ? j.paginas : []).map(Number).filter(x => Number.isInteger(x) && x >= 0 && x < n);
+    const el = (Array.isArray(j.elementos) ? j.elementos : []).filter(e => e && ['fundo', 'texto', 'imagem', 'forma', 'novo'].includes(e.tipo) && Number.isInteger(+e.pagina) && +e.pagina >= 0 && +e.pagina < n).map(e => ({ pagina: +e.pagina, tipo: e.tipo, indice: Number.isInteger(+e.indice) ? +e.indice : 0 }));
+    return { acao: j.acao, paginas: pg.length ? pg : [...new Set(el.map(e => e.pagina))], elementos: el, entendi: String(j.entendi || '').slice(0, 300) };
+  } catch (e) { console.error('entender pedido:', e.message); return null; }
+}
+// junta a arte nova com a anterior deixando mudar SÓ os elementos pedidos
+function soElementos(ant, novo, els) {
+  const out = JSON.parse(JSON.stringify(ant)), K = { texto: 'texts', imagem: 'items', forma: 'shapes' };
+  for (const e of els) {
+    const a = out.slides[e.pagina], b = novo.slides?.[e.pagina]; if (!a || !b) continue;
+    if (e.tipo === 'fundo') { a.bg = b.bg; a.shade = b.shade; a.shade_dir = b.shade_dir; if (b.fx) a.fx = b.fx; continue; }
+    if (e.tipo === 'novo') { for (const k of ['texts', 'items', 'shapes']) { const extra = (b[k] || []).slice((a[k] || []).length); if (extra.length) a[k] = [...(a[k] || []), ...extra]; } continue; }
+    const k = K[e.tipo]; if (b[k]?.[e.indice]) { a[k] ||= []; a[k][e.indice] = b[k][e.indice]; }
+  }
+  return out;
+}
 // páginas que o pedido cita (capa = 1ª, contracapa = 2ª, "página 3"); null quando o pedido não fala de página nenhuma
 function paginasPedidas(fb) {
   const t = String(fb || '').toLowerCase(), out = new Set();
@@ -5527,9 +5560,15 @@ const HANDLERS = {
       input.feedback = ''; input.from = '';   // fora da notícia: o Designer cria de novo, sem partir da versão que você recusou
     }
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
+    // o Gerente entende o pedido elemento por elemento e diz no chat o que vai mudar; depois cada ação segue o caminho certo
+    if (input.from === 'dono' && input.feedback && c.art_spec && !input.ped) {
+      const ped = await entendePedidoArte(c, input.feedback, jparse(c.art_spec, {}));
+      if (ped) { input.ped = ped; if (ped.entendi) addChat('gerente', `Entendi o seu pedido em “${c.title}”: ${ped.entendi}. Só isso vai mudar.`); if (ped.acao === 'refazer') { input.refazer = true; if (c.kind !== 'noticia') { input.feedback = ''; input.from = ''; } } }
+    }
+    if (input.refazer && input.ped?.acao === 'refazer' && c.kind === 'noticia' && !als.getStore()?.dry && await arteDoRoteiro(c.id, 'refazer a arte do zero (pedido do dono)')) { try { await trocaFotoNoticia(getContent(c.id), 0, 'foto nova, forte, nítida, sem texto, diferente da anterior'); } catch { /* fica a foto da remontagem */ } addChat('gerente', `A arte de “${c.title}” foi refeita do zero. Está na Mesa.`); return { text: 'Arte refeita do zero', tin: 0, tout: 0 }; }
     // “volta como estava”: devolve a página pedida (ou a arte inteira) da versão anterior guardada no histórico, sem refazer nada
-    if (input.from === 'dono' && c.art_spec && /\b(volt[ae]|desfa[zç]|como estava|vers[ãa]o anterior)/i.test(input.feedback || '')) {
-      const fb = String(input.feedback), cur = jparse(c.art_spec, {}), pg = /contra-?capa/i.test(fb) ? 1 : /\bcapa\b/i.test(fb) ? 0 : (fb.match(/(?:p[áa]gina|slide)\s*(\d+)/i) || [])[1] ? +(fb.match(/(?:p[áa]gina|slide)\s*(\d+)/i)[1]) - 1 : -1;
+    if (input.from === 'dono' && c.art_spec && (input.ped ? input.ped.acao === 'voltar' : /\b(volt[ae]|desfa[zç]|como estava|vers[ãa]o anterior)/i.test(input.feedback || ''))) {
+      const fb = String(input.feedback), cur = jparse(c.art_spec, {}), pg = input.ped?.paginas?.length === 1 ? input.ped.paginas[0] : input.ped ? -1 : /contra-?capa/i.test(fb) ? 1 : /\bcapa\b/i.test(fb) ? 0 : (fb.match(/(?:p[áa]gina|slide)\s*(\d+)/i) || [])[1] ? +(fb.match(/(?:p[áa]gina|slide)\s*(\d+)/i)[1]) - 1 : -1;
       const H = all('SELECT spec FROM art_hist WHERE content_id=? ORDER BY id DESC', c.id).map(x => jparse(x.spec, null)).filter(Boolean);
       const alvo = H.find(h => pg < 0 ? JSON.stringify(h.slides) !== JSON.stringify(cur.slides) : h.slides?.[pg] && JSON.stringify(h.slides[pg]) !== JSON.stringify(cur.slides?.[pg]));
       if (alvo) {
@@ -5542,7 +5581,13 @@ const HANDLERS = {
       return { text: 'Sem versão anterior no histórico', tin: 0, tout: 0 };
     }
     // notícia: pedido do dono para trocar a foto de fundo vai direto na foto (a arte de notícia é montada pelo painel e ignoraria o pedido)
-    if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && (/\b(foto|imagem|fundo)\b/i.test(input.feedback || '') || /^\s*(troc|troq|mud|substitu)\w*\s+(s[óo]\s+|somente\s+|apenas\s+)?(a\s+)?(contra-?)?capa\b/i.test(input.feedback || '')) && /\b(troc|troq|mud|outr|substitu|alter|nova)/i.test(input.feedback || '')) {
+    if (input.from === 'dono' && c.art_spec && input.ped?.acao === 'trocar_foto') {   // o Gerente entendeu “trocar a foto”: troca só o fundo das páginas pedidas
+      const pgs = input.ped.paginas.length ? input.ped.paginas : [0]; let ok = 0, err = '';
+      for (const pg of pgs) { const r = await trocaFotoNoticia(getContent(c.id), pg, input.feedback); if (r.ok) ok++; else err = r.erro; }
+      addChat('gerente', ok ? `Troquei a foto de fundo ${pgs.map(p => p === 0 ? 'da capa' : 'da página ' + (p + 1)).join(' e ')} de “${c.title}”. O resto da arte ficou igual. Está na Mesa.` : `Não consegui trocar a foto de “${c.title}”: ${err}. Se quiser, envie uma foto pela Biblioteca no editor.`);
+      return { text: ok ? 'Foto trocada' : err, tin: 0, tout: 0 };
+    }
+    if (!input.ped && c.kind === 'noticia' && input.from === 'dono' && c.art_spec && (/\b(foto|imagem|fundo)\b/i.test(input.feedback || '') || /^\s*(troc|troq|mud|substitu)\w*\s+(s[óo]\s+|somente\s+|apenas\s+)?(a\s+)?(contra-?)?capa\b/i.test(input.feedback || '')) && /\b(troc|troq|mud|outr|substitu|alter|nova)/i.test(input.feedback || '')) {
       const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
       addChat('gerente', `Recebi seu pedido em “${c.title}”: o Designer está buscando outra foto para a ${pg ? 'contracapa' : 'capa'}, seguindo o que você pediu. Leva alguns minutos; até lá a arte que aparece é a anterior. Aviso aqui quando terminar.`);
       const r = await trocaFotoNoticia(c, pg, fb);
@@ -5557,6 +5602,7 @@ const HANDLERS = {
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
     if (input.feedback && (c.art || c.art_spec)) user += `\n\n# VERSÃO ANTERIOR\n${c.art}${c.art_spec ? '\n\n# ESPECIFICAÇÃO VISUAL ANTERIOR (JSON)\n```json\n' + c.art_spec + '\n```\nMantenha tudo o que não foi pedido para mudar (textos, cores, prompts de fundo "gen" idênticos) e altere somente o que os ajustes pedem.' : ''}\n\n# AJUSTES PEDIDOS ${input.from === 'dono' ? 'PELO DONO (prioridade máxima; o roteiro e os textos continuam os mesmos, ajuste a diagramação e os elementos visuais)' : input.from === 'sistema' ? 'PELO SISTEMA' : 'PELO REVISOR'} (aplique todos e entregue a direção de arte completa de novo, com a especificação visual em JSON)\n${input.feedback}`;
+    if (input.ped?.acao === 'editar' && input.ped.elementos.length) user += `\n\n# O QUE MUDAR (o Gerente leu o pedido do dono)\n${input.ped.entendi}\nElementos que podem mudar: ${input.ped.elementos.map(e => (e.pagina === 0 ? 'capa' : 'página ' + (e.pagina + 1)) + ' › ' + (e.tipo === 'novo' ? 'acrescentar elemento' : e.tipo + (e.tipo === 'fundo' ? '' : '#' + e.indice))).join('; ')}. TODO o resto da especificação volta igual (mesmos índices, mesmos valores); o painel desfaz qualquer outra mudança.\n# ELEMENTOS DA ARTE ATUAL\n${descreveArte(jparse(c.art_spec, {}))}`;
     const lidas = !input.feedback && paginasDoRoteiro(c.script, c.format, c.brand);
     if (lidas) user += `\n\n# PÁGINAS JÁ LIDAS DO ROTEIRO PELO PAINEL\nO roteiro está no modelo do dono e o painel já separou as páginas e escolheu um modelo para cada uma. Use isto como base: mantenha os textos (pode encurtar e quebrar com "|" para a diagramação), troque o modelo só se outro servir melhor, e reescreva "foto"/"objeto"/"particulas" em inglês a partir do "Visual" do roteiro. Uma palavra de destaque por página.\n\`\`\`json\n${JSON.stringify(lidas)}\n\`\`\``;
     const ea = String(c.estilo_arte || ''), layEsc = input.layout_id || (/^l:\d+$/.test(ea) ? +ea.slice(2) : undefined);
@@ -5567,8 +5613,9 @@ const HANDLERS = {
     const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000 });
     const sp = extractArteSpec(r.text, c.format, c);
     // você pediu para mexer só numa página (capa, contracapa, página N): as outras páginas e o formato ficam exatamente como estavam
-    if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const so = paginasPedidas(input.feedback), ant = jparse(c.art_spec, null);
-      if (so && ant?.slides?.length) { sp.spec.slides = ant.slides.map((x, i) => so.has(i) && sp.spec.slides[i] ? sp.spec.slides[i] : x); sp.format = c.format; for (const k of ['accent', 'ink', 'paper']) if (ant[k] !== undefined) sp.spec[k] = ant[k]; log('designer', `Mexeu só ${[...so].map(i => i === 0 ? 'na capa' : i === 1 && ant.slides.length === 2 ? 'na contracapa' : 'na página ' + (i + 1)).join(' e ')} de "${c.title}", como você pediu; o resto ficou igual`, c.id); } }
+    if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const so = input.ped?.paginas?.length ? new Set(input.ped.paginas) : paginasPedidas(input.feedback), ant = jparse(c.art_spec, null);
+      if (input.ped?.acao === 'editar' && input.ped.elementos.length && ant?.slides?.length) { sp.spec = { ...soElementos(ant, sp.spec, input.ped.elementos), accent: ant.accent, ink: ant.ink, paper: ant.paper }; sp.format = c.format; log('designer', `Mexeu só no que você pediu em "${c.title}" (${input.ped.elementos.length} elemento(s)); o resto ficou igual`, c.id); }
+      else if (so && ant?.slides?.length) { sp.spec.slides = ant.slides.map((x, i) => so.has(i) && sp.spec.slides[i] ? sp.spec.slides[i] : x); sp.format = c.format; for (const k of ['accent', 'ink', 'paper']) if (ant[k] !== undefined) sp.spec[k] = ant[k]; log('designer', `Mexeu só ${[...so].map(i => i === 0 ? 'na capa' : i === 1 && ant.slides.length === 2 ? 'na contracapa' : 'na página ' + (i + 1)).join(' e ')} de "${c.title}", como você pediu; o resto ficou igual`, c.id); } }
     if (sp && sp.format !== c.format && ['feed', 'carrossel'].includes(c.format)) { setContent(c.id, { format: sp.format }); log('designer', `A peça "${c.title}" tem ${sp.spec.slides.length} páginas: virou carrossel`, c.id); }
     setContent(c.id, { art: sp ? r.text.replace(sp.raw, '').trim() : r.text, art_spec: sp ? JSON.stringify(sp.spec) : '', art_spec_base: sp ? JSON.stringify(sp.spec) : '', art_status: '', art_note: '' });
     log('designer', `Direção de arte pronta: "${c.title}"`, c.id);
