@@ -2567,6 +2567,8 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'nenhum', linha: true, rodape: 'logo', italico: true, sombra: true } }] },
   { id: 'noticia-jornal', nome: 'Notícia de jornal (2 páginas)', nivel: 'robusto', formatos: ['carrossel'], paginas: 2, uso: 'Notícia no estilo de jornal em 2 páginas: capa com a foto da notícia, degradê, selo “Notícia urgente!” e manchete em caixa alta; contra-capa com um cartão branco (avatar, nome verificado e o texto da notícia). Estrutura fixa, sem miolo.',
     seq: [{ modelo: 'noticia', papel: 'capa' }, { modelo: 'post-card', papel: 'fim' }] },
+  { id: 'noticia-nuvo', marcas: ['Vivendo de Bet'], nome: 'Notícia estilo Nuvo (2 páginas)', nivel: 'robusto', formatos: ['carrossel', 'feed'], paginas: 2, uso: 'Notícia em 2 páginas no estilo Nuvo (referência do dono): logo centralizada no topo, foto única grande, pílula na cor da marca com o site, manchete em caixa normal com o nome da marca vazado atrás e "Siga @marca no Instagram"; contra-capa com o cartão de post.',
+    seq: [{ modelo: 'noticia', papel: 'capa', opcoes: { estilo: 'nuvo' } }, { modelo: 'post-card', papel: 'fim' }] },
   { id: 'noticia', nome: 'Notícia / novidade do mercado', nivel: 'robusto', formatos: ['carrossel', 'feed', 'stories'], uso: 'Notícia, novidade, lançamento, mudança de regra ou acontecimento que o público precisa saber agora: manchete forte na capa, o que aconteceu, o que muda para quem segue, e a chamada para acompanhar.',
     seq: [{ modelo: 'capa-faixa', papel: 'capa' }, { modelo: 'texto', foto: true }, { modelo: 'texto', repetir: true }, { modelo: 'frase' }, { modelo: 'cta', papel: 'fim' }] },
   { id: 'stories-sequencia', nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
@@ -2829,7 +2831,8 @@ function estruturaTemplate(tpl, format, pags, b = {}, brand = '') {
   const meio = seq.slice(1, fimS ? -1 : undefined), resumo = meio.filter(x => x.papel === 'resumo' || x.papel === 'beneficios'), corpo = meio.filter(x => !resumo.includes(x));
   const capaD = { kicker: t(capa.kicker, 60) || undefined, titulo: t(capa.titulo, 120) || 'Seu título *aqui*', foto: t(capa.foto, 300) || undefined, particulas: t(capa.particulas, 120) || undefined, apoio: t(capa.apoio, 60) || undefined, cta: format === 'feed' ? (t(b.cta, 40) || 'Saiba mais') : undefined, ambiente: t(capa.ambiente, 160) || undefined };
   if (!capaD.foto && capaS.mascote !== false && masc.length && ['heroi', 'revista', 'capa-faixa', 'capa-mascote'].includes(capaS.modelo)) capaD.objeto = proxMascote('dynamic heroic pose pointing at the viewer, big confident smile');
-  if (capaS.modelo === 'noticia') { capaD.selo = t(capa.selo, 40) || (capa.kicker ? undefined : 'Notícia urgente!'); capaD.legenda = t(capa.legenda, 40) || undefined; delete capaD.ambiente; delete capaD.particulas; delete capaD.apoio; delete capaD.objeto; if (capa.kicker && !capaD.selo && t(capa.kicker, 40).length <= 28) capaD.selo = t(capa.kicker, 40); delete capaD.kicker; }
+  if (capaS.modelo === 'noticia') { Object.assign(capaD, capaS.opcoes || {}); capaD.selo = t(capa.selo, 40) || undefined;   // selo padrão: o nome da marca (pílula vermelha só em notícia urgente)
+    capaD.legenda = t(capa.legenda, 40) || undefined; delete capaD.ambiente; delete capaD.particulas; delete capaD.apoio; delete capaD.objeto; if (capa.kicker && !capaD.selo && t(capa.kicker, 40).length <= 28) capaD.selo = t(capa.kicker, 40); delete capaD.kicker; }
   if (capaS.modelo === 'manchete-foto') { for (const k of Object.keys(capaD)) delete capaD[k]; Object.assign(capaD, { titulo: t(capa.titulo, 140) || 'A manchete que *para* o dedo em até quatro linhas', foto: t(capa.foto, 300) || undefined, ...(capaS.opcoes || {}) }); }
   if (capaS.modelo === 'citacao') { for (const k of Object.keys(capaD)) delete capaD[k]; Object.assign(capaD, { nome: t(capa.nome || capa.kicker, 50) || 'Nome de quem disse', frase: t(capa.frase || capa.titulo, 220) || '“A frase marcante, fiel ao que a pessoa disse.”', foto: t(capa.foto, 300) || undefined }); }
   const paginas = [{ modelo: capaS.modelo, dados: capaD }];
@@ -4523,6 +4526,13 @@ const RADAR_FONTES = [
   { id: 'neofeed', nome: 'NeoFeed', url: 'https://neofeed.com.br/feed/', nichos: ['financas'] }, { id: 'bloomberglinea', nome: 'Bloomberg Línea', url: 'https://www.bloomberglinea.com.br/arc/outboundfeeds/rss/?outputType=xml', nichos: ['financas'] },
   { id: 'crunchbase', nome: 'Crunchbase News', url: 'https://news.crunchbase.com/feed/', nichos: ['financas'] }];
 const RADAR_NICHO_IDS = Object.keys(RADAR_NICHOS);
+// uma vez só (pedido do dono, 14/11/2026): Vivendo de Bet testa a notícia no estilo Nuvo; as marcas sem estilo de notícia ficam no estilo Zyrion (capa + cartão)
+setTimeout(() => { try { if (one("SELECT 1 x FROM settings WHERE key='estilos_noticia_v1'")) return;
+  const raw = jparse(one("SELECT value FROM settings WHERE key='radar_cfg'")?.value, {}) || {}; raw.marcas = raw.marcas && typeof raw.marcas === 'object' ? raw.marcas : {};
+  for (const { name } of all('SELECT name FROM brands')) { const m = raw.marcas[name] || (raw.marcas[name] = { ativo: !/marketing\s*raiz/i.test(name), max: 2, formato: 'carrossel' }); if (/vivendo\s*de\s*bet/i.test(name)) m.estilo = 'noticia-nuvo'; else if (!m.estilo) m.estilo = 'noticia-jornal'; }
+  run("INSERT INTO settings(key,value) VALUES('radar_cfg',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(raw));
+  run("INSERT OR REPLACE INTO settings(key,value) VALUES('estilos_noticia_v1','1')");
+} catch (e) { console.error('estilos de notícia:', e.message); } }, 6000).unref?.();
 function radarCfg() {
   const c = jparse(one("SELECT value FROM settings WHERE key='radar_cfg'")?.value, {}) || {}, marcas = {};
   for (const [b, m] of Object.entries(c.marcas && typeof c.marcas === 'object' ? c.marcas : {})) marcas[b] = { ativo: !!m?.ativo, termos: String(m?.termos || '').slice(0, 400), max: Math.max(1, Math.min(6, +m?.max || 2)), formato: RADAR_FMTS.includes(m?.formato) ? m.formato : 'carrossel', estilo: String(m?.estilo || '').slice(0, 80), cta: String(m?.cta || '').replace(/\s+/g, ' ').trim().slice(0, 140), nicho: RADAR_NICHO_IDS.includes(m?.nicho) ? m.nicho : '', stories: ['venda', 'servico'].includes(m?.stories) ? m.stories : '', jornal: String(m?.jornal || '').replace(/\s+/g, ' ').trim().slice(0, 200), secoes: String(m?.secoes || '').replace(/\s+/g, ' ').trim().slice(0, 400) };

@@ -236,6 +236,23 @@ function postX(d, ctx, s) {
   return s;
 }
 
+// Notícia estilo Nuvo (referência do dono): logo no topo, foto única, pílula com o site na cor da marca, manchete em caixa normal, nome da marca vazado atrás e "Siga @marca"
+function noticiaNuvo(d, ctx) {
+  const { W, H } = ctx, foto = genOuAsset(d.foto), s = base(ctx, '#000000', { grain: .15, vignette: .25 }), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
+  if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`), color: '#000000', pos: 'topo', fil: pb }; s.shade = .2; s.shade_dir = 'bottom'; }
+  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .5 }];
+  s.shapes.push({ kind: 'rect', x: .5, y: .002, w: 1, h: .006, color: ctx.accent, moldura: true, front: true });
+  const marca = String(ctx.marca || '').trim(), c = ctx.contatos || {}, site = String(d.site || c.site || '').replace(/^https?:\/\//, '').replace(/\/$/, ''), arroba = String(d.handle || c.instagram || '').replace(/^.*instagram\.com\//, '').replace(/^@?/, '@').replace(/\/$/, '');
+  if (ctx.logo) { const lw = Math.round(W * .3); s.items.push({ asset: ctx.logo, x: .5, y: .085, size: lw, moldura: true, front: true }); }
+  else if (marca) s.texts.push({ role: 'label', value: marca.toUpperCase(), x: .5, y: .085, align: 'center', size: Math.round(W * .06), font: 'montserrat', weight: 900, ls: -.02, color: '#ffffff', nowrap: true, shadow: false, front: true });
+  const tf = { k: 'montserrat', w: 700, lh: 1.08, ls: -.01, upper: false }, ti = ajusta(String(d.titulo || ''), tf, W * .9, H * .25, { maxSize: W * .085, maxLinhas: 4 });
+  const hT = ti.linhas.length * tf.lh * ti.size, yT = H * .86 - hT, B = [];
+  if (marca) { const g = marca.split(/\s+/)[0].toUpperCase().slice(0, 8), gs = Math.round(Math.min(H * .2, W * 1.05 / Math.max(1, largura(g, { k: 'montserrat', w: 800 }, 1)))); s.texts.push({ role: 'title', value: g, x: .5, y: F2((yT + hT * .55) / H), align: 'center', size: gs, font: 'montserrat', weight: 800, outline: true, stroke: '#ffffff', stroke_w: Math.max(2, Math.round(W * .0022)), opacity: .35, nowrap: true, shadow: false }); }
+  if (site) { const ps = Math.round(W * .026); s.texts.push({ role: 'badge', value: site, x: .5, y: F2((yT - H * .035) / H), align: 'center', size: ps, font: 'montserrat', weight: 600, ls: 0, upper: false, caixa: 'normal', bg: ctx.accent, color: sobre(ctx.accent), shape: 'pill', nowrap: true, shadow: false, front: true }); }
+  s.texts.push(...[].concat(texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: yT, align: 'center', color: '#ffffff', extra: { front: true } }).t));
+  if (arroba.length > 1) s.texts.push({ role: 'body', value: `Siga ${arroba} no Instagram`, x: .5, y: .935, align: 'center', size: Math.round(W * .019), font: 'montserrat', weight: 400, italic: true, color: '#ffffff', opacity: .7, nowrap: true, shadow: false, front: true });
+  return s;
+}
 export const MODELOS = [
   { id: 'heroi', nome: 'Personagem em destaque', uso: 'capa ou post único', desc: 'Personagem recortado e grande à direita, saindo pela borda de baixo, com luz de contorno na cor da marca, ambiente desfocado e partículas do tema; à esquerda chamada, título enorme (linha final na cor de destaque), apoio espaçado e botão.', campos: ['kicker', 'titulo', 'apoio', 'texto', 'cta', 'foto', 'objeto', 'particulas', 'ambiente', 'icone'] },
   { id: 'revista', nome: 'Capa de revista', uso: 'capa ou post único', desc: 'Título gigante de lado a lado no alto e o personagem recortado NA FRENTE cobrindo parte das letras; apoio e botão embaixo. É a capa que mais para o dedo.', campos: ['titulo', 'apoio', 'cta', 'foto', 'objeto', 'particulas', 'ambiente', 'icone'] },
@@ -636,6 +653,7 @@ const COMPOR = {
   },
   // Capa de jornal: foto de página inteira, degradê escuro-azulado embaixo, selo, manchete em caixa alta centralizada, fio com a marca e "Leia a legenda"
   noticia(d, ctx) {
+    if (d.estilo === 'nuvo') return noticiaNuvo(d, ctx);
     const { W, H, mx, T } = ctx, foto = genOuAsset(d.foto), azul = mistura(ctx.accent, '#000000', lum(ctx.accent) > .5 ? .8 : .66), s = base(ctx, azul, { grain: .22, vignette: .3 });
     // padrão de referência do dono (Zyrion): foto viva e nítida; preto e branco em notícia triste (d.pb); tela dividida com 2 fotos (d.foto2) ou foto + círculo com a referência do assunto (d.circulo)
     const pf = x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`, foto2 = genOuAsset(d.foto2), circ = genOuAsset(d.circulo), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
