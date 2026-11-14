@@ -2780,6 +2780,8 @@ async function arteDoRoteiro(id, origem = 'painel') {
   let notaFoto = '';
   if (c.kind === 'noticia' && pags[0]) {   // foto da própria matéria na capa: busca de novo se ainda não veio e usa mesmo que o Roteirista não tenha citado
     try { let it = one('SELECT * FROM radar_items WHERE content_id=?', id);
+      // notícia que não veio do Agente de Notícias (Treino, pedido manual): cria o registro da notícia para buscar a foto (banco de imagens, matéria, internet)
+      if (!it) { const tit = String(c.title || '').replace(/\s*\(.*?\)\s*$/, ''); run("INSERT INTO radar_items(brand,titulo,origem,content_id) VALUES(?,?,?,?)", c.brand || '', (c.script.match(/Capa:\s*([^\n]+)/i) || [])[1] || tit, 'manual', id); it = one('SELECT * FROM radar_items WHERE content_id=?', id); }
       if (it && !it.foto_asset) { await radarFoto(it, null); it = one('SELECT * FROM radar_items WHERE content_id=?', id); }
       if (it && !it.foto_asset) notaFoto = String(it.foto_info || 'Sem foto: a busca não retornou imagem. Envie a foto na aba Arte.').slice(0, 320);
       if (it?.foto_asset && assetDaMarca(c.brand, it.foto_asset) && ['noticia', 'manchete-foto', 'citacao', 'heroi', 'revista'].includes(pags[0].modelo) && !(pags[0].dados.foto && assetDaMarca(c.brand, String(pags[0].dados.foto).split(' (')[0]))) pags[0].dados = { ...pags[0].dados, foto: it.foto_asset };
