@@ -5128,6 +5128,15 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
   if (!bons.length) return { erro: errImg || (descartadas ? `${descartadas} imagem(ns) sem detalhe/sem graça, descartada(s)` : '') };
   return { ...bons[0], outras: bons.slice(1) };
 }
+// páginas que o pedido cita (capa = 1ª, contracapa = 2ª, "página 3"); null quando o pedido não fala de página nenhuma
+function paginasPedidas(fb) {
+  const t = String(fb || '').toLowerCase(), out = new Set();
+  if (/contra-?capa/.test(t)) out.add(1);
+  if (/\bcapa\b/.test(t.replace(/contra-?capa/g, ''))) out.add(0);
+  for (const m of t.matchAll(/(?:p[áa]gina|slide|tela)\s*(\d{1,2})/g)) out.add(+m[1] - 1);
+  if (/primeir[ao]\s+(p[áa]gina|slide|tela)/.test(t)) out.add(0);
+  return out.size ? out : null;
+}
 // O dono pediu outra foto de fundo numa notícia (capa ou contracapa): busca uma foto NOVA do assunto (internet e bancos), diferente das que já foram usadas,
 // troca só o fundo daquela página e mantém o resto da arte como está (template, textos, posições)
 async function trocaFotoNoticia(c, pagina, pedido = '') {
@@ -5533,7 +5542,7 @@ const HANDLERS = {
       return { text: 'Sem versão anterior no histórico', tin: 0, tout: 0 };
     }
     // notícia: pedido do dono para trocar a foto de fundo vai direto na foto (a arte de notícia é montada pelo painel e ignoraria o pedido)
-    if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && /\b(foto|imagem|fundo)\b/i.test(input.feedback || '') && /\b(troc|mud|outr|substitu|alter)/i.test(input.feedback || '')) {
+    if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && (/\b(foto|imagem|fundo)\b/i.test(input.feedback || '') || /^\s*(troc|troq|mud|substitu)\w*\s+(s[óo]\s+|somente\s+|apenas\s+)?(a\s+)?(contra-?)?capa\b/i.test(input.feedback || '')) && /\b(troc|troq|mud|outr|substitu|alter|nova)/i.test(input.feedback || '')) {
       const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
       addChat('gerente', `Recebi seu pedido em “${c.title}”: o Designer está buscando outra foto para a ${pg ? 'contracapa' : 'capa'}, seguindo o que você pediu. Leva alguns minutos; até lá a arte que aparece é a anterior. Aviso aqui quando terminar.`);
       const r = await trocaFotoNoticia(c, pg, fb);
@@ -5557,6 +5566,9 @@ const HANDLERS = {
       return { text: getContent(c.id).art, tin: 0, tout: 0 };   // notícia: a arte sai do roteiro, no template da marca, sem depender de o Designer entregar JSON
     const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000 });
     const sp = extractArteSpec(r.text, c.format, c);
+    // você pediu para mexer só numa página (capa, contracapa, página N): as outras páginas e o formato ficam exatamente como estavam
+    if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const so = paginasPedidas(input.feedback), ant = jparse(c.art_spec, null);
+      if (so && ant?.slides?.length) { sp.spec.slides = ant.slides.map((x, i) => so.has(i) && sp.spec.slides[i] ? sp.spec.slides[i] : x); sp.format = c.format; for (const k of ['accent', 'ink', 'paper']) if (ant[k] !== undefined) sp.spec[k] = ant[k]; log('designer', `Mexeu só ${[...so].map(i => i === 0 ? 'na capa' : i === 1 && ant.slides.length === 2 ? 'na contracapa' : 'na página ' + (i + 1)).join(' e ')} de "${c.title}", como você pediu; o resto ficou igual`, c.id); } }
     if (sp && sp.format !== c.format && ['feed', 'carrossel'].includes(c.format)) { setContent(c.id, { format: sp.format }); log('designer', `A peça "${c.title}" tem ${sp.spec.slides.length} páginas: virou carrossel`, c.id); }
     setContent(c.id, { art: sp ? r.text.replace(sp.raw, '').trim() : r.text, art_spec: sp ? JSON.stringify(sp.spec) : '', art_spec_base: sp ? JSON.stringify(sp.spec) : '', art_status: '', art_note: '' });
     log('designer', `Direção de arte pronta: "${c.title}"`, c.id);
