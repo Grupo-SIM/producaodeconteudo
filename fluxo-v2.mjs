@@ -73,7 +73,7 @@ export function criarFluxoV2(ctx) {
     id INTEGER PRIMARY KEY AUTOINCREMENT, content_id INTEGER NOT NULL, n INTEGER NOT NULL, ts TEXT NOT NULL,
     autor TEXT NOT NULL DEFAULT 'dono', motivo TEXT DEFAULT '', campos TEXT NOT NULL, antes TEXT NOT NULL, depois TEXT NOT NULL, resumo TEXT DEFAULT '', aprendido INTEGER DEFAULT 0)`);
   db.exec('CREATE INDEX IF NOT EXISTS content_versions_c ON content_versions(content_id, n)');
-  for (const [col, def] of [['em_ajuste', 'INTEGER DEFAULT 0'], ['ajuste_motivo', "TEXT DEFAULT ''"], ['status_antes', "TEXT DEFAULT ''"], ['raia', "TEXT DEFAULT ''"], ['avulso', 'INTEGER DEFAULT 0']]) {
+  for (const [col, def] of [['em_ajuste', 'INTEGER DEFAULT 0'], ['ajuste_motivo', "TEXT DEFAULT ''"], ['status_antes', "TEXT DEFAULT ''"], ['raia', "TEXT DEFAULT ''"], ['avulso', 'INTEGER DEFAULT 0'], ['pausado', 'INTEGER DEFAULT 0']]) {
     if (!db.prepare('PRAGMA table_info(contents)').all().some(x => x.name === col)) db.exec(`ALTER TABLE contents ADD COLUMN ${col} ${def}`);
   }
   FORMATOS_PADRAO.forEach((f, i) => run('INSERT OR IGNORE INTO formatos(id,nome,etapas,meta_dia,modo,ordem,updated_at) VALUES(?,?,?,?,?,?,?)', f.id, f.nome, JSON.stringify(f.etapas), f.meta, 'manual', i, T()));
@@ -167,7 +167,7 @@ export function criarFluxoV2(ctx) {
     return {
       id: c.id, titulo: c.title, marca: c.brand || '', produto_id: c.product_id || null, formato: c.format, tipo: c.kind, raia: raiaDe(c, ctx),
       status: c.status, ...e, estado_nome: ESTADOS[e.estado], etapa_nome: ETAPA_NOME[e.etapa] || e.etapa,
-      em_ajuste: !!c.em_ajuste, ajuste_motivo: c.ajuste_motivo || '', nota: c.score, post_url: c.post_url || '', postado_em: c.posted_at,
+      pausado: !!c.pausado, em_ajuste: !!c.em_ajuste, ajuste_motivo: c.ajuste_motivo || '', nota: c.score, post_url: c.post_url || '', postado_em: c.posted_at,
       tem_arte: c.art_status === 'ok', tem_video: !!c.video, tem_spec: !!c.spec, tem_art_spec: !!c.art_spec, atualizado: c.updated_at, criado: c.created_at,
       thumb: c.art_status === 'ok' ? `/api/contents/${c.id}/arte/file/1?review=1&t=${encodeURIComponent(c.updated_at)}` : ''
     };
@@ -417,11 +417,11 @@ export function criarFluxoV2(ctx) {
     // Fila: o que cada agente está fazendo agora e o que espera, na ordem em que vai ser feito
     if (p === '/api/v2/fila' && m === 'GET') {
       const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0;
-      const J = all(`SELECT j.id,j.agent,j.kind,j.status,j.origin,j.run_after,j.started_at,j.content_id,c.title,c.brand,c.created_by,c.status cst FROM jobs j LEFT JOIN contents c ON c.id=j.content_id
+      const J = all(`SELECT j.id,j.agent,j.kind,j.status,j.origin,j.run_after,j.started_at,j.content_id,c.title,c.brand,c.created_by,c.status cst,c.pausado FROM jobs j LEFT JOIN contents c ON c.id=j.content_id
         WHERE j.status IN ('queued','running') ORDER BY (j.status='running') DESC, (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id`);
       const ag = all('SELECT id,name,enabled FROM agents ORDER BY rowid');
       const voce = j => j.origin === 'manual' || ['manual', 'treino_designer', 'grade_aprovada'].includes(j.created_by) || ['chat', 'teste'].includes(j.kind);
-      const f = j => ({ job: j.id, id: j.content_id, titulo: j.title || ({ chat: 'Respondendo você no chat', pautas: 'Criando pautas', radar: 'Buscando notícias', cerebro: 'Consolidando o Cérebro', relatorio: 'Lendo as métricas' })[j.kind] || j.kind, marca: j.brand || '', voce: voce(j), sozinho: !voce(j) && !!j.content_id, quando: j.run_after && new Date(j.run_after) > new Date() ? j.run_after : null, desde: j.started_at });
+      const f = j => ({ job: j.id, id: j.content_id, titulo: j.title || ({ chat: 'Respondendo você no chat', pautas: 'Criando pautas', radar: 'Buscando notícias', cerebro: 'Consolidando o Cérebro', relatorio: 'Lendo as métricas' })[j.kind] || j.kind, marca: j.brand || '', voce: voce(j), sozinho: !voce(j) && !!j.content_id, quando: j.run_after && new Date(j.run_after) > new Date() ? j.run_after : null, desde: j.started_at, pausado: !!j.pausado });
       const P = new Set(ctx.agentesPausados?.() || []);
       return send(res, 200, { usadas, limite: +st.max_jobs_day, vagas: Math.max(1, +st.concurrency || 1), pausados: [...P], agentes: ag.map(a => ({ id: a.id, nome: a.name, ligado: !!a.enabled, pausado: P.has(a.id), agora: J.filter(j => j.agent === a.id && j.status === 'running').map(f), fila: J.filter(j => j.agent === a.id && j.status === 'queued').map(f) })),
         sozinhos: one(`SELECT COUNT(*) n FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer','grade_aprovada') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`).n });
@@ -435,6 +435,13 @@ export function criarFluxoV2(ctx) {
       run("INSERT OR REPLACE INTO settings(key,value) VALUES('agentes_pausados',?)", JSON.stringify([...P]));
       log(null, `Você ${b.pausar ? 'pausou' : 'retomou'} ${b.agente === '*' ? 'todos os agentes' : alvo[0]}`); changed(); ctx.pump?.();
       return send(res, 200, { pausados: [...P] });
+    }
+    // parar / continuar uma tarefa: fica parada onde está (sem ir para a lixeira) até o dono mandar continuar
+    if (p === '/api/v2/fila/item-pausa' && m === 'POST') {
+      const b = await readBody(req, 5000), c = getContent(+b.id); if (!c) throw fail(404, 'Item não encontrado');
+      run('UPDATE contents SET pausado=? WHERE id=?', b.pausar ? 1 : 0, c.id);
+      log(null, `Você ${b.pausar ? 'parou' : 'mandou continuar'} "${c.title}"`, c.id); changed(); ctx.pump?.();
+      return send(res, 200, { ok: true });
     }
     // descarta de uma vez o que foi criado sozinho e ainda não chegou na Mesa do dono (vai para a lixeira, dá para restaurar)
     if (p === '/api/v2/fila/limpar-sozinhos' && m === 'POST') {

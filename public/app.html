@@ -465,7 +465,7 @@ function porQueAguarda(i) {
   return `${f.pos}º na fila do ${quem}${f.ocupado ? ' (trabalhando em outra agora)' : ''}`;
 }
 function cartao(i) {
-  const sub = i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';
+  const sub = i.pausado ? 'parada por você · clique em Continuar na Fila' : i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';
   const vivo = (i.estado === 'etapa' || i.estado === 'ajuste') && !i.aguardando;   // agente trabalhando agora: ponto pulsando e barra correndo
   return `<button class="c ${CLS[i.estado]}${i.em_ajuste ? ' aj' : ''}${vivo ? ' vivo' : ''}" onclick="abrirItem(${i.id})">${esc(i.titulo)}<i>${vivo ? '<b class="pulso"></b>' : ''}${[i.marca, sub].filter(Boolean).map(esc).join(' · ')}</i>${vivo ? '<u class="corre"></u>' : ''}</button>`;
 }
@@ -531,7 +531,7 @@ async function escritorio3d(head, ban) {
 // Fila: o que cada agente está fazendo e o que espera, em ordem
 async function verFila() {
   const F = await api('/api/v2/fila');
-  const lin = (x, k) => `<div class="kvr"><span>${k ? `<b class="muted" style="width:26px;display:inline-block">${k}º</b>` : '<b class="pulso"></b>'}${x.id ? `<a href="#" onclick="fecha();abrirItem(${x.id});return false">${esc(x.titulo)}</a>` : esc(x.titulo)}${x.marca ? ` <span class="muted small">· ${esc(x.marca)}</span>` : ''}</span><span class="small ${x.voce ? 'gold' : 'muted'}">${x.voce ? 'pedido por você' : x.sozinho ? 'criado sozinho' : ''}${x.quando ? ' · agendado ' + fmtD(x.quando) : ''}${x.id && !k ? '' : x.id ? ` <button class="chip" style="padding:2px 8px" onclick="descFila(${x.id})" title="Para esta tarefa e tira da produção (fica na lixeira, dá para restaurar)">Parar</button>` : ''}</span></div>`;
+  const lin = (x, k) => `<div class="kvr"><span>${k ? `<b class="muted" style="width:26px;display:inline-block">${k}º</b>` : '<b class="pulso"></b>'}${x.id ? `<a href="#" onclick="fecha();abrirItem(${x.id});return false">${esc(x.titulo)}</a>` : esc(x.titulo)}${x.marca ? ` <span class="muted small">· ${esc(x.marca)}</span>` : ''}</span><span class="small ${x.voce ? 'gold' : 'muted'}">${x.voce ? 'pedido por você' : x.sozinho ? 'criado sozinho' : ''}${x.quando ? ' · agendado ' + fmtD(x.quando) : ''}${x.id ? `${x.pausado ? ' <b style="color:#ff7b7b">parada por você</b>' : ''} <button class="chip" style="padding:2px 8px" onclick="pausaItem(${x.id},${!x.pausado})">${x.pausado ? 'Continuar' : 'Parar'}</button>${k ? ` <button class="chip" style="padding:2px 8px" onclick="descFila(${x.id})">Descartar</button>` : ''}` : ''}</span></div>`;
   modal(`<div class="hd"><h2>Fila dos agentes</h2><span class="muted small">cada agente faz uma tarefa por vez, na ordem abaixo · o que você pede passa na frente</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
     <div class="box" style="margin-bottom:12px">${F.usadas} tarefas feitas hoje · até ${F.vagas} agentes trabalhando ao mesmo tempo · o volume vem só da Produção diária e do que você pedir</div>
     ${F.sozinhos ? `<div class="box" style="margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="flex:1"><b>${F.sozinhos}</b> peça(s) criadas sozinhas (pautas automáticas e notícias) ainda não chegaram na sua Mesa e ocupam a fila.</span><button class="btn sm dg" onclick="limparSozinhos(${F.sozinhos})">Descartar todas</button></div>` : ''}
@@ -540,7 +540,8 @@ async function verFila() {
   </div>`);
 }
 async function pausaAg(agente, pausar) { await tryDo(() => api('/api/v2/fila/pausa', { body: { agente, pausar } }), pausar ? 'Pausado' : 'Retomado'); verFila(); }
-async function descFila(id) { await tryDo(() => api(`/api/v2/itens/${id}/descartar`, { body: {} }), 'Parada (está na lixeira, dá para restaurar)'); verFila(); }
+async function pausaItem(id, pausar) { await tryDo(() => api('/api/v2/fila/item-pausa', { body: { id, pausar } }), pausar ? 'Parada: fica onde está até você mandar continuar' : 'Continuando'); verFila(); }
+async function descFila(id) { await tryDo(() => api(`/api/v2/itens/${id}/descartar`, { body: {} }), 'Descartado (fica na lixeira)'); verFila(); }
 async function limparSozinhos(n) { if (!confirm(`Descartar ${n} peça(s) criadas sozinhas? Vão para a lixeira; as que já chegaram para você revisar ficam.`)) return; const r = await tryDo(() => api('/api/v2/fila/limpar-sozinhos', { body: {} })); if (r) toast(r.descartados + ' descartada(s)'); verFila(); }
 // Treino do Designer: escolhe uma copy já aprovada e manda direto para a arte (sem roteiro novo)
 async function treinoDesigner() {
