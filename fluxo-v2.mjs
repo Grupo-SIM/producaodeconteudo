@@ -152,6 +152,13 @@ export function criarFluxoV2(ctx) {
     run("INSERT OR REPLACE INTO settings(key,value) VALUES('recomeco_v1','1')");
     if (L.length) { log(null, `Recomeço: ${L.length} pedido(s) antigos em andamento saíram da produção (estão na lixeira)`); changed(); }
   } catch (e) { console.error('recomeço:', e.message); } }, 5000).unref?.();
+  // uma vez só (dono, 14/11/2026: "começar do zero de verdade"): tudo o que não foi postado e foi criado até agora vai para a lixeira, inclusive Mesa e Publicação
+  setTimeout(() => { try { if (one("SELECT 1 x FROM settings WHERE key='recomeco_v2'")) return;
+    const L = all("SELECT id,status FROM contents WHERE teste=0 AND status NOT IN ('posted','discarded') AND created_at < '2026-11-14T06:30:00Z'");
+    for (const c of L) { run("DELETE FROM jobs WHERE content_id=? AND status IN ('queued','error')", c.id); setContent(c.id, { status: 'discarded', status_antes: c.status, em_ajuste: 0, pausado: 0 }); }
+    run("INSERT OR REPLACE INTO settings(key,value) VALUES('recomeco_v2','1')");
+    if (L.length) { log(null, `Recomeço do zero: ${L.length} peça(s) não postadas foram para a lixeira (dá para restaurar)`); changed(); }
+  } catch (e) { console.error('recomeço do zero:', e.message); } }, 5500).unref?.();
   ctx.metaDe = (brand, raia) => one('SELECT qtd FROM brand_metas WHERE brand=? COLLATE NOCASE AND raia=?', brand, raia)?.qtd || 0;
   // começa tudo zerado (decisão do dono, em treino): uma vez só, zera as metas que já existiam
   if (!one("SELECT 1 x FROM settings WHERE key='metas_zeradas_v1'")) { run('UPDATE brand_metas SET qtd=0'); run("INSERT OR REPLACE INTO settings(key,value) VALUES('metas_zeradas_v1','1')"); }
@@ -178,6 +185,8 @@ export function criarFluxoV2(ctx) {
     const porC = new Map(); for (const j of ativos) { if (!porC.has(j.content_id)) porC.set(j.content_id, []); porC.get(j.content_id).push(j); }
     const rows = all(`SELECT * FROM contents WHERE teste=0 ${marca ? 'AND brand=? COLLATE NOCASE' : ''} ${incluirDescartados ? '' : "AND status<>'discarded'"} AND (status<>'posted' OR posted_at>=?) ORDER BY updated_at DESC LIMIT 600`, ...(marca ? [marca] : []), new Date(Date.now() - 14 * 864e5).toISOString());
     const itens = rows.map(c => item(c, porC.get(c.id) || []));
+    // notícia tem 2 entregas: o post do Instagram (cards) aparece na raia Carrossel e a matéria do site na raia Matéria de jornal
+    for (const i of [...itens]) if (i.raia === 'materia' && i.tem_arte) { const c0 = rows.find(r => r.id === i.id); if (c0?.materia) { i.parte = 'materia'; itens.push({ ...i, raia: 'carrossel', parte: 'post' }); } else { i.raia = 'carrossel'; i.parte = 'post'; } }
     // por que está aguardando: posição na fila (mesma ordem do agendador) e quem está rodando agora
     const fila = all("SELECT j.id,j.content_id,j.kind,j.agent FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id", T());
     const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0, limite = 0;
