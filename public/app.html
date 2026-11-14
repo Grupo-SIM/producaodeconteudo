@@ -468,7 +468,7 @@ VIEWS.fluxo = () => {
   const nM = S.brands.length, aviso = F.avisos[0];
   const ban = F.avisos.length ? `<div class="prob"><b>${F.avisos.length} problema${F.avisos.length > 1 ? 's' : ''}</b><span>${esc(explica(aviso.motivo).titulo)} · ${esc(aviso.titulo)}${F.avisos.length > 1 ? ` e mais ${F.avisos.length - 1}` : ''}</span><button onclick="abreProblemas()">Resolver</button></div>` : '';
   const head = `<div class="top"><h1>Fluxo</h1><button class="chip ${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');E3?.destruir();E3=null;render()">Lista</button><button class="chip ${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span>
-    ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}${S.modoFluxo === 'escritorio' ? `<button class="chip" onclick="telao()">${store.get('telaoOn', true) ? 'Desligar telão' : 'Ligar telão'}</button><button class="chip" onclick="trocaVideo()">Vídeo</button><button class="chip" id="btnTela" onclick="telaCheia()">${document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia'}</button>` : `<button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button>`}</div>`;
+    ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}${S.modoFluxo === 'escritorio' ? `<button class="chip" onclick="telao()">${store.get('telaoOn', true) ? 'Desligar telão' : 'Ligar telão'}</button><button class="chip" onclick="trocaVideo()">Vídeo</button><button class="chip" id="btnTela" onclick="telaCheia()">${document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia'}</button>` : `<button class="chip" onclick="treinoDesigner()">Treino do Designer</button><button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button>`}</div>`;
   if (S.modoFluxo === 'escritorio') return escritorio3d(head, ban);
   E3?.destruir(); E3 = null;
   const lanes = F.formatos.filter(f => f.ativo).map(f => {
@@ -521,6 +521,16 @@ async function escritorio3d(head, ban) {
   } catch (e) { $('#esc').innerHTML = `<div class="empty">Sem 3D neste aparelho (${esc(e.message)}).</div>`; }
   finally { S.e3carregando = false; }
 }
+// Treino do Designer: escolhe uma copy já aprovada e manda direto para a arte (sem roteiro novo)
+async function treinoDesigner() {
+  const [{ pecas }, { brands }] = await Promise.all([api('/api/v2/treino-designer'), api('/api/brands')]); S._td = pecas;
+  const FMT = { carrossel: 'Carrossel', feed: 'Feed', stories: 'Stories', video_vertical: 'Reels (Editor)', '': 'Blog (sem arte)' };
+  const grupos = [...new Set(pecas.map(x => x.secao))];
+  modal(`<div class="hd"><h2>Treino do Designer</h2><span class="muted small">copy aprovada vira arte, sem escrever roteiro novo</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
+    ${grupos.map(g => `<h5 style="margin:14px 0 6px">${esc(g)}</h5>` + pecas.filter(x => x.secao === g).map(x => `<div class="kvr"><span><b>${esc(x.n)}.</b> ${esc(x.titulo)} <span class="muted small">· ${esc(x.nicho)} · ${FMT[x.format] || x.format}</span></span><span style="display:flex;gap:6px;align-items:center">${x.format ? (x.enviado ? `<button class="chip" onclick="fecha();abrirItem(${x.enviado.id})">Ver (já enviado)</button>` : `<select class="f" id="tdm${esc(x.n)}" style="width:170px;padding:4px 8px">${x.marca ? '' : '<option value="">Marca…</option>'}${brands.map(b => `<option ${b.name === x.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select><button class="chip gold" onclick="mandaTreino('${esc(x.n)}')">Mandar</button>`) : '<span class="muted small">sem arte</span>'}</span></div>`).join('')).join('')}
+  </div><div class="ft"><span class="muted small" style="margin-right:auto">A peça entra no Fluxo direto na etapa de arte. Você corrige na Mesa de revisão e as correções viram regra do Designer.</span></div>`);
+}
+async function mandaTreino(n) { const brand = $('#tdm' + n)?.value; if (!brand) return toast('Escolha a marca'); const r = await tryDo(() => api('/api/v2/treino-designer', { body: { n, brand } }), 'Enviado para o Designer'); if (r) treinoDesigner(); }
 function telao() { const on = !store.get('telaoOn', true); store.set('telaoOn', on); E3?.telaoVideo(on ? store.get('telao2', 'GG1XOAZ9Vd0') : ''); event.target.textContent = on ? 'Desligar telão' : 'Ligar telão'; }
 function trocaVideo() { const u = prompt('Link ou ID do vídeo do YouTube para o telão', store.get('telao2', 'GG1XOAZ9Vd0')); const id = ytId(u); if (!id) return; store.set('telao2', id); store.set('telaoOn', true); E3?.telaoVideo(id); }
 document.addEventListener('fullscreenchange', () => { const b = $('#btnTela'); if (b) b.textContent = document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia'; });

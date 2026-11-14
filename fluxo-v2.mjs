@@ -323,10 +323,43 @@ export function criarFluxoV2(ctx) {
   }
   setInterval(() => { try { if (new Date().getDay() === 1 && new Date().getHours() === 8) gerarDescobertas(); exportarAprendido(); } catch (e) { console.error('fluxo-v2 rotina:', e.message); } }, 3600e3).unref();
 
+  // lê as peças aprovadas no treino do Roteirista, com o formato de cada seção
+  function pecasAprovadas() {
+    let md = ''; try { md = fsx.readFileSync(path.join(ctx.dirname, 'carrosseis-aprovados-producao.md'), 'utf8'); } catch { return []; }
+    const SEC = [[/^Educativo/i, 'carrossel', 'educativo'], [/^Hist[óo]ria real/i, 'carrossel', 'historia_real'], [/^Est[áa]tico/i, 'feed', 'educativo'], [/^Stories/i, 'stories', 'venda'], [/^Posts? de venda/i, 'carrossel', 'venda'], [/^Educativos aprovados/i, 'carrossel', 'educativo'], [/^Reels/i, 'video_vertical', 'educativo'], [/^Mat[ée]rias?/i, 'feed', 'noticia'], [/^Posts? de blog/i, '', 'texto']];
+    const marcas = all('SELECT name FROM brands').map(x => x.name), usados = new Map(all("SELECT id, brief, status FROM contents WHERE created_by='treino_designer'").map(c => [(c.brief.match(/nº (\w+)/) || [])[1], c]));
+    const out = []; let sec = null, cur = null;
+    for (const l of md.split('\n')) {
+      const h2 = l.match(/^## (.+)/), h3 = l.match(/^### (\w+)\.\s*(.+)/);
+      if (h2 && !cur?.dentroMateria) { const k = SEC.find(([re]) => re.test(h2[1])); if (k || /^N[ãa]o inclu/i.test(h2[1])) { sec = k ? { nome: h2[1].trim(), format: k[1], kind: k[2] } : null; cur = null; continue; } }
+      if (h3) { cur = null; if (!sec) continue; const t = h3[2].trim(), marca = marcas.find(mm => t.toLowerCase().includes(mm.toLowerCase())) || '';
+        let format = sec.format, kind = sec.kind; if (format === 'video_vertical') kind = /venda/i.test(t) ? 'venda' : /institucional/i.test(t) ? 'institucional' : 'educativo';
+        const u = usados.get(h3[1]);
+        cur = { n: h3[1], titulo: t.replace(/^[^:]{2,40}:\s*/, '').replace(/\s*\(.*?\)\s*,?\s*aprovad[oa].*$/i, '').replace(/,\s*aprovad[oa].*$/i, '').trim(), secao: sec.nome, nicho: t.split(':')[0], format, kind, marca, enviado: u ? { id: u.id, status: u.status } : null, texto: '' }; out.push(cur); continue; }
+      if (cur) cur.texto += l + '\n';
+    }
+    return out;
+  }
+
   async function rota(req, res, p, m, user) {
     let mt;
     if (p === '/api/v2/fluxo' && m === 'GET') { const u = new URL(req.url, 'http://x'); return send(res, 200, fluxo({ marca: u.searchParams.get('marca') || '', incluirDescartados: u.searchParams.get('lixeira') === '1' })); }
     if (p === '/api/v2/novo-formatos' && m === 'GET') { try { return send(res, 200, { formatos: JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'formatos-novo-conteudo.json'), 'utf8')) }); } catch { return send(res, 200, { formatos: [] }); } }
+    // Treino do Designer: copy já aprovada (carrosseis-aprovados-producao.md) vai direto para a arte, sem escrever roteiro novo
+    if (p === '/api/v2/treino-designer' && m === 'GET') return send(res, 200, { pecas: pecasAprovadas().map(({ texto, ...x }) => x) });
+    if (p === '/api/v2/treino-designer' && m === 'POST') {
+      const b = await readBody(req, 20000), pc = pecasAprovadas().find(x => x.n === String(b.n)); if (!pc) throw fail(404, 'Peça aprovada não encontrada');
+      if (!pc.format) throw fail(400, 'Este formato não tem arte (post de blog)');
+      const br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || pc.marca || '')); if (!br) throw fail(400, 'Escolha a marca');
+      const leg = (pc.texto.match(/^Legenda:\s*([\s\S]*?)(?:\n\s*\n|$)/m) || [])[1] || '';
+      const script = pc.texto.replace(/^Legenda:[\s\S]*?(?:\n\s*\n|$)/m, '').trim();
+      const r = run("INSERT INTO contents(title,format,kind,platform,brief,goal,brand,status,script,caption,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        pc.titulo, pc.format, pc.kind, 'instagram', `Treino do Designer: copy aprovada nº ${pc.n} (${pc.secao}). Não reescreva a copy: dê vida a ela.`, '', br.name, 'producing', script, leg.trim(), 'treino_designer', T(), T());
+      const id = +r.lastInsertRowid, ag = pc.format === 'video_vertical' ? 'editor' : 'designer';
+      ctx.enqueue(id, ag, ag === 'designer' ? 'arte' : 'video', {}, 'manual');
+      log(null, `Treino do Designer: copy aprovada nº ${pc.n} "${pc.titulo}" enviada para ${ag === 'designer' ? 'o Designer' : 'o Editor'} (${br.name})`, id); changed();
+      return send(res, 200, { id });
+    }
     if (p === '/api/v2/metas' && m === 'GET') return send(res, 200, { metas: all('SELECT * FROM brand_metas'), formatos: novoFormatos(), autopilot: ctx.settings().autopilot === '1' });
     if (p === '/api/v2/metas' && m === 'PUT') {
       const b = await readBody(req, 20000), br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || '')); if (!br) throw fail(400, 'Marca não encontrada');
