@@ -180,7 +180,7 @@ export function criarFluxoV2(ctx) {
       status: c.status, ...e, estado_nome: ESTADOS[e.estado], etapa_nome: ETAPA_NOME[e.etapa] || e.etapa,
       pausado: !!c.pausado, em_ajuste: !!c.em_ajuste, ajuste_motivo: c.ajuste_motivo || '', nota: c.score, post_url: c.post_url || '', postado_em: c.posted_at,
       tem_arte: c.art_status === 'ok', tem_video: !!c.video, tem_spec: !!c.spec, tem_art_spec: !!c.art_spec, atualizado: c.updated_at, criado: c.created_at,
-      thumb: c.art_status === 'ok' ? `/api/contents/${c.id}/arte/file/1?review=1&t=${encodeURIComponent(c.updated_at)}` : ''
+      thumb: c.art_status === 'ok' || (!c.art_status && c.art_spec && c.post_em) ? `/api/contents/${c.id}/arte/file/1?review=1&t=${encodeURIComponent(c.art_status === 'ok' ? c.updated_at : c.post_em || c.created_at)}` : ''   // enquanto a arte nova é gerada, fica a imagem anterior (sem piscar o texto)
     };
   }
 
