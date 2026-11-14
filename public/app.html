@@ -759,7 +759,7 @@ async function copiaVp() { try { await navigator.clipboard.writeText(S._vp.txt);
 async function baixaPdf() {
   const { d } = S._vp; toast('Gerando o PDF…');
   try {
-    if (!window.jspdf) await new Promise((ok, erro) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; sc.onload = ok; sc.onerror = () => erro(new Error('não carregou o gerador de PDF')); document.head.appendChild(sc); });
+    if (!window.jspdf) await new Promise((ok, erro) => { const sc = document.createElement('script'); sc.src = '/jspdf.umd.min.js'; sc.onload = ok; sc.onerror = () => erro(new Error('não carregou o gerador de PDF')); document.head.appendChild(sc); });
     const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' }), L = 56, W = doc.internal.pageSize.getWidth() - 2 * L, Hp = doc.internal.pageSize.getHeight();
     let y = 64;
     const escreve = (txt, tam, neg, cor = 20, esp = 1.45) => { doc.setFont('helvetica', neg ? 'bold' : 'normal'); doc.setFontSize(tam); doc.setTextColor(cor); for (const ln of doc.splitTextToSize(txt, W)) { if (y > Hp - 56) { doc.addPage(); y = 64; } doc.text(ln, L, y); y += tam * esp; } };
