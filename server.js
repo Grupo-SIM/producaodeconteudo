@@ -5486,6 +5486,7 @@ const HANDLERS = {
     const txt = String(r.text || '').replace(/^```[a-z]*\n?|```\s*$/g, '').trim(); if (txt.length < 200 || !/^#\s/m.test(txt)) throw new Error('O Copy não devolveu a matéria completa');
     setContent(c.id, { materia: txt, materia_aprovada: '' });   // volta para a Mesa só a matéria; o post e a arte não mudam de etapa
     log('roteirista', `Ajustou a matéria do site como você pediu: "${c.title}" (está na Mesa para você aprovar)`, c.id);
+    addChat('gerente', `O Copy ajustou a matéria do site de “${c.title}” como você pediu. O post e a arte não mudaram. A matéria está na Mesa para você aprovar.`);
     return r;
   },
   async encurtar(job, c) {
@@ -5508,7 +5509,8 @@ const HANDLERS = {
     if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && /\b(foto|imagem|fundo)\b/i.test(input.feedback || '') && /\b(troc|mud|outr|substitu|alter)/i.test(input.feedback || '')) {
       const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
       const r = await trocaFotoNoticia(c, pg);
-      if (r.ok) return { text: `Foto de fundo da ${pg ? 'contracapa' : 'capa'} trocada (${r.nome})`, tin: 0, tout: 0 };
+      if (r.ok) { addChat('gerente', `Troquei a foto de fundo da ${pg ? 'contracapa' : 'capa'} de “${c.title}”, como você pediu: busquei uma foto nova do assunto, sem texto e diferente das já usadas. O resto da arte ficou igual. Está na Mesa para você ver.`); return { text: `Foto de fundo da ${pg ? 'contracapa' : 'capa'} trocada (${r.nome})`, tin: 0, tout: 0 }; }
+      addChat('gerente', `Não consegui trocar a foto de “${c.title}”: ${r.erro}. Se quiser, envie uma foto pela Biblioteca no editor da arte.`);
       log('designer', `Não consegui trocar a foto de "${c.title}": ${r.erro}. Envie a foto pela Biblioteca no editor.`, c.id);
       setContent(c.id, { art_note: `Pedido de nova foto: ${r.erro}. Envie a foto pela Biblioteca no editor.` });
       return { text: r.erro, tin: 0, tout: 0 };
