@@ -28,3 +28,8 @@ Vale para toda notícia (capa + contracapa). Só arte: a copy não muda. Modelos
 - Logo da marca centralizada no alto; foto única grande; pílula na cor da marca com o site da marca acima do título;
 - título em fonte sem serifa grossa, em caixa normal (não maiúscula), branco, centralizado; nome da marca enorme vazado (só contorno) atrás do título; "Siga @marca no Instagram" pequeno no rodapé.
 - Ainda não existe como modelo no painel: usar o estilo Zyrion até o dono pedir este.
+
+## Correções do dono (teste 37, Seguidores em Alta, 14/11/2026)
+- **Foto sem letras nem números.** A foto de fundo (capa e contracapa) é uma imagem limpa: nada de cartaz, print de tela, banner, flyer, documento ou qualquer foto com texto ou número. O post já tem manchete, logo e textos; letra sobre letra fica ilegível. Na dúvida, troque a foto.
+- **Foto que para o dedo.** Chocante, polêmica ou forte, e ligada ao assunto da manchete (ex.: notícia de IA e adolescentes: um adolescente no celular, rosto iluminado pela tela, clima de vigilância/IA). Foto genérica, de palestra ou de pessoa que não tem nada a ver com a notícia não serve.
+- **Texto que cabe.** Capa: no máximo 100 caracteres (até 4 linhas na arte). Contracapa (texto + chamada do cartão): no máximo 130 caracteres. Se o texto aprovado passar disso, a arte NÃO corta: a peça volta para o Copy dizer a mesma coisa com menos palavras e depois a arte é refeita.

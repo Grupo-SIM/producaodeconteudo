@@ -17,5 +17,6 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - No treino, a peça vai direto para a Mesa do dono: uma chamada do Designer, sem inspeção visual, sem refazer automático e sem as rodadas do Revisor.
 
 ## Correções do dono
+- 14/11/2026 · Teste 37 (Zyrion): foto de fundo sem letras/números; foto chocante e ligada ao assunto; capa até 100 caracteres e contracapa até 130, texto maior volta para o Copy encurtar; no editor, o fundo pode ser apagado (clique no fundo + Delete ou botão).
 - 14/11/2026 · Feed jornalístico: referências Zyrion (capa dividida, foto + círculo, foto única; contracapa com cartão de post do X) e Nuvo. Base `09-feed-jornalistico.md`; fotos de banco em alta, vivas; preto e branco em notícia triste.
 (registrar aqui e na base do Designer a cada rodada)

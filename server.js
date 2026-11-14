@@ -337,7 +337,7 @@ async function callAssinatura({ system, content, images = [], model, search }) {
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 if (!API_KEY) assinaturaStatus().then(a => { if (a.connected) console.log(`Assinatura do Claude conectada (${a.email || 'conta'}): agentes rodam sozinhos.`); });
-const STAGE_LABEL = { seo: 'Agente de SEO revisando a matéria', radar: 'Agente de Notícias pesquisando', estilo: 'Designer aprendendo o estilo de arte', roteiro: 'Roteirista escrevendo', revisao: 'Revisor revisando o roteiro', arte: 'Designer criando a arte', video: 'Editor montando a decupagem', pacote: 'Social Media montando o pacote', gerencia: 'Revisor revisando a entrega', pautas: 'Gerente definindo as pautas', relatorio: 'Gerente lendo as métricas', cerebro: 'Cérebro consolidando o aprendizado', chat: 'Gerente respondendo a você', teste: 'Teste de agente pedido por você' };
+const STAGE_LABEL = { encurtar: 'Roteirista encurtando o texto para caber na arte', seo: 'Agente de SEO revisando a matéria', radar: 'Agente de Notícias pesquisando', estilo: 'Designer aprendendo o estilo de arte', roteiro: 'Roteirista escrevendo', revisao: 'Revisor revisando o roteiro', arte: 'Designer criando a arte', video: 'Editor montando a decupagem', pacote: 'Social Media montando o pacote', gerencia: 'Revisor revisando a entrega', pautas: 'Gerente definindo as pautas', relatorio: 'Gerente lendo as métricas', cerebro: 'Cérebro consolidando o aprendizado', chat: 'Gerente respondendo a você', teste: 'Teste de agente pedido por você' };
 
 const FORMAT_GUIDE = {
   video_vertical: 'Vídeo vertical 9:16 (Reels, TikTok, Shorts), 20–60 s. Seções: ## GANCHO (primeiros 3 s: fala + texto na tela), ## ROTEIRO (cena a cena, com tempo, fala/narração e ação visual), ## CTA, ## LEGENDA (texto pronto para postar, primeira linha forte).',
@@ -4718,7 +4718,14 @@ async function radarGarantiFoto2(c) {   // REGRA: puxa 5-6 imagens do assunto, e
     const p = salvaFotoRadar(it, r, 'busca na internet', '', '-2'); run('UPDATE radar_items SET foto2_asset=? WHERE id=?', p.name, it.id);
   } catch { /* sem 2ª foto: a contracapa usa o fundo da marca */ }
 }
-function textoContracapa(c) {   // REGRA: texto CURTO (resumo de até ~95 caracteres + chamada curta), como o post pequeno do X
+// partes do post de notícia escritas pelo Copy: "Capa: ...", "Contracapa: ... Chamada: ..."
+const LIM_CAPA_NOTICIA = 100, LIM_CARD_NOTICIA = 130;   // medidos na arte (capa em até 4 linhas; cartão da contracapa sem cortar frase)
+function partesNoticia(script) {
+  const t = String(script || ''), capa = (t.match(/Capa:\s*([^\n]+)/i) || [])[1] || '', cc = (t.match(/Contracapa:\s*([^\n]+)/i) || [])[1] || '';
+  const [contra, chamada = ''] = cc.split(/\s*Chamada:\s*/i); return { capa: capa.trim(), contra: (contra || '').trim(), chamada: chamada.trim() };
+}
+function textoContracapa(c) {
+  { const p = partesNoticia(c.script); if (p.contra) return [p.contra, p.chamada ? p.chamada.replace(/(siga[^.!?]*)/i, '*$1*') : ''].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim(); }   // o texto que o Copy escreveu para a contracapa, inteiro   // REGRA: texto CURTO (resumo de até ~95 caracteres + chamada curta), como o post pequeno do X
   const it = one('SELECT * FROM radar_items WHERE content_id=?', c.id) || {};
   let cap = String(parseCaption(c.script) || c.caption || '').replace(/#\S+/g, ' ').replace(/^\s*(fonte|cr[eé]dito|foto)\s*:.*$/gim, ' ').replace(/https?:\/\/\S+/g, ' ').replace(/[*_]+/g, '').replace(/\s+/g, ' ').trim();
   if (cap.length < 40) cap = limpaTituloFonte(xmlDec(String(it.snippet || ''))).replace(/\s+/g, ' ').trim();
@@ -5400,8 +5407,25 @@ const HANDLERS = {
     return r;
   },
 
+  // o Copy diz a mesma coisa com menos palavras para caber na arte (pedido do Designer); depois a arte é refeita
+  async encurtar(job, c) {
+    const i = JSON.parse(job.input || '{}');
+    const user = `# TAREFA\nO Designer não conseguiu encaixar o texto do post desta notícia na arte. Reescreva dizendo EXATAMENTE a mesma coisa, com os mesmos fatos, em menos palavras. Não invente nada, não mude o sentido, mantenha o tom de manchete.\n\nLimites (contando espaços):\n- capa: no máximo ${LIM_CAPA_NOTICIA} caracteres\n- contracapa + chamada juntas: no máximo ${LIM_CARD_NOTICIA} caracteres\n\nCAPA ATUAL (${i.capa.length}): ${i.capa}\nCONTRACAPA ATUAL: ${i.contra}\nCHAMADA ATUAL: ${i.chamada}\n\nResponda só com o bloco:\n\`\`\`json\n{"capa":"...","contracapa":"...","chamada":"..."}\n\`\`\``;
+    const r = await callClaude({ agent: agentRow('roteirista'), user, maxTokens: 800 });
+    const j = jparse((String(r.text).match(/\{[\s\S]*\}/) || [])[0], null); if (!j?.capa) throw new Error('O Copy não devolveu o texto curto no formato pedido');
+    let sc = String(c.script || '');
+    sc = sc.replace(/(Capa:\s*)[^\n]+/i, (m, a) => a + String(j.capa).trim());
+    if (j.contracapa) sc = sc.replace(/(Contracapa:\s*)[^\n]+/i, (m, a) => a + String(j.contracapa).trim() + (j.chamada ? ' Chamada: ' + String(j.chamada).trim() : ''));
+    setContent(c.id, { script: sc });
+    log('roteirista', `Encurtou o texto do post para caber na arte: capa ${String(j.capa).length} caracteres`, c.id);
+    enqueue(c.id, 'designer', 'arte', { encurtado: true }, 'manual');
+    return r;
+  },
   async arte(job, c) {
     const input = JSON.parse(job.input || '{}');
+    // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
+    if (c.kind === 'noticia' && !input.encurtado) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
+      if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada }, 'manual'); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
     if (input.feedback && (c.art || c.art_spec)) user += `\n\n# VERSÃO ANTERIOR\n${c.art}${c.art_spec ? '\n\n# ESPECIFICAÇÃO VISUAL ANTERIOR (JSON)\n```json\n' + c.art_spec + '\n```\nMantenha tudo o que não foi pedido para mudar (textos, cores, prompts de fundo "gen" idênticos) e altere somente o que os ajustes pedem.' : ''}\n\n# AJUSTES PEDIDOS ${input.from === 'dono' ? 'PELO DONO (prioridade máxima; o roteiro e os textos continuam os mesmos, ajuste a diagramação e os elementos visuais)' : input.from === 'sistema' ? 'PELO SISTEMA' : 'PELO REVISOR'} (aplique todos e entregue a direção de arte completa de novo, com a especificação visual em JSON)\n${input.feedback}`;

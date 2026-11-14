@@ -4579,6 +4579,8 @@ async function arteEditor(id, onClose, opts = {}) {
     markDirty(); drawPanel(); repaint();
   };
   const stepLayer = (id, dir) => { const lst = AS.camadas(cur()), i = lst.findIndex(l => l.id === id); if (i < 0) return; moveLayer(id, i - dir); };
+  // fundo selecionado (clique no fundo): Delete ou o botão apagam a imagem; fica o fundo branco liso para pôr outra imagem por cima nas camadas, como no Canva
+  const apagaFundo = () => { const s = cur(); if (!s.bg || !(s.bg.asset || s.bg.src || s.bg.gen || s.bg.banco)) return; pushUndo(); s.bg = { color: '#ffffff' }; s.shade = 0; markDirty(); repaint(); drawStrip(); drawPanel(); toast('Imagem do fundo apagada'); };
   const selSys = id => { E.sel = null; E.multi = null; E.sys = id; E.sysSi = E.si; drawOverlay(); drawPanel(); };
   const FX_NOVOS = [['glows', 'Brilho de cor'], ['tint', 'Tinta de cor'], ['vignette', 'Vinheta'], ['grain', 'Granulado'], ['fade', 'Degradê de leitura']];
   const addFx = id => {
@@ -4676,7 +4678,7 @@ async function arteEditor(id, onClose, opts = {}) {
     return h('div', { class: 'g' }, h('h4', null, 'Fundo do slide ' + (E.si + 1)), seg([['cor', 'Cor'], ['grad', 'Degradê'], ['img', 'Imagem'], ['ia', 'Por IA']], tipo, setTipo),
       t === 'cor' ? h('div', { class: 'g' }, colorF('Cor do fundo', () => s.bg.color, v => { s.bg.color = v; }, data.defaults.paper), colorF('Brilho (degradê)', () => s.bg.color2, v => { s.bg.color2 = v; }, data.defaults.accent)) : null,
       t === 'grad' ? gradUI : null,
-      t === 'img' ? h('div', { class: 'g' }, h('div', { class: 'small mut' }, 'Imagem: ' + s.bg.asset), h('div', { class: 'row' }, h('button', { class: 'btn sm', onclick: () => setTipo('x') }, 'Trocar imagem'), h('button', { class: 'btn sm', onclick: () => setTipo('grad') }, 'Voltar ao degradê'))) : null,
+      t === 'img' ? h('div', { class: 'g' }, h('div', { class: 'small mut' }, 'Imagem: ' + s.bg.asset), h('div', { class: 'row' }, h('button', { class: 'btn sm', onclick: () => setTipo('x') }, 'Trocar imagem'), h('button', { class: 'btn sm', onclick: () => setTipo('grad') }, 'Voltar ao degradê'), h('button', { class: 'btn sm', style: 'color:#ff8a8a', onclick: () => apagaFundo() }, 'Apagar imagem do fundo'))) : null,
       t === 'ia' ? h('label', { class: 'c' }, 'Descrição da imagem (em inglês, sem texto nem pessoas reais)', ta, h('span', { class: 'small', style: { color: data.fal ? 'var(--mut)' : 'var(--warn)' } }, data.fal ? 'A imagem é gerada ao salvar (consome créditos do fal.ai) e fica guardada para não gerar de novo.' : 'A geração por IA está desligada: ao salvar, o fundo sai liso.')) : null,
       t === 'img' || t === 'ia' ? filtrosUI(s.bg) : null,
       E.spec.slides.length > 1 ? h('label', { class: 'c' }, h('span', null, h('input', { type: 'checkbox', checked: s.pager !== false, onchange: e => edit('', () => { s.pager = e.target.checked; }) }), ' Mostrar os pontinhos de página')) : null);
@@ -4991,7 +4993,7 @@ async function arteEditor(id, onClose, opts = {}) {
     if (ctrl && key === 'g') { e.preventDefault(); e.shiftKey ? desagrupar() : agrupar(); return; }
     if (!ctrl && (e.key === '+' || e.key === '=')) { setZoom((E.zm || 1) * 1.2); return; } if (!ctrl && e.key === '-') { setZoom((E.zm || 1) / 1.2); return; } if (!ctrl && e.key === '0') { setZoom(1); return; }
     if (ctrl && key === 'z') { e.preventDefault(); e.shiftKey ? doRedo() : doUndo(); } else if (ctrl && key === 'y') { e.preventDefault(); doRedo(); }
-    else if (ctrl && key === 'd') { e.preventDefault(); dupSel(); } else if (e.key === 'Delete' || e.key === 'Backspace') { if (selList().length) { e.preventDefault(); removeSel(); } } else if (e.key === 'Escape') select(null);
+    else if (ctrl && key === 'd') { e.preventDefault(); dupSel(); } else if (e.key === 'Delete' || e.key === 'Backspace') { if (selList().length) { e.preventDefault(); removeSel(); } else if (E.sys === 'bg') { e.preventDefault(); apagaFundo(); } } else if (e.key === 'Escape') select(null);
     else if (selList().length && e.key.startsWith('Arrow')) { e.preventDefault(); const st = e.shiftKey ? 10 : 1; pushUndo('nudge'); for (const m of selList()) { const o = getObj(m.kind, m.k); if (e.key === 'ArrowLeft') o.x = r2(clamp(o.x - st / W, -4, 5)); if (e.key === 'ArrowRight') o.x = r2(clamp(o.x + st / W, -4, 5)); if (e.key === 'ArrowUp') o.y = r2(clamp(o.y - st / H, -4, 5)); if (e.key === 'ArrowDown') o.y = r2(clamp(o.y + st / H, -4, 5)); } markDirty(); soft(); drawPanel(); }
     else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); const j = clamp(E.si + (e.key === 'PageDown' ? 1 : -1), 0, E.spec.slides.length - 1); if (j !== E.si) { E.si = j; E.sel = null; E.multi = null; drawPanel(); repaint(); drawStrip(true); } }
     else if (ctrl && key === 'c' && selList().length) { e.preventDefault(); S.artClip = selList().map(m => ({ kind: m.kind, o: JSON.parse(JSON.stringify(getObj(m.kind, m.k))) })); toast(S.artClip.length + ' elemento(s) copiado(s). Ctrl+V cola neste ou em outro slide', 'ok'); }

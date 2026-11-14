@@ -89,3 +89,7 @@ Imagem: descrição da foto + texto alternativo (alt) descritivo, com o assunto.
 - Publicar notícia sem fonte, ou com uma fonte só sem dizer "segundo".
 - Crime violento, tragédia, vítima, política partidária (mesma regra das manchetes).
 - Copiar parágrafo de outro site.
+
+## Tamanho do post da notícia (correção do dono, 14/11/2026)
+- Capa do post: no máximo 100 caracteres, contando espaços. Contracapa (texto + chamada): no máximo 130. É o que cabe na arte sem cortar.
+- Quando o Designer devolver por tamanho: diga exatamente a mesma coisa, com os mesmos fatos, em menos palavras. Não invente, não mude o sentido.
