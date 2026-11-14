@@ -5242,7 +5242,8 @@ async function arteEditor(id, onClose, opts = {}) {
     TPLS = null; toast('Pronto: a página ' + (E.si + 1) + ' virou o template “' + nome + '” (está em Templates › Meus templates)', 'ok'); toggleTpl(true);
   });
   addEventListener('message', ev => { if (ev.origin === location.origin && ev.data?.acao === 'virarTemplate') virarTemplate(); });
-  const apagaTpl = guard(async t => { if (!confirm('Excluir o template “' + t.nome + '”? ' + (t.custom ? 'Ele vai para a lixeira.' : 'Ele some da lista (dá para restaurar os prontos).'))) return; await api('/tpl-paginas/' + (t.custom ? t.id : 'pronto:' + tplChave(t)), 'DELETE'); if (E.tplEd && ((t.custom && E.tplEd.id === t.id) || E.tplEd.base === tplChave(t))) E.tplEd = null; TPLS = null; tpl.paint(); toast('Template excluído'); });
+  const confirma = (titulo, texto, ok) => new Promise(res => modal(titulo, h('p', { style: { margin: '4px 0 0', lineHeight: 1.5 } }, texto), [h('button', { class: 'btn', onclick: () => { closeModal(); res(false); } }, 'Cancelar'), h('button', { class: 'btn primary', onclick: () => { closeModal(); res(true); } }, ok)]));   // confirmação dentro do sistema (não a janela do navegador)
+  const apagaTpl = guard(async t => { if (!(await confirma('Excluir template', 'Excluir o template “' + t.nome + '”? ' + (t.custom ? 'Ele vai para a lixeira.' : 'Ele some da lista (no fim da lista dá para mostrar os prontos de novo).'), 'Excluir'))) return; await api('/tpl-paginas/' + (t.custom ? t.id : 'pronto:' + tplChave(t)), 'DELETE'); if (E.tplEd && ((t.custom && E.tplEd.id === t.id) || E.tplEd.base === tplChave(t))) E.tplEd = null; TPLS = null; tpl.paint(); toast('Template excluído'); });
   tpl.paint = async () => {
     if (!MODS) { try { MODS = (await api('/arte-modelos')).modelos; } catch { MODS = []; } }
     if (!TPLS) { try { TPLS = await api('/tpl-paginas'); } catch { TPLS = { itens: [], ocultos: [] }; } }
