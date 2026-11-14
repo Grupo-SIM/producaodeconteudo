@@ -422,8 +422,19 @@ export function criarFluxoV2(ctx) {
       const ag = all('SELECT id,name,enabled FROM agents ORDER BY rowid');
       const voce = j => j.origin === 'manual' || ['manual', 'treino_designer', 'grade_aprovada'].includes(j.created_by) || ['chat', 'teste'].includes(j.kind);
       const f = j => ({ job: j.id, id: j.content_id, titulo: j.title || ({ chat: 'Respondendo você no chat', pautas: 'Criando pautas', radar: 'Buscando notícias', cerebro: 'Consolidando o Cérebro', relatorio: 'Lendo as métricas' })[j.kind] || j.kind, marca: j.brand || '', voce: voce(j), sozinho: !voce(j) && !!j.content_id, quando: j.run_after && new Date(j.run_after) > new Date() ? j.run_after : null, desde: j.started_at });
-      return send(res, 200, { usadas, limite: +st.max_jobs_day, vagas: Math.max(1, +st.concurrency || 1), agentes: ag.map(a => ({ id: a.id, nome: a.name, ligado: !!a.enabled, agora: J.filter(j => j.agent === a.id && j.status === 'running').map(f), fila: J.filter(j => j.agent === a.id && j.status === 'queued').map(f) })).filter(a => a.agora.length || a.fila.length),
+      const P = new Set(ctx.agentesPausados?.() || []);
+      return send(res, 200, { usadas, limite: +st.max_jobs_day, vagas: Math.max(1, +st.concurrency || 1), pausados: [...P], agentes: ag.map(a => ({ id: a.id, nome: a.name, ligado: !!a.enabled, pausado: P.has(a.id), agora: J.filter(j => j.agent === a.id && j.status === 'running').map(f), fila: J.filter(j => j.agent === a.id && j.status === 'queued').map(f) })),
         sozinhos: one(`SELECT COUNT(*) n FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer','grade_aprovada') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`).n });
+    }
+    // pausar / retomar agente (ou todos): não pega tarefa nova; a que já começou termina
+    if (p === '/api/v2/fila/pausa' && m === 'POST') {
+      const b = await readBody(req, 5000), ids = all('SELECT id FROM agents').map(a => a.id);
+      let P = new Set(ctx.agentesPausados?.() || []);
+      const alvo = b.agente === '*' ? ids : ids.includes(b.agente) ? [b.agente] : []; if (!alvo.length) throw fail(400, 'Agente não encontrado');
+      for (const a of alvo) b.pausar ? P.add(a) : P.delete(a);
+      run("INSERT OR REPLACE INTO settings(key,value) VALUES('agentes_pausados',?)", JSON.stringify([...P]));
+      log(null, `Você ${b.pausar ? 'pausou' : 'retomou'} ${b.agente === '*' ? 'todos os agentes' : alvo[0]}`); changed(); ctx.pump?.();
+      return send(res, 200, { pausados: [...P] });
     }
     // descarta de uma vez o que foi criado sozinho e ainda não chegou na Mesa do dono (vai para a lixeira, dá para restaurar)
     if (p === '/api/v2/fila/limpar-sozinhos' && m === 'POST') {

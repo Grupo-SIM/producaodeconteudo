@@ -5805,12 +5805,14 @@ let running = 0;
 let limitWarnedDay = '';
 // fila por agente: cada agente faz uma tarefa por vez e tem a própria fila (o Designer não espera atrás do Roteirista)
 const agentesOcupados = new Set();
+// agentes pausados pelo dono (botão Pausar na Fila): não pegam tarefa nova; a que já começou termina
+const agentesPausados = () => { try { return JSON.parse(one("SELECT value FROM settings WHERE key='agentes_pausados'")?.value || '[]'); } catch { return []; } };
 function nextJob(onlyChat = false) {
   // o que o dono pede (Novo conteúdo, Treino, chat) passa na frente do que foi criado sozinho (pautas automáticas, notícias)
   return one(`SELECT j.* FROM jobs j JOIN agents a ON a.id=j.agent LEFT JOIN contents c ON c.id=j.content_id
     WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ${onlyChat ? "AND j.kind IN ('chat','teste')" : ''}
-    ${agentesOcupados.size ? `AND j.agent NOT IN (${[...agentesOcupados].map(() => '?').join(',')})` : ''}
-    ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer','grade_aprovada')) DESC, j.id LIMIT 1`, T(), ...agentesOcupados);
+    ${[...agentesOcupados, ...agentesPausados()].length ? `AND j.agent NOT IN (${[...agentesOcupados, ...agentesPausados()].map(() => '?').join(',')})` : ''}
+    ORDER BY (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer','grade_aprovada')) DESC, j.id LIMIT 1`, T(), ...agentesOcupados, ...agentesPausados());
 }
 // modo chat: a arte de roteiro no modelo do dono é montada pelo painel na hora, sem pedido para colar (a revisão segue normal)
 let localRodando = false;
@@ -6466,7 +6468,7 @@ function contentAct(id, act, b = {}) {
   }
 }
 
-const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
+const fluxoV2 = criarFluxoV2({ agentesPausados: () => agentesPausados(), pump: () => setImmediate(pump), db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;
