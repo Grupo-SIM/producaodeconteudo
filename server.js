@@ -5090,7 +5090,7 @@ async function acabaFotoCapa(f) {
   return ok;
 }
 const FOTO_GENERICA = /(handshake|aperto de m[aã]o|business ?(man|woman|people|team)|people (working|using)|team ?work|stock ?photo|clip ?art|vector|illustration|ilustra[cç][aã]o|infogr[aá]fico|wallpaper|template|mockup|banner|thumbnail|laptop on|pessoas? (no|com) notebook)/i;   // foto de banco genérica: nunca representa a notícia
-async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800, 450], tit = '') {   // o "olho do Designer": baixa até 6, pontua (nitidez, resolução, assunto citado, formato) e devolve a melhor com a lista das demais já ordenada em `outras`
+async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800, 450], tit = '', pedido = '') {   // o "olho do Designer": baixa até 6, pontua (nitidez, resolução, assunto citado, formato) e devolve a melhor com a lista das demais já ordenada em `outras`
   let errImg = '', n = 0, descartadas = 0; const bons = [];
   for (const x of cands) {
     if (n >= max) break;
@@ -5114,8 +5114,8 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
     for (const b of top) { const ent = arquivoTemp(b.ext === 'jpeg' ? 'jpg' : b.ext), out = arquivoTemp('jpg'); try { fs.writeFileSync(ent, b.buf); execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', ent, '-vf', 'scale=512:-2', '-frames:v', '1', out], { timeout: 20000 }); imgs.push(visionImg(out)); } catch { imgs.push(null); } finally { for (const t of [ent, out]) try { fs.unlinkSync(t); } catch { /* já removido */ } } }
     const ok = imgs.map((v, i) => v ? i : -1).filter(i => i >= 0);
     if (ok.length > 1) {
-      const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: ok.map(i => imgs[i]), user: `São ${ok.length} fotos candidatas para FUNDO de capa de notícia, na ordem. Para cada uma, diga se tem TEXTO visível (palavras, letreiros, legendas, manchetes, marca d'água, print de tela com escrita, placas). Logo pequena sem palavras não conta. Responda só com um JSON: lista de true (tem texto) ou false (sem texto), na mesma ordem.` });
-      const L = extrairJSON(r.text, '['); if (Array.isArray(L)) ok.forEach((i, k) => { if (L[k] === true) { top[i].nota -= 20; top[i].temTexto = true; top[i].porque = [top[i].porque, 'tem texto na foto'].filter(Boolean).join(', '); } });
+      const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: ok.map(i => imgs[i]), user: `São ${ok.length} fotos candidatas para FUNDO de capa de notícia, na ordem. Para cada uma, diga se tem TEXTO visível (palavras, letreiros, legendas, manchetes, marca d'água, print de tela com escrita, placas). Logo pequena sem palavras não conta.${pedido ? `\nO dono pediu: “${String(pedido).slice(0, 300)}”. Dê também uma nota de 0 a 10 para quanto cada foto atende a esse pedido.` : ''}\nResponda só com um JSON: lista na mesma ordem, ${pedido ? 'cada item {"texto": true|false, "nota": 0-10}' : 'de true (tem texto) ou false (sem texto)'}.` });
+      const L = extrairJSON(r.text, '['); if (Array.isArray(L)) ok.forEach((i, k) => { const v = L[k] && typeof L[k] === 'object' ? L[k] : { texto: L[k] }; if (pedido && Number.isFinite(+v.nota)) top[i].nota += (+v.nota - 5) * 2; if (v.texto === true) { top[i].nota -= 20; top[i].temTexto = true; top[i].porque = [top[i].porque, 'tem texto na foto'].filter(Boolean).join(', '); } });
       bons.sort((a, b) => b.nota - a.nota);
     }
   } catch (e) { console.error('foto sem texto:', e.message); } }
@@ -5125,7 +5125,7 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
 }
 // O dono pediu outra foto de fundo numa notícia (capa ou contracapa): busca uma foto NOVA do assunto (internet e bancos), diferente das que já foram usadas,
 // troca só o fundo daquela página e mantém o resto da arte como está (template, textos, posições)
-async function trocaFotoNoticia(c, pagina) {
+async function trocaFotoNoticia(c, pagina, pedido = '') {
   const sp = jparse(c.art_spec); if (!sp?.slides?.[pagina]) return { erro: 'a arte ainda não tem essa página' };
   let it = one('SELECT * FROM radar_items WHERE content_id=?', c.id);
   if (!it) { run("INSERT INTO radar_items(brand,titulo,origem,content_id) VALUES(?,?,?,?)", c.brand || '', (String(c.script || '').match(/Capa:\s*([^\n]+)/i) || [])[1] || c.title, 'manual', c.id); it = one('SELECT * FROM radar_items WHERE content_id=?', c.id); }
@@ -5134,7 +5134,7 @@ async function trocaFotoNoticia(c, pagina) {
   const ents = radarEntidades(it.titulo), w = await radarImagensWeb(it), b = await radarBancos(it);
   const cands = [...w.lista, ...b].filter(x => x.u && !urls.has(x.u) && !(x.pagina && urls.has(x.pagina)));
   if (!cands.length) return { erro: 'a busca não achou outra foto do assunto' };
-  const r = await radarEscolheImagem(cands, '', ents, 10, [1000, 560]);
+  const r = await radarEscolheImagem(cands, '', ents, 10, [1000, 560], '', pedido);
   const nova = [r, ...(r.outras || [])].find(x => x?.buf && !bufs.some(bb => fotosParecidas(bb, x.buf)));
   if (!nova) return { erro: 'só achei fotos iguais às que já foram usadas' };
   try { await acabaFotoCapa(nova); } catch { /* sem acabamento: fica a original */ }
@@ -5508,7 +5508,8 @@ const HANDLERS = {
     // notícia: pedido do dono para trocar a foto de fundo vai direto na foto (a arte de notícia é montada pelo painel e ignoraria o pedido)
     if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && /\b(foto|imagem|fundo)\b/i.test(input.feedback || '') && /\b(troc|mud|outr|substitu|alter)/i.test(input.feedback || '')) {
       const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
-      const r = await trocaFotoNoticia(c, pg);
+      addChat('gerente', `Recebi seu pedido em “${c.title}”: o Designer está buscando outra foto para a ${pg ? 'contracapa' : 'capa'}, seguindo o que você pediu. Leva alguns minutos; até lá a arte que aparece é a anterior. Aviso aqui quando terminar.`);
+      const r = await trocaFotoNoticia(c, pg, fb);
       if (r.ok) { addChat('gerente', `Troquei a foto de fundo da ${pg ? 'contracapa' : 'capa'} de “${c.title}”, como você pediu: busquei uma foto nova do assunto, sem texto e diferente das já usadas. O resto da arte ficou igual. Está na Mesa para você ver.`); return { text: `Foto de fundo da ${pg ? 'contracapa' : 'capa'} trocada (${r.nome})`, tin: 0, tout: 0 }; }
       addChat('gerente', `Não consegui trocar a foto de “${c.title}”: ${r.erro}. Se quiser, envie uma foto pela Biblioteca no editor da arte.`);
       log('designer', `Não consegui trocar a foto de "${c.title}": ${r.erro}. Envie a foto pela Biblioteca no editor.`, c.id);

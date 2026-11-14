@@ -455,7 +455,7 @@ const COLS = {
 const SUBR = { carrossel: 'educativo · história real · post de venda', estatico: 'post único', stories: 'telas de venda · caixinha', reels: 'voz de IA · motion', materia: 'site · fato com fonte', blog: 'aula escrita' };
 function colunaDe(i) {
   if (i.estado === 'finalizado') return 'fim';
-  if (i.estado === 'esperando') return i.etapa === 'publicacao' ? 'postagem' : i.roteiro ? 'ap_roteiro' : 'ap_final';
+  if (i.estado === 'esperando') return i.etapa === 'publicacao' ? 'postagem' : i.roteiro || i.parte === 'materia' ? 'ap_roteiro' : 'ap_final';   // a matéria do site espera você em “Aprovar matéria”
   const e = i.etapa;
   return e === 'roteirista' || e === 'radar' ? 'roteiro' : e === 'revisorcopy' || e === 'gerente' || e === 'seo' ? 'copy' : e === 'designer' || e === 'editor' ? 'arte' : e === 'publicador' ? 'postagem' : 'roteiro';
 }
