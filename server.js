@@ -1745,9 +1745,14 @@ function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter =
   return +r.lastInsertRowid;
 }
 const getContent = id => one('SELECT * FROM contents WHERE id=?', id);
+for (const col of ['materia_em', 'post_em']) if (!db.prepare('PRAGMA table_info(contents)').all().some(x => x.name === col)) db.exec(`ALTER TABLE contents ADD COLUMN ${col} TEXT DEFAULT ''`);
 const setContent = (id, fields) => {
   const keys = Object.keys(fields);
   if ('status' in fields) dlog('conteudo', `#${id} status -> ${fields.status}${fields.error ? ' | ' + String(fields.error).slice(0, 200) : ''}`);
+  // notícia: a matéria do site e o post (texto/arte) têm hora própria, para o "há X min" de um não mudar quando você mexe no outro
+  const mexeMateria = keys.includes('materia'), mexePost = keys.some(k => ['script', 'caption', 'art', 'art_spec', 'art_status', 'video', 'spec'].includes(k));
+  if (mexeMateria && !('materia_em' in fields)) { fields = { ...fields, materia_em: T() }; keys.push('materia_em'); }
+  if (mexePost && !('post_em' in fields)) { fields = { ...fields, post_em: T() }; keys.push('post_em'); }
   run(`UPDATE contents SET ${keys.map(k => k + '=?').join(',')}, updated_at=? WHERE id=?`, ...keys.map(k => fields[k] ?? null), T(), id);
   changed();
 };
