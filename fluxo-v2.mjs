@@ -349,12 +349,19 @@ export function criarFluxoV2(ctx) {
     log(null, `${origem === 'treino_designer' ? 'Treino do Designer' : 'Produção diária'}: copy aprovada nº ${pc.n} "${pc.titulo}" foi para ${ag === 'designer' ? 'o Designer' : 'o Editor'} (${marca})`, id); changed();
     return id;
   }
+  // assunto de cada marca (conhecimento/marcas-assuntos.json): copy de marketing só vai para marca de marketing, e assim por diante
+  const semAc = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  function marcasDoAssunto(nicho) {
+    let A = {}; try { A = JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'marcas-assuntos.json'), 'utf8')); } catch { return []; }
+    const k = Object.keys(A).find(x => x[0] !== '_' && semAc(x) === semAc(nicho)); const nomes = k ? A[k] : [];
+    const reais = all('SELECT name FROM brands').map(x => x.name); return nomes.map(n => reais.find(r => semAc(r).replace(/\s+/g, '') === semAc(n).replace(/\s+/g, '')) || n);
+  }
   // copy aprovada ainda não usada para a marca e o formato da grade (primeiro as feitas para a marca, depois as sem marca definida)
   const RAIA_FMT = { carrossel: p => p.format === 'carrossel', estatico: p => p.format === 'feed' && p.kind !== 'noticia', materia: p => p.format === 'feed' && p.kind === 'noticia', stories: p => p.format === 'stories', reels: p => p.format === 'video_vertical' };
   function aprovadaPara(marca, raia) {
     const ok = RAIA_FMT[raia]; if (!ok) return null;
     const L = pecasAprovadas().filter(p => !p.enviado && ok(p));
-    return L.find(p => p.marca.toLowerCase() === marca.toLowerCase()) || L.find(p => !p.marca) || null;
+    return L.find(p => p.marca.toLowerCase() === marca.toLowerCase()) || L.find(p => !p.marca && marcasDoAssunto(p.nicho).some(b => b.toLowerCase() === marca.toLowerCase())) || null;
   }
   // lê as peças aprovadas no treino do Roteirista, com o formato de cada seção
   function pecasAprovadas() {
@@ -365,10 +372,10 @@ export function criarFluxoV2(ctx) {
     for (const l of md.split('\n')) {
       const h2 = l.match(/^## (.+)/), h3 = l.match(/^### (\w+)\.\s*(.+)/);
       if (h2 && !cur?.dentroMateria) { const k = SEC.find(([re]) => re.test(h2[1])); if (k || /^N[ãa]o inclu/i.test(h2[1])) { sec = k ? { nome: h2[1].trim(), format: k[1], kind: k[2] } : null; cur = null; continue; } }
-      if (h3) { cur = null; if (!sec) continue; const t = h3[2].trim(), marca = marcas.find(mm => t.toLowerCase().includes(mm.toLowerCase())) || '';
+      if (h3) { cur = null; if (!sec) continue; const t = h3[2].trim(), marca = marcas.find(mm => t.toLowerCase().includes(mm.toLowerCase())) || '', sugeridas = marca ? [marca] : marcasDoAssunto(t.split(':')[0]);
         let format = sec.format, kind = sec.kind; if (format === 'video_vertical') kind = /venda/i.test(t) ? 'venda' : /institucional/i.test(t) ? 'institucional' : 'educativo';
         const u = usados.get(h3[1]);
-        cur = { n: h3[1], titulo: t.replace(/^[^:]{2,40}:\s*/, '').replace(/\s*\(.*?\)\s*,?\s*aprovad[oa].*$/i, '').replace(/,\s*aprovad[oa].*$/i, '').trim(), secao: sec.nome, nicho: t.split(':')[0], format, kind, marca, enviado: u ? { id: u.id, status: u.status } : null, texto: '' }; out.push(cur); continue; }
+        cur = { n: h3[1], titulo: t.replace(/^[^:]{2,40}:\s*/, '').replace(/\s*\(.*?\)\s*,?\s*aprovad[oa].*$/i, '').replace(/,\s*aprovad[oa].*$/i, '').trim(), secao: sec.nome, nicho: t.split(':')[0], format, kind, marca, sugeridas, enviado: u ? { id: u.id, status: u.status } : null, texto: '' }; out.push(cur); continue; }
       if (cur) cur.texto += l + '\n';
     }
     return out;
