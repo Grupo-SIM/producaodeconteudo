@@ -5504,8 +5504,6 @@ const HANDLERS = {
   async arte(job, c) {
     const input = JSON.parse(job.input || '{}');
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
-    if (c.kind === 'noticia' && !input.encurtado) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
-      if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada }, 'manual'); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
     // notícia: pedido do dono para trocar a foto de fundo vai direto na foto (a arte de notícia é montada pelo painel e ignoraria o pedido)
     if (c.kind === 'noticia' && input.from === 'dono' && c.art_spec && /\b(foto|imagem|fundo)\b/i.test(input.feedback || '') && /\b(troc|mud|outr|substitu|alter)/i.test(input.feedback || '')) {
       const fb = String(input.feedback), pg = /contra-?capa/i.test(fb) && !/\bcapa\b(?!.*contra)/i.test(fb.replace(/contra-?capa/gi, '')) ? 1 : 0;
@@ -5515,6 +5513,9 @@ const HANDLERS = {
       setContent(c.id, { art_note: `Pedido de nova foto: ${r.erro}. Envie a foto pela Biblioteca no editor.` });
       return { text: r.erro, tin: 0, tout: 0 };
     }
+    // ajuste pedido por você na arte não chama o Copy: encurtar o texto só na primeira montagem
+    if (c.kind === 'noticia' && !input.encurtado && input.from !== 'dono') { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
+      if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada }, 'manual'); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
     if (input.feedback && (c.art || c.art_spec)) user += `\n\n# VERSÃO ANTERIOR\n${c.art}${c.art_spec ? '\n\n# ESPECIFICAÇÃO VISUAL ANTERIOR (JSON)\n```json\n' + c.art_spec + '\n```\nMantenha tudo o que não foi pedido para mudar (textos, cores, prompts de fundo "gen" idênticos) e altere somente o que os ajustes pedem.' : ''}\n\n# AJUSTES PEDIDOS ${input.from === 'dono' ? 'PELO DONO (prioridade máxima; o roteiro e os textos continuam os mesmos, ajuste a diagramação e os elementos visuais)' : input.from === 'sistema' ? 'PELO SISTEMA' : 'PELO REVISOR'} (aplique todos e entregue a direção de arte completa de novo, com a especificação visual em JSON)\n${input.feedback}`;
@@ -5523,7 +5524,8 @@ const HANDLERS = {
     const ea = String(c.estilo_arte || ''), layEsc = input.layout_id || (/^l:\d+$/.test(ea) ? +ea.slice(2) : undefined);
     user += templatesBloco(c, /^t:/.test(ea) ? ea.slice(2) : '') + moldesBloco('designer', c) + layoutsBloco(c, layEsc);
     if (lidas && !MANUAL && !als.getStore()?.dry && settings().arte_do_roteiro === 'sempre' && !/^l:/.test(String(c.estilo_arte || '')) && await arteDoRoteiro(c.id, 'modo rápido')) return { text: getContent(c.id).art, tin: 0, tout: 0 };
-    if (c.kind === 'noticia' && !als.getStore()?.dry && await arteDoRoteiro(c.id, 'notícia: arte montada pelo painel')) return { text: getContent(c.id).art, tin: 0, tout: 0 };   // notícia: a arte sai do roteiro, no template da marca, sem depender de o Designer entregar JSON
+    if (c.kind === 'noticia' && !input.feedback && !als.getStore()?.dry && await arteDoRoteiro(c.id, 'notícia: arte montada pelo painel'))   // com pedido seu, o Designer mexe na arte que já existe em vez de remontar do roteiro
+      return { text: getContent(c.id).art, tin: 0, tout: 0 };   // notícia: a arte sai do roteiro, no template da marca, sem depender de o Designer entregar JSON
     const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000 });
     const sp = extractArteSpec(r.text, c.format, c);
     if (sp && sp.format !== c.format && ['feed', 'carrossel'].includes(c.format)) { setContent(c.id, { format: sp.format }); log('designer', `A peça "${c.title}" tem ${sp.spec.slides.length} páginas: virou carrossel`, c.id); }
