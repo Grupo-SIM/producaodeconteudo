@@ -381,10 +381,24 @@ export function criarFluxoV2(ctx) {
   }
   setInterval(() => { try { if (new Date().getDay() === 1 && new Date().getHours() === 8) gerarDescobertas(); exportarAprendido(); } catch (e) { console.error('fluxo-v2 rotina:', e.message); } }, 3600e3).unref();
 
+  // matéria do arquivo de treino como o leitor do site vê: título, linha fina, lide e seções, sem rótulos internos (Título SEO, Observação)
+  function materiaLeitor(t) {
+    const L = String(t).replace(/^Mat[ée]ria\.\s*/m, '').split('\n').map(x => x.trim()).filter(Boolean), out = [];
+    for (const l of L) {
+      if (/^Observa[cç][aã]o:/i.test(l)) continue;
+      const m = l.match(/^(T[íi]tulo(?: SEO)?|Manchete|Linha fina|Lide|Se[cç][aã]o|Palavra-chave|Meta descri[cç][aã]o|Slug):\s*(.*)$/i);
+      if (m) { const k = m[1].toLowerCase(); if (/t[íi]tulo|manchete/.test(k)) out.push('# ' + m[2]); else if (/linha fina|lide/.test(k)) out.push(m[2]); continue; }
+      out.push(l);
+    }
+    return out.join('\n\n');
+  }
   function criarDeAprovada(pc, marca, origem) {
-    const leg = (pc.texto.match(/^Legenda:\s*([\s\S]*?)(?:\n\s*\n|$)/m) || [])[1] || '', script = pc.texto.replace(/^Legenda:[\s\S]*?(?:\n\s*\n|$)/m, '').trim();
-    const r = run("INSERT INTO contents(title,format,kind,platform,brief,goal,brand,status,script,caption,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      pc.titulo, pc.format, pc.kind, 'instagram', `${origem === 'treino_designer' ? 'Treino do Designer' : 'Produção diária'}: copy aprovada nº ${pc.n} (${pc.secao}). Não reescreva a copy: dê vida a ela.`, '', marca, 'producing', script, leg.trim(), origem, T(), T());
+    const leg = (pc.texto.match(/^Legenda:\s*([\s\S]*?)(?:\n\s*\n|$)/m) || [])[1] || '';
+    let script = pc.texto.replace(/^Legenda:[\s\S]*?(?:\n\s*\n|$)/m, '').trim(), materia = '';
+    // notícia: o post do Instagram (capa e contracapa) fica no roteiro e a matéria do site fica separada, só com o que o leitor vê
+    if (pc.kind === 'noticia') { const k = script.search(/^Mat[ée]ria\.\s*/m); if (k >= 0) { materia = materiaLeitor(script.slice(k)); script = script.slice(0, k).replace(/^Post\.\s*/m, '').trim(); } }
+    const r = run("INSERT INTO contents(title,format,kind,platform,brief,goal,brand,status,script,caption,materia,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      pc.titulo, pc.format, pc.kind, 'instagram', `${origem === 'treino_designer' ? 'Treino do Designer' : 'Produção diária'}: copy aprovada nº ${pc.n} (${pc.secao}). Não reescreva a copy: dê vida a ela.`, '', marca, 'producing', script, leg.trim(), materia, origem, T(), T());
     const id = +r.lastInsertRowid, ag = pc.format === 'video_vertical' ? 'editor' : 'designer';
     ctx.enqueue(id, ag, ag === 'designer' ? 'arte' : 'video', {}, 'manual');
     log(null, `${origem === 'treino_designer' ? 'Treino do Designer' : 'Produção diária'}: copy aprovada nº ${pc.n} "${pc.titulo}" foi para ${ag === 'designer' ? 'o Designer' : 'o Editor'} (${marca})`, id); changed();
