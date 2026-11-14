@@ -266,6 +266,7 @@ img.av{object-fit:cover;padding:0}
 .grade{border-collapse:collapse;width:100%;min-width:720px}.grade th,.grade td{padding:9px 10px;border-bottom:1px solid var(--ln,#262a33);text-align:center;font-size:13px}.grade th{font-weight:600;color:var(--tx2,#9aa3b2);font-size:12px}.grade td:first-child,.grade th:first-child{text-align:left}.grade .metain{width:58px;text-align:center}
 .c.vivo{position:relative;overflow:hidden}.c .pulso{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3ddc84;margin-right:5px;vertical-align:middle;animation:pul 1.2s ease-in-out infinite}@keyframes pul{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}.c .corre{position:absolute;left:0;bottom:0;height:2px;width:35%;background:linear-gradient(90deg,transparent,#3ddc84,transparent);animation:cor 1.6s linear infinite}@keyframes cor{from{left:-35%}to{left:100%}}
 .mc .tg,h2 .tg{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:#1d2633;color:#9ec5ff;margin:4px 0;vertical-align:middle;width:max-content}.tg.inst{background:#33280f;color:#f2c95a}
+.c.pausa{box-shadow:inset 2px 0 0 #f59e0b;opacity:.75}.c .pausa-ic{color:#f59e0b;margin-right:5px;font-size:9px}
 </style>
 </head>
 <body>
@@ -465,9 +466,9 @@ function porQueAguarda(i) {
   return `${f.pos}º na fila do ${quem}${f.ocupado ? ' (trabalhando em outra agora)' : ''}`;
 }
 function cartao(i) {
-  const sub = i.pausado ? 'parada por você · clique em Continuar na Fila' : i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';
-  const vivo = (i.estado === 'etapa' || i.estado === 'ajuste') && !i.aguardando;   // agente trabalhando agora: ponto pulsando e barra correndo
-  return `<button class="c ${CLS[i.estado]}${i.em_ajuste ? ' aj' : ''}${vivo ? ' vivo' : ''}" onclick="abrirItem(${i.id})">${esc(i.titulo)}<i>${vivo ? '<b class="pulso"></b>' : ''}${[i.marca, sub].filter(Boolean).map(esc).join(' · ')}</i>${vivo ? '<u class="corre"></u>' : ''}</button>`;
+  const sub = i.pausado ? 'PAUSADA por você · nenhum agente mexe nela até você mandar continuar' : i.estado === 'parado' ? 'parou: ' + explica(i.motivo).titulo.toLowerCase() : i.em_ajuste ? `ajuste: "${i.ajuste_motivo}"` : i.estado === 'fila' ? (i.retenta ? 'volta sozinho quando o limite renovar' : 'na fila' + (i.quando ? ' · ' + fmtD(i.quando) : '')) : i.estado === 'finalizado' ? 'postado' : i.estado === 'esperando' ? (i.etapa === 'publicacao' ? 'marcar postado' : '') : i.aguardando ? porQueAguarda(i) : FAZENDO(i.etapa) + ' agora';
+  const vivo = (i.estado === 'etapa' || i.estado === 'ajuste') && !i.aguardando && !i.pausado;   // agente trabalhando agora: ponto pulsando e barra correndo
+  return `<button class="c ${CLS[i.estado]}${i.em_ajuste ? ' aj' : ''}${vivo ? ' vivo' : ''}${i.pausado ? ' pausa' : ''}" onclick="abrirItem(${i.id})">${esc(i.titulo)}<i>${vivo ? '<b class="pulso"></b>' : ''}${i.pausado ? '<b class="pausa-ic">❚❚</b>' : ''}${[i.marca, sub].filter(Boolean).map(esc).join(' · ')}</i>${vivo ? '<u class="corre"></u>' : ''}</button>`;
 }
 VIEWS.fluxo = () => {
   const F = S.fluxo; if (!F) return;
