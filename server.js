@@ -5439,7 +5439,8 @@ const HANDLERS = {
   // o Copy diz a mesma coisa com menos palavras para caber na arte (pedido do Designer); depois a arte é refeita
   async materia_ajuste(job, c) {
     const i = JSON.parse(job.input || '{}');
-    const user = `# TAREFA\nO dono pediu um ajuste na MATÉRIA DO SITE desta notícia. Aplique só o que ele pediu e mantenha todo o resto igual (fatos, fontes, citações, ordem). Não mexa no post nem na arte.\n\n# PEDIDO DO DONO\n${i.feedback || ''}\n\n# MATÉRIA ATUAL\n${c.materia}\n\n# SAÍDA\nDevolva só a matéria completa, no mesmo formato: primeira linha "# Manchete", depois linha fina, lide, intertítulos com "## " e a linha de Fontes no fim. Sem comentários antes ou depois.`;
+    const treino = ctxFluxo?.materiaTreino?.(c) || '';
+    const user = `# TAREFA\nO dono pediu um ajuste na MATÉRIA DO SITE desta notícia. Aplique só o que ele pediu e mantenha todo o resto igual (fatos, fontes, citações, ordem). Não mexa no post nem na arte.\n\n# PEDIDO DO DONO\n${i.feedback || ''}\n\n# MATÉRIA ATUAL\n${c.materia}\n\n${treino ? `# MATÉRIA APROVADA NO TREINO (texto completo que o dono aprovou; se ele pedir para voltar ao aprovado/treinado, devolva exatamente este texto)\n${treino}\n\n` : ''}# SAÍDA\nDevolva só a matéria completa, no mesmo formato: primeira linha "# Manchete", depois linha fina, lide, intertítulos com "## " e a linha de Fontes no fim. Sem comentários antes ou depois.`;
     const r = await callClaude({ agent: agentRow('roteirista'), user, maxTokens: 6000 });
     const txt = String(r.text || '').replace(/^```[a-z]*\n?|```\s*$/g, '').trim(); if (txt.length < 200 || !/^#\s/m.test(txt)) throw new Error('O Copy não devolveu a matéria completa');
     setContent(c.id, { materia: txt });
@@ -6575,7 +6576,7 @@ function contentAct(id, act, b = {}) {
   }
 }
 
-const fluxoV2 = criarFluxoV2({ paraAgora: id => paraAgoraConteudo(id), agentesPausados: () => agentesPausados(), pump: () => setImmediate(pump), db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
+var ctxFluxo; const fluxoV2 = criarFluxoV2(ctxFluxo = { paraAgora: id => paraAgoraConteudo(id), agentesPausados: () => agentesPausados(), pump: () => setImmediate(pump), db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;

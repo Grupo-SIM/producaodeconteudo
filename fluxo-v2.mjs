@@ -426,6 +426,21 @@ export function criarFluxoV2(ctx) {
     const L = pecasAprovadas().filter(p => !p.enviado && ok(p));
     return L.find(p => (p.sugeridas || []).some(b => b.toLowerCase() === marca.toLowerCase())) || null;
   }
+  // matéria do site como foi treinada (arquivo de treino), para a peça vinda do Treino do Designer ou da Produção diária
+  function materiaTreino(c) {
+    if (!c || !['treino_designer', 'grade_aprovada'].includes(c.created_by)) return '';
+    const n = (String(c.brief || '').match(/nº (\w+)/) || [])[1], pc = n && pecasAprovadas().find(p => p.n === n); if (!pc) return '';
+    const k = pc.texto.search(/^Mat[ée]ria\.\s*/m); return k >= 0 ? materiaLeitor(pc.texto.slice(k)) : '';
+  }
+  ctx.materiaTreino = materiaTreino;
+  // o treino da matéria mudou (ex.: entrou o texto completo): a peça ainda não publicada e que você não editou na mão recebe a matéria nova
+  setTimeout(() => { try {
+    for (const c of all("SELECT * FROM contents WHERE created_by IN ('treino_designer','grade_aprovada') AND kind='noticia' AND status NOT IN ('posted','discarded')")) {
+      const m = materiaTreino(c); if (!m || m === c.materia) continue;
+      if (all('SELECT campos FROM content_versions WHERE content_id=? AND autor=?', c.id, 'dono').some(v => String(v.campos).includes('materia'))) continue;
+      setContent(c.id, { materia: m }); log('roteirista', `Matéria do site atualizada com o texto do treino: "${c.title}"`, c.id);
+    }
+  } catch (e) { console.error('matéria do treino:', e.message); } }, 4000).unref?.();
   // lê as peças aprovadas no treino do Roteirista, com o formato de cada seção
   function pecasAprovadas() {
     let md = ''; try { md = fsx.readFileSync(path.join(ctx.dirname, 'carrosseis-aprovados-producao.md'), 'utf8'); } catch { return []; }
