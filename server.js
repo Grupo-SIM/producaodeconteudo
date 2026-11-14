@@ -4910,7 +4910,8 @@ function consertaManchetesUmaLinha() {   // artes de notícia já feitas: (1) ma
       if (['noticia', 'manchete-foto', 'citacao', undefined].includes(sl.modelo) && main && (main.nowrap === true || (lg && (lg.size || 0) < 28)) && String(main.value || '').length >= 30 && (sl.shapes || []).some(x => x.kind === 'line')) {
         layoutNoticiaTexto(sl, main, sp.accent, String(main.value).replace(/[*|]+/g, ' ').replace(/\s+/g, ' ').trim(), r.format === 'stories' ? 1920 : 1350); mud = true; }
       const c = getContent(r.id), f1 = sl.bg?.asset || '', f2 = sp.slides[1]?.bg?.asset || sp.slides[1]?.dados?.foto || '';
-      if (c && f1 && f2 && (f1 === f2 || fotosParecidas(bufDoAsset(assetDaMarca(c.brand, f1)), bufDoAsset(assetDaMarca(c.brand, f2))))) { const cc = contracapaNoticia(c, f1); if (cc) { sp.slides[1] = cc; mud = true; } }
+      if (c && f1 && f2 && f1 === f2 && !['awaiting_approval', 'approved', 'posted'].includes(c.status)) { const cc = contracapaNoticia(c, f1);   // só a MESMA foto e só peça que ainda não chegou em você: nada muda sozinho numa arte que você está revisando
+        if (cc) { sp.slides[1] = cc; mud = true; } }
       if (!mud) continue;
       const j = JSON.stringify(sp); setContent(r.id, { art_spec: j, art_spec_base: j }); n++; renderArte(r.id).catch(() => {});
     }
@@ -5090,7 +5091,7 @@ async function acabaFotoCapa(f) {
   return ok;
 }
 const FOTO_GENERICA = /(handshake|aperto de m[aã]o|business ?(man|woman|people|team)|people (working|using)|team ?work|stock ?photo|clip ?art|vector|illustration|ilustra[cç][aã]o|infogr[aá]fico|wallpaper|template|mockup|banner|thumbnail|laptop on|pessoas? (no|com) notebook)/i;   // foto de banco genérica: nunca representa a notícia
-async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800, 450], tit = '', pedido = '') {   // o "olho do Designer": baixa até 6, pontua (nitidez, resolução, assunto citado, formato) e devolve a melhor com a lista das demais já ordenada em `outras`
+async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800, 450], tit = '', pedido = '', atual = null) {   // o "olho do Designer": baixa até 6, pontua (nitidez, resolução, assunto citado, formato) e devolve a melhor com a lista das demais já ordenada em `outras`
   let errImg = '', n = 0, descartadas = 0; const bons = [];
   for (const x of cands) {
     if (n >= max) break;
@@ -5113,8 +5114,9 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
     const top = bons.slice(0, 5), imgs = [];
     for (const b of top) { const ent = arquivoTemp(b.ext === 'jpeg' ? 'jpg' : b.ext), out = arquivoTemp('jpg'); try { fs.writeFileSync(ent, b.buf); execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', ent, '-vf', 'scale=512:-2', '-frames:v', '1', out], { timeout: 20000 }); imgs.push(visionImg(out)); } catch { imgs.push(null); } finally { for (const t of [ent, out]) try { fs.unlinkSync(t); } catch { /* já removido */ } } }
     const ok = imgs.map((v, i) => v ? i : -1).filter(i => i >= 0);
+    let ref = null; if (atual) { const ent = arquivoTemp('jpg'), out = arquivoTemp('jpg'); try { fs.writeFileSync(ent, atual); execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', ent, '-vf', 'scale=512:-2', '-frames:v', '1', out], { timeout: 20000 }); ref = visionImg(out); } catch { /* sem referência */ } finally { for (const t of [ent, out]) try { fs.unlinkSync(t); } catch { /* já removido */ } } }
     if (ok.length > 1) {
-      const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: ok.map(i => imgs[i]), user: `São ${ok.length} fotos candidatas para FUNDO de capa de notícia, na ordem. Para cada uma, diga se tem TEXTO visível (palavras, letreiros, legendas, manchetes, marca d'água, print de tela com escrita, placas). Logo pequena sem palavras não conta.${pedido ? `\nO dono pediu: “${String(pedido).slice(0, 300)}”. Dê também uma nota de 0 a 10 para quanto cada foto atende a esse pedido.` : ''}\nResponda só com um JSON: lista na mesma ordem, ${pedido ? 'cada item {"texto": true|false, "nota": 0-10}' : 'de true (tem texto) ou false (sem texto)'}.` });
+      const r = await callClaude({ agent: agentRow('designer'), maxTokens: 300, images: [...(ref ? [ref] : []), ...ok.map(i => imgs[i])], user: `${ref ? 'A PRIMEIRA imagem é a foto ATUAL, que o dono quer TROCAR (não conta como candidata). Foto com o mesmo assunto, mesmo objeto ou mesma composição dela conta como “igual” e deve levar nota 0. Depois dela vêm as candidatas.\n' : ''}São ${ok.length} fotos candidatas para FUNDO de capa de notícia, na ordem. Para cada uma, diga se tem TEXTO visível (palavras, letreiros, legendas, manchetes, marca d'água, print de tela com escrita, placas). Logo pequena sem palavras não conta.${pedido ? `\nO dono pediu: “${String(pedido).slice(0, 300)}”. Dê também uma nota de 0 a 10 para quanto cada foto atende a esse pedido.` : ''}\nResponda só com um JSON: lista na mesma ordem, ${pedido ? 'cada item {"texto": true|false, "nota": 0-10}' : 'de true (tem texto) ou false (sem texto)'}.` });
       const L = extrairJSON(r.text, '['); if (Array.isArray(L)) ok.forEach((i, k) => { const v = L[k] && typeof L[k] === 'object' ? L[k] : { texto: L[k] }; if (pedido && Number.isFinite(+v.nota)) top[i].nota += (+v.nota - 5) * 2; if (v.texto === true) { top[i].nota -= 20; top[i].temTexto = true; top[i].porque = [top[i].porque, 'tem texto na foto'].filter(Boolean).join(', '); } });
       bons.sort((a, b) => b.nota - a.nota);
     }
@@ -5130,18 +5132,18 @@ async function trocaFotoNoticia(c, pagina, pedido = '') {
   let it = one('SELECT * FROM radar_items WHERE content_id=?', c.id);
   if (!it) { run("INSERT INTO radar_items(brand,titulo,origem,content_id) VALUES(?,?,?,?)", c.brand || '', (String(c.script || '').match(/Capa:\s*([^\n]+)/i) || [])[1] || c.title, 'manual', c.id); it = one('SELECT * FROM radar_items WHERE content_id=?', c.id); }
   const usadas = all("SELECT * FROM assets WHERE name LIKE ? AND brand=? COLLATE NOCASE", 'noticia-' + it.id + '%', c.brand || ''), urls = new Set(usadas.flatMap(a => String(a.note || '').match(/https?:\/\/\S+/g) || []).map(u => u.replace(/[).,]+$/, '')));
-  const bufs = usadas.map(a => { try { return fs.readFileSync(path.join(ASSET_DIR, a.id + '.' + a.ext)); } catch { return null; } }).filter(Boolean);
+  const naArte = sp.slides.map(x => x.bg?.asset || x.dados?.foto).filter(x => typeof x === 'string').map(n => assetDaMarca(c.brand, n.split(' (')[0])).filter(Boolean);   // fotos que já estão na capa e na contracapa
+  const bufs = [...usadas, ...naArte].map(a => bufDoAsset(a)).filter(Boolean), atual = bufDoAsset(naArte.find(a => a.name === (sp.slides[pagina].bg?.asset || sp.slides[pagina].dados?.foto)));
   const ents = radarEntidades(it.titulo), w = await radarImagensWeb(it), b = await radarBancos(it);
   const cands = [...w.lista, ...b].filter(x => x.u && !urls.has(x.u) && !(x.pagina && urls.has(x.pagina)));
   if (!cands.length) return { erro: 'a busca não achou outra foto do assunto' };
-  const r = await radarEscolheImagem(cands, '', ents, 10, [1000, 560], '', pedido);
+  const r = await radarEscolheImagem(cands, '', ents, 8, [1000, 560], '', pedido, atual);
   const nova = [r, ...(r.outras || [])].find(x => x?.buf && !bufs.some(bb => fotosParecidas(bb, x.buf)));
   if (!nova) return { erro: 'só achei fotos iguais às que já foram usadas' };
   try { await acabaFotoCapa(nova); } catch { /* sem acabamento: fica a original */ }
   const salvo = salvaFotoRadar(it, nova, 'busca na internet', '', '-t' + (usadas.length + 1));
   const sl = sp.slides[pagina]; sl.bg = { ...(sl.bg || {}), asset: salvo.name }; delete sl.bg.gen; delete sl.bg.banco;
   if (sl.dados && typeof sl.dados === 'object' && sl.dados.foto) sl.dados = { ...sl.dados, foto: salvo.name };
-  if (pagina === 0) run('UPDATE radar_items SET foto_asset=? WHERE id=?', salvo.name, it.id); else run('UPDATE radar_items SET foto2_asset=? WHERE id=?', salvo.name, it.id);
   setContent(c.id, { art_spec: JSON.stringify(sp), art_status: '' });
   log('designer', `Trocou a foto de fundo da ${pagina === 0 ? 'capa' : 'página ' + (pagina + 1)} como você pediu: "${c.title}" (${salvo.credito})`, c.id);
   await renderArte(c.id);
