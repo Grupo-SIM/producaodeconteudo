@@ -944,17 +944,20 @@ function achaTrecho(nome, titulo) {
     return { doc, L, i, f };
   }
 }
+// texto da marca: abre em modo leitura; Editar troca o texto pela caixa de edição e o botão vira Salvar
+const leEd = (v, rows) => `<div class="leitura" id="edLer">${String(v).split(/\n\s*\n/).map(p => `<p style="white-space:pre-wrap">${sw(p)}</p>`).join('')}</div><textarea class="f hidden" id="edTxt" rows="${rows}">${esc(v)}</textarea>`;
+const btEd = () => `<button class="btn ok" id="edBt" onclick="if(this.dataset.on){salvaEd()}else{this.dataset.on=1;this.textContent='Salvar';$('#edLer').classList.add('hidden');$('#edTxt').classList.remove('hidden');$('#edTxt').focus()}">Editar</button>`;
 function editaSecao(nome, titulo) {
   const r = achaTrecho(nome, titulo); if (!r) return toast('Não achei este trecho nos documentos da marca');
   S._ed = { tipo: 'secao', nome, titulo };
-  modal(`<div class="hd"><h2>${esc(titulo.charAt(0) + titulo.slice(1).toLowerCase())}</h2><span class="muted small">${esc(r.doc.title)}</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><textarea class="f" id="edTxt" rows="16">${esc(r.L.slice(r.i + 1, r.f).join('\n').trim())}</textarea></div><div class="ft"><span class="muted small" style="margin-right:auto">Salva no documento da marca, que os agentes leem. Também dá para pedir ao gerente.</span><button class="btn ok" onclick="salvaEd()">Salvar</button></div>`);
+  modal(`<div class="hd"><h2>${esc(titulo.charAt(0) + titulo.slice(1).toLowerCase())}</h2><span class="muted small">${esc(r.doc.title)}</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">${leEd(r.L.slice(r.i + 1, r.f).join('\n').trim(), 16)}</div><div class="ft"><span class="muted small" style="margin-right:auto">Salva no documento da marca, que os agentes leem. Também dá para pedir ao gerente.</span>${btEd()}</div>`);
 }
 function editaCampo(nome, chave) {
   const re = new RegExp('^(\\s*[-*]?\\s*' + chave.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ':\\s*)(.+)$');
   const doc = docsMarca(nome).find(d => String(d.content || '').split('\n').some(l => re.test(l))); if (!doc) return toast('Não achei este campo nos documentos da marca');
   const v = String(doc.content).split('\n').find(l => re.test(l)).match(re)[2];
   S._ed = { tipo: 'campo', nome, chave, re };
-  modal(`<div class="hd"><h2>${esc(chave)}</h2><span class="muted small">${esc(doc.title)}</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb"><div class="leitura" style="margin-bottom:10px"><p>${sw(v)}</p></div><textarea class="f" id="edTxt" rows="4">${esc(v)}</textarea></div><div class="ft"><span class="muted small" style="margin-right:auto">Salva no documento da marca, que os agentes leem.</span><button class="btn ok" onclick="salvaEd()">Salvar</button></div>`, 'sm');
+  modal(`<div class="hd"><h2>${esc(chave)}</h2><span class="muted small">${esc(doc.title)}</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">${leEd(v, 8)}</div><div class="ft"><span class="muted small" style="margin-right:auto">Salva no documento da marca, que os agentes leem.</span>${btEd()}</div>`, 'sm');
 }
 async function salvaEd() {
   const e = S._ed, novo = $('#edTxt').value.replace(/\s+$/, ''); let doc, content;
@@ -998,7 +1001,7 @@ VIEWS.produtos = async () => {
       : tab === 'objecoes' ? `${linha('Objeções', sel.objections)}${linha('Bônus', sel.bonus)}${linha('Garantia', sel.guarantee)}`
       : tab === 'feitos' ? feitos.map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhum conteúdo ainda.</p>'
       : `${linha('Tipo', sel.type)}${linha('Promessa', sel.promise)}${linha('Público', sel.audience)}${linha('Dores', sel.pains)}${linha('Entregável', sel.deliverable)}`;
-    det = `<div class="box mdet"><div class="mh"><div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(sel.type)} · usado por ${esc((sel.brands || []).join(', ') || 'todas as marcas')}</span></div><span style="flex:1"></span><button class="btn sm" onclick="detProduto(${sel.id})">Editar</button><button class="btn sm ok" onclick="pedirDoProduto(${sel.id})">Pedir conteúdo deste produto</button></div>
+    det = `<div class="box mdet"><div class="mh"><div><h2>${esc(sel.name)}</h2><span class="muted small">${esc(sel.type)} · usado por ${esc((sel.brands || []).join(', ') || 'todas as marcas')}</span></div><span style="flex:1"></span><button class="btn sm" onclick="detProduto(${sel.id})">Editar</button><button class="btn sm ok" onclick="pedirDoProduto(${sel.id})">Pedir conteúdo deste produto</button></div>
       <div class="tabs">${[['ficha', 'Ficha'], ['pagina', 'Página de vendas'], ['objecoes', 'Objeções e bônus'], ['feitos', 'Conteúdos feitos']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.prodTab='${k}';render()">${n}</button>`).join('')}</div>
       <div class="two"><div><h5>${{ ficha: 'Ficha', pagina: 'Página de vendas', objecoes: 'Objeções e bônus', feitos: 'Conteúdos feitos' }[tab]}</h5>${corpo}</div><div><h5>Conteúdos com este produto</h5>${feitos.slice(0, 8).map(i => `<div class="kvr" style="cursor:pointer" onclick="abrirItem(${i.id})"><span>${esc(i.titulo)}</span><span>${esc(i.raia)}</span></div>`).join('') || '<p class="muted small">Nenhum ainda.</p>'}</div></div></div>`;
   }
