@@ -247,7 +247,7 @@ export const MODELOS = [
   { id: 'lista', nome: 'Lista numerada', uso: 'página interna', desc: 'Fundo claro, até 4 itens “1. Título” em negrito com explicação curta; letra gigante quase invisível ao fundo.', campos: ['titulo', 'itens', 'fundo', 'objeto'] },
   { id: 'numero', nome: 'Número gigante', uso: 'página interna', desc: 'Número enorme na cor de destaque, título e apoio: dica 1, passo 2, erro 3... Pode levar foto em cartão (foto) ou mascote/objeto (objeto).', campos: ['numero', 'titulo', 'texto', 'fundo', 'foto', 'objeto'] },
   { id: 'pilulas', nome: 'Estouro com pílulas', uso: 'página interna', desc: 'Forma estourada grande na cor da marca com 2 a 4 frases curtas em pílulas empilhadas.', campos: ['itens'] },
-  { id: 'noticia', nome: 'Capa de jornal (notícia)', uso: 'capa de carrossel', desc: 'Foto da notícia em página inteira com degradê escuro embaixo, selo “Notícia urgente!”, manchete em caixa alta centralizada, fio com a marca e “Leia a legenda”.', campos: ['titulo', 'selo', 'legenda', 'foto'] },
+  { id: 'noticia', nome: 'Capa de jornal (notícia)', uso: 'capa de carrossel', desc: 'Foto da notícia em página inteira com degradê escuro embaixo, selo “Notícia urgente!”, manchete em caixa alta centralizada, fio com a marca e “Leia a legenda”.', campos: ['titulo', 'selo', 'legenda', 'foto', 'foto2', 'circulo', 'urgente', 'pb'] },
   { id: 'manchete-foto', nome: 'Manchete sobre foto (perfil no topo)', uso: 'capa ou post único', desc: 'Foto em página inteira que escurece embaixo; perfil da marca no topo à esquerda (avatar, nome e verificado); manchete em caixa alta centralizada, “Leia a legenda” e barra na cor da marca no rodapé.', campos: ['titulo', 'legenda', 'nome', 'foto'] },
   { id: 'citacao', nome: 'Frase de personalidade (retrato + citação)', uso: 'capa ou post único', desc: 'Retrato em página inteira que escurece até o preto embaixo; fio com a logo da marca e o @ no meio; nome de quem disse e a frase centralizados, em caixa alta.', campos: ['nome', 'frase', 'foto', 'handle'] },
   { id: 'post-card', nome: 'Contra-capa em cartão (notícia)', uso: 'última página', desc: 'Fundo escuro de foto com um cartão branco arredondado: avatar da marca, nome verificado e o texto da notícia (palavra em *negrito*).', campos: ['titulo', 'nome', 'foto'] },
@@ -637,15 +637,22 @@ const COMPOR = {
   // Capa de jornal: foto de página inteira, degradê escuro-azulado embaixo, selo, manchete em caixa alta centralizada, fio com a marca e "Leia a legenda"
   noticia(d, ctx) {
     const { W, H, mx, T } = ctx, foto = genOuAsset(d.foto), azul = mistura(ctx.accent, '#000000', lum(ctx.accent) > .5 ? .8 : .66), s = base(ctx, azul, { grain: .22, vignette: .3 });
-    if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, natural light, high contrast, sharp focus, no text, no watermark`), color: azul, pos: 'topo' }; s.shade = .3; s.shade_dir = 'bottom'; }
+    // padrão de referência do dono (Zyrion): foto viva e nítida; preto e branco em notícia triste (d.pb); tela dividida com 2 fotos (d.foto2) ou foto + círculo com a referência do assunto (d.circulo)
+    const pf = x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`, foto2 = genOuAsset(d.foto2), circ = genOuAsset(d.circulo), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
+    if (foto && foto2) {   // tela dividida: duas fotos lado a lado na parte de cima, dissolvendo no preto
+      s.paper = '#000000'; s.bg = { color: '#000000' };
+      for (const [i, f] of [[0, foto], [1, foto2]]) s.items.push({ ...srcDe(f, pf), x: i ? .75 : .25, y: .35, box: { w: .5, h: .7, fade: .35 }, fil: pb });
+    } else if (foto) { s.bg = { ...srcDe(foto, pf), color: azul, pos: 'topo', fil: pb }; s.shade = .25; s.shade_dir = 'bottom'; }
     else s.fx.glows = [{ x: .5, y: .3, r: .8, color: ctx.accent, opacity: .35 }];
-    s.fx.fadeFront = [{ dir: 'bottom', a: .96, ext: .62 }];
-    const tf = { ...T.tit, k: 'impact', w: 400, ls: 0, lh: lhAcento(d.titulo), upper: true, caixa: undefined }, selo = String(d.selo || 'Notícia urgente!').trim(), legenda = String(d.legenda || 'Leia a legenda').trim();
+    if (circ) s.items.push({ ...srcDe(circ, x => `${x}, high quality, vivid colors, no text`), x: .72, y: .22, box: { w: .46, h: .46 * W / H, circle: true, border: .008, bc: '#ffffff', pos: 'center' }, fil: pb, shadow: 1 });
+    s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: foto2 ? .72 : .58 }];
+    const tf = { ...T.tit, k: 'impact', w: 400, ls: 0, lh: lhAcento(d.titulo), upper: true, caixa: undefined }, selo = String(d.selo || (d.urgente ? 'Notícia urgente' : ctx.marca || ctx.nome || 'Notícia em destaque')).trim(), legenda = String(d.legenda || 'Leia a legenda').trim();
     const ti = ajusta(d.titulo || '', tf, W * .92, H * .37, { maxSize: W * .15, maxLinhas: 4 }), hl = lum(ctx.accent) > .4 ? ctx.accent : mistura(ctx.accent, '#ffffff', .6);
     const fs = { ...T.txtB, upper: true, caixa: undefined, ls: 0 }, sz = Math.round(Math.min(W * .03, (W * .7) / Math.max(1, largura(selo.toUpperCase(), fs, 1)))), hs = botaoH(sz), fl = Math.round(W * .021);
     const logoW = ctx.logo ? Math.round(Math.min(W * .16, (W * .05) / (ctx.logoRatio || .2))) : 0, logoH = ctx.logo ? logoW * (ctx.logoRatio || .2) : 0, hLinha = Math.max(logoH, W * .012);
     const base0 = ctx.storiesH ? H * .8 : H * .93, B = [];
-    B.push({ h: hs, gap: 0, make: y => ({ role: 'cta', value: selo, x: .5, y: F2((y + hs / 2) / H), align: 'center', size: sz, font: fontKey(fs, ctx), weight: fs.w, upper: true, italic: true, bg: ctx.accent, color: sobre(ctx.accent), shape: 'pill', nowrap: true, shadow: false, front: true }) });
+    if (d.urgente || /urgente/i.test(selo)) B.push({ h: hs, gap: 0, make: y => ({ role: 'badge', value: selo, x: .5, y: F2((y + hs / 2) / H), align: 'center', size: sz, font: fontKey(fs, ctx), weight: 800, upper: true, bg: '#E0242B', color: '#ffffff', shape: 'pill', nowrap: true, shadow: false, front: true }) });
+    else { const ls = Math.round(W * .022); B.push({ h: ls * 1.3, gap: 0, make: y => ({ role: 'label', value: selo, x: .5, y: F2((y + ls * .65) / H), align: 'center', size: ls, font: fontKey(fs, ctx), weight: 800, upper: true, ls: .04, color: '#ffffff', opacity: .92, nowrap: true, shadow: false, front: true }) }); }
     B.push({ h: ti.linhas.length * tf.lh * ti.size, gap: H * .028, make: y => texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: y, align: 'center', color: '#ffffff', extra: { hl, hw: tf.w, upper: true, front: true } }).t });
     B.push({ h: hLinha, gap: H * .03, make: y => { const cy = y + hLinha / 2, lw = (W - mx * 2 - (logoW ? logoW + W * .06 : 0)) / 2, ox = (logoW ? logoW / 2 + W * .03 : W * .015) + lw / 2;
       const linha = sx => ({ kind: 'line', x: F2((W / 2 + sx * ox) / W), y: F2(cy / H), w: F2(lw / W), h: .0018, color: '#ffffff', opacity: .75, moldura: true, front: true });
