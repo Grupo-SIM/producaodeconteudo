@@ -683,7 +683,7 @@ const KNOWLEDGE_SEED = [{
 
 const SETTINGS_DEFAULTS = {
   model: DEFAULT_MODEL, autopilot: '0', per_day: '3', start_hour: '7', tz: 'America/Rio_Branco', themes: '',
-  score_min: '7.5', copy_review: '1', max_revisions: '2', max_jobs_day: '60', concurrency: '2', web_search: '0',
+  score_min: '7.5', copy_review: '1', max_revisions: '2', max_jobs_day: '60', concurrency: '4', web_search: '0',
   webhook_url: '', report_hour: '20', auto_produce: '1', approve_script: '0', night_hour: '22', art_gen: '1', fal_pausa: '0', arte_do_roteiro: 'chat', visual_check: '1', max_art_gen: '8', max_pose_gen: '0', q_feed: '1', q_carrossel: '1', q_stories: '0', q_video_vertical: '1', q_video_horizontal: '0', quota_days: '0,1,2,3,4,5,6', carousel_slides: '7', stories_slides: '5', video_secs: '30', img_budget_day: '1', pacote_ia: '0', kb_budget: '60000', auto_render: '1', max_gen_objects: '5', img_qualidade: 'alta', voz_provider: 'auto', brain_auto: '0', brain_daily: '1', brain_hour: '21', 
 };
 
@@ -6458,7 +6458,7 @@ function contentAct(id, act, b = {}) {
   }
 }
 
-const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), path, fs, dirname: __dirname });
+const fluxoV2 = criarFluxoV2({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;

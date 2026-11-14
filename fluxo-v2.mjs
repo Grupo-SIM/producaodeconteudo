@@ -142,6 +142,11 @@ export function criarFluxoV2(ctx) {
     const porC = new Map(); for (const j of ativos) { if (!porC.has(j.content_id)) porC.set(j.content_id, []); porC.get(j.content_id).push(j); }
     const rows = all(`SELECT * FROM contents WHERE teste=0 ${marca ? 'AND brand=? COLLATE NOCASE' : ''} ${incluirDescartados ? '' : "AND status<>'discarded'"} AND (status<>'posted' OR posted_at>=?) ORDER BY updated_at DESC LIMIT 600`, ...(marca ? [marca] : []), new Date(Date.now() - 14 * 864e5).toISOString());
     const itens = rows.map(c => item(c, porC.get(c.id) || []));
+    // por que está aguardando: posição na fila (mesma ordem do agendador) e quem está rodando agora
+    const fila = all("SELECT j.id,j.content_id,j.kind FROM jobs j JOIN agents a ON a.id=j.agent WHERE j.status='queued' AND a.enabled=1 AND (j.run_after IS NULL OR j.run_after<=?) ORDER BY (j.kind IN ('chat','teste')) DESC, j.id", T());
+    const rodando = all("SELECT j.agent, c.title FROM jobs j LEFT JOIN contents c ON c.id=j.content_id WHERE j.status='running'");
+    const vagas = Math.max(1, +ctx.settings().concurrency || 1), manual = !!ctx.manual?.();
+    for (const i of itens) if (i.aguardando) { const k = fila.findIndex(j => j.content_id === i.id); i.fila = { pos: k + 1, rodando: rodando.length, vagas, manual }; }
     const fs = formatos().map(f => {
       const da = itens.filter(i => i.raia === f.id), cont = {};
       for (const i of da) cont[i.estado] = (cont[i.estado] || 0) + 1;
@@ -149,7 +154,7 @@ export function criarFluxoV2(ctx) {
       return { ...f, contagem: cont, total: da.length, hoje: da.filter(i => ['finalizado', 'esperando'].includes(i.estado) && i.atualizado?.slice(0, 10) === hoje()).length, feitos_hoje_geral: feitosHoje };
     });
     const avisos = itens.filter(i => i.estado === 'parado').slice(0, 5).map(i => ({ id: i.id, titulo: i.titulo, motivo: i.motivo }));
-    return { formatos: fs, itens, avisos, estados: ESTADOS, etapas: ETAPA_NOME };
+    return { formatos: fs, itens, avisos, estados: ESTADOS, etapas: ETAPA_NOME, rodando, vagas: Math.max(1, +ctx.settings().concurrency || 1) };
   }
 
   function novaVersao(id, autor, campos, antes, depois, motivo = '', resumo = '') {
