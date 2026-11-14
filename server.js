@@ -6495,7 +6495,11 @@ function contentAct(id, act, b = {}) {
   } else if (act === 'reprocess') {
     setContent(id, { status: 'producing', error: '', revisions: 0, prod_revisions: 0 });
     log(null, `Reprocessando "${c.title}"`, id);
-    if (['treino_designer', 'grade_aprovada'].includes(c.created_by) && c.script) { const ag = c.format === 'video_vertical' ? 'editor' : 'designer'; enqueue(id, ag, ag === 'designer' ? 'arte' : 'video'); }   // copy já aprovada pelo dono: recomeça na arte, nunca reescreve nem revisa a copy
+    // recomeça DE ONDE PAROU: a última etapa que falhou ou ficou pela metade roda de novo; o que já foi aprovado não volta
+    const ult = one("SELECT agent, kind, input FROM jobs WHERE content_id=? AND status IN ('error','queued','running') ORDER BY id DESC LIMIT 1", id) || one("SELECT agent, kind, input FROM jobs WHERE content_id=? AND kind NOT IN ('chat','teste') ORDER BY id DESC LIMIT 1", id);
+    run("DELETE FROM jobs WHERE content_id=? AND status IN ('queued','error')", id);
+    if (ult) enqueue(id, ult.agent, ult.kind, jparse(ult.input, {}) || {});
+    else if (['treino_designer', 'grade_aprovada'].includes(c.created_by) && c.script) { const ag = c.format === 'video_vertical' ? 'editor' : 'designer'; enqueue(id, ag, ag === 'designer' ? 'arte' : 'video'); }   // copy já aprovada pelo dono: recomeça na arte, nunca reescreve nem revisa a copy
     else if (c.script) enqueue(id, 'gerente', 'revisao'); else enqueue(id, 'roteirista', 'roteiro');
   } else {
     if (c.status !== 'approved') throw fail(400, 'Só conteúdos aprovados podem ser marcados como postados');
