@@ -474,7 +474,7 @@ VIEWS.fluxo = () => {
   const nM = S.brands.length, aviso = F.avisos[0];
   const ban = F.avisos.length ? `<div class="prob"><b>${F.avisos.length} problema${F.avisos.length > 1 ? 's' : ''}</b><span>${esc(explica(aviso.motivo).titulo)} · ${esc(aviso.titulo)}${F.avisos.length > 1 ? ` e mais ${F.avisos.length - 1}` : ''}</span><button onclick="abreProblemas()">Resolver</button></div>` : '';
   const head = `<div class="top"><h1>Fluxo</h1><button class="chip ${S.modoFluxo === 'lista' ? 'on' : ''}" onclick="S.modoFluxo='lista';store.set('modoFluxo','lista');E3?.destruir();E3=null;render()">Lista</button><button class="chip ${S.modoFluxo === 'escritorio' ? 'on' : ''}" onclick="S.modoFluxo='escritorio';store.set('modoFluxo','escritorio');render()">Escritório</button><span style="flex:1"></span>
-    ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}${S.modoFluxo === 'escritorio' ? `<button class="chip" onclick="telao()">${store.get('telaoOn', true) ? 'Desligar telão' : 'Ligar telão'}</button><button class="chip" onclick="trocaVideo()">Vídeo</button><button class="chip" id="btnTela" onclick="telaCheia()">${document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia'}</button>` : `<button class="chip" onclick="treinoDesigner()">Treino do Designer</button><button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button>`}</div>`;
+    ${marcaSel(`Marca: <b>${esc(S.marca || `Todas (${nM})`)}</b> ▾`)}${S.modoFluxo === 'escritorio' ? `<button class="chip" onclick="telao()">${store.get('telaoOn', true) ? 'Desligar telão' : 'Ligar telão'}</button><button class="chip" onclick="trocaVideo()">Vídeo</button><button class="chip" id="btnTela" onclick="telaCheia()">${document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia'}</button>` : `<button class="chip" onclick="verFila()">Fila</button><button class="chip" onclick="treinoDesigner()">Treino do Designer</button><button class="chip gold" onclick="novoConteudo()">+ Novo conteúdo</button>`}</div>`;
   if (S.modoFluxo === 'escritorio') return escritorio3d(head, ban);
   E3?.destruir(); E3 = null;
   const lanes = F.formatos.filter(f => f.ativo).map(f => {
@@ -527,6 +527,18 @@ async function escritorio3d(head, ban) {
   } catch (e) { $('#esc').innerHTML = `<div class="empty">Sem 3D neste aparelho (${esc(e.message)}).</div>`; }
   finally { S.e3carregando = false; }
 }
+// Fila: o que cada agente está fazendo e o que espera, em ordem
+async function verFila() {
+  const F = await api('/api/v2/fila'), parado = F.usadas >= F.limite;
+  const lin = (x, k) => `<div class="kvr"><span>${k ? `<b class="muted" style="width:26px;display:inline-block">${k}º</b>` : '<b class="pulso"></b>'}${x.id ? `<a href="#" onclick="fecha();abrirItem(${x.id});return false">${esc(x.titulo)}</a>` : esc(x.titulo)}${x.marca ? ` <span class="muted small">· ${esc(x.marca)}</span>` : ''}</span><span class="small ${x.voce ? 'gold' : 'muted'}">${x.voce ? 'pedido por você' : x.sozinho ? 'criado sozinho' : ''}${x.quando ? ' · agendado ' + fmtD(x.quando) : ''}${x.id && !k ? '' : x.id ? ` <button class="chip" style="padding:2px 8px" onclick="descFila(${x.id})">Descartar</button>` : ''}</span></div>`;
+  modal(`<div class="hd"><h2>Fila dos agentes</h2><span class="muted small">cada agente faz uma tarefa por vez, na ordem abaixo · o que você pede passa na frente</span><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
+    <div class="box" style="margin-bottom:12px;${parado ? 'border-color:#6b2a2e' : ''}"><b>${F.usadas} de ${F.limite}</b> tarefas usadas hoje${parado ? ' · <span style="color:#ff7b7b">limite do dia acabou: a fila só volta amanhã ou aumentando o limite em Configurações</span>' : ''} · até ${F.vagas} agentes trabalhando ao mesmo tempo</div>
+    ${F.sozinhos ? `<div class="box" style="margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="flex:1"><b>${F.sozinhos}</b> peça(s) criadas sozinhas (pautas automáticas e notícias) ainda não chegaram na sua Mesa e ocupam a fila.</span><button class="btn sm dg" onclick="limparSozinhos(${F.sozinhos})">Descartar todas</button></div>` : ''}
+    ${F.agentes.map(a => `<h5 style="margin:14px 0 6px">${esc(a.nome)} <span class="muted small">· ${a.agora.length ? 'trabalhando agora' : 'livre'} · ${a.fila.length} na fila${a.ligado ? '' : ' · desligado'}</span></h5>${a.agora.map(x => lin(x, 0)).join('')}${a.fila.slice(0, 30).map((x, k) => lin(x, k + 1)).join('')}${a.fila.length > 30 ? `<p class="muted small">+ ${a.fila.length - 30} na fila</p>` : ''}`).join('') || '<p class="muted">Fila vazia: nenhum agente com tarefa.</p>'}
+  </div>`);
+}
+async function descFila(id) { await tryDo(() => api(`/api/v2/itens/${id}/descartar`, { body: {} }), 'Descartado (fica na lixeira)'); verFila(); }
+async function limparSozinhos(n) { if (!confirm(`Descartar ${n} peça(s) criadas sozinhas? Vão para a lixeira; as que já chegaram para você revisar ficam.`)) return; const r = await tryDo(() => api('/api/v2/fila/limpar-sozinhos', { body: {} })); if (r) toast(r.descartados + ' descartada(s)'); verFila(); }
 // Treino do Designer: escolhe uma copy já aprovada e manda direto para a arte (sem roteiro novo)
 async function treinoDesigner() {
   const [{ pecas }, { brands }] = await Promise.all([api('/api/v2/treino-designer'), api('/api/brands')]); S._td = pecas;

@@ -351,6 +351,24 @@ export function criarFluxoV2(ctx) {
     let mt;
     if (p === '/api/v2/fluxo' && m === 'GET') { const u = new URL(req.url, 'http://x'); return send(res, 200, fluxo({ marca: u.searchParams.get('marca') || '', incluirDescartados: u.searchParams.get('lixeira') === '1' })); }
     if (p === '/api/v2/novo-formatos' && m === 'GET') { try { return send(res, 200, { formatos: JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'formatos-novo-conteudo.json'), 'utf8')) }); } catch { return send(res, 200, { formatos: [] }); } }
+    // Fila: o que cada agente está fazendo agora e o que espera, na ordem em que vai ser feito
+    if (p === '/api/v2/fila' && m === 'GET') {
+      const st = ctx.settings(), usadas = one("SELECT COUNT(*) n FROM jobs WHERE day=? AND kind NOT IN ('chat','teste')", diaLocal(Date.now()))?.n || 0;
+      const J = all(`SELECT j.id,j.agent,j.kind,j.status,j.origin,j.run_after,j.started_at,j.content_id,c.title,c.brand,c.created_by,c.status cst FROM jobs j LEFT JOIN contents c ON c.id=j.content_id
+        WHERE j.status IN ('queued','running') ORDER BY (j.status='running') DESC, (j.kind IN ('chat','teste')) DESC, (j.origin='manual' OR c.created_by IN ('manual','treino_designer')) DESC, j.id`);
+      const ag = all('SELECT id,name,enabled FROM agents ORDER BY rowid');
+      const voce = j => j.origin === 'manual' || ['manual', 'treino_designer'].includes(j.created_by) || ['chat', 'teste'].includes(j.kind);
+      const f = j => ({ job: j.id, id: j.content_id, titulo: j.title || ({ chat: 'Respondendo você no chat', pautas: 'Criando pautas', radar: 'Buscando notícias', cerebro: 'Consolidando o Cérebro', relatorio: 'Lendo as métricas' })[j.kind] || j.kind, marca: j.brand || '', voce: voce(j), sozinho: !voce(j) && !!j.content_id, quando: j.run_after && new Date(j.run_after) > new Date() ? j.run_after : null, desde: j.started_at });
+      return send(res, 200, { usadas, limite: +st.max_jobs_day, vagas: Math.max(1, +st.concurrency || 1), agentes: ag.map(a => ({ id: a.id, nome: a.name, ligado: !!a.enabled, agora: J.filter(j => j.agent === a.id && j.status === 'running').map(f), fila: J.filter(j => j.agent === a.id && j.status === 'queued').map(f) })).filter(a => a.agora.length || a.fila.length),
+        sozinhos: one(`SELECT COUNT(*) n FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`).n });
+    }
+    // descarta de uma vez o que foi criado sozinho e ainda não chegou na Mesa do dono (vai para a lixeira, dá para restaurar)
+    if (p === '/api/v2/fila/limpar-sozinhos' && m === 'POST') {
+      const L = all(`SELECT id,status,title FROM contents WHERE teste=0 AND created_by NOT IN ('manual','treino_designer') AND status NOT IN ('posted','discarded','approved','awaiting_approval','awaiting_script')`);
+      for (const c of L) { run("DELETE FROM jobs WHERE content_id=? AND status='queued'", c.id); setContent(c.id, { status: 'discarded', status_antes: c.status, em_ajuste: 0 }); }
+      if (L.length) log(null, `Você descartou ${L.length} peça(s) criadas sozinhas que ainda não tinham chegado para você (ficam na lixeira)`); changed();
+      return send(res, 200, { descartados: L.length });
+    }
     // Treino do Designer: copy já aprovada (carrosseis-aprovados-producao.md) vai direto para a arte, sem escrever roteiro novo
     if (p === '/api/v2/treino-designer' && m === 'GET') return send(res, 200, { pecas: pecasAprovadas().map(({ texto, ...x }) => x) });
     if (p === '/api/v2/treino-designer' && m === 'POST') {
