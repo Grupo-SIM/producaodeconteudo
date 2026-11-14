@@ -88,6 +88,19 @@ export function criarFluxoV2(ctx) {
       log(null, `Produto cadastrado a partir do treino: ${p.name}`);
     }
   } catch (e) { if (e.code !== 'ENOENT') console.error('produtos do treino:', e.message); }
+  // Marcas do mapa de assuntos (conhecimento/marcas-assuntos.json): a que faltar entra sozinha, sem duplicar (ignora acento, espaço e maiúscula)
+  try {
+    const A = JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'marcas-assuntos.json'), 'utf8')), chave = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '').toLowerCase();
+    const inst = A._institucionais || {}, sobre = A._institucionais_sobre || {}, nomes = new Set([...Object.keys(inst), ...Object.entries(A).filter(([k]) => k[0] !== '_').flatMap(([, v]) => v)]);
+    const tem = new Set(all('SELECT name FROM brands').map(b => chave(b.name)));
+    for (const n of nomes) {
+      if (tem.has(chave(n))) continue; tem.add(chave(n));
+      run('INSERT INTO brands(name,created_at) VALUES(?,?)', n, T());
+      const papel = inst[n] ? `Marca institucional${sobre[n] ? ': ' + sobre[n] : ''}. O produto é a própria marca e tem Instagram próprio.` : `Marca de nicho: ${Object.entries(A).filter(([k, v]) => k[0] !== '_' && v.includes(n)).map(([k]) => k).join(', ')}.`;
+      run('INSERT INTO knowledge(title,category,content,brand,created_at,updated_at) VALUES(?,?,?,?,?,?)', 'Sobre a marca', 'marca', `PAPEL DA MARCA\n${papel}\n\nIDENTIDADE VISUAL\nLogo, cores e fontes: [CONFIRMAR] cadastre em Marcas.`, n, T(), T());
+      log(null, `Marca cadastrada a partir do mapa de assuntos: ${n} (falta logo e identidade visual)`);
+    }
+  } catch (e) { if (e.code !== 'ENOENT') console.error('marcas do mapa:', e.message); }
   // Itens parados pelo erro antigo de configuração (já corrigido no servidor): voltam sozinhos para a fila, sem aparecer como problema
   setTimeout(() => { try {
     const presos = all("SELECT DISTINCT c.id FROM contents c LEFT JOIN jobs j ON j.content_id=c.id WHERE c.status NOT IN ('posted','discarded','approved') AND (c.error LIKE '%dangerously-skip-permissions%' OR c.error LIKE '%root/sudo%' OR j.error LIKE '%dangerously-skip-permissions%' OR j.error LIKE '%root/sudo%')");
