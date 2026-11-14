@@ -4689,7 +4689,7 @@ async function arteEditor(id, onClose, opts = {}) {
     return h('div', { class: 'g' }, h('h4', null, 'Fundo do slide ' + (E.si + 1)), seg([['cor', 'Cor'], ['grad', 'Degradê'], ['img', 'Imagem'], ['ia', 'Por IA']], tipo, setTipo),
       t === 'cor' ? h('div', { class: 'g' }, colorF('Cor do fundo', () => s.bg.color, v => { s.bg.color = v; }, data.defaults.paper), colorF('Brilho (degradê)', () => s.bg.color2, v => { s.bg.color2 = v; }, data.defaults.accent)) : null,
       t === 'grad' ? gradUI : null,
-      t === 'img' ? h('div', { class: 'g' }, h('div', { class: 'small mut' }, 'Imagem: ' + s.bg.asset), h('div', { class: 'row' }, h('button', { class: 'btn sm', onclick: () => setTipo('x') }, 'Trocar imagem'), h('button', { class: 'btn sm', onclick: () => setTipo('grad') }, 'Voltar ao degradê'), h('button', { class: 'btn sm', style: 'color:#ff8a8a', onclick: () => apagaFundo() }, 'Apagar imagem do fundo'))) : null,
+      null,   // trocar e excluir a imagem do fundo ficam na barra que aparece ao clicar no fundo (sem repetir aqui)
       t === 'ia' ? h('label', { class: 'c' }, 'Descrição da imagem (em inglês, sem texto nem pessoas reais)', ta, h('span', { class: 'small', style: { color: data.fal ? 'var(--mut)' : 'var(--warn)' } }, data.fal ? 'A imagem é gerada ao salvar (consome créditos do fal.ai) e fica guardada para não gerar de novo.' : 'A geração por IA está desligada: ao salvar, o fundo sai liso.')) : null,
       t === 'img' || t === 'ia' ? filtrosUI(s.bg) : null,
       E.spec.slides.length > 1 ? h('label', { class: 'c' }, h('span', null, h('input', { type: 'checkbox', checked: s.pager !== false, onchange: e => edit('', () => { s.pager = e.target.checked; }) }), ' Mostrar os pontinhos de página')) : null);
