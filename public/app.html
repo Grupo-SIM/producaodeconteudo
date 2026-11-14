@@ -274,7 +274,7 @@ img.av{object-fit:cover;padding:0}
     <div class="msgs" id="msgs"></div>
     <div class="typing hidden" id="typing">Gerente digitando…</div>
     <div class="sugs" id="sugs"></div>
-    <div class="cin"><textarea id="cin" placeholder="Fale com o gerente…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea><button class="btn ok sm" onclick="chatSend()">Enviar</button></div>
+    <div class="cin"><button class="ibtn" title="Enviar arquivo ao gerente (logo, foto, fundo…)" onclick="$('#cfile').click()" style="flex:none">📎</button><input type="file" id="cfile" hidden onchange="anexo(this.files[0]);this.value=''"><textarea id="cin" placeholder="Fale com o gerente…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea><button class="btn ok sm" onclick="chatSend()">Enviar</button></div>
   </aside>
   <button class="fab" id="fab" onclick="chatToggle(true)" aria-label="Gerente"><svg viewBox="0 0 24 24" width="22" height="22" fill="#141006"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H9l-5 4v-4a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg><span class="dot"></span><span class="cnt" id="fabcnt"></span></button>
 </div>
@@ -388,7 +388,7 @@ function busca(q) {
 function abreBusca(r) { $('#bpop').classList.add('hidden'); if (r.tipo === 'conteudo') abrirItem(r.id); else if (r.tipo === 'marca') { go('marcas'); setTimeout(() => detMarca(r.id), 400); } else if (r.tipo === 'produto') { go('produtos'); setTimeout(() => detProduto(r.id), 400); } else if (r.tipo === 'regra') { chatToggle(true); $('#cin').value = `Me explica a regra #${r.id}`; } else { go('marcas'); } }
 async function notifs(primeira) {
   const { itens } = await api('/api/v2/notificacoes'); const vistas = new Set(store.get('notifVistas', []));
-  const novas = itens.filter(n => !vistas.has(n.chave)); S.notif = itens; S.ncnt = novas.length || '';
+  const novas = itens.filter(n => !vistas.has(n.chave) && /:revisao$/.test(n.chave)); S.notif = itens; S.ncnt = novas.length || '';
   const el = $('#ncnt'); if (el) el.textContent = S.ncnt;
   const avisadas = new Set(store.get('notifAvisadas', []));
   if (!primeira && 'Notification' in window && Notification.permission === 'granted') for (const n of novas.filter(n => !avisadas.has(n.chave)).slice(0, 3)) { try { new Notification(n.titulo, { body: n.detalhe || '' }); } catch { } }
@@ -503,7 +503,7 @@ async function escritorio3d(head, ban) {
   if (E3 && $('#esc')) { $('#eshud').innerHTML = hud; $('#escfeed').innerHTML = feed; E3.atualizar(st.agents, parados, info); return; }
   const vid = store.get('telao2', 'GG1XOAZ9Vd0'), on = store.get('telaoOn', true);
   $('#main').innerHTML = `<div id="escw">${ban}${head}
-    <div id="esc"></div><div id="eshud">${hud}</div><div id="escfeed" class="escf">${feed}</div></div>`;
+    <div id="esc"></div><div id="eshud">${hud}</div><div id="escfeed" class="escf" style="display:none"></div></div>`;
   if (S.e3carregando) return; S.e3carregando = true;
   try {
     const { criarEscritorio } = await import('/escritorio-v2.js');
@@ -1009,6 +1009,24 @@ function textoChat(m) {
   const t = String(m.text || '').trim(), sem = t.replace(/```json[\s\S]*?```/g, '').trim();
   if (/^[\[{]/.test(sem)) { try { const j = JSON.parse(sem), n = [].concat(j).length; return n ? `Pronto, executei ${n} ação(ões).` : 'Pronto.'; } catch { const fora = sem.replace(/\[[\s\S]*\]|\{[\s\S]*\}/g, '').trim(); return fora || 'Pronto, executei o pedido.'; } }
   return sem || t;
+}
+function anexo(f) {
+  if (!f) return; S._anexo = f;
+  modal(`<div class="hd"><h2>Enviar ao gerente</h2></div><div class="mb novo"><b>${esc(f.name)}</b><span class="small muted">${(f.size / 1024 / 1024).toFixed(1)} MB</span>
+    <label class="lb">Marca</label><select class="f" id="axm"><option value="">Geral (todas as marcas)</option>${S.brands.map(b => `<option ${b.name === S.marca ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select>
+    <label class="lb">O que é</label><select class="f" id="axk">${[['logo', 'Logo'], ['mascote', 'Mascote'], ['foto', 'Foto'], ['fundo', 'Fundo'], ['textura', 'Textura'], ['fonte', 'Fonte'], ['musica', 'Música'], ['video', 'Vídeo'], ['outro', 'Outro']].map(([k, l]) => `<option value="${k}" ${/logo/i.test(f.name) && k === 'logo' ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    <label class="lb">Recado (opcional)</label><input class="f" id="axt" placeholder="Ex.: troca a logo da marca por esta"></div>
+    <div class="ft"><button class="btn" style="margin-left:auto" onclick="fecha()">Cancelar</button><button class="btn ok" onclick="enviaAnexo()">Enviar</button></div>`, 'sm');
+}
+async function enviaAnexo() {
+  const f = S._anexo, brand = $('#axm').value, kind = $('#axk').value, txt = $('#axt').value.trim();
+  try {
+    const r = await fetch('/api/assets/upload?' + new URLSearchParams({ filename: f.name, brand }), { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/octet-stream', 'x-nerd': '1' }, body: f });
+    const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Falha no envio');
+    if (j.kind !== kind) await api('/api/assets/' + j.id, { method: 'PUT', body: { brand, name: j.name, kind, tags: '' } }).catch(() => { });
+    fecha(); toast('Arquivo salvo na biblioteca' + (brand ? ' de ' + brand : ''));
+    await chatSend(`Enviei o arquivo "${j.name}" (#${j.id}, ${kind}${brand ? ', marca ' + brand : ''}).${txt ? ' ' + txt : ''}`);
+  } catch (e) { toast(e.message); }
 }
 async function chatSend(t) {
   const text = t || $('#cin').value.trim(); if (!text) return; $('#cin').value = '';

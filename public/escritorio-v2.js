@@ -52,9 +52,9 @@ export function criarEscritorio(el, { onPick } = {}) {
     const est = new THREE.Mesh(new THREE.BoxGeometry(10, 4.2, .6), nm); est.position.y = 2.1; g.add(est);
     for (let r = 0; r < 4; r++) for (let x = -4.6; x < 4.6;) { const bw = .12 + Math.random() * .12, bh = .55 + Math.random() * .3; const b = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, .4), mat(new THREE.Color().setHSL(Math.random(), .35, .2 + Math.random() * .25))); b.position.set(x, .35 + r * 1 + bh / 2, .12); g.add(b); x += bw + .02; } }
   // tapete e luz quente sobre o Gerente
-  { const t = new THREE.Mesh(new THREE.CircleGeometry(4.6, 64), mat(0x2b2f3a, { roughness: 1 })); t.rotation.x = -Math.PI / 2; t.position.y = .02; t.receiveShadow = true; scene.add(t);
-    const borda = new THREE.Mesh(new THREE.RingGeometry(4.4, 4.6, 64), new THREE.MeshBasicMaterial({ color: 0xc9a040 })); borda.rotation.x = -Math.PI / 2; borda.position.y = .03; scene.add(borda);
-    const l = new THREE.SpotLight(0xffe2b0, 60, 18, .6, .5); l.position.set(0, 9, 0); l.target.position.set(0, 0, 0); scene.add(l, l.target); }
+  { const t = new THREE.Mesh(new THREE.CircleGeometry(4.6, 64), mat(0x2b2f3a, { roughness: 1 })); t.rotation.x = -Math.PI / 2; t.position.set(0, .02, -5); t.receiveShadow = true; scene.add(t);
+    const borda = new THREE.Mesh(new THREE.RingGeometry(4.4, 4.6, 64), new THREE.MeshBasicMaterial({ color: 0xc9a040 })); borda.rotation.x = -Math.PI / 2; borda.position.set(0, .03, -5); scene.add(borda);
+    const l = new THREE.SpotLight(0xffe2b0, 60, 18, .6, .5); l.position.set(0, 9, -5); l.target.position.set(0, 0, -5); scene.add(l, l.target); }
   // luminárias lineares, plantas e lounge de couro
   for (const z of [-6, 2]) { const p = new THREE.PointLight(0xfff1dc, 18, 16); p.position.set(-2, 7.8, z); scene.add(p); }
   const planta = (x, z, s = 1) => { const vaso = new THREE.Mesh(new THREE.CylinderGeometry(.42 * s, .34 * s, .9 * s, 24), mat(0xe8e4dc, { roughness: .4 })); vaso.position.set(x, .45 * s, z); vaso.castShadow = true; scene.add(vaso); for (let k = 0; k < 14; k++) { const f = new THREE.Mesh(new THREE.ConeGeometry(.12 * s, 1.4 * s, 5), mat(new THREE.Color().setHSL(.28 + Math.random() * .06, .5, .2 + Math.random() * .12))); const a = Math.random() * Math.PI * 2; f.position.set(x + Math.cos(a) * .2 * s, (1.3 + Math.random() * .5) * s, z + Math.sin(a) * .2 * s); f.rotation.set(Math.cos(a) * .5, 0, Math.sin(a) * .5); f.castShadow = true; scene.add(f); } };
@@ -62,11 +62,11 @@ export function criarEscritorio(el, { onPick } = {}) {
   box(5, .45, 1.8, 0x3a2418, -17, 0, 12, scene, { roughness: .45 }); box(5, 1.1, .45, 0x3a2418, -17, 0, 12.9, scene, { roughness: .45 }); box(2, .4, 1.1, 0x1a1a1a, -17, 0, 9.8, scene, { roughness: .15, metalness: .5 });
 
   // telão na parede do fundo, de frente para a câmera
-  const telao = new THREE.Group(); telao.position.set(4, 0, -17.6); scene.add(telao);
+  const telao = new THREE.Group(); telao.position.set(0, 0, -17.6); scene.add(telao);
   box(12.8, 7.4, .25, 0x05070c, 0, 1.2, -.15, telao);
   const tela = new THREE.Mesh(new THREE.PlaneGeometry(12.2, 6.86), new THREE.MeshBasicMaterial({ color: 0x0b1a10 })); tela.position.set(0, 4.9, .02); telao.add(tela);
 
-  const pessoas = new Map(), pick = [], gerentePos = new THREE.Vector3(0, 0, 0);
+  const pessoas = new Map(), pick = [], gerentePos = new THREE.Vector3(0, 0, -5);
   const pele = [0xe8c0a0, 0xc68e64, 0x8d5a3b, 0xf1d0b5, 0xa86f4c, 0x5c3a24];
   const ternos = [0x1c2433, 0x2b2b2e, 0x3a3f4a, 0x111111, 0x24304a, 0x4a3a2a];
   const roupa = ternos;
@@ -117,16 +117,15 @@ export function criarEscritorio(el, { onPick } = {}) {
     const lista = agentes.filter(a => a.id !== 'chefe');
     lista.forEach((a, k) => {
       if (pessoas.has(a.id)) return;
-      const ang = Math.PI * 0.92 + (k / Math.max(1, lista.length - 1)) * Math.PI * 1.16, rx = 11.5, rz = 8.5;
-      const x = Math.cos(ang) * rx, z = Math.sin(ang) * rz + 1;
-      const m = mesa(x, z, Math.PI + Math.atan2(x, 14) * .5, a.color || roupa[k % roupa.length], k);
+      const por = 4, fil = Math.floor(k / por), col = k % por, x = (col - (por - 1) / 2) * 5.2, z = 1.5 + fil * 4.6;
+      const m = mesa(x, z, 0, a.color || roupa[k % roupa.length], k);
       const d = { a, ...m, casa: new THREE.Vector3(x, 0, z), cardEl: card('ecard'), nomeEl: card('enome'), estado: 'descansando', t: Math.random() * 10 };
       m.g.traverse(o => { o.userData = { agente: a.id }; if (o.isMesh) pick.push(o); });
       const curva = new THREE.QuadraticBezierCurve3(gerentePos.clone().setY(1.6), new THREE.Vector3(x / 2, 4.5, z / 2), new THREE.Vector3(x, 1.6, z));
       const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curva.getPoints(40)), new THREE.LineBasicMaterial({ color: 0x3b6cf0, transparent: true, opacity: 0.8 })); scene.add(ln); linhas.set(a.id, ln);
       pessoas.set(a.id, d);
     });
-    if (!pessoas.has('chefe')) { const g = agentes.find(a => a.id === 'chefe') || { id: 'chefe', name: 'Gerente' }; const m = mesa(0, 0, Math.PI, 0xc9a040, 7, true); m.mon.material.emissive.setHex(0x8a6a20); m.g.traverse(o => { o.userData = { agente: 'chefe' }; if (o.isMesh) pick.push(o); }); pessoas.set('chefe', { a: g, ...m, casa: gerentePos, cardEl: card('ecard'), nomeEl: card('enome'), estado: 'trabalhando', t: 0 }); }
+    if (!pessoas.has('chefe')) { const g = agentes.find(a => a.id === 'chefe') || { id: 'chefe', name: 'Gerente' }; const m = mesa(0, -5, 0, 0xc9a040, 7, true); m.mon.material.emissive.setHex(0x8a6a20); m.g.traverse(o => { o.userData = { agente: 'chefe' }; if (o.isMesh) pick.push(o); }); pessoas.set('chefe', { a: g, ...m, casa: gerentePos, cardEl: card('ecard'), nomeEl: card('enome'), estado: 'trabalhando', t: 0 }); }
   }
   // info[id] = { texto, sub, prog } vindo do painel
   function atualizar(agentes, parados = new Set(), info = {}) {
@@ -139,9 +138,9 @@ export function criarEscritorio(el, { onPick } = {}) {
     }
   }
 
-  const ray = new THREE.Raycaster(), ms = new THREE.Vector2();
-  renderer.domElement.addEventListener('click', e => { const r = renderer.domElement.getBoundingClientRect(); ms.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ms, cam); const o = ray.intersectObjects(pick)[0]?.object; if (o) onPick?.(o.userData.agente); });
-  let ang = 0.62, zoom = 1, arr = null;
+  let sel = null; const ray = new THREE.Raycaster(), ms = new THREE.Vector2();
+  renderer.domElement.addEventListener('click', e => { const r = renderer.domElement.getBoundingClientRect(); ms.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ms, cam); const o = ray.intersectObjects(pick)[0]?.object; sel = o ? (sel === o.userData.agente ? null : o.userData.agente) : null; });
+  let ang = 1.0, zoom = 1, arr = null;
   renderer.domElement.addEventListener('pointerdown', e => arr = { x: e.clientX, a: ang });
   addEventListener('pointerup', () => arr = null);
   renderer.domElement.addEventListener('pointermove', e => { if (arr) ang = Math.max(0.1, Math.min(1.2, arr.a + (e.clientX - arr.x) * 0.004)); });
@@ -168,7 +167,7 @@ export function criarEscritorio(el, { onPick } = {}) {
       const [x, y, z] = tela2d(wp.clone().setY(3.4)), [nx, ny] = tela2d(wp.clone().setY(2.6));
       const ok = z < 1, vis = ok ? '' : 'none';
       const inf = d.info || {};
-      d.cardEl.style.display = ok && (inf.texto || d.estado === 'parado') ? '' : 'none';
+      d.cardEl.style.display = ok && sel === d.a.id && (inf.texto || d.estado !== 'descansando') ? '' : 'none';
       d.cardEl.style.left = x + 'px'; d.cardEl.style.top = y + 'px';
       const html = `${inf.texto || (d.estado === 'parado' ? 'Parado' : d.estado === 'trabalhando' ? 'Trabalhando' : '')}${inf.sub ? `<small>${inf.sub}</small>` : ''}${inf.prog != null ? `<u><i style="width:${Math.round(inf.prog * 100)}%"></i></u>` : ''}`;
       if (d.cardEl._h !== html) { d.cardEl.innerHTML = html; d.cardEl._h = html; }
