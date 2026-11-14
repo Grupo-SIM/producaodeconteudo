@@ -616,15 +616,25 @@ Contracapa: Segundo a Meta, milhões de adolescentes vão receber as proteções
 Legenda: A Meta anunciou na segunda-feira (9) que vai usar inteligência artificial no mundo todo para identificar adolescentes no Instagram, mesmo quando eles informam uma idade de adulto no cadastro. Quem o sistema identificar como tendo entre 13 e 17 anos passa para uma Conta de Adolescente, com limites de contato, de conteúdo e de tempo de uso. Para quem cria conteúdo para o público jovem, a mudança pode mexer em quem consegue ver e falar com esse público. Leia a matéria completa clicando no link da bio.
 
 Matéria. Título SEO: Instagram usa IA para identificar adolescentes no mundo todo
+Manchete (H1): Instagram passa a usar inteligência artificial no mundo todo para identificar adolescentes que informam idade de adulto e colocá-los em contas com restrições
 Linha fina: A Meta diz que milhões de adolescentes vão receber as proteções. No Brasil, onde a tecnologia já era usada, a lei exige verificação de idade desde março.
 Lide: A Meta anunciou na segunda-feira (9) que vai usar inteligência artificial no mundo todo para identificar adolescentes no Instagram, mesmo quando eles informam uma data de nascimento de adulto. Quem o sistema apontar como tendo entre 13 e 17 anos passa automaticamente para uma Conta de Adolescente, com proteções que limitam contato, conteúdo e tempo de uso.
-## O que muda para quem usa o Instagram: Contas de Adolescente limitam contato, conteúdo e tempo (Meta); impedem mensagens de desconhecidos, perfil e posts privados por padrão, limite diário e controle dos pais (Engadget). Citação do comunicado em tradução livre. O comunicado não explica como um adulto colocado por engano pode contestar.
-## No Brasil, a tecnologia já era usada: EUA, União Europeia e Brasil (Engadget); sem números de precisão (Fast Company Brasil).
-## No Brasil, a lei já exige verificação de idade: ECA Digital em vigor desde 17/03/2026; "mecanismos confiáveis de verificação de idade a cada acesso"; contas até 16 anos vinculadas a responsável; regulamentação pendente para lojas e sistemas; multa de até 10% do faturamento (Agência Senado).
-## Um acordo nos Estados Unidos por trás da mudança: acordo de agosto com 52 procuradores-gerais, até US$ 18 bilhões (Engadget); correção da Engadget sobre análise de fotos para menores de 13.
-## Apple, Facebook e Threads: os próximos passos: sinal de idade da Apple na Austrália; cobrança a TikTok e YouTube; Facebook em expansão; Threads ainda em 2026; vídeo para pais nos EUA.
-Fontes: Meta (09/11/2026); Engadget (09/11/2026); Fast Company Brasil (10/11/2026); Agência Senado (17/03/2026).
-Observação: matéria datada; texto completo na conversa de treino de 11/11/2026. Serve como modelo.
+## O que muda para quem usa o Instagram
+Segundo a Meta, as Contas de Adolescente limitam quem pode entrar em contato com o jovem, o que ele vê e quanto tempo passa nos aplicativos. De acordo com a Engadget, essas contas impedem mensagens de desconhecidos, deixam perfil e posts privados por padrão, têm limite diário de uso e controles para os pais.
+“Milhões de adolescentes a mais no mundo todo que usam o Instagram vão receber essas proteções, mesmo que tenham mentido a idade”, afirmou a Meta no comunicado, em tradução livre.
+O comunicado não explica como um adulto colocado por engano numa Conta de Adolescente pode contestar a classificação.
+## No Brasil, a tecnologia já era usada
+A expansão é global, mas o Brasil não é novidade. Segundo a Engadget, a Meta já usava a estimativa de idade por inteligência artificial nos Estados Unidos, na União Europeia e no Brasil. A empresa diz que ampliou a tecnologia por causa dos resultados, mas, segundo a Fast Company Brasil, não divulgou números sobre a precisão do sistema nem sobre quantos perfis serão identificados.
+## No Brasil, a lei já exige verificação de idade
+Desde 17 de março de 2026 está em vigor no Brasil o Estatuto Digital da Criança e do Adolescente, o ECA Digital. Segundo a Agência Senado, a lei exige que as plataformas adotem “mecanismos confiáveis de verificação de idade a cada acesso” para conteúdos inadequados a menores de 18 anos, sem depender só da idade declarada pelo usuário.
+A lei também determina que contas de crianças e adolescentes de até 16 anos estejam vinculadas a um responsável. Vários pontos ainda dependem de regulamentação, como os requisitos para a verificação de idade feita por sistemas operacionais e lojas de aplicativos. Descumprir a lei pode render multa de até 10% do faturamento da empresa.
+## Um acordo nos Estados Unidos por trás da mudança
+A Meta liga a expansão ao acordo firmado em agosto com 52 procuradores-gerais de estados e territórios dos Estados Unidos. Segundo a Engadget, o acordo encerra uma ação sobre danos a usuários jovens, e a empresa pode ter que pagar até US$ 18 bilhões. No comunicado, a Meta diz que está investindo em tecnologia para encontrar contas de menores de 13 anos e de adolescentes de 13 a 17.
+Depois de publicar a notícia, a Engadget corrigiu um ponto: a análise de fotos e de menções a aniversários e séries escolares, segundo a Meta, é usada para encontrar e remover menores de 13 anos, não para identificar adolescentes.
+## Apple, Facebook e Threads: os próximos passos
+Na Austrália, a Meta começou a usar a faixa de idade informada pela Apple. Quando os pais configuram o celular do filho, a loja de aplicativos confirma a idade e repassa a faixa etária a cada aplicativo baixado. A Meta defende que essa verificação seja feita pelas lojas de aplicativos e cobrou que TikTok e YouTube adotem as mesmas práticas.
+A empresa também segue levando a tecnologia ao Facebook e diz que vai começar a usá-la no Threads ainda em 2026. Neste mês, pais nos Estados Unidos vão receber um vídeo no Instagram explicando como os adolescentes são colocados nas contas protegidas.
+Fontes: Meta, comunicado (09/11/2026); Engadget (09/11/2026, com atualização); Fast Company Brasil (10/11/2026); Agência Senado (17/03/2026).
 
 ## Posts de blog
 

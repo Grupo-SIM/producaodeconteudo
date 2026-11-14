@@ -386,7 +386,8 @@ export function criarFluxoV2(ctx) {
     const L = String(t).replace(/^Mat[ée]ria\.\s*/m, '').split('\n').map(x => x.trim()).filter(Boolean), out = [];
     for (const l of L) {
       if (/^Observa[cç][aã]o:/i.test(l)) continue;
-      const m = l.match(/^(T[íi]tulo(?: SEO)?|Manchete|Linha fina|Lide|Se[cç][aã]o|Palavra-chave|Meta descri[cç][aã]o|Slug):\s*(.*)$/i);
+      if (/^Lide$/i.test(l) || (/^T[íi]tulo SEO:/i.test(l) && /^Manchete/im.test(t))) continue;   // título SEO é metadado: com manchete (H1), o leitor vê só a manchete
+      const m = l.match(/^(T[íi]tulo(?: SEO)?|Manchete(?: \(H1\))?|Linha fina|Lide|Se[cç][aã]o|Palavra-chave|Meta descri[cç][aã]o|Slug):\s*(.*)$/i);
       if (m) { const k = m[1].toLowerCase(); if (/t[íi]tulo|manchete/.test(k)) out.push('# ' + m[2]); else if (/linha fina|lide/.test(k)) out.push(m[2]); continue; }
       out.push(l);
     }
