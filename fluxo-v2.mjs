@@ -431,6 +431,17 @@ export function criarFluxoV2(ctx) {
       const br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || pc.marca || '')); if (!br) throw fail(400, 'Escolha a marca');
       return send(res, 200, { id: criarDeAprovada(pc, br.name, 'treino_designer') });
     }
+    // tipo de cada marca (nicho ou institucional) e o assunto, para a etiqueta em Marcas
+    if (p === '/api/v2/marcas-tipos' && m === 'GET') {
+      let A = {}; try { A = JSON.parse(fsx.readFileSync(path.join(ctx.dirname, 'conhecimento', 'marcas-assuntos.json'), 'utf8')); } catch { }
+      const ch = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '').toLowerCase(), out = {};
+      for (const b of all('SELECT name FROM brands')) {
+        const inst = Object.keys(A._institucionais || {}).find(n => ch(n) === ch(b.name));
+        const assuntos = Object.entries(A).filter(([k, v]) => k[0] !== '_' && v.some(n => ch(n) === ch(b.name))).map(([k]) => k);
+        out[b.name] = inst ? { tipo: 'institucional', assunto: (A._institucionais_sobre || {})[inst] || '' } : assuntos.length ? { tipo: 'nicho', assunto: assuntos.filter(x => !['Futebol', 'Finanças'].includes(x)).join(', ') } : { tipo: '', assunto: '' };
+      }
+      return send(res, 200, { marcas: out });
+    }
     if (p === '/api/v2/metas' && m === 'GET') return send(res, 200, { metas: all('SELECT * FROM brand_metas'), formatos: novoFormatos(), marcas: all('SELECT name FROM brands ORDER BY name').map(x => x.name), autopilot: ctx.settings().autopilot === '1', hora: +(ctx.settings().start_hour || 0) });
     if (p === '/api/v2/metas' && m === 'PUT') {
       const b = await readBody(req, 20000), br = one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', String(b.brand || '')); if (!br) throw fail(400, 'Marca não encontrada');
