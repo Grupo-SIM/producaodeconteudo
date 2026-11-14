@@ -4464,7 +4464,7 @@ async function arteEditor(id, onClose, opts = {}) {
   const bgAsset = a => { pushUndo(); const s = cur(); s.bg ||= {}; delete s.bg.gen; delete s.__ia; s.bg.asset = a.name; markDirty(); drawPanel(); repaint(); drawStrip(); toast('Fundo do slide ' + (E.si + 1) + ' trocado', 'ok'); };
   const lib = libDrawer({ list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Minha biblioteca']], match: () => true,
     onAdd: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } addAssetAt(a); }, onBg: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } bgAsset(a); }, onClose: () => toggleLib(false), onUpload: (j, f) => E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }) });
-  const toggleLib = on => { lib.el.hidden = !on; libB.classList.toggle('on', on); if (on) { lib.paint(); elp.el.hidden = true; elB.classList.remove('on'); } setTimeout(fit, 30); };
+  const toggleLib = on => { lib.el.hidden = !on; libB.classList.toggle('on', on); if (on) { lib.paint(); elp.el.hidden = true; elB.classList.remove('on'); tpl.el.hidden = true; tplB.classList.remove('on'); } setTimeout(fit, 30); };
   const libB = h('button', { title: 'Biblioteca de imagens da marca', onclick: () => toggleLib(lib.el.hidden) }, svg(AI.image), 'Biblioteca');
   cv.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('text/x-asset') || e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
   cv.addEventListener('drop', async e => {
@@ -5175,8 +5175,41 @@ async function arteEditor(id, onClose, opts = {}) {
     }
     el.replaceChildren(head, tb, body);
   };
-  const toggleEl = on => { elp.el.hidden = !on; if (on) { lib.el.hidden = true; libB.classList.remove('on'); paintEl(); } elB.classList.toggle('on', on); setTimeout(fit, 30); };
+  const toggleEl = on => { elp.el.hidden = !on; if (on) { lib.el.hidden = true; libB.classList.remove('on'); tpl.el.hidden = true; tplB.classList.remove('on'); paintEl(); } elB.classList.toggle('on', on); setTimeout(fit, 30); };
   const elB = h('button', { title: 'Ícones, formas, selos, estilos de texto e cores', onclick: () => toggleEl(elp.el.hidden) }, svg(AI.shape), 'Elementos');
+  // Templates aprovados: troca o layout da página aberta num clique, mantendo textos e fotos. Não vira regra: ao aprovar, o Gerente faz a engenharia reversa do que melhorou
+  const TPL_NOTICIA = [['noticia', {}, 'Notícia Zyrion: foto inteira', 'Foto em página inteira, degradê escuro embaixo e manchete em caixa alta.'],
+    ['noticia', { foto2: 1 }, 'Notícia Zyrion: tela dividida', 'Duas fotos lado a lado no alto, dissolvendo no preto. Bom para confronto ou antes e depois.'],
+    ['noticia', { circulo: 1 }, 'Notícia Zyrion: foto com círculo', 'Foto de fundo e um círculo com a referência do assunto (rosto, logo, objeto).'],
+    ['noticia', { pb: 1 }, 'Notícia Zyrion: preto e branco', 'Igual à foto inteira, em preto e branco, para notícia triste.'],
+    ['noticia', { estilo: 'nuvo' }, 'Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
+  const tplDados = () => {   // o que já está na página vira os dados do template novo
+    const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).find(t => t.role === r && !t.decor)?.value;
+    if (!s.modelo) { d.titulo ??= T('title'); d.texto ??= T('body'); d.cta ??= T('cta'); d.kicker ??= T('label'); d.selo ??= T('badge'); if (s.bg?.asset) d.foto ??= { asset: s.bg.asset }; else if (s.bg?.gen) d.foto ??= { gen: s.bg.gen }; }
+    for (const k of Object.keys(d)) if (d[k] == null) delete d[k];
+    delete d.estilo; delete d.pb; return d;
+  };
+  const usaTpl = guard(async (modelo, extra) => {
+    const d = tplDados(), x = { ...extra };
+    const pede = (campo, titulo) => new Promise(ok => { if (d[campo]) return ok(true); pickImage(titulo, a => { d[campo] = { asset: a.name }; ok(true); }); });
+    if (x.foto2) { delete x.foto2; await pede('foto2', 'Tela dividida: escolha a segunda foto'); } else delete d.foto2;
+    if (x.circulo) { delete x.circulo; await pede('circulo', 'Foto com círculo: escolha a imagem do círculo'); } else if (modelo === 'noticia') delete d.circulo;
+    const r = await api(`/contents/${id}/arte/modelo`, 'POST', { modelo, dados: { ...d, ...x }, i: E.si, total: E.spec.slides.length });
+    pushUndo(); E.spec.slides[E.si] = r.slide; E.sel = null; E.multi = null; markDirty(); repaint(); drawStrip(); drawPanel();
+    toast('Template aplicado na página ' + (E.si + 1) + '. Ao aprovar, o Gerente estuda o que melhorou (não vira regra da marca).', 'ok');
+  });
+  const tpl = { el: h('div', { class: 'aelp', hidden: true }) };
+  tpl.paint = async () => {
+    if (!MODS) { try { MODS = (await api('/arte-modelos')).modelos; } catch { MODS = []; } }
+    const s = cur(), card = (nome, desc, uso, on, fn) => h('button', { type: 'button', class: 'aemod' + (on ? ' on' : ''), title: desc, style: { textAlign: 'left', width: '100%' }, onclick: fn }, h('b', null, nome), h('small', null, uso ? uso + ' · ' + desc : desc));
+    const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
+    tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
+      h('div', { class: 'small mut' }, 'Troca o layout da página ' + (E.si + 1) + ' mantendo os textos e as fotos.'),
+      h('h4', null, 'Notícia'), ...TPL_NOTICIA.map(([m, e, n, ds]) => card(n, ds, '', tplAtual(m, e), () => usaTpl(m, e))),
+      h('h4', null, 'Todos os formatos'), ...MODS.filter(m => m.id !== 'noticia').map(m => card(m.nome, m.desc, m.uso, s.modelo === m.id, () => usaTpl(m.id, {}))));
+  };
+  const toggleTpl = on => { tpl.el.hidden = !on; tplB.classList.toggle('on', on); if (on) { lib.el.hidden = true; libB.classList.remove('on'); elp.el.hidden = true; elB.classList.remove('on'); tpl.paint(); } setTimeout(fit, 30); };
+  const tplB = h('button', { title: 'Templates aprovados: troca o layout desta página', onclick: () => toggleTpl(tpl.el.hidden) }, svg(AI.layout), 'Templates');
   const abreEl = tab => { EL.tab = tab; toggleEl(true); };
   cv.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('text/x-elem')) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; } });
   cv.addEventListener('drop', e => {
@@ -5186,7 +5219,7 @@ async function arteEditor(id, onClose, opts = {}) {
   }, true);
   const EMB = document.body.classList.contains('embed');   // dentro do novo painel: só o essencial (texto, biblioteca e formas)
   rail.append(EMB ? h('button', { onclick: () => abreEl('texto') }, svg(AI.text), 'Texto') : flyBtn(AI.text, 'Texto', [['Título', () => addText('title')], ['Texto de apoio', () => addText('body')], ['Selo', () => addText('badge')], ['Número grande', () => addText('number')], ['Botão (CTA)', () => addText('cta')], ['Estilos e duplas de fonte…', () => abreEl('texto')]]),
-    libB, EMB ? null : elB, EMB ? null : h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), 
+    libB, tplB, EMB ? null : elB, EMB ? null : h('button', { onclick: addImage }, svg(AI.image), 'Imagem'), 
     EMB ? null : h('button', { onclick: () => select(null) }, svg(AI.bg), 'Fundo'), EMB ? null : h('button', { onclick: aplicarLayout }, svg(AI.layout), 'Layouts'), ...(EMB ? [] : [ h('button', { title: 'Ímã: gruda no centro e nas bordas dos outros elementos (segure Alt para ignorar)', class: 'on', onclick: e => { E.snap = !E.snap; e.currentTarget.classList.toggle('on', E.snap); } }, svg(AI.shape), 'Ímã'), h('button', { onclick: e => { E.guides = !E.guides; e.currentTarget.classList.toggle('on', E.guides); drawOverlay(); } }, svg(AI.grid), 'Guias')]));
   const nomeEst = opts.estilo ? h('input', { type: 'text', class: 'ttl', value: opts.estilo.nome, 'aria-label': 'Nome do estilo', style: { background: 'transparent', border: '1px solid var(--bd)', borderRadius: '8px', padding: '4px 8px', color: 'inherit', font: 'inherit', minWidth: '200px' } }) : null;
   const salvarEstilo = guard(async () => {
@@ -5200,7 +5233,7 @@ async function arteEditor(id, onClose, opts = {}) {
     h('button', { class: 'btn sm', onclick: salvarTemplate, title: 'Guarda a estrutura desta arte para repetir com outros conteúdos e em outras marcas' }, svg(AI.layout, 15), 'Salvar como template'), h('button', { class: 'btn sm', onclick: salvarLayout }, 'Salvar layout'), data.teste === 2 ? h('button', { class: 'btn sm', onclick: pedirDesigner }, svg(AI.wand, 15), 'Pedir ao Designer') : null,
     h('a', { class: 'btn sm', href: `/api/contents/${id}/arte/zip`, download: '', title: 'Baixa as imagens da última versão salva' }, svg(AI.down2, 15), 'Baixar'), h('button', { class: 'btn sm', onclick: save }, svg(AI.save, 15), 'Salvar'), h('button', { class: 'btn primary sm', onclick: aprovar }, svg(AI.check, 15), 'Aprovar e ensinar'));
   const banner = data.arte?.status === 'sem_motor' ? h('div', { class: 'banner warn', style: { margin: 0, borderRadius: 0 } }, 'O motor de imagem não está instalado neste computador: você pode editar aqui normalmente, mas o PNG só é gerado depois de instalar o motor (veja o README).') : null;
-  root.append(top, ...(banner ? [banner] : []), h('div', { class: 'aem' }, rail, lib.el, elp.el, h('div', { class: 'aec' }, cv, h('div', { class: 'vehint' }, h('span', null, 'Dois cliques edita o texto'), h('span', null, 'Shift+arrastar: reto'), h('span', null, 'Alt: ignora o ímã'), h('span', null, 'Ctrl+C / Ctrl+V: copia entre slides'), h('span', null, 'Ctrl+D duplica'), h('span', null, 'Botão direito: mais opções'), h('span', null, 'Ctrl+G agrupa'), h('div', { class: 'sp' }), h('div', { class: 'aezb' }, h('button', { class: 'btn sm', title: 'Reduzir o zoom (tecla -)', onclick: () => setZoom((E.zm || 1) / 1.2) }, '−'), zlbl, h('button', { class: 'btn sm', title: 'Aumentar o zoom (tecla +). Ctrl+roda do mouse também dá zoom', onclick: () => setZoom((E.zm || 1) * 1.2) }, '+'), h('button', { class: 'btn sm', title: 'Mostrar ou esconder as réguas. Arraste da régua para criar guias', onclick: e => { E.rul = !E.rul; e.currentTarget.classList.toggle('on', E.rul); drawOverlay(); } }, 'Réguas'))), strip), panel));
+  root.append(top, ...(banner ? [banner] : []), h('div', { class: 'aem' }, rail, lib.el, tpl.el, elp.el, h('div', { class: 'aec' }, cv, h('div', { class: 'vehint' }, h('span', null, 'Dois cliques edita o texto'), h('span', null, 'Shift+arrastar: reto'), h('span', null, 'Alt: ignora o ímã'), h('span', null, 'Ctrl+C / Ctrl+V: copia entre slides'), h('span', null, 'Ctrl+D duplica'), h('span', null, 'Botão direito: mais opções'), h('span', null, 'Ctrl+G agrupa'), h('div', { class: 'sp' }), h('div', { class: 'aezb' }, h('button', { class: 'btn sm', title: 'Reduzir o zoom (tecla -)', onclick: () => setZoom((E.zm || 1) / 1.2) }, '−'), zlbl, h('button', { class: 'btn sm', title: 'Aumentar o zoom (tecla +). Ctrl+roda do mouse também dá zoom', onclick: () => setZoom((E.zm || 1) * 1.2) }, '+'), h('button', { class: 'btn sm', title: 'Mostrar ou esconder as réguas. Arraste da régua para criar guias', onclick: e => { E.rul = !E.rul; e.currentTarget.classList.toggle('on', E.rul); drawOverlay(); } }, 'Réguas'))), strip), panel));
   $('#layer').append(root); addEventListener('keydown', onKey); addEventListener('resize', onResize);
   setStatus(); drawPanel(); drawStrip(true); fit(); try { let rw = 0, rh = 0; ro = new ResizeObserver(() => { if (cv.clientWidth === rw && cv.clientHeight === rh) return; rw = cv.clientWidth; rh = cv.clientHeight; fit(); }); ro.observe(cv); } catch { /* sem observador: só o resize da janela */ } await repaint();
   if (fmtCur === 'carrossel' && E.spec.slides.length < 2) pedirPaginas('Quantas páginas o carrossel vai ter?', 'Esta arte é um carrossel, mas está com uma página só. Escolha o total: as páginas novas repetem a estrutura desta e você troca os textos.');

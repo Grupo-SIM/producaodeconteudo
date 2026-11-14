@@ -3208,6 +3208,11 @@ function dadosOk(d) {
   if (Array.isArray(d.itens)) out.itens = d.itens.slice(0, 6).map(x => typeof x === 'string' ? t(x, 200) : x && typeof x === 'object' ? limpaUndef({ t: t(x.t || x.titulo, 120), d: t(x.d || x.texto, 220) }) : null).filter(x => x && (typeof x === 'string' || x.t));
   else if (typeof d.itens === 'string') out.itens = t(d.itens, 800);
   if (d.brilho === false) out.brilho = false;
+  // variações da capa de notícia (Zyrion: tela dividida, círculo, preto e branco; Nuvo) e textos próprios dela
+  for (const k of ['selo', 'legenda', 'nome', 'site', 'handle']) { const v = t(d[k], 200); if (v) out[k] = v; }
+  if (d.estilo === 'nuvo') out.estilo = 'nuvo';
+  for (const k of ['pb', 'urgente']) if (d[k]) out[k] = true;
+  for (const k of ['foto2', 'circulo']) { const v = d[k]; if (typeof v === 'string' && v.trim()) out[k] = t(v, 500); else if (v && typeof v === 'object' && (v.asset || v.gen)) out[k] = v.asset ? { asset: t(v.asset, 80) } : { gen: t(v.gen, 500) }; }
   return out;
 }
 // Limpa e limita a especificação (vinda do Designer ou do editor visual): só campos conhecidos, números dentro de faixa, sem HTML
@@ -3775,6 +3780,13 @@ function limpaReferenciasArte(tipo, id, brand) {
 const sameDims = (a, b) => { const x = ART_SIZE[a], y = ART_SIZE[b]; return !!x && !!y && x[0] === y[0] && x[1] === y[1]; };
 
 // O que mudou entre a versão do agente e a versão editada, em frases e em dados (os dados alimentam o aprendizado)
+// nome do template de uma página (modelo + variação da notícia), para o diff dizer "trocou o template"
+function tplNome(x) {
+  if (!x?.modelo) return '';
+  const d = x.dados || {}, m = MODELOS_ARTE.find(q => q.id === x.modelo), nome = m?.nome || x.modelo;
+  if (x.modelo !== 'noticia') return nome;
+  return d.estilo === 'nuvo' ? 'Notícia estilo Nuvo' : `Notícia estilo Zyrion${d.foto2 ? ', tela dividida' : d.circulo ? ', foto com círculo' : ', foto inteira'}${d.pb ? ', preto e branco' : ''}`;
+}
 function arteDiff(a, b) {
   const out = [], r2 = v => Math.round(v * 100) / 100, dirN = (x, y) => (y > x ? '+' : '-');
   const add = (slide, alvo, prop, de, para, txt, learn = true, dir = '') => out.push({ slide, alvo, prop, de: de ?? '', para: para ?? '', txt, learn, dir });
@@ -3783,6 +3795,8 @@ function arteDiff(a, b) {
   if (A.length !== B.length) add(0, 'arte', 'slides', A.length, B.length, `Mudou a quantidade de slides (${A.length} → ${B.length})`, false);
   for (let i = 0; i < Math.min(A.length, B.length); i++) {
     const s = A[i], n = B[i], sl = i + 1, P = `Slide ${sl}`;
+    // trocou o template da página: um ajuste só desta peça, não regra. O resto do slide muda por causa do template, então não vira ajuste a repetir
+    if (tplNome(s) !== tplNome(n) && tplNome(n)) { add(sl, 'template', 'troca', tplNome(s) || 'livre', tplNome(n), `${P}: trocou o template (${tplNome(s) || 'arte livre do Designer'} → ${tplNome(n)})`, false, 'template'); continue; }
     const bgk = x => x.bg?.asset ? 'imagem' : x.bg?.gen ? 'ia' : x.bg?.grad ? 'degrade' : 'cor';
     if (bgk(s) !== bgk(n)) add(sl, 'fundo', 'tipo', bgk(s), bgk(n), `${P}: trocou o fundo (${{ imagem: 'imagem da biblioteca', ia: 'imagem por IA', cor: 'cor lisa', degrade: 'degradê' }[bgk(s)]} → ${{ imagem: 'imagem da biblioteca', ia: 'imagem por IA', cor: 'cor lisa', degrade: 'degradê' }[bgk(n)]})`, true, bgk(n));
     else if (bgk(n) === 'imagem' && s.bg.asset !== n.bg.asset) add(sl, 'fundo', 'imagem', s.bg.asset, n.bg.asset, `${P}: trocou a imagem de fundo (${s.bg.asset} → ${n.bg.asset})`, false);
@@ -3886,6 +3900,15 @@ function arteAprende(c, ign = []) {
   let regras = [];
   if (diff.length) { brainEvent('designer', 'arte_editada', c, `Você editou e aprovou a arte (${diff.length} ajuste${diff.length > 1 ? 's' : ''}, ${c.format})`, diff.map(d => d.txt).join('\n')); regras = aprendeDiffs(c, 'designer', diff); }
   else brainEvent('designer', 'aprovado_dono', c, `Você aprovou a arte sem precisar editar (${c.format})`, '');
+  // template trocado no editor: engenharia reversa do que o Designer entregou e do que o dono aprovou, para o Gerente avaliar no Cérebro o que melhorou (lição desta situação, não regra da marca)
+  { const tr = diff.filter(d => d.alvo === 'template'); if (tr.length && base) {
+    const desc = nm => { const m = MODELOS_ARTE.find(q => nm && nm.startsWith(q.nome)) || (/^Notícia/.test(nm || '') ? MODELOS_ARTE.find(q => q.id === 'noticia') : null); return m ? m.desc : ''; };
+    const quadro = sl => { const x = (base.slides || [])[sl - 1] || {}, y = (cur.slides || [])[sl - 1] || {}, f = v => v ? (v.asset ? 'imagem ' + v.asset : v.gen ? 'imagem por IA' : 'sim') : 'não';
+      return `foto principal: entregue ${f(x.dados?.foto || x.bg)} / aprovada ${f(y.dados?.foto || y.bg)}; segunda foto: ${f(y.dados?.foto2)}; círculo: ${f(y.dados?.circulo)}; preto e branco: ${y.dados?.pb ? 'sim' : 'não'}; título: ${String(y.dados?.titulo || (y.texts || []).find(t => t.role === 'title')?.value || '').slice(0, 160)}`; };
+    brainEvent('designer', 'template_trocado', c, `Você trocou o template de ${tr.length} página(s) e aprovou (${c.format}${c.kind ? ', ' + c.kind : ''}): ${tr.map(d => d.de + ' → ' + d.para).join('; ')}`,
+      `ENGENHARIA REVERSA (ajuste desta peça, não é regra da marca: descubra POR QUE o template aprovado funcionou melhor para ESTE assunto e ESTAS imagens, e quando o Designer deve escolhê-lo sozinho)\nPeça: ${c.title} · marca ${c.brand || '-'} · formato ${c.format} · tipo ${c.kind || '-'}\n` +
+      tr.map(d => `Página ${d.slide}: o Designer entregou “${d.de}” (${desc(d.de) || 'arte livre'}). O dono aprovou “${d.para}” (${desc(d.para)}). ${quadro(d.slide)}`).join('\n'), ['template']);
+  } }
   setContent(c.id, { art_spec_base: c.art_spec });
   return { ajustes: diff.length, regras, resumo: diff.slice(0, 40).map(d => d.txt) };
 }
@@ -5732,6 +5755,7 @@ ${metTxt}
 8c. "formato": lições de Designer ou Editor que valem só para um formato (carrossel, feed, stories ou video) devem trazer esse formato; vazio vale para todos. Não generalize um aprendizado de carrossel para vídeo nem o contrário.
 8. No máximo 8 lições. "marca" fica vazio (vale para todas) ou traz o nome exato de uma marca: ${brandNames.length ? brandNames.join(', ') : '(nenhuma cadastrada)'}.
 
+8c. TEMPLATE TROCADO PELO DONO (sinais template_trocado): compare o template que o Designer entregou com o que o dono aprovou, faça a engenharia reversa do que melhorou (assunto, fotos disponíveis, peso da notícia, leitura) e escreva para o designer uma lição tipo "padrao" dizendo EM QUE SITUAÇÃO usar aquele template (ex.: duas pessoas em confronto → tela dividida). Não transforme numa regra fixa da marca: uma troca isolada é ajuste daquela peça; só vira padrão com o mesmo motivo repetido.
 8b. ESTILO DE ARTE: se os sinais do Designer (aprovações e devoluções de arte, com os parâmetros de cada arte) mostrarem um padrão de estilo (composição, estilo visual, luz, lente, textura, fundo de imagem), proponha em "estilos" os ajustes de parâmetros por marca, só com evidência e só dos campos que mudam. Esquema dos parâmetros:
 ${STYLE_SCHEMA}
 

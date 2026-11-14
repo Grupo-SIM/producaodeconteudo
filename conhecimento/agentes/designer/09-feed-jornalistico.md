@@ -27,7 +27,7 @@ Vale para toda notícia (capa + contracapa). Só arte: a copy não muda. Modelos
 ## Referência alternativa aprovada: estilo Nuvo
 - Logo da marca centralizada no alto; foto única grande; pílula na cor da marca com o site da marca acima do título;
 - título em fonte sem serifa grossa, em caixa normal (não maiúscula), branco, centralizado; nome da marca enorme vazado (só contorno) atrás do título; "Siga @marca no Instagram" pequeno no rodapé.
-- Ainda não existe como modelo no painel: usar o estilo Zyrion até o dono pedir este.
+- Já existe no painel (modelo noticia com estilo nuvo). O padrão continua o Zyrion; o dono pode trocar a página para Nuvo pelo editor (Templates). Quando ele trocar e aprovar, o Gerente estuda o porquê: é ajuste daquela peça, não regra da marca.
 
 ## Correções do dono (teste 37, Seguidores em Alta, 14/11/2026)
 - **Foto sem letras nem números.** A foto de fundo (capa e contracapa) é uma imagem limpa: nada de cartaz, print de tela, banner, flyer, documento ou qualquer foto com texto ou número. O post já tem manchete, logo e textos; letra sobre letra fica ilegível. Na dúvida, troque a foto.
