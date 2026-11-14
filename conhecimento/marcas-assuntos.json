@@ -1,11 +1,33 @@
 {
-  "_sobre": "Assunto de cada marca (decisão do dono, 14/11/2026). A copy aprovada de um assunto vai para as marcas desse assunto.",
-  "Marketing": ["Central do Marketing", "Marketing Raiz"],
-  "Tecnologia": ["007 Spyhacker"],
-  "Redes sociais": ["Seguidores em Alta"],
-  "Esportes": ["Vivendo de Bet"],
-  "Futebol": ["Vivendo de Bet"],
-  "Empreendedorismo e finanças": ["Corte dos Ricos"],
-  "Finanças": ["Corte dos Ricos"],
-  "Atlas": ["007 Spyhacker"]
+  "_sobre": "Dois tipos de marca (decisão do dono, 14/11/2026). Marcas de nicho: a copy aprovada de um assunto vai para as marcas desse assunto. Marcas institucionais: o produto é a própria marca e tem Instagram próprio; a peça institucional do produto vai para a marca dele.",
+  "Marketing": [
+    "Central do Marketing",
+    "Marketing Raiz"
+  ],
+  "Tecnologia": [
+    "007 Spyhacker"
+  ],
+  "Redes sociais": [
+    "Seguidores em Alta"
+  ],
+  "Esportes": [
+    "Vivendo de Bet"
+  ],
+  "Futebol": [
+    "Vivendo de Bet"
+  ],
+  "Empreendedorismo e finanças": [
+    "Corte dos Ricos"
+  ],
+  "Finanças": [
+    "Corte dos Ricos"
+  ],
+  "_institucionais": {
+    "Atlas Hosting": [
+      "Atlas"
+    ],
+    "SimIntPay": [
+      "SimIntPay"
+    ]
+  }
 }
