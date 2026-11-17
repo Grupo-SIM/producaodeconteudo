@@ -583,7 +583,7 @@ details.apane summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--
 .aefly{position:absolute;left:78px;top:8px;z-index:5;background:#101012;border:1px solid var(--line2);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 20px 50px -10px rgba(0,0,0,.7)}
 .aefly button{flex-direction:row;width:100%;justify-content:flex-start;padding:9px 12px;font-size:13px;gap:10px}
 .aec{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
-.aecv{flex:1;min-height:0;overflow:auto;display:flex;padding:34px;background:radial-gradient(circle at 50% 40%,#131315,#08080a)}
+.aecv{flex:1;min-height:0;overflow:auto;display:flex;padding:20px;background:radial-gradient(circle at 50% 40%,#131315,#08080a)}
 .aewrap{position:relative;flex:none;margin:auto;box-shadow:0 30px 80px -20px #000,0 0 0 1px var(--line2)}
 .aestage{position:absolute;left:0;top:0;transform-origin:0 0}
 .aef{position:absolute;left:0;top:0;border:0;pointer-events:none;background:transparent;color-scheme:normal}
@@ -4265,7 +4265,8 @@ async function arteEditor(id, onClose, opts = {}) {
 
   let frame = null, paintTok = 0;
   const zlbl = h('button', { class: 'btn sm', title: 'Voltar ao encaixe na tela', onclick: () => setZoom(1) }, '100%');
-  const fit = () => { const base = Math.min((cv.clientWidth - 68) / W, (cv.clientHeight - 68) / H, 1); E.base = base; E.k = clamp(base * (E.zm || 1), .08, 3); zlbl.textContent = Math.round(E.k * 100) + '%'; wrap.style.width = Math.floor(W * E.k) + 'px'; wrap.style.height = Math.floor(H * E.k) + 'px'; stage.style.width = W + 'px'; stage.style.height = H + 'px'; stage.style.transform = `scale(${E.k})`; cv.style.overflow = (E.zm || 1) > 1 ? 'auto' : 'hidden'; };
+  const fit = () => { const base = Math.min((cv.clientWidth - 40) / W, (cv.clientHeight - 40) / H, 1); E.base = base; E.k = clamp(base * (E.zm || 1), .08, 3); zlbl.textContent = Math.round(E.k * 100) + '%'; wrap.style.width = Math.floor(W * E.k) + 'px'; wrap.style.height = Math.floor(H * E.k) + 'px'; stage.style.width = W + 'px'; stage.style.height = H + 'px'; stage.style.transform = `scale(${E.k})`; cv.style.overflow = (E.zm || 1) > 1 ? 'auto' : 'hidden'; };
+  cv.addEventListener('scroll', () => { if ((E.zm || 1) <= 1 && (cv.scrollTop || cv.scrollLeft)) { cv.scrollTop = 0; cv.scrollLeft = 0; } });
   const repaint = () => new Promise(done => {
     const tok = ++paintTok, v = view(), f = h('iframe', { class: 'aef', scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', opacity: 0 } });
     f.srcdoc = AS.slideHtml(v, v.slides[E.si], E.si, v.slides.length);
@@ -4837,7 +4838,9 @@ async function arteEditor(id, onClose, opts = {}) {
     o.grade && o.grade !== 'mono' ? slideF('Intensidade da cor', () => o.grade.amount ?? .6, v => { o.grade = { ...o.grade, amount: r2(v) }; }, .1, 1, .01, v => Math.round(v * 100) + '%') : null,
     slideF('Girar', () => o.rot ?? 0, v => { o.rot = Math.round(v); }, -180, 180, 1, v => Math.round(v) + '°'));
   const ABAS = document.body.classList.contains('embed') ? [['el', 'Elemento'], ['cam', 'Camadas']] : [['el', 'Elemento'], ['cam', 'Camadas'], ['pag', 'Página']];
-  const drawPanel = () => {
+  // redesenhar o painel não pode jogar a rolagem para o topo (ex.: trocar a cor do texto)
+  const drawPanel = () => { const ant = E.assin + '|' + E.tab, top = panel.scrollTop; drawPanelIn(); if (E.assin + '|' + E.tab === ant) panel.scrollTop = top; };
+  const drawPanelIn = () => {
     if (E.sys && (E.sel || E.sysSi !== E.si || (E.multi && E.multi.length > 1))) E.sys = null;
     const multi = !!(E.multi && E.multi.length > 1), selObj = E.sel && getObj(E.sel.kind, E.sel.k), temEl = !!(E.sys || multi || selObj);
     const assin = E.sys ? 'sys:' + E.sys : multi ? 'multi:' + E.multi.map(m => m.kind + m.k).join() : selObj ? E.sel.kind + ':' + E.sel.k : '';
@@ -5299,7 +5302,7 @@ async function arteEditor(id, onClose, opts = {}) {
     h('button', { class: 'btn sm', onclick: salvarTemplate, title: 'Guarda a estrutura desta arte para repetir com outros conteúdos e em outras marcas' }, svg(AI.layout, 15), 'Salvar como template'), h('button', { class: 'btn sm', onclick: salvarLayout }, 'Salvar layout'), data.teste === 2 ? h('button', { class: 'btn sm', onclick: pedirDesigner }, svg(AI.wand, 15), 'Pedir ao Designer') : null,
     h('a', { class: 'btn sm', href: `/api/contents/${id}/arte/zip`, download: '', title: 'Baixa as imagens da última versão salva' }, svg(AI.down2, 15), 'Baixar'), h('button', { class: 'btn sm', onclick: save }, svg(AI.save, 15), 'Salvar'), h('button', { class: 'btn primary sm', onclick: aprovar }, svg(AI.check, 15), 'Aprovar e ensinar'));
   const banner = data.arte?.status === 'sem_motor' ? h('div', { class: 'banner warn', style: { margin: 0, borderRadius: 0 } }, 'O motor de imagem não está instalado neste computador: você pode editar aqui normalmente, mas o PNG só é gerado depois de instalar o motor (veja o README).') : null;
-  root.append(top, ...(banner ? [banner] : []), h('div', { class: 'aem' }, rail, lib.el, tpl.el, elp.el, h('div', { class: 'aec' }, cv, h('div', { class: 'vehint' }, h('span', null, 'Dois cliques edita o texto'), h('span', null, 'Shift+arrastar: reto'), h('span', null, 'Alt: ignora o ímã'), h('span', null, 'Ctrl+C / Ctrl+V: copia entre slides'), h('span', null, 'Ctrl+D duplica'), h('span', null, 'Botão direito: mais opções'), h('span', null, 'Ctrl+G agrupa'), h('div', { class: 'sp' }), h('div', { class: 'aezb' }, h('button', { class: 'btn sm', title: 'Reduzir o zoom (tecla -)', onclick: () => setZoom((E.zm || 1) / 1.2) }, '−'), zlbl, h('button', { class: 'btn sm', title: 'Aumentar o zoom (tecla +). Ctrl+roda do mouse também dá zoom', onclick: () => setZoom((E.zm || 1) * 1.2) }, '+'), h('button', { class: 'btn sm', title: 'Mostrar ou esconder as réguas. Arraste da régua para criar guias', onclick: e => { E.rul = !E.rul; e.currentTarget.classList.toggle('on', E.rul); drawOverlay(); } }, 'Réguas'))), strip), panel));
+  root.append(top, ...(banner ? [banner] : []), h('div', { class: 'aem' }, rail, lib.el, tpl.el, elp.el, h('div', { class: 'aec' }, cv, h('div', { class: 'vehint' }, h('div', { class: 'sp' }), h('div', { class: 'aezb' }, h('button', { class: 'btn sm', title: 'Reduzir o zoom (tecla -)', onclick: () => setZoom((E.zm || 1) / 1.2) }, '−'), zlbl, h('button', { class: 'btn sm', title: 'Aumentar o zoom (tecla +). Ctrl+roda do mouse também dá zoom', onclick: () => setZoom((E.zm || 1) * 1.2) }, '+'), h('button', { class: 'btn sm', title: 'Mostrar ou esconder as réguas. Arraste da régua para criar guias', onclick: e => { E.rul = !E.rul; e.currentTarget.classList.toggle('on', E.rul); drawOverlay(); } }, 'Réguas'))), strip), panel));
   $('#layer').append(root); addEventListener('keydown', onKey); addEventListener('resize', onResize);
   setStatus(); drawPanel(); drawStrip(true); fit(); try { let rw = 0, rh = 0; ro = new ResizeObserver(() => { if (cv.clientWidth === rw && cv.clientHeight === rh) return; rw = cv.clientWidth; rh = cv.clientHeight; fit(); }); ro.observe(cv); } catch { /* sem observador: só o resize da janela */ } await repaint();
   if (fmtCur === 'carrossel' && E.spec.slides.length < 2) pedirPaginas('Quantas páginas o carrossel vai ter?', 'Esta arte é um carrossel, mas está com uma página só. Escolha o total: as páginas novas repetem a estrutura desta e você troca os textos.');
