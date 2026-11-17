@@ -240,17 +240,17 @@ function postX(d, ctx, s) {
 function noticiaNuvo(d, ctx) {
   const { W, H } = ctx, foto = genOuAsset(d.foto), s = base(ctx, '#000000', { grain: .15, vignette: .25 }), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
   if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`), color: '#000000', pos: 'topo', fil: pb }; s.shade = .2; s.shade_dir = 'bottom'; }
-  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .5 }];
+  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .48 }];
   s.shapes.push({ kind: 'rect', x: .5, y: .002, w: 1, h: .006, color: ctx.accent, moldura: true, front: true });
   const marca = String(ctx.marca || '').trim(), c = ctx.contatos || {}, site = String(d.site || c.site || '').replace(/^https?:\/\//, '').replace(/\/$/, ''), arroba = String(d.handle || c.instagram || '').replace(/^.*instagram\.com\//, '').replace(/^@?/, '@').replace(/\/$/, '');
   if (ctx.logo) { const lw = Math.round(W * .3); s.items.push({ asset: ctx.logo, x: .5, y: .085, size: lw, moldura: true, front: true }); }
   else if (marca) s.texts.push({ role: 'label', value: marca.toUpperCase(), x: .5, y: .085, align: 'center', size: Math.round(W * .06), font: 'montserrat', weight: 900, ls: -.02, color: '#ffffff', nowrap: true, shadow: false, front: true });
-  const tf = { k: 'montserrat', w: 700, lh: 1.08, ls: -.01, upper: false }, ti = ajusta(String(d.titulo || ''), tf, W * .9, H * .25, { maxSize: W * .085, maxLinhas: 4 });
-  const hT = ti.linhas.length * tf.lh * ti.size, yT = H * .86 - hT, B = [];
-  if (marca) { const g = marca.split(/\s+/)[0].toUpperCase().slice(0, 8), gs = Math.round(Math.min(H * .2, W * 1.05 / Math.max(1, largura(g, { k: 'montserrat', w: 800 }, 1)))); s.texts.push({ role: 'title', value: g, x: .5, y: F2((yT + hT * .55) / H), align: 'center', size: gs, font: 'montserrat', weight: 800, outline: true, stroke: '#ffffff', stroke_w: Math.max(2, Math.round(W * .0022)), opacity: .35, nowrap: true, shadow: false }); }
-  if (site) { const ps = Math.round(W * .026); s.texts.push({ role: 'badge', value: site, x: .5, y: F2((yT - H * .035) / H), align: 'center', size: ps, font: 'montserrat', weight: 600, ls: 0, upper: false, caixa: 'normal', bg: ctx.accent, color: sobre(ctx.accent), shape: 'pill', nowrap: true, shadow: false, front: true }); }
+  const tf = { k: 'montserrat', w: 700, lh: 1.08, ls: -.01, upper: false }, ti = ajusta(String(d.titulo || ''), tf, W * .86, H * .2, { maxSize: W * .064, maxLinhas: 4 });
+  const hT = ti.linhas.length * tf.lh * ti.size, yT = H * .705, B = [];   // referência Nuvo: pílula do site em .645 e a manchete logo abaixo, sempre no mesmo lugar
+  if (marca) { const g = marca.split(/\s+/)[0].toUpperCase().slice(0, 8), gs = Math.round(Math.min(H * .2, W * 1.05 / Math.max(1, largura(g, { k: 'montserrat', w: 800 }, 1)))); s.texts.push({ role: 'title', value: g, x: .5, y: F2((yT + hT * .55) / H), align: 'center', size: gs, font: 'montserrat', weight: 800, decor: true, outline: true, stroke: '#ffffff', stroke_w: Math.max(2, Math.round(W * .0022)), opacity: .35, nowrap: true, shadow: false }); }
+  if (site) { const ps = Math.round(W * .026); s.texts.push({ role: 'badge', value: site, x: .5, y: .65, align: 'center', size: ps, font: 'montserrat', weight: 600, ls: 0, upper: false, caixa: 'normal', bg: ctx.accent, color: sobre(ctx.accent), shape: 'pill', nowrap: true, shadow: false, front: true }); }
   s.texts.push(...[].concat(texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: yT, align: 'center', color: '#ffffff', extra: { front: true } }).t));
-  if (arroba.length > 1) s.texts.push({ role: 'body', value: `Siga ${arroba} no Instagram`, x: .5, y: .935, align: 'center', size: Math.round(W * .019), font: 'montserrat', weight: 400, italic: true, color: '#ffffff', opacity: .7, nowrap: true, shadow: false, front: true });
+  if (arroba.length > 1) s.texts.push({ role: 'body', value: `[i:instagram] Siga ${arroba} no Instagram`, x: .5, y: .94, align: 'center', size: Math.round(W * .019), font: 'montserrat', weight: 400, italic: true, color: '#ffffff', opacity: .7, nowrap: true, shadow: false, front: true });
   return s;
 }
 export const MODELOS = [
@@ -664,17 +664,17 @@ const COMPOR = {
     else s.fx.glows = [{ x: .5, y: .3, r: .8, color: ctx.accent, opacity: .35 }];
     if (circ) s.items.push({ ...srcDe(circ, x => `${x}, high quality, vivid colors, no text`), x: .72, y: .22, box: { w: .46, h: .46 * W / H, circle: true, border: .008, bc: '#ffffff', pos: 'center' }, fil: pb, shadow: 1 });
     s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: foto2 ? .72 : .58 }];
-    const tf = { ...T.tit, k: 'impact', w: 400, ls: 0, lh: lhAcento(d.titulo), upper: true, caixa: undefined }, selo = String(d.selo || (d.urgente ? 'Notícia urgente' : ctx.marca || ctx.nome || 'Notícia em destaque')).trim(), legenda = String(d.legenda || 'Leia a legenda').trim();
-    const ti = ajusta(d.titulo || '', tf, W * .92, H * .37, { maxSize: W * .15, maxLinhas: 4 }), hl = lum(ctx.accent) > .4 ? ctx.accent : mistura(ctx.accent, '#ffffff', .6);
+    const tf = { ...T.tit, k: 'impact', w: 400, ls: 0, lh: lhAcento(d.titulo), upper: true, caixa: undefined }, selo = String(d.editoria || d.selo || ctx.marca || ctx.nome || 'Notícia').trim(), legenda = String(d.legenda || 'Leia a legenda').trim();
+    const ti = ajusta(d.titulo || '', tf, W * .88, H * .3, { maxSize: W * .088, maxLinhas: 5 }), hl = '#ffffff';   // referência Zyrion: manchete toda branca, sem palavra colorida
     const fs = { ...T.txtB, upper: true, caixa: undefined, ls: 0 }, sz = Math.round(Math.min(W * .03, (W * .7) / Math.max(1, largura(selo.toUpperCase(), fs, 1)))), hs = botaoH(sz), fl = Math.round(W * .021);
-    const logoW = ctx.logo ? Math.round(Math.min(W * .16, (W * .05) / (ctx.logoRatio || .2))) : 0, logoH = ctx.logo ? logoW * (ctx.logoRatio || .2) : 0, hLinha = Math.max(logoH, W * .012);
-    const base0 = ctx.storiesH ? H * .8 : H * .93, B = [];
-    if (d.urgente || /urgente/i.test(selo)) B.push({ h: hs, gap: 0, make: y => ({ role: 'badge', value: selo, x: .5, y: F2((y + hs / 2) / H), align: 'center', size: sz, font: fontKey(fs, ctx), weight: 800, upper: true, bg: '#E0242B', color: '#ffffff', shape: 'pill', nowrap: true, shadow: false, front: true }) });
-    else { const ls = Math.round(W * .022); B.push({ h: ls * 1.3, gap: 0, make: y => ({ role: 'label', value: selo, x: .5, y: F2((y + ls * .65) / H), align: 'center', size: ls, font: fontKey(fs, ctx), weight: 800, upper: true, ls: .04, color: '#ffffff', opacity: .92, nowrap: true, shadow: false, front: true }) }); }
-    B.push({ h: ti.linhas.length * tf.lh * ti.size, gap: H * .028, make: y => texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: y, align: 'center', color: '#ffffff', extra: { hl, hw: tf.w, upper: true, front: true } }).t });
+    const mk = ctx.logo || ctx.avatar, mkR = ctx.logo ? (ctx.logoRatio || .2) : 1, logoW = Math.round(mk ? Math.min(W * .1, (W * .036) / mkR) : W * .036), logoH = mk ? logoW * mkR : logoW, hLinha = Math.max(logoH, W * .012);
+    const base0 = ctx.storiesH ? H * .8 : H * .945, B = [];
+    { const ls = Math.round(W * .02); B.push({ h: ls * 1.3, gap: 0, make: y => ({ role: 'label', value: selo, x: .5, y: F2((y + ls * .65) / H), align: 'center', size: ls, font: fontKey(fs, ctx), weight: 800, upper: true, ls: .04, color: '#ffffff', opacity: .92, nowrap: true, shadow: false, front: true }) }); }
+    B.push({ h: ti.linhas.length * tf.lh * ti.size, gap: H * .016, make: y => texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: y, align: 'center', color: '#ffffff', extra: { hl, hw: tf.w, upper: true, front: true } }).t });
     B.push({ h: hLinha, gap: H * .03, make: y => { const cy = y + hLinha / 2, lw = (W - mx * 2 - (logoW ? logoW + W * .06 : 0)) / 2, ox = (logoW ? logoW / 2 + W * .03 : W * .015) + lw / 2;
       const linha = sx => ({ kind: 'line', x: F2((W / 2 + sx * ox) / W), y: F2(cy / H), w: F2(lw / W), h: .0018, color: '#ffffff', opacity: .75, moldura: true, front: true });
-      if (logoW) s.items.push({ asset: ctx.logo, x: .5, y: F2(cy / H), size: logoW, moldura: true, front: true });
+      if (mk) s.items.push({ asset: mk, x: .5, y: F2(cy / H), size: logoW, moldura: true, front: true });
+      else s.texts.push({ role: 'label', value: (String(ctx.marca || 'Z').match(/[A-Za-zÀ-ÿ0-9]/) || ['Z'])[0].toLowerCase(), x: .5, y: F2(cy / H), align: 'center', size: Math.round(logoW * 1.1), font: 'anton', weight: 400, color: '#ffffff', nowrap: true, shadow: false, front: true, moldura: true });
       s.shapes.push(linha(-1), linha(1)); return []; } });
     B.push({ h: fl * 1.2, gap: H * .018, make: y => ({ role: 'body', value: legenda, x: .5, y: F2((y + fl * .6) / H), align: 'center', size: fl, font: fontKey(T.txt, ctx), weight: 300, color: '#ffffff', opacity: .85, nowrap: true, shadow: false, front: true }) });
     s.texts.push(...pilha(B, 0, ctx, { base: base0 }).itens);

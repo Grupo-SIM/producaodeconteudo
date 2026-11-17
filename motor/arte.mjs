@@ -56,7 +56,7 @@ async function analisar(page, s) {
       for (const it of items) { const c = s.items[it.k]; if (!c || !(c.card || c.fotoCard)) continue; const ia = inter(t, it) / area(t); if (ia > .02 && t.t < it.t) { out.push({ tipo: 'sobre_cartao', k: t.k, sev: 'erro', fix: true, limite: it.t - H * .02, msg: 'texto encostava na foto (reduzido)' }); break; } }
     }
     for (let q = j + 1; q < texts.length; q++) {
-      const o = texts[q], ia = inter(t, o); { const ot = s.texts[o.k] || {}; if (ot.outline || ot.decor || (ot.opacity ?? 1) < .6) continue; }
+      const o = texts[q], ia = inter(t, o); { const ot = s.texts[o.k] || {}; if (ot.outline || ot.decor || (ot.opacity ?? 1) < .6 || tt.outline || tt.decor || (tt.opacity ?? 1) < .6) continue; }   // letra vazada/marca d'água atrás não empurra o título
       if (s.modelo && !spec.editada && !s.texts[o.k]?.mexido && !tt.mexido) continue;   // página composta por modelo: medidas exatas, o recorte do glifo engana a checagem
       if (ia / Math.min(area(t), area(o)) > .18) {
         const up = t.t <= o.t ? t : o, lw = up === t ? o : t, hh = (lw.b - lw.t) / 2, ny = (up.b + H * .018 + hh) / H, cabe = ny + hh / H <= .93 && !['cta', 'badge'].includes(lw.role);
