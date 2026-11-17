@@ -248,7 +248,7 @@ function noticiaNuvo(d, ctx) {
   s.shapes.push({ kind: 'rect', x: .5, y: .002, w: 1, h: .006, color: ctx.accent, moldura: true, front: true });
   const marca = String(ctx.marca || '').trim(), c = ctx.contatos || {}, site = String(d.site || c.site || '').replace(/^https?:\/\//, '').replace(/\/$/, ''), arroba = String(d.handle || c.instagram || '').replace(/^.*instagram\.com\//, '').replace(/^@?/, '@').replace(/\/$/, '');
   if (ctx.logo) { const lw = Math.round(W * .3); s.items.push({ asset: ctx.logo, x: .5, y: .085, size: lw, moldura: true, front: true }); }
-  else if (marca) s.texts.push({ role: 'label', value: marca.toUpperCase(), x: .5, y: .085, align: 'center', size: Math.round(W * .06), font: 'montserrat', weight: 900, ls: -.02, color: '#ffffff', nowrap: true, shadow: false, front: true });
+  else s.items.push({ asset: 'avatar-padrao', x: .5, y: .085, size: Math.round(W * .1), round: true, moldura: true, front: true });   // sem logo: imagem “LOGO” trocável
   const tf = { k: 'montserrat', w: 700, lh: 1.08, ls: -.01, upper: false }, ti = ajusta(String(d.titulo || ''), tf, W * .86, H * .2, { maxSize: W * .064, maxLinhas: 4 });
   const hT = ti.linhas.length * tf.lh * ti.size, yT = H * .705, B = [];   // referência Nuvo: pílula do site em .645 e a manchete logo abaixo, sempre no mesmo lugar
   if (marca) { const g = marca.split(/\s+/)[0].toUpperCase().slice(0, 8), gs = Math.round(Math.min(H * .2, W * 1.05 / Math.max(1, largura(g, { k: 'montserrat', w: 800 }, 1)))); s.texts.push({ role: 'title', value: g, x: .5, y: F2((yT + hT * .55) / H), align: 'center', size: gs, font: 'montserrat', weight: 800, decor: true, outline: true, stroke: '#ffffff', stroke_w: Math.max(2, Math.round(W * .0022)), opacity: .35, nowrap: true, shadow: false }); }
@@ -618,8 +618,7 @@ const COMPOR = {
       { const r = ctx.logoRatio || .2, lw = Math.round(Math.min(W * .27, W * .14 / r)); s.items.push({ asset: ctx.logo, x: F2((mx * .62 + lw / 2) / W), y: F2((H * .045 + lw * r / 2) / H), size: lw, moldura: true, front: true }); }
     } else if (d.topo !== 'nenhum') {
     const quad = ctx.logo && ctx.logoRatio > .7 && ctx.logoRatio < 1.4;
-    if (quad) s.items.push({ asset: ctx.logo, x: F2(ax / W), y: F2(ay / H), size: av, round: true, moldura: true });
-    else { s.shapes.push({ kind: 'circle', x: F2(ax / W), y: F2(ay / H), w: F2(av / W), h: F2(av / H), color: ctx.accent }); const ini = (nome.match(/[A-Za-zÀ-ÿ0-9]/) || ['N'])[0].toUpperCase(); s.texts.push({ role: 'badge', value: ini, x: F2(ax / W), y: F2(ay / H), align: 'center', size: Math.round(av * .5), font: fontKey(T.txtB, ctx), weight: 800, color: sobre(ctx.accent), nowrap: true, shadow: false }); }
+    s.items.push({ asset: ctx.avatar || (quad ? ctx.logo : '') || 'avatar-padrao', x: F2(ax / W), y: F2(ay / H), size: av, round: true, moldura: true });   // sempre imagem trocável
     const nz = Math.round(W * .021), nx = ax + av / 2 + W * .014, fn = { ...T.txtB, w: 700 };
     if (nome) { s.texts.push({ role: 'label', value: nome, x: F2(nx / W), y: F2(ay / H), align: 'left', size: nz, font: fontKey(fn, ctx), weight: 700, ls: 0, caixa: 'normal', color: '#ffffff', nowrap: true, shadow: false, front: true });
       const vz = Math.round(nz * 1.05); s.shapes.push({ kind: 'circle', x: F2((nx + largura(nome, fn, nz) + W * .01 + vz / 2) / W), y: F2(ay / H), w: F2(vz / W), h: F2(vz / H), color: '#1d9bf0', icon: 'check', icon_color: '#ffffff', front: true }); }
@@ -678,7 +677,7 @@ const COMPOR = {
     B.push({ h: hLinha, gap: H * .03, make: y => { const cy = y + hLinha / 2, lw = (W - mx * 2 - (logoW ? logoW + W * .06 : 0)) / 2, ox = (logoW ? logoW / 2 + W * .03 : W * .015) + lw / 2;
       const linha = sx => ({ kind: 'line', x: F2((W / 2 + sx * ox) / W), y: F2(cy / H), w: F2(lw / W), h: .0018, color: '#ffffff', opacity: .75, moldura: true, front: true });
       if (mk) s.items.push({ asset: mk, x: .5, y: F2(cy / H), size: logoW, moldura: true, front: true });
-      else s.texts.push({ role: 'label', value: (String(ctx.marca || 'Z').match(/[A-Za-zÀ-ÿ0-9]/) || ['Z'])[0].toLowerCase(), x: .5, y: F2(cy / H), align: 'center', size: Math.round(logoW * 1.1), font: 'anton', weight: 400, color: '#ffffff', nowrap: true, shadow: false, front: true, moldura: true });
+      else s.items.push({ asset: 'avatar-padrao', x: .5, y: F2(cy / H), size: Math.round(W * .05), round: true, moldura: true, front: true });   // sem logo: imagem “LOGO” trocável
       s.shapes.push(linha(-1), linha(1)); return []; } });
     B.push({ h: fl * 1.2, gap: H * .018, make: y => ({ role: 'body', value: legenda, x: .5, y: F2((y + fl * .6) / H), align: 'center', size: fl, font: fontKey(T.txt, ctx), weight: 300, color: '#ffffff', opacity: .85, nowrap: true, shadow: false, front: true }) });
     s.texts.push(...pilha(B, 0, ctx, { base: base0 }).itens);
