@@ -7,7 +7,8 @@ Sempre que um treino novo entrar (novo formato de copy, novo formato que o Desig
 - `fluxo-v2.mjs` (`FORMATOS_PADRAO`, `raiaDe`) e `public/app.html` (`COLS`, `SUBR`, `RHORA`): raias, colunas e horários do Fluxo e da Publicação.
 - `conhecimento/agentes/<agente>/`: a base do agente.
 - `conhecimento/produtos.json`: produtos confirmados pelo dono.
-Hoje: Editor de vídeo só faz motion; Designer ainda não foi treinado em todos os formatos.
+- Templates de arte (`TEMPLATES_CASA` em `server.js`, numerados "N · Nome"): só template APROVADO pelo dono fica visível; o resto leva `oculto: true`. O visível aparece sozinho na checklist de Marcas → Formatos e metas (agrupado em Jornalístico, Feed estático, Carrossel, Stories): confira lá a cada template novo aprovado ou removido.
+Hoje: Editor de vídeo só faz motion. Designer: só o jornalístico está aprovado (1 a 5 + contracapa 6); estático, carrossel e stories vão ser refeitos do zero a partir de referências do dono.
 
 ## Deploy
 Push no `main` gera a imagem `ghcr.io/grupo-sim/producaodeconteudo:latest`; o dono faz o Deploy no Komodo.

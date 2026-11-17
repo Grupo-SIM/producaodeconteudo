@@ -183,6 +183,15 @@ img.av{object-fit:cover;padding:0}
 .busca{width:260px;padding:7px 12px}
 .novo{display:grid;gap:8px}.novo .lb{font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-top:6px}.nvf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nvf button{text-align:left;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:#161618}.nvf button.on{border-color:#a8864a;background:#1a1710}.nvf b{display:block;font-size:13.5px}.nvf span{font-size:11.5px;color:var(--tx3)}
 .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 4px -1px 6px;border:1px solid #ffffff22}.kvr span:last-child{color:var(--tx3);text-align:right}
+.mtg{margin-top:14px}.mtg>b{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);font-weight:600;margin-bottom:8px}.mtg>b i{font-style:normal;color:var(--tx3);background:#18181b;border-radius:99px;padding:1px 8px;letter-spacing:0;text-transform:none;font-weight:500}
+.mtgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.mtc{position:relative;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:#151517;border:1px solid var(--line2);cursor:pointer;transition:border-color .15s,background .15s}.mtc:hover{border-color:#34343a}
+.mtc input{position:absolute;opacity:0;pointer-events:none}.mtc .n{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:12.5px;font-weight:700;background:#1d1d20;color:var(--tx2);font-variant-numeric:tabular-nums}
+.mtc .t{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}.mtc .t b{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mtc .t span{font-size:11.5px;color:var(--tx3)}
+.mtc .ck{flex:none;width:18px;height:18px;border-radius:6px;border:1.5px solid #3a3a40;display:grid;place-items:center;transition:all .15s}.mtc .ck svg{opacity:0;transition:opacity .15s}
+.mtc:has(input:checked){background:var(--goldbg);border-color:var(--goldline)}.mtc:has(input:checked) .n{background:var(--grad);color:#1a1408}.mtc:has(input:checked) .ck{background:var(--gold);border-color:var(--gold)}.mtc:has(input:checked) .ck svg{opacity:1}
+.mtc input:focus-visible~.ck{outline:2px solid var(--gold2);outline-offset:2px}
+.mtvazio{font-size:12.5px;color:var(--tx3);border:1px dashed var(--line2);border-radius:12px;padding:11px 12px}
 .tagsw{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.tg{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:var(--gold2)}.tg.out{background:#1c1c1f;color:var(--tx2)}
 .learnbox{margin-top:18px;padding:10px 14px;border:1px solid var(--goldline);background:#16140e;border-radius:10px;font-size:12.5px;color:var(--gold)}
 .kps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.kp span{font-size:12px;color:var(--tx2);display:block}.kp b{font-size:24px}
@@ -931,7 +940,7 @@ VIEWS.marcas = async () => {
     }
     det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
       <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos e metas'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
-      <div class="two"><div>${esq}</div><div>${dir}</div></div>
+      <div class="two"${tab === 'formatos' ? ' style="grid-template-columns:1fr"' : ''}><div>${esq}</div>${dir ? `<div>${dir}</div>` : ''}</div>
       <div class="learnbox">O que você mudar aqui, o gerente avisa os agentes e salva no cérebro da marca. Também dá para mudar só pela conversa.</div></div>`;
   }
   $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><input class="f busca" placeholder="Buscar marca…" value="${esc(S.qMarca || '')}" oninput="S.qMarca=this.value;clearTimeout(S.tq);S.tq=setTimeout(()=>{render();setTimeout(()=>{const i=$('.busca');i.focus();i.setSelectionRange(99,99)},30)},250)"><span style="flex:1"></span>${[['', 'Todas'], ['nicho', 'Nicho'], ['institucional', 'Institucionais']].map(([k, n]) => `<button class="chip ${(S.tipoMarca || '') === k ? 'on' : ''}" onclick="S.tipoMarca='${k}';render()">${n} (${k ? brands.filter(b => tipo(b).tipo === k).length : brands.length})</button>`).join('')}<button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
@@ -944,13 +953,17 @@ async function carregaTplMarca(marca) {
   const fmt = { feed: 'Feed', carrossel: 'Carrossel', stories: 'Stories' }, ord = [...r.itens].sort((a, b) => (parseInt(a.nome) || 99) - (parseInt(b.nome) || 99) || a.nome.localeCompare(b.nome));
   const grupo = t => t.tema === 'noticia' || /not[ií]cia|manchete/i.test(t.nome) ? 'Jornalístico' : (t.formatos || []).includes('stories') && t.formatos.length === 1 ? 'Stories' : (t.formatos || []).includes('carrossel') ? 'Carrossel' : 'Feed estático';
   const G = ['Jornalístico', 'Feed estático', 'Carrossel', 'Stories'];
-  el.className = ''; el.innerHTML = `<div style="display:flex;gap:6px;margin:4px 0 8px;flex-wrap:wrap"><button class="btn sm" onclick="tplMarcaTodos(true)">Marcar todos</button><button class="btn sm" onclick="tplMarcaTodos(false)">Desmarcar todos</button>${r.personalizado ? `<button class="btn sm" onclick="tplMarcaSalva(${esc(JSON.stringify(marca))}, true)">Voltar ao padrão</button>` : ''}</div>`
-    + G.map(g => { const L = ord.filter(t => grupo(t) === g); return L.length ? `<b style="display:block;margin:12px 0 4px">${g}</b>` + L.map(t => `<label class="kvr" style="cursor:pointer;justify-content:flex-start"><span><input type="checkbox" class="mtck" value="${esc(t.id)}" ${t.marcado ? 'checked' : ''} onchange='tplMarcaSalva(${esc(JSON.stringify(marca))})'> ${esc(t.nome)}</span></label>`).join('') : ''; }).join('')
-    + `<p class="small muted" style="margin-top:6px">${r.personalizado ? 'Lista escolhida por você.' : 'Padrão do sistema. Marque ou desmarque para escolher.'}</p>`;
+  const card = t => { const m = String(t.nome).match(/^(\d+)\s*·\s*(.+)$/), num = m ? m[1] : '•', nome = m ? m[2] : t.nome;
+    return `<label class="mtc"><input type="checkbox" class="mtck" value="${esc(t.id)}" ${t.marcado ? 'checked' : ''} onchange='tplMarcaSalva(${esc(JSON.stringify(marca))})'><span class="n">${esc(num)}</span><span class="t"><b>${esc(nome)}</b><span>${esc((t.formatos || []).map(f => fmt[f] || f).join(' · '))}</span></span><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a1408" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span></label>`; };
+  el.className = ''; el.innerHTML = `<div style="display:flex;gap:6px;margin:4px 0 2px;flex-wrap:wrap"><button class="btn sm" onclick="tplMarcaTodos(true)">Marcar todos</button><button class="btn sm" onclick="tplMarcaTodos(false)">Desmarcar todos</button>${r.personalizado ? `<button class="btn sm" onclick="tplMarcaSalva(${esc(JSON.stringify(marca))}, true)">Voltar ao padrão</button>` : ''}</div>`
+    + G.map(g => { const L = ord.filter(t => grupo(t) === g), n = L.filter(t => t.marcado).length;
+      return `<div class="mtg"><b>${g}${L.length ? `<i>${n} de ${L.length}</i>` : ''}</b>${L.length ? `<div class="mtgrid">${L.map(card).join('')}</div>` : '<div class="mtvazio">Nenhum template aprovado ainda. Aguardando referências.</div>'}</div>`; }).join('')
+    + `<p class="small muted" style="margin-top:10px">${r.personalizado ? 'Lista escolhida por você.' : 'Padrão do sistema: marque ou desmarque para escolher.'}</p>`;
   S._tplMarca = marca;
 }
 function tplMarcaTodos(on) { document.querySelectorAll('.mtck').forEach(c => c.checked = on); tplMarcaSalva(S._tplMarca); }
 async function tplMarcaSalva(marca, padrao) {
+  document.querySelectorAll('.mtg').forEach(g => { const c = g.querySelectorAll('.mtck'), i = g.querySelector('b i'); if (i && c.length) i.textContent = [...c].filter(x => x.checked).length + ' de ' + c.length; });
   const ids = [...document.querySelectorAll('.mtck')].filter(c => c.checked).map(c => c.value);
   try { await api('/api/art-templates/marca', { method: 'PUT', body: padrao ? { brand: marca, padrao: true } : { brand: marca, ids } }); toast(padrao ? 'Templates voltaram ao padrão' : 'Salvo: o Designer usa ' + ids.length + ' template(s) nesta marca'); if (padrao) carregaTplMarca(marca); } catch (e) { toast('Não consegui salvar'); }
 }
