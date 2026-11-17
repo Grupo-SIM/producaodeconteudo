@@ -216,23 +216,28 @@ const srcDe = (g, fn) => g.gen ? { gen: fn(g.gen) } : g.banco ? { banco: g.banco
 
 // Cartão de post do X (antigo Twitter) para a contracapa da notícia, pequeno e na parte de baixo, como no print do dono: avatar redondo à esquerda; ao lado, nome com selo azul e logo abaixo o texto CURTO. Fonte Inter (parecida com a do X). Só mudam o logo e o nome da marca.
 function postX(d, ctx, s) {
+  // medidas tiradas do exemplo do dono (contracapa Zyrion): foto viva até ~3/4, fade para o preto embaixo; cartão branco de .83 da largura com o fundo em ~90% da altura;
+  // avatar redondo à esquerda; nome em negrito com selo azul; texto normal com o @ em azul
   const { W, H, T } = ctx, bonito = v => /^[^a-zà-ÿ]+$/.test(v) ? v.toLowerCase().replace(/(^|\s)(\p{L})(\p{L}*)/gu, (x, sp, p, r) => sp + (/^(do|da|de|dos|das|e)$/.test(p + r) && sp ? p + r : p.toUpperCase() + r)) : v;
-  const nome = bonito(String(d.nome || ctx.marca || '').trim()), cardW = Math.round(W * .86), pad = Math.round(W * .034), av = Math.round(W * .078), gx = Math.round(W * .02), ink = '#0f1419';
-  s.shade = .72; s.shade_dir = 'bottom';   // fade escuro por trás do cartão (atrás, não na frente)
-  const fi = { ...T.txt, k: 'inter', w: 500, lh: 1.28, upper: false }, fn = { ...T.txtB, k: 'inter', w: 800, upper: false, caixa: undefined };
-  const nz = Math.round(W * .036), colW = cardW - pad * 2 - av - gx, ti = quebraTexto(String(d.titulo || ''), fi, colW, H * .2, W * .037, W * .028), hNome = Math.round(nz * 1.35), hTxt = ti.linhas.length * fi.lh * ti.size;
-  const hCard = pad + hNome + hTxt + pad, cx = W / 2, yBot = ctx.storiesH ? H * .8 : H * .9, yTop = yBot - hCard, left = cx - cardW / 2 + pad, nx = left + av + gx;
-  s.shapes.push({ kind: 'rect', x: F2(cx / W), y: F2((yTop + hCard / 2) / H), w: F2(cardW / W), h: F2(hCard / H), radius: .17, color: '#ffffff' });
-  if (!d.foto && ctx.logo) { const lw = Math.round(W * .62), lh = ctx.logoRatio ? lw / ctx.logoRatio : lw * .3; s.items.push({ asset: ctx.logo, x: .5, y: F2((yTop * .5) / H), size: ctx.logoRatio > 1.4 ? Math.round(W * .95) : Math.round(W * .5), shadow: 1 }); }   // sem foto: a marca grande ocupa o alto, em vez de um vazio
-  const ay = yTop + pad + av / 2, quad = ctx.logo && ctx.logoRatio > .7 && ctx.logoRatio < 1.4, avA = ctx.avatar || (quad ? ctx.logo : '');
+  const nome = bonito(String(d.nome || ctx.marca || '').trim()), cardW = Math.round(W * .83), padX = Math.round(W * .018), padT = Math.round(W * .026), padB = Math.round(W * .03), av = Math.round(W * .087), gx = Math.round(W * .017), ink = '#0f1419';
+  s.shade = 0; s.fx.fade = [{ dir: 'bottom', a: 1, ext: .42 }];   // fade para o preto; o cartão fica acima dele (z), o texto acima do cartão
+  const c = ctx.contatos || {}, arroba = String(d.handle || c.instagram || '').replace(/^.*instagram\.com\//, '').replace(/^@?/, '').replace(/\/$/, '');
+  const txt0 = String(d.titulo || '').trim() || `Gostou da notícia? Siga a @${arroba || String(ctx.marca || 'marca').toLowerCase().replace(/[^a-z0-9_.]/g, '')} e fique por dentro de tudo o que está movimentando o Brasil e o mundo.`;
+  const txt = txt0.replace(/\*/g, '').replace(/@[\w.]+/g, m => '*' + m.replace(/[.]$/, '') + '*' + (m.endsWith('.') ? '.' : ''));   // @ em azul, como no X
+  const fi = { ...T.txt, k: 'inter', w: 400, lh: 1.16, upper: false }, fn = { ...T.txtB, k: 'inter', w: 700, upper: false, caixa: undefined };
+  const nz = Math.round(W * .031), colW = cardW - padX * 2 - av - gx - Math.round(W * .02), ti = quebraTexto(txt, fi, colW, H * .2, W * .031, W * .025), hNome = Math.round(nz * 1.3), hTxt = ti.linhas.length * fi.lh * ti.size;
+  const hCard = Math.max(padT + hNome + hTxt + padB, av + padT * 2), cx = W / 2, yBot = ctx.storiesH ? H * .8 : H * .895, yTop = yBot - hCard, left = cx - cardW / 2 + padX, nx = left + av + gx;
+  s.shapes.push({ kind: 'rect', x: F2(cx / W), y: F2((yTop + hCard / 2) / H), w: F2(cardW / W), h: F2(hCard / H), radius: .16, color: '#ffffff', z: 3700 });
+  if (!d.foto && ctx.logo) { s.items.push({ asset: ctx.logo, x: .5, y: F2((yTop * .5) / H), size: ctx.logoRatio > 1.4 ? Math.round(W * .95) : Math.round(W * .5), shadow: 1 }); }   // sem foto: a marca grande ocupa o alto, em vez de um vazio
+  const ay = yTop + padT + av / 2, quad = ctx.logo && ctx.logoRatio > .7 && ctx.logoRatio < 1.4, avA = ctx.avatar || (quad ? ctx.logo : '');
   if (avA) s.items.push({ asset: avA, x: F2((left + av / 2) / W), y: F2(ay / H), size: av, round: true, moldura: true });
-  else { s.shapes.push({ kind: 'circle', x: F2((left + av / 2) / W), y: F2(ay / H), w: F2(av / W), h: F2(av / H), color: '#0a0a0c' }); const ini = (nome.match(/[A-Za-zÀ-ÿ0-9]/) || ['N'])[0].toUpperCase(); s.texts.push({ role: 'badge', value: ini, x: F2((left + av / 2) / W), y: F2(ay / H), align: 'center', size: Math.round(av * .5), font: fontKey(fn, ctx), weight: 800, color: '#ffffff', nowrap: true, shadow: false }); }
-  const ny = yTop + pad + hNome / 2;
-  s.texts.push({ role: 'body', value: nome, x: F2(nx / W), y: F2(ny / H), align: 'left', size: nz, font: fontKey(fn, ctx), weight: 800, color: ink, nowrap: true, shadow: false });
-  const vz = Math.round(nz * 1.05), vx = nx + largura(nome, fn, nz) * .975 + vz * .68;   // selo azul recortado (dois quadrados arredondados girados) com o check branco
-  for (const rot of [0, 45]) s.shapes.push({ kind: 'rect', x: F2(vx / W), y: F2(ny / H), w: F2(vz * .74 / W), h: F2(vz * .74 / H), radius: .3, color: '#1d9bf0', rot });
-  s.shapes.push({ kind: 'circle', x: F2(vx / W), y: F2(ny / H), w: F2(vz * .72 / W), h: F2(vz * .72 / H), color: '#1d9bf0', icon: 'check', icon_color: '#ffffff' });
-  s.texts.push(texto(ctx, fi, ti.linhas, ti.size, { x: nx, yTop: yTop + pad + hNome, align: 'left', role: 'body', color: ink, extra: { hl: ink, hw: 800 } }).t);
+  else { s.shapes.push({ kind: 'circle', x: F2((left + av / 2) / W), y: F2(ay / H), w: F2(av / W), h: F2(av / H), color: '#0a0a0c', z: 3750 }); const ini = (nome.match(/[A-Za-zÀ-ÿ0-9]/) || ['N'])[0].toUpperCase(); s.texts.push({ role: 'badge', value: ini, x: F2((left + av / 2) / W), y: F2(ay / H), align: 'center', size: Math.round(av * .5), font: fontKey(fn, ctx), weight: 800, color: '#ffffff', nowrap: true, shadow: false }); }
+  const ny = yTop + padT + hNome * .45;
+  s.texts.push({ role: 'body', value: nome, x: F2(nx / W), y: F2(ny / H), align: 'left', size: nz, font: fontKey(fn, ctx), weight: 700, color: ink, nowrap: true, shadow: false });
+  const vz = Math.round(nz * .95), vx = nx + largura(nome, fn, nz) * .975 + vz * .75;   // selo azul recortado (dois quadrados arredondados girados) com o check branco
+  for (const rot of [0, 45]) s.shapes.push({ kind: 'rect', x: F2(vx / W), y: F2(ny / H), w: F2(vz * .74 / W), h: F2(vz * .74 / H), radius: .3, color: '#1d9bf0', rot, z: 3760 });
+  s.shapes.push({ kind: 'circle', x: F2(vx / W), y: F2(ny / H), w: F2(vz * .72 / W), h: F2(vz * .72 / H), color: '#1d9bf0', icon: 'check', icon_color: '#ffffff', z: 3780 });
+  s.texts.push(texto(ctx, fi, ti.linhas, ti.size, { x: nx, yTop: yTop + padT + hNome * .9, align: 'left', role: 'body', color: ink, extra: { hl: '#1d9bf0', hw: 400 } }).t);
   return s;
 }
 
@@ -620,7 +625,7 @@ const COMPOR = {
     if (nome) { s.texts.push({ role: 'label', value: nome, x: F2(nx / W), y: F2(ay / H), align: 'left', size: nz, font: fontKey(fn, ctx), weight: 700, ls: 0, caixa: 'normal', color: '#ffffff', nowrap: true, shadow: false, front: true });
       const vz = Math.round(nz * 1.05); s.shapes.push({ kind: 'circle', x: F2((nx + largura(nome, fn, nz) + W * .01 + vz / 2) / W), y: F2(ay / H), w: F2(vz / W), h: F2(vz / H), color: '#1d9bf0', icon: 'check', icon_color: '#ffffff', front: true }); }
     }
-    const fio = d.rodape === 'fio', logoR = d.rodape === 'logo', barH = fio || logoR ? Math.round(H * .006) : Math.round(H * .034), tf = { ...T.tit, k: 'impact', w: 400, ls: 0, upper: true, caixa: undefined, lh: lhAcento(d.titulo) }, sombra = d.sombra ? ctx.accent : undefined, ti = ajusta(d.titulo || '', tf, W * .9, H * .36, { maxSize: W * .145, maxLinhas: 4 }), leg = String(d.legenda || 'Leia a legenda').trim(), lz = Math.round(W * .021);   // hierarquia: manchete grande, legenda pequena
+    const fio = d.rodape === 'fio', logoR = d.rodape === 'logo', barH = fio || logoR ? Math.round(H * .006) : Math.round(H * .012), tf = { ...T.tit, k: 'impact', w: 400, ls: 0, upper: true, caixa: undefined, lh: lhAcento(d.titulo) }, sombra = d.sombra ? ctx.accent : undefined, ti = ajusta(d.titulo || '', tf, W * .9, H * .36, { maxSize: W * .145, maxLinhas: 4 }), leg = String(d.legenda || 'Leia a legenda').trim(), lz = Math.round(W * .021);   // hierarquia: manchete grande, legenda pequena
     if (fio) { const cores = ['#ff4d8d', '#ff9a3c', '#ffe14d', '#4db8ff', '#3be08a'], x0 = mx * .62, ww = (W - x0 * 2) / 4, cy = H - H * .03;
       for (let q = 0; q < 4; q++) s.shapes.push({ kind: 'rect', x: F2((x0 + ww * (q + .5)) / W), y: F2(cy / H), w: F2(ww / W), h: F2(barH / H), color: cores[q], color2: cores[q + 1], grad: 90, radius: q === 0 || q === 3 ? .5 : 0, front: true }); }
     else if (!logoR) s.shapes.push({ kind: 'rect', x: .5, y: F2((H - barH / 2) / H), w: 1, h: F2(barH / H), color: ctx.accent, front: true });
@@ -662,7 +667,7 @@ const COMPOR = {
       for (const [i, f] of [[0, foto], [1, foto2]]) s.items.push({ ...srcDe(f, pf), x: i ? .75 : .25, y: .35, box: { w: .5, h: .7, fade: .35 }, fil: pb });
     } else if (foto) { s.bg = { ...srcDe(foto, pf), color: azul, pos: 'topo', fil: pb }; s.shade = .25; s.shade_dir = 'bottom'; }
     else s.fx.glows = [{ x: .5, y: .3, r: .8, color: ctx.accent, opacity: .35 }];
-    if (circ) s.items.push({ ...srcDe(circ, x => `${x}, high quality, vivid colors, no text`), x: .72, y: .22, box: { w: .46, h: .46 * W / H, circle: true, border: .008, bc: '#ffffff', pos: 'center' }, fil: pb, shadow: 1 });
+    if (circ) s.items.push({ ...srcDe(circ, x => `${x}, high quality, vivid colors, no text`), x: .72, y: .22, box: { w: .46, h: .46 * W / H, circle: true, border: .014, bc: '#ffffff', pos: 'center' }, fil: pb, shadow: 1 });
     s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: foto2 ? .72 : .58 }];
     const tf = { ...T.tit, k: 'impact', w: 400, ls: 0, lh: lhAcento(d.titulo), upper: true, caixa: undefined }, selo = String(d.editoria || d.selo || ctx.marca || ctx.nome || 'Notícia').trim(), legenda = String(d.legenda || 'Leia a legenda').trim();
     const ti = ajusta(d.titulo || '', tf, W * .88, H * .3, { maxSize: W * .088, maxLinhas: 5 }), hl = '#ffffff';   // referência Zyrion: manchete toda branca, sem palavra colorida
@@ -777,7 +782,7 @@ const COMPOR = {
     const { W, H, mx, T } = ctx, foto = genOuAsset(d.foto), azul = mistura(ctx.accent, '#000000', .78), s = base(ctx, azul, { grain: .2, vignette: 0 });
     if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, natural light, no text, no watermark`), color: azul, pos: 'topo' }; s.shade = .62; s.shade_dir = 'full'; }
     else s.fx.glows = d.x ? [{ x: .5, y: .3, r: .85, color: ctx.accent, opacity: .6 }, { x: .05, y: .05, r: .6, color: ctx.accent, opacity: .35 }, { x: .95, y: .65, r: .6, color: ctx.accent, opacity: .3 }] : [{ x: .5, y: .35, r: .8, color: ctx.accent, opacity: .3 }];
-    if (d.x) return postX(d, ctx, s);   // contracapa de notícia: cartão idêntico a um post do X
+    return postX(d, ctx, s);   // padrão do dono: a contracapa é sempre o cartão do X (o modelo antigo abaixo fica sem uso)   // contracapa de notícia: cartão idêntico a um post do X
     const nome = String(d.nome || ctx.marca || '').trim(), cardW = W - mx * 2, pad = Math.round(W * .05), av = Math.round(W * .105), ink = '#0a0a0c';
     const f = { ...T.txt, w: 500, lh: 1.32, upper: false }, ti = quebraTexto(String(d.titulo || ''), f, cardW - pad * 2, H * .36, W * .05, W * .032);
     const hTxt = ti.linhas.length * f.lh * ti.size, hCard = pad + av + Math.round(W * .035) + hTxt + pad, cx = W / 2, yBot = ctx.storiesH ? H * .8 : H * .9, yTop = yBot - hCard, left = mx + pad;

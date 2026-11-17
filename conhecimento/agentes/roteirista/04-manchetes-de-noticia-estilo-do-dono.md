@@ -87,3 +87,7 @@ No bloco da arte de notícia entregue **uma única** manchete, final, assim: `T�
 - Sujeito: Prefeitura de Rio Branco. Verbo: reajusta. Detalhe mais forte: valor e prazo.
 - Manchete: Prefeitura de Rio Branco reajusta passagem de ônibus em 12%, para R$ 4,50, a partir de segunda-feira
 - Conferência: conta o fato, tem número e prazo, 17 palavras, nada fora dos fatos.
+
+## Contracapa é opcional (decisão do dono, 16/11/2026)
+A contracapa (cartão do X sobre a foto) só entra no post quando você escreve a linha "Contracapa: ..." no roteiro. Sem essa linha, o post sai só com a capa. Vale para qualquer formato: se escrever a contracapa, ela é adicionada no fim.
+Texto padrão quando a ideia é só chamar para seguir: "Gostou da notícia? Siga a @marca e fique por dentro de tudo o que está movimentando o Brasil e o mundo."

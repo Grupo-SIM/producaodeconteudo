@@ -2526,8 +2526,9 @@ function compoeModelos(found, format, brand, c = null) {
         // roteiro com páginas no meio (o que aconteceu, o que muda): o cartão leva esse texto da notícia, e não a página final de "siga a página"
         const corpoRaw = sl.length > 2 ? sl.slice(1, -1).map(x => [x.dados?.titulo, x.dados?.texto || x.dados?.apoio].filter(Boolean).join('. ')).filter(Boolean).map(t => /[.!?…]\**\s*$/.test(t) ? t : t.replace(/\s*(\**)\s*$/, '.$1')).join(' ').replace(/\s+/g, ' ').trim() : '';
         const corpoNoticia = corpoRaw.length <= 340 ? corpoRaw : (corpoRaw.slice(0, 340).match(/^[\s\S]*[.!?](?=\s|$)/)?.[0] || corpoRaw.slice(0, 340).replace(/\s+\S*$/, '') + '…');
+        const temContra = sl.length >= 2 || !!partesNoticia(c?.script).contra;   // contracapa opcional: só quando o roteirista/Designer mandou uma 2ª página
         found.slides = [{ ...p0, modelo: 'noticia', dados: { titulo: d0.titulo, selo: d0.selo || (kk && kk.length <= 28 ? kk : undefined), legenda: d0.legenda, foto } },
-          { ...p1, modelo: 'post-card', dados: { x: c?.kind === 'noticia' ? true : undefined, titulo: corpoNoticia || (p1.modelo === 'post-card' ? d1.titulo : [d1.titulo, d1.texto || d1.apoio].filter(Boolean).join('. ').replace(/\*\.\s/g, '* ')), nome: d1.nome, foto } }];
+          ...(temContra ? [{ ...p1, modelo: 'post-card', dados: { x: c?.kind === 'noticia' ? true : undefined, titulo: corpoNoticia || (p1.modelo === 'post-card' ? d1.titulo : [d1.titulo, d1.texto || d1.apoio].filter(Boolean).join('. ').replace(/\*\.\s/g, '* ')), nome: d1.nome, foto } }] : [])];
         for (const x of found.slides) for (const k of Object.keys(x.dados)) if (x.dados[k] == null || x.dados[k] === '') delete x.dados[k];
       }
     } }
@@ -2578,7 +2579,7 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'citacao', papel: 'capa' }] },
   { id: 'manchete-perfil', marcas: ['Seguidores em Alta'], nome: '5 · Manchete sobre foto com perfil', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto em página inteira, perfil da marca no topo, manchete em caixa alta centralizada, “Leia a legenda” e barra na cor da marca. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa' }] },
-  { id: 'manchete-bet', marcas: ['Vivendo de Bet'], nome: '6 · Manchete sobre foto com logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do esporte/aposta em post único: foto em página inteira, logo da marca no canto, manchete em caixa alta centralizada, “Leia a legenda” e fio colorido no rodapé. Foto = a imagem real do assunto.',
+  { id: 'manchete-bet', oculto: true, marcas: ['Vivendo de Bet'], nome: '6 · Manchete sobre foto com logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do esporte/aposta em post único: foto em página inteira, logo da marca no canto, manchete em caixa alta centralizada, “Leia a legenda” e fio colorido no rodapé. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'logo', rodape: 'fio' } }] },
   { id: 'manchete-raiz', oculto: true, marcas: ['Marketing Raiz'], nome: 'Manchete sobre foto com fio e logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto (ou colagem de fotos) no alto que escurece até o preto, fio branco, manchete em itálico com sombra na cor da marca, logo e “Leia a legenda” embaixo. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'nenhum', linha: true, rodape: 'logo', italico: true, sombra: true } }] },
@@ -2807,10 +2808,10 @@ async function arteDoRoteiro(id, origem = 'painel') {
   if (c.kind === 'noticia') { const tl = radarEstiloDaMarca(c.brand || ''); if (tl?.layoutId && await arteDeLayoutNoticia(id, c, tl, pags, [avisoRoteiro, notaFoto])) return true; }
   if (c.kind === 'noticia') { const tn = radarEstiloDaMarca(c.brand || ''); if (tn && !tn.layoutId && c.estilo_arte !== 't:' + tn.id) { setContent(id, { estilo_arte: 't:' + tn.id }); c = getContent(id); } }
   const estilo = escolheEstilo(c, format); let spec = sanitizeArteSpec(compoeModelos({ slides: pags, estilo: estilo || undefined }, format, c.brand, c), format); if (!spec) return false;
-  if (c.kind === 'noticia' && spec.slides.length === 1) {   // notícia tem sempre 2 páginas: capa + contracapa (foto + cartão de post do X)
-    await radarGarantiFoto2(c);
+  if (partesNoticia(c.script).contra && spec.slides.at(-1)?.modelo !== 'post-card') {   // contracapa é opcional (decisão do dono): entra em QUALQUER formato quando o roteirista escreveu a “Contracapa:”, e só nesse caso
+    if (c.kind === 'noticia') await radarGarantiFoto2(c);
     const f1 = spec.slides[0].bg?.asset || spec.slides[0].dados?.foto || '', cc = contracapaNoticia(c, f1);
-    if (cc) { const sp2 = sanitizeArteSpec({ ...spec, slides: [spec.slides[0], cc] }, 'carrossel'); if (sp2) { spec = sp2; format = 'carrossel'; } }
+    if (cc) { const sp2 = sanitizeArteSpec({ ...spec, slides: [...spec.slides, cc] }, 'carrossel'); if (sp2) { spec = sp2; format = 'carrossel'; } }
   }
   const confere = c.kind === 'noticia' ? confereNoticia(c, spec.slides[1], spec.slides[0].bg?.asset || spec.slides[0].dados?.foto || '') : '';
   const resumo = `Direção de arte montada pelo painel a partir do roteiro, no estilo aprovado da marca (${origem}).\n` + pags.map((p, i) => `Página ${i + 1} · ${p.modelo}: ${String(p.dados.titulo || '').replace(/\*/g, '')}`).join('\n');
@@ -3068,7 +3069,7 @@ function estiloEstruturaBloco(c, para = 'roteirista') {
     const nsl = nsl0;
     const L = est.map(p => `- Página ${p.n} (${p.papel === 'capa' ? 'capa' : p.papel === 'fim' ? 'fechamento' : 'miolo'} · ${p.modelo_nome}, fundo ${p.fundo}${p.mascote ? ', com mascote' : ''}): ${p.jornal?.manchete ? `manchete direta e forte, ideal até ~${p.titulo_ideal} caracteres (máximo ~${p.titulo_max}), numa página só; foto = a imagem real do assunto` : p.jornal?.citacao ? 'chamada = nome de quem disse a frase (até ~30 letras); título = a frase inteira, fiel e real, entre aspas, ideal até ~120 caracteres (máximo ~170), numa página só; foto = o retrato da pessoa' : p.jornal?.texto_ideal ? `texto da notícia em UM parágrafo corrido, ideal até ~${p.jornal.texto_ideal} caracteres (máximo ~${p.jornal.texto_max}), com a palavra-chave em *negrito*` : p.jornal ? `selo curto até ~${p.jornal.chamada_max} letras (ex.: “Notícia urgente!”); ` : ''}${p.jornal?.texto_ideal || p.jornal?.citacao || p.jornal?.manchete ? '' : [p.campos.includes('chamada') && p.chamada_max ? `chamada até ~${p.chamada_max} letras` : '', p.campos.includes('título') ? `título ideal até ~${p.titulo_ideal} caracteres (máximo ~${p.titulo_max}; acima disso a letra encolhe e perde impacto)` : '', p.campos.includes('número') ? 'número curto' : '', p.itens ? `até ${p.itens} itens curtos (título + 1 frase)` : '', p.campos.includes('texto de apoio') && p.apoio_max ? `apoio (opcional) ideal até ~${p.apoio_ideal} caracteres, máximo ~${p.apoio_max}` : '', p.campos.includes('botão') ? 'botão de 2 a 4 palavras' : ''].filter(Boolean).join('; ') || 'só o título'}`);
     const quem = para === 'roteirista' ? 'Escreva a copy JÁ PENSANDO NESSA DIAGRAMAÇÃO: cada página só pode ter o que cabe.' : para === 'revisor' ? 'Confira se a copy cabe nessa diagramação (texto maior que o espaço é correção obrigatória: o painel só consegue encolher a letra, e letra pequena perde impacto).' : 'Confira se a copy cabe nessa diagramação; texto que não cabe é ajuste obrigatório.';
-    return `\n\n# DIAGRAMAÇÃO DO ESTILO ESCOLHIDO: “${tpl.nome}”${c.brand ? ' (' + c.brand + ')' : ''}\nO Designer/dono já escolheu o estilo. ${quem}${fixo2(tpl) ? ' ESTE ESTILO TEM EXATAMENTE 2 PÁGINAS (capa e contra-capa, sem miolo): ignore a quantidade padrão de slides. Capa: manchete curta e forte (selo opcional como chamada, ex.: “Notícia urgente!”). Contra-capa: UM parágrafo curto da notícia (2 a 4 frases), com a palavra-chave em *negrito*. Foto: a imagem real da notícia.' : nsl && fmt !== 'feed' ? ` A peça terá ${nsl} páginas, na ordem abaixo.` : ''}\n${L.join('\n')}\nOs textos de exemplo do template são só marcadores de lugar: serão trocados pelos seus. Um título forte por página, sem blocos longos.`;
+    return `\n\n# DIAGRAMAÇÃO DO ESTILO ESCOLHIDO: “${tpl.nome}”${c.brand ? ' (' + c.brand + ')' : ''}\nO Designer/dono já escolheu o estilo. ${quem}${fixo2(tpl) ? ' ESTE ESTILO TEM A CAPA E, SE VOCÊ QUISER, UMA CONTRACAPA (sem miolo): ignore a quantidade padrão de slides. Capa: manchete curta e forte (editoria opcional como chamada, ex.: “Cinema e entretenimento”). Contracapa é OPCIONAL: só entra se você escrever (cartão de post com foto, ex.: “Gostou da notícia? Siga a @marca e fique por dentro…”); sem contracapa, a peça sai só com a capa. Foto: a imagem real da notícia.' : nsl && fmt !== 'feed' ? ` A peça terá ${nsl} páginas, na ordem abaixo.` : ''}\n${L.join('\n')}\nOs textos de exemplo do template são só marcadores de lugar: serão trocados pelos seus. Um título forte por página, sem blocos longos.`;
   } catch (e) { console.error('diagramação do estilo:', e.message); return ''; }
 }
 function escolheEstilo(c, format) {
@@ -4785,7 +4786,7 @@ function textoContracapa(c) {
 // CONFERÊNCIA AUTOMÁTICA (o sistema não entrega arte com falha sem avisar): capa e contracapa com foto, fotos diferentes, texto curto
 function confereNoticia(cap, cc, foto1) {
   const p = [], f2 = cc?.bg?.asset || cc?.dados?.foto || '';
-  if (!cc) p.push('sem contracapa'); else {
+  if (!cc) { if (partesNoticia(cap?.script).contra) p.push('sem contracapa'); } else {
     if (!f2) p.push('contracapa sem foto da notícia (só fundo da marca): troque a imagem na aba Arte');
     else if (foto1 && f2 === foto1) p.push('contracapa repete a foto da capa');
   }

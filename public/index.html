@@ -5197,7 +5197,8 @@ async function arteEditor(id, onClose, opts = {}) {
   const TPL_NOTICIA = [['noticia', {}, '1 · Notícia Zyrion: foto inteira', 'Foto em página inteira, degradê escuro embaixo e manchete em caixa alta.'],
     ['noticia', { foto2: 1 }, '2 · Notícia Zyrion: tela dividida', 'Duas fotos lado a lado no alto, dissolvendo no preto. Bom para confronto ou antes e depois.'],
     ['noticia', { circulo: 1 }, '3 · Notícia Zyrion: foto com círculo', 'Foto de fundo e um círculo com a referência do assunto (rosto, logo, objeto).'],
-    ['noticia', { estilo: 'nuvo' }, '4 · Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
+    ['noticia', { estilo: 'nuvo' }, '4 · Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.'],
+    ['post-card', {}, '6 · Contracapa (cartão do X)', 'Página à parte e opcional: foto com fade e o cartão de post da marca. Crie uma página nova e aplique.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
     const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
     // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram
@@ -5254,7 +5255,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si, oc = new Set(TPLS.ocultos || []);
     const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
     const stories = x => /stories|vertical/.test(x || ''), meus = (TPLS.itens || []).filter(t => stories(t.format) === stories(data.format)).map(t => ({ ...t, custom: true, g: 'Meus templates' }));
-    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia').map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
+    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card').map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
     const tw = 104, th = Math.round(tw * H / W), ks = tw / W;
     const ib = (txt, tt, fn, cor) => h('button', { type: 'button', title: tt, onclick: e => { e.stopPropagation(); fn(); }, style: cor ? { color: cor } : null }, txt);   // mesmo visual dos botões das páginas (.aethb)
     const card = t => {

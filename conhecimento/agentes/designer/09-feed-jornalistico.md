@@ -34,3 +34,9 @@ Vale para toda notícia (capa + contracapa). Só arte: a copy não muda. Modelos
 - **Foto sem letras nem números.** A foto de fundo (capa e contracapa) é uma imagem limpa: nada de cartaz, print de tela, banner, flyer, documento ou qualquer foto com texto ou número. O post já tem manchete, logo e textos; letra sobre letra fica ilegível. Na dúvida, troque a foto.
 - **Foto que para o dedo.** Chocante, polêmica ou forte, e ligada ao assunto da manchete (ex.: notícia de IA e adolescentes: um adolescente no celular, rosto iluminado pela tela, clima de vigilância/IA). Foto genérica, de palestra ou de pessoa que não tem nada a ver com a notícia não serve.
 - **Texto que cabe.** Capa: no máximo 100 caracteres (até 4 linhas na arte). Contracapa (texto + chamada do cartão): no máximo 130 caracteres. Se o texto aprovado passar disso, a arte NÃO corta: a peça volta para o Copy dizer a mesma coisa com menos palavras e depois a arte é refeita.
+
+## Templates jornalísticos numerados (dono, 16/11/2026)
+1 Zyrion foto inteira · 2 Zyrion tela dividida · 3 Zyrion foto com círculo · 4 Nuvo · 5 Manchete com perfil. Preto e branco não é template: é o filtro da foto.
+Zyrion: editoria pequena em branco acima da manchete (sem pílula), manchete toda branca em caixa alta, logo da marca entre as duas linhas, "Leia a legenda".
+Nuvo: logo no topo, pílula do site em ~65% da altura, manchete logo abaixo (até 4 linhas), nome vazado atrás, "Siga @marca no Instagram" com o ícone.
+Contracapa (cartão do X) é uma página à parte e opcional: só entra quando o roteirista escreveu a Contracapa. Padrão: foto viva até ~3/4 com fade para o preto, cartão branco de 83% da largura terminando em ~90% da altura, avatar redondo, nome em negrito com selo azul, texto normal com o @ em azul.
