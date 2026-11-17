@@ -118,7 +118,55 @@ function botaoArraste(ctx, s, { x, y, bg, cor, txt = 'Arrasta para o lado', cont
   s.texts.push({ role: 'cta', value: txt, x, y, align, size: Math.round(ctx.W * size), weight: 700, bg: contorno ? '#00000000' : bg, color: cor, shape: contorno ? 'outline' : 'pill', arrow: 'arrow-right', arrow_bg: contorno ? '#00000000' : bg, arrow_color: cor, upper: true, caixa: 'alta', nowrap: true, shadow: false, seta: false });
 }
 
-// ───────── composição de cada kit ─────────
+
+// ───────── ARTE REAL DA REFERÊNCIA (versão 2, pedido do dono: "copie exatamente igual") ─────────
+// Cada slide da referência virou uma placa sem texto (public/kits/kNN-M.jpg). A capa usa a placa 1, o fim a última e o miolo
+// gira pelas do meio, na ordem da referência (os objetos que atravessam a emenda continuam certos). O texto entra onde ficava
+// na referência: [x, largura, y, âncora (topo|centro|base), alinhamento, fundo (c = claro, e = escuro)].
+const Z = (x, w, y, an = 'topo', al = 'left', t = 'e') => ({ x, w, y, an, al, t });
+export const PLACAS = {
+  k01: { n: 6, capa: 'impacto', z: { 1: Z(.5, .86, .9, 'base', 'center'), 2: Z(.08, .5, .42, 'topo', 'left', 'c'), 3: Z(.06, .52, .4, 'topo', 'left', 'c'), 4: Z(.44, .52, .07, 'topo', 'left'), 5: Z(.06, .56, .1, 'topo', 'left', 'c'), 6: Z(.06, .55, .08, 'topo', 'left', 'c') } },
+  k02: { n: 3, capa: 'faixas', z: { 1: Z(.48, .62, .45, 'centro', 'center'), 2: Z(.3, .5, .2, 'topo', 'left', 'c'), 3: Z(.5, .8, .4, 'centro', 'center') } },
+  k03: { n: 5, capa: 'impacto', z: { 1: Z(.5, .72, .72, 'topo', 'center'), 2: Z(.28, .5, .14, 'topo', 'left', 'c'), 3: Z(.36, .5, .14, 'topo', 'left', 'c'), 4: Z(.3, .52, .14, 'topo', 'left', 'c'), 5: Z(.5, .6, .66, 'topo', 'center') } },
+  k04: { n: 10, capa: 'texto', z: { fim: Z(.5, .76, .45, 'centro', 'center'), meio: Z(.1, .76, .4, 'centro', 'left') } },
+  k05: { n: 8, capa: 'impacto', z: { 1: Z(.5, .8, .74, 'topo', 'center', 'c'), fim: Z(.5, .8, .45, 'centro', 'center', 'c'), meio: Z(.13, .74, .17, 'topo', 'left', 'c') } },
+  k06: { n: 9, capa: 'serifa', temas: 'cecceceec', z: { fim: Z(.5, .8, .72, 'topo', 'center', 'c'), meio: Z(.5, .86, .08, 'topo', 'center') } },
+  k07: { n: 4, capa: 'italico', temas: 'ceec', z: { 1: Z(.5, .88, .08, 'topo', 'center', 'c'), meio: Z(.08, .84, .45, 'centro', 'left'), fim: Z(.08, .84, .42, 'centro', 'left') } },
+  k08: { n: 8, capa: 'texto', z: { fim: Z(.5, .8, .45, 'centro', 'center'), meio: Z(.1, .8, .18, 'topo', 'left') } },
+  k09: { n: 9, capa: 'faixas', temas: 'ececececE', z: { 1: Z(.07, .72, .84, 'base', 'left'), fim: Z(.5, .8, .62, 'centro', 'center'), meio: Z(.1, .72, .16, 'topo', 'left') } },
+  k10: { n: 8, capa: 'impacto', z: { 1: Z(.5, .84, .6, 'topo', 'center'), 3: Z(.5, .8, .1, 'topo', 'center'), fim: Z(.5, .8, .64, 'topo', 'center'), meio: Z(.1, .76, .16, 'topo', 'left') } },
+  k11: { n: 3, capa: 'faixas', z: { 1: Z(.34, .6, .44, 'centro', 'center'), 2: Z(.3, .5, .2, 'topo', 'left'), 3: Z(.5, .8, .4, 'centro', 'center') } },
+  k12: { n: 5, capa: 'monitor', z: { 1: Z(.33, .46, .42, 'centro', 'center', 'c'), fim: Z(.5, .7, .36, 'centro', 'center'), meio: Z(.12, .6, .24, 'topo', 'left') } },
+  k13: { n: 6, capa: 'impacto', z: { 1: Z(.08, .6, .88, 'base', 'left'), 2: Z(.06, .44, .1, 'topo', 'left', 'c'), 3: Z(.6, .36, .2, 'topo', 'left'), 4: Z(.06, .5, .1, 'topo', 'left'), 5: Z(.62, .34, .1, 'topo', 'left'), 6: Z(.08, .5, .2, 'topo', 'left', 'c') } },
+  k14: { n: 5, capa: 'serifa', z: { 1: Z(.08, .5, .3, 'topo', 'left', 'c'), 5: Z(.55, .4, .3, 'topo', 'left', 'c'), meio: Z(.05, .58, .22, 'topo', 'left', 'c') } }
+};
+function comporPlaca(papel, d, ctx, H) {
+  const P = PLACAS[d.kit], A = ctx.accent, { i, total, W } = ctx;
+  const m = P.n - 2, num = papel === 'capa' ? 1 : papel === 'fim' ? P.n : 2 + ((i - 1) % Math.max(1, m)), placa = `${d.kit}-${num}`;
+  const z = P.z[num] || (papel === 'fim' ? P.z.fim : null) || P.z.meio || Z(.1, .76, .16);
+  const t = P.temas ? (P.temas[num - 1] || 'e').toLowerCase() : z.t, claro = t === 'c';
+  const tc = claro ? '#111111' : '#ffffff', sub = claro ? '#2b2b2b' : '#ffffffd9';
+  const s = { bg: { placa, color: claro ? '#ffffff' : '#000000' }, shade: 0, pager: false, fx: {}, texts: [], items: [], shapes: [] };
+  const box = { x: z.x, w: z.w, align: z.al, ...(z.an === 'base' ? { base: z.y } : z.an === 'centro' ? { centro: z.y } : { topo: z.y }) };
+  const pt = partes(d.titulo);
+  if (papel === 'capa') {
+    const est = P.capa;
+    if (est === 'faixas') bloco(ctx, H, s, [{ v: pt.antes, f: 'tit', fw: 400, k: ctx.T.txt.k, cor: '#111111', max: .07, maxH: .14, linhas: 2, extra: { band: '#ffffff' } }, { v: pt.dest, cor: A, max: .2, maxH: .17, linhas: 1, caixa: 'alta', gap: 0 }, { v: d.texto, f: 'txt', cor: tc, max: .03, gap: .03 }], box);
+    else if (est === 'serifa') bloco(ctx, H, s, [{ v: pt.antes || pt.dest, cor: claro ? '#111111' : '#ffffff', max: .085, maxH: .2, linhas: 3, caixa: 'alta' }, { v: pt.antes ? pt.dest : '', f: 'tit', k: 'playfair', fw: 400, cor: A, max: .07, linhas: 2, gap: 0, caixa: 'normal', extra: { italic: true } }, { v: d.texto, f: 'txt', cor: sub, max: .03, gap: .03 }], box);
+    else if (est === 'italico') bloco(ctx, H, s, [{ v: semMarca(d.titulo), cor: A, max: .09, maxH: .2, linhas: 2, caixa: 'alta', extra: { italic: true } }], box);
+    else if (est === 'monitor') bloco(ctx, H, s, [{ v: pt.antes, cor: '#111111', max: .05, linhas: 2, caixa: 'alta' }, { v: pt.dest, cor: '#111111', max: .15, maxH: .14, linhas: 1, caixa: 'alta', gap: 0 }], box);
+    else if (est === 'texto') bloco(ctx, H, s, [{ v: d.titulo, f: 'txtB', cor: tc, max: .045, maxH: .25, hl: A }, { v: d.texto, f: 'txt', cor: tc, max: .034, maxH: .3, gap: .03 }], box);
+    else bloco(ctx, H, s, [{ v: pt.antes, cor: tc, max: .085, maxH: .14, linhas: 2, caixa: 'alta' }, { v: pt.dest, cor: A, max: .2, maxH: .17, linhas: 1, caixa: 'alta', gap: 0 }, { v: d.texto, f: 'txt', cor: sub, max: .03, gap: .03 }], box);
+  } else if (papel === 'fim') {
+    bloco(ctx, H, s, [{ v: d.titulo || 'Gostou do *conteúdo*?', cor: tc, max: .085, maxH: .22, linhas: 3 }, { v: d.texto, f: 'txt', cor: sub, max: .034, gap: .02 }, { v: d.cta || (ctx.contatos?.instagram ? 'Siga ' + ctx.contatos.instagram : ''), f: 'txtB', cor: A, max: .045, gap: .03 }], box);
+  } else {
+    const tit = d.titulo ? (d.numero ? `${d.numero}. ` : '') + d.titulo : '';
+    bloco(ctx, H, s, [{ v: tit, cor: tc, max: .06, maxH: .14, linhas: 3, hl: A }, { v: d.texto, f: 'txt', cor: sub, max: .032, min: .024, maxH: .4, gap: .025, hl: claro ? '#000000' : '#ffffff', extra: { hw: 700 } }], box);
+  }
+  return s;
+}
+
+// ───────── composição de cada kit (versão 1, desenhada por código) ─────────
 const COMP = {
   // 1 · Mesa do designer
   k01(p, d, ctx, H) {
@@ -436,8 +484,9 @@ const COMP = {
   }
 };
 
-// ponto de entrada: monta a página do kit
+// ponto de entrada: monta a página do kit (arte real da referência quando há placas; senão o desenho por código)
 export function comporKit(papel, d, ctx, H) {
+  if (PLACAS[d.kit] && !d.desenho) return comporPlaca(papel, d, ctx, H);
   const k = kitDe(d.kit), fn = COMP[k.id];
   const s = fn(papel, d, ctx, H);
   s.items = s.items.filter(Boolean);
