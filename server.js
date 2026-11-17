@@ -3227,7 +3227,8 @@ function dadosOk(d) {
   else if (typeof d.itens === 'string') out.itens = t(d.itens, 800);
   if (d.brilho === false) out.brilho = false;
   // variações da capa de notícia (Zyrion: tela dividida, círculo, preto e branco; Nuvo) e textos próprios dela
-  for (const k of ['selo', 'legenda', 'nome', 'site', 'handle']) { const v = t(d[k], 200); if (v) out[k] = v; }
+  for (const k of ['selo', 'legenda', 'nome', 'site', 'handle', 'editoria']) { const v = t(d[k], 200); if (v) out[k] = v; }
+  { const v = t(d.frase, 400); if (v) out.frase = v; }   // frase da citação (frase de personalidade)
   if (d.estilo === 'nuvo') out.estilo = 'nuvo';
   for (const k of ['pb', 'urgente']) if (d[k]) out[k] = true;
   for (const k of ['foto2', 'circulo']) { const v = d[k]; if (typeof v === 'string' && v.trim()) out[k] = t(v, 500); else if (v && typeof v === 'object' && (v.asset || v.gen)) out[k] = v.asset ? { asset: t(v.asset, 80) } : { gen: t(v.gen, 500) }; }
