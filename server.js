@@ -2583,9 +2583,9 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'logo', rodape: 'fio' } }] },
   { id: 'manchete-raiz', oculto: true, marcas: ['Marketing Raiz'], nome: 'Manchete sobre foto com fio e logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto (ou colagem de fotos) no alto que escurece até o preto, fio branco, manchete em itálico com sombra na cor da marca, logo e “Leia a legenda” embaixo. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'nenhum', linha: true, rodape: 'logo', italico: true, sombra: true } }] },
-  { id: 'noticia-jornal', nome: '1 · Notícia Zyrion (2 páginas)', nivel: 'robusto', formatos: ['carrossel'], paginas: 2, uso: 'Notícia no estilo de jornal em 2 páginas: capa com a foto da notícia, degradê, selo “Notícia urgente!” e manchete em caixa alta; contra-capa com um cartão branco (avatar, nome verificado e o texto da notícia). Estrutura fixa, sem miolo.',
+  { id: 'noticia-jornal', nome: '1 · Notícia Zyrion', nivel: 'robusto', formatos: ['carrossel'], paginas: 2, uso: 'Notícia no estilo de jornal em 2 páginas: capa com a foto da notícia, degradê, selo “Notícia urgente!” e manchete em caixa alta; contra-capa com um cartão branco (avatar, nome verificado e o texto da notícia). Estrutura fixa, sem miolo.',
     seq: [{ modelo: 'noticia', papel: 'capa' }, { modelo: 'post-card', papel: 'fim' }] },
-  { id: 'noticia-nuvo', marcas: ['Vivendo de Bet'], nome: '4 · Notícia Nuvo (2 páginas)', nivel: 'robusto', formatos: ['carrossel', 'feed'], paginas: 2, uso: 'Notícia em 2 páginas no estilo Nuvo (referência do dono): logo centralizada no topo, foto única grande, pílula na cor da marca com o site, manchete em caixa normal com o nome da marca vazado atrás e "Siga @marca no Instagram"; contra-capa com o cartão de post.',
+  { id: 'noticia-nuvo', marcas: ['Vivendo de Bet'], nome: '4 · Notícia Nuvo', nivel: 'robusto', formatos: ['carrossel', 'feed'], paginas: 2, uso: 'Notícia em 2 páginas no estilo Nuvo (referência do dono): logo centralizada no topo, foto única grande, pílula na cor da marca com o site, manchete em caixa normal com o nome da marca vazado atrás e "Siga @marca no Instagram"; contra-capa com o cartão de post.',
     seq: [{ modelo: 'noticia', papel: 'capa', opcoes: { estilo: 'nuvo' } }, { modelo: 'post-card', papel: 'fim' }] },
   { id: 'noticia', oculto: true, nome: 'Notícia / novidade do mercado', nivel: 'robusto', formatos: ['carrossel', 'feed', 'stories'], uso: 'Notícia, novidade, lançamento, mudança de regra ou acontecimento que o público precisa saber agora: manchete forte na capa, o que aconteceu, o que muda para quem segue, e a chamada para acompanhar.',
     seq: [{ modelo: 'capa-faixa', papel: 'capa' }, { modelo: 'texto', foto: true }, { modelo: 'texto', repetir: true }, { modelo: 'frase' }, { modelo: 'cta', papel: 'fim' }] },
@@ -3076,7 +3076,9 @@ function estiloEstruturaBloco(c, para = 'roteirista') {
   } catch (e) { console.error('diagramação do estilo:', e.message); return ''; }
 }
 function escolheEstilo(c, format) {
-  if (c?.kind === 'noticia') { const tn = radarEstiloDaMarca(c.brand || ''); if (tn && !tn.layoutId) return tn.id; if (tn?.layoutId) return ''; }   // REGRA: notícia só usa o template de notícia cadastrado da marca (Escritório), nunca outro
+  if (c?.kind === 'noticia') { const tn = radarEstiloDaMarca(c.brand || ''), sel = marcaTemplates()[String(c.brand || '').trim().toLowerCase()];
+    if (Array.isArray(sel) && !(tn && sel.includes(tn.id))) { const jn = templatesDaMarca(c.brand || '').find(t => t.formatos.includes(format) && (t.tema === 'noticia' || /not[ií]cia|manchete/i.test(t.nome))); if (jn) return jn.id; }   // checklist da marca (tela Marcas) manda
+    if (tn && !tn.layoutId) return tn.id; if (tn?.layoutId) return ''; }   // REGRA: notícia só usa o template de notícia cadastrado da marca (Escritório), nunca outro
   { const ea = String(c?.estilo_arte || ''); if (/^t:/.test(ea) && templateDe(ea.slice(2))?.formatos.includes(format)) return ea.slice(2); }   // o dono escolheu o estilo ao criar o pedido
   const brand = c.brand || '', lc = brand.toLowerCase(), tema = temaDoConteudo(c), todos = templatesDaMarca(brand).filter(t => t.formatos.includes(format));
   const daMarca = t => mesmaMarca(t.brand, brand) && !!brand || (t.visual_marcas || []).some(m => String(m).toLowerCase() === lc);

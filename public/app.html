@@ -922,12 +922,9 @@ VIEWS.marcas = async () => {
     } else if (tab === 'voz') {
       const L = achaSec(ss, 'PAPEL', 'PÚBLICO', 'PUBLICO', 'VOZ', 'GANCHO'), R = achaSec(ss, 'O INIMIGO', 'INIMIGO', 'DOR', 'DESEJO', 'MECANISMO', 'CTA', 'MONETIZ', 'CONCORRENTES');
       esq = L.map(blocoL).join('') || '<p class="muted small">Sem descrição de voz e público.</p>'; dir = R.map(blocoL).join('');
-    } else if (tab === 'formatos') {
-      const MT = S._metas || { metas: [], formatos: [] };
-      esq = `<h5>Quantos posts por dia</h5>
-        ${MT.formatos.map(f => { const q = MT.metas.find(x => x.brand.toLowerCase() === sel.name.toLowerCase() && x.raia === f.id)?.qtd || 0; return `<div class="kvr"><span>${esc(f.nome)}</span><span><input class="metain" style="width:56px" type="number" min="0" max="20" value="${q}" onchange="salvaMeta(${JSON.stringify(esc(sel.name))},'${f.id}',this.value)"> por dia</span></div>`; }).join('')}
-        <p class="small muted" style="margin-top:8px">0 = nada é criado sozinho. A grade com todas as marcas fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p>`;
-      dir = `<h5>Templates que o Designer usa nesta marca</h5><div id="mtpl" class="small muted">Carregando…</div>` + (achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '');
+    } else if (tab === 'formatos') {   // só a checklist: a quantidade por dia fica em Produção diária
+      esq = `<h5>Templates que o Designer usa nesta marca</h5><p class="small muted" style="margin:0 0 8px">Marque só o que esta marca pode usar. O Designer faz a arte apenas com os marcados. A quantidade de posts por dia fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p><div id="mtpl" class="small muted">Carregando…</div>`;
+      dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
       esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('')}<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>`;
       dir = achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('');
@@ -945,8 +942,10 @@ VIEWS.marcas = async () => {
 async function carregaTplMarca(marca) {
   const el = $('#mtpl'); if (!el) return; let r; try { r = await api('/api/art-templates/marca?brand=' + encodeURIComponent(marca)); } catch (e) { el.textContent = 'Não consegui carregar os templates.'; return; }
   const fmt = { feed: 'Feed', carrossel: 'Carrossel', stories: 'Stories' }, ord = [...r.itens].sort((a, b) => (parseInt(a.nome) || 99) - (parseInt(b.nome) || 99) || a.nome.localeCompare(b.nome));
+  const grupo = t => t.tema === 'noticia' || /not[ií]cia|manchete/i.test(t.nome) ? 'Jornalístico' : (t.formatos || []).includes('stories') && t.formatos.length === 1 ? 'Stories' : (t.formatos || []).includes('carrossel') ? 'Carrossel' : 'Feed estático';
+  const G = ['Jornalístico', 'Feed estático', 'Carrossel', 'Stories'];
   el.className = ''; el.innerHTML = `<div style="display:flex;gap:6px;margin:4px 0 8px;flex-wrap:wrap"><button class="btn sm" onclick="tplMarcaTodos(true)">Marcar todos</button><button class="btn sm" onclick="tplMarcaTodos(false)">Desmarcar todos</button>${r.personalizado ? `<button class="btn sm" onclick="tplMarcaSalva(${esc(JSON.stringify(marca))}, true)">Voltar ao padrão</button>` : ''}</div>`
-    + ord.map(t => `<label class="kvr" style="cursor:pointer"><span><input type="checkbox" class="mtck" value="${esc(t.id)}" ${t.marcado ? 'checked' : ''} onchange='tplMarcaSalva(${esc(JSON.stringify(marca))})'> ${esc(t.nome)}</span><span class="muted small">${esc((t.formatos || []).map(f => fmt[f] || f).join(' · '))}</span></label>`).join('')
+    + G.map(g => { const L = ord.filter(t => grupo(t) === g); return L.length ? `<b style="display:block;margin:12px 0 4px">${g}</b>` + L.map(t => `<label class="kvr" style="cursor:pointer;justify-content:flex-start"><span><input type="checkbox" class="mtck" value="${esc(t.id)}" ${t.marcado ? 'checked' : ''} onchange='tplMarcaSalva(${esc(JSON.stringify(marca))})'> ${esc(t.nome)}</span></label>`).join('') : ''; }).join('')
     + `<p class="small muted" style="margin-top:6px">${r.personalizado ? 'Lista escolhida por você.' : 'Padrão do sistema. Marque ou desmarque para escolher.'}</p>`;
   S._tplMarca = marca;
 }
