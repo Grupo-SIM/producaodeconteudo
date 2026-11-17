@@ -2589,7 +2589,7 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'noticia', papel: 'capa', opcoes: { estilo: 'nuvo' } }, { modelo: 'post-card', papel: 'fim' }] },
   { id: 'noticia', oculto: true, nome: 'Notícia / novidade do mercado', nivel: 'robusto', formatos: ['carrossel', 'feed', 'stories'], uso: 'Notícia, novidade, lançamento, mudança de regra ou acontecimento que o público precisa saber agora: manchete forte na capa, o que aconteceu, o que muda para quem segue, e a chamada para acompanhar.',
     seq: [{ modelo: 'capa-faixa', papel: 'capa' }, { modelo: 'texto', foto: true }, { modelo: 'texto', repetir: true }, { modelo: 'frase' }, { modelo: 'cta', papel: 'fim' }] },
-  { id: 'stories-sequencia', nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
+  { id: 'stories-sequencia', oculto: true, nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }
 ];
 const TEMA_CASA = { mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
