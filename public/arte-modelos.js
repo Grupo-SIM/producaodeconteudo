@@ -242,9 +242,9 @@ function postX(d, ctx, s) {
 
 // Notícia estilo Nuvo (referência do dono): logo no topo, foto única, pílula com o site na cor da marca, manchete em caixa normal, nome da marca vazado atrás e "Siga @marca"
 function noticiaNuvo(d, ctx) {
-  const { W, H } = ctx, foto = genOuAsset(d.foto), s = base(ctx, '#000000', { grain: .15, vignette: .25 }), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
-  if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`), color: '#000000', pos: 'topo', fil: pb }; s.shade = .2; s.shade_dir = 'bottom'; }
-  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .4 }];   // fade só embaixo, sem cobrir o rosto
+  const { W, H } = ctx, foto = genOuAsset(d.foto), s = base(ctx, '#000000', { grain: .15, vignette: 0 }), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
+  if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`), color: '#000000', pos: 'topo', fil: pb }; }
+  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .55 }];   // só o fade atrás dos textos, até quase a metade (como o 1); o resto da foto fica limpo
   s.shapes.push({ kind: 'rect', x: .5, y: .002, w: 1, h: .006, color: ctx.accent, moldura: true, front: true });
   const marca = String(ctx.marca || '').trim(), c = ctx.contatos || {}, site = String(d.site || c.site || '').replace(/^https?:\/\//, '').replace(/\/$/, ''), arroba = String(d.handle || c.instagram || '').replace(/^.*instagram\.com\//, '').replace(/^@?/, '@').replace(/\/$/, '');
   if (ctx.logo) { const lw = Math.round(W * .3); s.items.push({ asset: ctx.logo, x: .5, y: .085, size: lw, moldura: true, front: true }); }
