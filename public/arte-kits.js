@@ -125,19 +125,19 @@ function botaoArraste(ctx, s, { x, y, bg, cor, txt = 'Arrasta para o lado', cont
 // na referência: [x, largura, y, âncora (topo|centro|base), alinhamento, fundo (c = claro, e = escuro)].
 const Z = (x, w, y, an = 'topo', al = 'left', t = 'e') => ({ x, w, y, an, al, t });
 export const PLACAS = {
-  k01: { n: 6, capa: 'impacto', z: { 1: Z(.5, .86, .9, 'base', 'center'), 2: Z(.08, .5, .42, 'topo', 'left', 'c'), 3: Z(.06, .52, .4, 'topo', 'left', 'c'), 4: Z(.44, .52, .07, 'topo', 'left'), 5: Z(.06, .56, .1, 'topo', 'left', 'c'), 6: Z(.06, .55, .08, 'topo', 'left', 'c') } },
+  k01: { n: 6, capa: 'impacto', z: { 1: Z(.5, .86, .9, 'base', 'center'), 2: Z(.04, .34, .55, 'topo', 'left', 'c'), 3: Z(.04, .3, .6, 'topo', 'left', 'c'), 4: Z(.44, .52, .07, 'topo', 'left'), 5: Z(.06, .56, .1, 'topo', 'left', 'c'), 6: Z(.06, .55, .08, 'topo', 'left', 'c') } },
   k02: { n: 3, capa: 'faixas', z: { 1: Z(.48, .62, .45, 'centro', 'center'), 2: Z(.3, .5, .2, 'topo', 'left', 'c'), 3: Z(.5, .8, .4, 'centro', 'center') } },
   k03: { n: 5, capa: 'impacto', z: { 1: Z(.5, .72, .72, 'topo', 'center'), 2: Z(.28, .5, .14, 'topo', 'left', 'c'), 3: Z(.36, .5, .14, 'topo', 'left', 'c'), 4: Z(.3, .52, .14, 'topo', 'left', 'c'), 5: Z(.5, .6, .66, 'topo', 'center') } },
   k04: { n: 10, capa: 'texto', z: { fim: Z(.5, .76, .45, 'centro', 'center'), meio: Z(.1, .76, .4, 'centro', 'left') } },
   k05: { n: 8, capa: 'impacto', z: { 1: Z(.5, .8, .74, 'topo', 'center', 'c'), fim: Z(.5, .8, .45, 'centro', 'center', 'c'), meio: Z(.13, .74, .17, 'topo', 'left', 'c') } },
-  k06: { n: 9, capa: 'serifa', temas: 'cecceceec', z: { fim: Z(.5, .8, .72, 'topo', 'center', 'c'), meio: Z(.5, .86, .08, 'topo', 'center') } },
-  k07: { n: 4, capa: 'italico', temas: 'ceec', z: { 1: Z(.5, .88, .08, 'topo', 'center', 'c'), meio: Z(.08, .84, .45, 'centro', 'left'), fim: Z(.08, .84, .42, 'centro', 'left') } },
+  k06: { n: 9, capa: 'serifa', temac: 'cecceccec', z: { fim: Z(.5, .8, .72, 'topo', 'center', 'c'), meio: Z(.5, .86, .08, 'topo', 'center') } },
+  k07: { n: 4, capa: 'italico', temas: 'cece', z: { 1: Z(.5, .88, .08, 'topo', 'center', 'c'), meio: Z(.08, .84, .45, 'centro', 'left'), fim: Z(.08, .84, .42, 'centro', 'left') } },
   k08: { n: 8, capa: 'texto', z: { fim: Z(.5, .8, .45, 'centro', 'center'), meio: Z(.1, .8, .18, 'topo', 'left') } },
   k09: { n: 9, capa: 'faixas', temas: 'ececececE', z: { 1: Z(.07, .72, .84, 'base', 'left'), fim: Z(.5, .8, .62, 'centro', 'center'), meio: Z(.1, .72, .16, 'topo', 'left') } },
   k10: { n: 8, capa: 'impacto', z: { 1: Z(.5, .84, .6, 'topo', 'center'), 3: Z(.5, .8, .1, 'topo', 'center'), fim: Z(.5, .8, .64, 'topo', 'center'), meio: Z(.1, .76, .16, 'topo', 'left') } },
   k11: { n: 3, capa: 'faixas', z: { 1: Z(.34, .6, .44, 'centro', 'center'), 2: Z(.3, .5, .2, 'topo', 'left'), 3: Z(.5, .8, .4, 'centro', 'center') } },
-  k12: { n: 5, capa: 'monitor', z: { 1: Z(.33, .46, .42, 'centro', 'center', 'c'), fim: Z(.5, .7, .36, 'centro', 'center'), meio: Z(.12, .6, .24, 'topo', 'left') } },
-  k13: { n: 6, capa: 'impacto', z: { 1: Z(.08, .6, .88, 'base', 'left'), 2: Z(.06, .44, .1, 'topo', 'left', 'c'), 3: Z(.6, .36, .2, 'topo', 'left'), 4: Z(.06, .5, .1, 'topo', 'left'), 5: Z(.62, .34, .1, 'topo', 'left'), 6: Z(.08, .5, .2, 'topo', 'left', 'c') } },
+  k12: { n: 5, capa: 'monitor', z: { 1: Z(.36, .4, .42, 'centro', 'center', 'c'), fim: Z(.5, .7, .36, 'centro', 'center'), meio: Z(.12, .6, .24, 'topo', 'left') } },
+  k13: { n: 6, capa: 'impacto', z: { 1: Z(.08, .6, .88, 'base', 'left'), 2: Z(.06, .4, .08, 'topo', 'left', 'c'), 3: Z(.6, .36, .2, 'topo', 'left'), 4: Z(.06, .5, .1, 'topo', 'left'), 5: Z(.62, .34, .1, 'topo', 'left'), 6: Z(.08, .5, .2, 'topo', 'left', 'c') } },
   k14: { n: 5, capa: 'serifa', z: { 1: Z(.08, .5, .3, 'topo', 'left', 'c'), 5: Z(.55, .4, .3, 'topo', 'left', 'c'), meio: Z(.05, .58, .22, 'topo', 'left', 'c') } }
 };
 function comporPlaca(papel, d, ctx, H) {
