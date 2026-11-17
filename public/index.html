@@ -5194,10 +5194,10 @@ async function arteEditor(id, onClose, opts = {}) {
   const toggleEl = on => { elp.el.hidden = !on; if (on) { lib.el.hidden = true; libB.classList.remove('on'); tpl.el.hidden = true; tplB.classList.remove('on'); paintEl(); } elB.classList.toggle('on', on); setTimeout(fit, 30); };
   const elB = h('button', { title: 'Ícones, formas, selos, estilos de texto e cores', onclick: () => toggleEl(elp.el.hidden) }, svg(AI.shape), 'Elementos');
   // Templates aprovados: troca o layout da página aberta num clique, mantendo textos e fotos. Não vira regra: ao aprovar, o Gerente faz a engenharia reversa do que melhorou
-  const TPL_NOTICIA = [['noticia', {}, 'Notícia Zyrion: foto inteira', 'Foto em página inteira, degradê escuro embaixo e manchete em caixa alta.'],
-    ['noticia', { foto2: 1 }, 'Notícia Zyrion: tela dividida', 'Duas fotos lado a lado no alto, dissolvendo no preto. Bom para confronto ou antes e depois.'],
-    ['noticia', { circulo: 1 }, 'Notícia Zyrion: foto com círculo', 'Foto de fundo e um círculo com a referência do assunto (rosto, logo, objeto).'],
-    ['noticia', { estilo: 'nuvo' }, 'Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
+  const TPL_NOTICIA = [['noticia', {}, '1 · Notícia Zyrion: foto inteira', 'Foto em página inteira, degradê escuro embaixo e manchete em caixa alta.'],
+    ['noticia', { foto2: 1 }, '2 · Notícia Zyrion: tela dividida', 'Duas fotos lado a lado no alto, dissolvendo no preto. Bom para confronto ou antes e depois.'],
+    ['noticia', { circulo: 1 }, '3 · Notícia Zyrion: foto com círculo', 'Foto de fundo e um círculo com a referência do assunto (rosto, logo, objeto).'],
+    ['noticia', { estilo: 'nuvo' }, '4 · Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
     const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
     // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram

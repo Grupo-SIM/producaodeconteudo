@@ -610,8 +610,8 @@ const COMPOR = {
     else s.fx.glows = [{ x: .5, y: .3, r: .8, color: ctx.accent, opacity: .35 }];
     s.fx.fadeFront = [{ dir: 'bottom', a: .94, ext: .52 }];
     const nome = String(d.nome || ctx.marca || '').trim().replace(/\S+/g, w => w === w.toUpperCase() && w.length > 3 ? w[0] + w.slice(1).toLowerCase() : w), av = Math.round(W * .056), ay = H * .052, ax = mx * .62 + av / 2;
-    if (d.topo === 'logo') {   // logo da marca (com mascote) solta no canto, sem avatar nem nome
-      if (ctx.logo) { const r = ctx.logoRatio || .2, lw = Math.round(Math.min(W * .27, W * .14 / r)); s.items.push({ asset: ctx.logo, x: F2((mx * .62 + lw / 2) / W), y: F2((H * .045 + lw * r / 2) / H), size: lw, moldura: true, front: true }); }
+    if (d.topo === 'logo' && ctx.logo) {   // logo da marca (com mascote) solta no canto, sem avatar nem nome; sem logo cadastrada, cai no perfil (ícone + nome), como no “com perfil”
+      { const r = ctx.logoRatio || .2, lw = Math.round(Math.min(W * .27, W * .14 / r)); s.items.push({ asset: ctx.logo, x: F2((mx * .62 + lw / 2) / W), y: F2((H * .045 + lw * r / 2) / H), size: lw, moldura: true, front: true }); }
     } else if (d.topo !== 'nenhum') {
     const quad = ctx.logo && ctx.logoRatio > .7 && ctx.logoRatio < 1.4;
     if (quad) s.items.push({ asset: ctx.logo, x: F2(ax / W), y: F2(ay / H), size: av, round: true, moldura: true });
