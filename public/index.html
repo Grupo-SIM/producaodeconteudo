@@ -5208,11 +5208,13 @@ async function arteEditor(id, onClose, opts = {}) {
     for (const k of Object.keys(d)) if (d[k] == null) delete d[k];
     delete d.estilo; delete d.pb; return d;
   };
+  const FOTO_TPL = new Set(['noticia', 'post-card', 'manchete-foto', 'citacao', 'heroi', 'capa-faixa', 'cinema-capa']);   // modelos que levam foto: sem foto na página, entra a foto padrão (o dono troca depois)
+  const comFoto = (m, d) => { if (FOTO_TPL.has(m) && !d.foto && !d.objeto) d.foto = { asset: 'foto-padrao-1' }; return d; };
   const usaTpl = guard(async (modelo, extra) => {
-    const d = tplDados(), x = { ...extra };
-    const pede = (campo, titulo) => new Promise(ok => { if (d[campo]) return ok(true); pickImage(titulo, a => { d[campo] = { asset: a.name }; ok(true); }); });
-    if (x.foto2) { delete x.foto2; await pede('foto2', 'Tela dividida: escolha a segunda foto'); } else delete d.foto2;
-    if (x.circulo) { delete x.circulo; await pede('circulo', 'Foto com círculo: escolha a imagem do círculo'); } else if (modelo === 'noticia') delete d.circulo;
+    const d = comFoto(modelo, tplDados()), x = { ...extra };
+    const pede = campo => { if (!d[campo]) d[campo] = { asset: 'foto-padrao-2' }; };   // sem a segunda foto: entra a padrão, o dono troca depois
+    if (x.foto2) { delete x.foto2; pede('foto2'); } else delete d.foto2;
+    if (x.circulo) { delete x.circulo; pede('circulo'); } else if (modelo === 'noticia') delete d.circulo;
     const r = await api(`/contents/${id}/arte/modelo`, 'POST', { modelo, dados: { ...d, ...x }, i: E.si, total: E.spec.slides.length });
     pushUndo(); E.spec.slides[E.si] = r.slide; E.sel = null; E.multi = null; markDirty(); repaint(); drawStrip(); drawPanel();
     toast('Template aplicado na página ' + (E.si + 1) + '. Ao aprovar, o Gerente estuda o que melhorou (não vira regra da marca).', 'ok');
@@ -5225,7 +5227,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const s = cur(), sl = JSON.parse(JSON.stringify(sl0)), T = r => (s.texts || []).find(t => t.role === r && !t.decor);
     for (const r of ['title', 'body']) { const v = T(r), alvo = (sl.texts || []).find(t => t.role === r && !t.decor); if (v && alvo) alvo.value = v.value; }
     // template salvo não tem foto: entra a foto desta página
-    if (s.bg?.asset || s.bg?.gen) { sl.bg = { ...sl.bg }; delete sl.bg.asset; delete sl.bg.gen; if (s.bg.asset) sl.bg.asset = s.bg.asset; else sl.bg.gen = s.bg.gen; }
+    if (s.bg?.asset || s.bg?.gen) { sl.bg = { ...sl.bg }; delete sl.bg.asset; delete sl.bg.gen; if (s.bg.asset) sl.bg.asset = s.bg.asset; else sl.bg.gen = s.bg.gen; } else if (sl.bg?.temFoto && !sl.bg.asset && !sl.bg.gen && !sl.bg.banco) sl.bg = { ...sl.bg, asset: 'foto-padrao-1' };
     delete sl.modelo; delete sl.dados; return sl;
   };
   const usaCustom = t => { pushUndo(); E.spec.slides[E.si] = tplCustom(t.slide); E.tplEd = { id: t.id, nome: t.nome }; E.sel = null; E.multi = null; markDirty(); repaint(); drawStrip(); drawPanel(); tpl.paint(); toast('Template “' + t.nome + '” aplicado'); };
@@ -5239,7 +5241,7 @@ async function arteEditor(id, onClose, opts = {}) {
   // “Virar template” (rodapé): a página aberta vira template, sem a imagem de fundo (o resto fica igual)
   const virarTemplate = guard(async () => {
     const sl = JSON.parse(JSON.stringify(cur())); delete sl.modelo; delete sl.dados; delete sl.__ia;
-    if (sl.bg) { delete sl.bg.asset; delete sl.bg.gen; delete sl.bg.banco; delete sl.bg.src; }
+    if (sl.bg) { if (sl.bg.asset || sl.bg.gen || sl.bg.banco || sl.bg.src) sl.bg.temFoto = 1; delete sl.bg.asset; delete sl.bg.gen; delete sl.bg.banco; delete sl.bg.src; }   // temFoto: o template mostra a foto padrão no lugar
     const nome = (String(data.title || 'Template').replace(/\s*\(.*?\)\s*$/, '').slice(0, 40) + ' · pág. ' + (E.si + 1)).trim();
     await api('/tpl-paginas', 'POST', { nome, slide: sl, format: data.format, brand: data.brand || '' });
     TPLS = null; toast('Pronto: a página ' + (E.si + 1) + ' virou o template “' + nome + '” (está em Templates › Meus templates)', 'ok'); toggleTpl(true);
@@ -5266,7 +5268,7 @@ async function arteEditor(id, onClose, opts = {}) {
       if (t.custom) pinta(tplCustom(t.slide));
       else { const k = sig + '|' + tplChave(t);
         if (tplCache.has(k)) pinta(tplCache.get(k));
-        else { const d = { ...base, ...t.e }; if (t.e.foto2) d.foto2 = base.foto2 || base.foto; if (t.e.circulo) d.circulo = base.circulo || base.foto;
+        else { const d = comFoto(t.m, { ...base, ...t.e }); if (t.e.foto2) d.foto2 = base.foto2 || { asset: 'foto-padrao-2' }; if (t.e.circulo) d.circulo = base.circulo || { asset: 'foto-padrao-2' };
           api(`/contents/${id}/arte/modelo`, 'POST', { modelo: t.m, dados: d, i: si, total: n }).then(r => { tplCache.set(k, r.slide); pinta(r.slide); }).catch(() => box.style.opacity = .3); } }
       return b;
     };

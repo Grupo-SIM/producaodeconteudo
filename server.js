@@ -3084,12 +3084,15 @@ function escolheEstilo(c, format) {
 // estilo padrão de cada marca (o dono escolhe na galeria): vale para as artes montadas pelo roteiro e quando o Designer não escolhe outro
 const estilosPadrao = () => jparse(one("SELECT value FROM settings WHERE key='estilo_padrao'")?.value, {}) || {};
 function estiloPadrao(brand, format) { const id = estilosPadrao()[String(brand || '').toLowerCase()] || estilosPadrao()['']; const t = id && templateDe(id); return t && (!format || t.formatos.includes(format)) ? id : ''; }
+const FOTO_PREVIA = new Set(['noticia', 'post-card', 'manchete-foto', 'citacao', 'heroi', 'capa-faixa', 'cinema-capa']);
 let previaFila = Promise.resolve(); const previaPend = new Set();
 function previaEstilo({ id, seq, format, brand, fresh }) {
   const tpl = seq ? { seq: seqOk(seq) } : templateDe(id); if (!tpl) throw fail(404, 'Estilo não encontrado');
   const fmt = ['feed', 'carrossel', 'stories'].includes(format) ? format : (tpl.formatos?.[0] || 'carrossel');
   const ex = !seq && Array.isArray(tpl.exemplo) && tpl.exemplo.length && (tpl.formatos || []).includes(fmt) && (fmt !== 'feed' || tpl.exemplo.length === 1) ? tpl.exemplo : null;
   const pags = ex ? JSON.parse(JSON.stringify(ex)) : previaPaginas(tpl, fmt, brand);
+  // página que leva foto mostra a foto padrão na prévia (sem foto o dono não entende o template); no post de verdade entra a foto do assunto
+  for (const pg of pags) { const d = pg.dados || (pg.dados = {}); if (FOTO_PREVIA.has(pg.modelo) && !d.foto && !d.objeto) d.foto = 'foto-padrao-1'; }
   if (ex) for (const pg of pags) for (const k of ['foto', 'particulas', 'ambiente']) if (pg.dados && typeof pg.dados[k] === 'string' && !/^[a-z0-9-]{2,60}$/.test(pg.dados[k])) delete pg.dados[k];   // na prévia, sem imagem por IA
   const chave = crypto.createHash('sha1').update(JSON.stringify({ pags, fmt, brand, v: BUILD, vt: seq ? '' : (tplRow(id)?.visual_at || ''), m: mascotesDe(brand), tp: styleParams(brand).tipografia || null, f: fresh ? crypto.randomBytes(6).toString('hex') : '' })).digest('hex').slice(0, 20), titulo = '__previa__' + chave;
   const ja = one('SELECT id FROM contents WHERE teste=3 AND title=?', titulo);
@@ -4619,6 +4622,15 @@ if (!one("SELECT 1 x FROM settings WHERE key='texturas_banco_v1'")) {
     }
     run("INSERT INTO settings(key,value) VALUES('texturas_banco_v1','1')");
   } catch (e) { console.error('banco de texturas:', e.message); }
+}
+// fotos padrão dos templates (Pexels, uso livre): a prévia e o template aplicado mostram uma foto de verdade, que o dono troca pela dele
+for (const nome of ['foto-padrao-1', 'foto-padrao-2']) {
+  try {
+    const arq = path.join(__dirname, 'banco', 'fotos-padrao', nome + '.jpg'); if (!fs.existsSync(arq) || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", nome)) continue;
+    const buf = fs.readFileSync(arq), r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'foto', 'foto padrão, template, exemplo', 'Foto de exemplo dos templates (Pexels). Troque pela foto do post.', 'motion', nome + '.jpg', 'jpg', buf.length, 'Fotos padrão', T());
+    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.jpg'), buf);
+    const pr = probeAsset(+r.lastInsertRowid, 'jpg'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+  } catch (e) { console.error('foto padrão', nome, e.message); }
 }
 // Capa da Central: o "Templete 01 Central" tinha a capa com ajustes soltos (título centralizado, apoio fixo) que bagunçavam conforme o texto. Passa a usar o modelo "capa-mascote", réplica da arte aprovada (título à esquerda, apoio, mascote grande à direita)
 if (!db.prepare("SELECT 1 x FROM settings WHERE key='capa_mascote_v4'").get()) {
