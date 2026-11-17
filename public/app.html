@@ -1222,7 +1222,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('.ov')) 
   $('#app').classList.remove('hidden');
   const h = location.hash.slice(1); if (VIEWS[h]) S.view = h;
   S.brands = (await api('/api/brands').catch(() => ({ brands: [] }))).brands; S.gasto = await api('/api/v2/gastos').catch(() => null);
-  await refresh(); loadChat().catch(() => { }); notifs(true).catch(() => { }); live(); setInterval(() => notifs().catch(() => { }), 30000);
+  await refresh(); if (!['fluxo', 'mesa', 'publicacao'].includes(S.view)) render();   // abriu direto em outra tela (ex.: #marcas): desenha ela
+  loadChat().catch(() => { }); notifs(true).catch(() => { }); live(); setInterval(() => notifs().catch(() => { }), 30000);
   addEventListener('resize', () => renderSide());
 })();
 </script>
