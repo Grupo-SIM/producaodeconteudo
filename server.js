@@ -2498,7 +2498,7 @@ function compoeModelos(found, format, brand, c = null) {
   if (Array.isArray(found?.slides) && found.template && templateDe(found.template)) {   // o Designer escolheu um template: a estrutura (modelo, mascote, fundo) vem dele
     const est = estruturaTemplate(templateDe(found.template), format, found.slides.length, {}, brand);
     found.slides = found.slides.map((s, i) => { const e = est[i]; if (!e || !s || typeof s !== 'object') return s; if (!MODELO_IDS.includes(s.modelo) && ((Array.isArray(s.texts) && s.texts.length) || (Array.isArray(s.items) && s.items.some(x => !x?.moldura)))) return s;   // página livre do Designer (textos e imagens próprios): o template não pode apagar e trocar por um modelo vazio
-      const d = { ...(e.dados.objeto && !s.dados?.foto && !s.dados?.objeto ? { objeto: e.dados.objeto } : {}), ...(e.dados.fundo ? { fundo: e.dados.fundo } : {}), ...(s.dados || {}) }; return { ...s, modelo: MODELO_IDS.includes(s.modelo) ? s.modelo : e.modelo, dados: d }; });
+      const d = { ...(e.dados.objeto && !s.dados?.foto && !s.dados?.objeto ? { objeto: e.dados.objeto } : {}), ...(e.dados.fundo ? { fundo: e.dados.fundo } : {}), ...(s.dados || {}), ...(e.dados.kit ? { kit: e.dados.kit } : {}) }; return { ...s, modelo: MODELO_IDS.includes(s.modelo) ? s.modelo : e.modelo, dados: d }; });
     if (!found.previa) { try { run('UPDATE art_templates SET usos=usos+1 WHERE id=?', tplRow(found.template)?.id || 0); } catch { /* template da casa */ } }
   }
   { const vidC = found.estilo || found.template || estiloPadrao(brand, format);   // a capa segue o modelo da capa do estilo/layout da marca (o dono montou o layout: a capa não pode virar outro modelo)
@@ -2589,6 +2589,34 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'noticia', papel: 'capa', opcoes: { estilo: 'nuvo' } }, { modelo: 'post-card', papel: 'fim' }] },
   { id: 'noticia', oculto: true, nome: 'Notícia / novidade do mercado', nivel: 'robusto', formatos: ['carrossel', 'feed', 'stories'], uso: 'Notícia, novidade, lançamento, mudança de regra ou acontecimento que o público precisa saber agora: manchete forte na capa, o que aconteceu, o que muda para quem segue, e a chamada para acompanhar.',
     seq: [{ modelo: 'capa-faixa', papel: 'capa' }, { modelo: 'texto', foto: true }, { modelo: 'texto', repetir: true }, { modelo: 'frase' }, { modelo: 'cta', papel: 'fim' }] },
+  { id: 'carrossel-k01', oculto: true, nome: '7 · Mesa do designer (personagem e rabiscos)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Capa escura com personagem dramático e luz da cor de destaque; miolo em papel quadriculado claro com barra de ferramentas do Photoshop, rabiscos à mão (coroa, !!!, $, #, sublinhado) e o personagem atravessando a emenda; páginas escuras intercaladas.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k01' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k01' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k01' } }] },
+  { id: 'carrossel-k02', oculto: true, nome: '8 · Xadrez em preto e bege (faixas e rodapé de agência)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Capa de foto escura com título em faixas brancas e palavra gigante na cor de destaque; miolo bege com forma gigante clara ao fundo e peça de xadrez 3D sangrando entre os slides; fim escuro com prédios e formas geométricas; rodapé de agência em todas.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k02' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k02' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k02' } }] },
+  { id: 'carrossel-k03', oculto: true, nome: '9 · Mármore e verde (moldura arredondada)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Capa escura com moldura arredondada e busto de mármore; miolo em papel cinza claro com ícone na cor de destaque, busto e cavalo de xadrez na emenda e dinheiro na base; hashtags verticais nas bordas; fim escuro com selo circular girando.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k03' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k03' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k03' } }] },
+  { id: 'carrossel-k04', oculto: true, nome: '10 · Narrativo escuro com palavra gigante', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Fundo preto esverdeado chapado, palavras gigantes em verde escuro atravessando os slides (horizontal e vertical), ladrilhos da marca desfocados; logo pequeno no topo e “Arraste para o lado” fixo embaixo.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k04' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k04' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k04' } }] },
+  { id: 'carrossel-k05', oculto: true, nome: '11 · Claro com marca d’água e palavra vertical', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Fundo branco limpo com marca d’água circular na cor de destaque bem clara e palavras gigantes verticais; capa com foto em moldura arredondada; perfil com verificado no topo.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k05' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k05' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k05' } }] },
+  { id: 'carrossel-k06', oculto: true, nome: '12 · Objeto-símbolo (branco e roxo)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Páginas alternando branco texturizado e roxo profundo com linhas de luz; o mesmo objeto-símbolo no centro de todas, mudando de contexto (pedestal, vitrine); título em caixa alta pesada com apoio em serifa itálica.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k06' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k06' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k06' } }] },
+  { id: 'carrossel-k07', oculto: true, nome: '13 · Mascote e magenta (dica com exemplos)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Capa clara com mascote grande no canto e marcas de seleção do Photoshop; miolo alternando roxo escuro (palavra gigante apagada) e branco; botão “Arraste” e selo final na cor de destaque.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k07' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k07' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k07' } }] },
+  { id: 'carrossel-k08', oculto: true, nome: '14 · Tutorial petróleo com prints', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Fundo azul-petróleo escuro com luz suave, logo centralizado no topo, cartão arredondado para print de tela e o nome da marca gigante vazado atravessando o rodapé de todos os slides.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k08' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k08' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k08' } }] },
+  { id: 'carrossel-k09', oculto: true, nome: '15 · Bege e preto com peça de xadrez', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Capa de foto escura com título em caixa alta e destaque amarelo; miolo alternando bege e preto com uma forma gigante apagada ao fundo e a peça de xadrez entrando pela emenda.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k09' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k09' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k09' } }] },
+  { id: 'carrossel-k10', oculto: true, nome: '16 · Preto e dourado com fumaça', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Fundo preto com fumaça branca, rei de xadrez dourado e notas de dinheiro atravessando a base; números e títulos grandes; fim com o rei e o @ em destaque.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k10' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k10' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k10' } }] },
+  { id: 'carrossel-k11', oculto: true, nome: '17 · Fogo (dinheiro queimando)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Capa com fogo real e nota queimando; título em faixas brancas com palavra gigante vermelha num bloco preto; miolo preto com fumaça e nota queimando na emenda; fim escuro; rodapé de agência.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k11' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k11' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k11' } }] },
+  { id: 'carrossel-k12', oculto: true, nome: '18 · Espaço ciano', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Céu estrelado azul-petróleo granulado com astronauta na capa; caneta digital e computador retrô 3D atravessando as emendas; selo-pílula no topo, títulos condensados ciano com seta circular e rodapé em cartões com contorno.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k12' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k12' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k12' } }] },
+  { id: 'carrossel-k13', oculto: true, nome: '19 · Colagem pop (papel rasgado)', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Fundos magenta, roxo e branco com bordas de papel rasgado; recortes de foto em preto e branco, objetos 3D brancos (megafone, foguete, alvo), “X” verde-neon, tipografia condensada gigante e selo circular girando.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k13' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k13' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k13' } }] },
+  { id: 'carrossel-k14', oculto: true, nome: '20 · Retrô P&B em fundo branco', nivel: 'robusto', formatos: ['carrossel'], uso: "Carrossel copiado da referência do dono (fundo e composição). Fundo branco com personagens vintage em preto e branco atravessando as emendas, galhos secos na base, pílula de perfil e barra de “arraste” no topo; dois destaques (magenta e turquesa), mãozinha apontando e check duplo.",
+    seq: [{ modelo: 'kit-capa', papel: 'capa', opcoes: { kit: 'k14' } }, { modelo: 'kit-texto', repetir: true, opcoes: { kit: 'k14' } }, { modelo: 'kit-fim', papel: 'fim', opcoes: { kit: 'k14' } }] },
   { id: 'stories-sequencia', oculto: true, nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }
 ];
@@ -2840,7 +2868,7 @@ async function recomporLayoutPeca(id) {
   const j = JSON.stringify(novo); if (j === c.art_spec) return false;
   setContent(id, { art_spec: j, art_spec_base: j }); await renderArte(id); return true;
 }
-const ehFim = m => m === 'cta' || m === 'post-card';
+const ehFim = m => m === 'cta' || m === 'post-card' || m === 'kit-fim';
 const NOTICIA_CAPAS = ['noticia', 'manchete-foto', 'citacao'];
 const fixo2Jornal = t => !!t && Array.isArray(t.seq) && t.seq.length === 2 && t.seq[0].modelo === 'noticia' && t.seq[1].modelo === 'post-card';   // o estilo clássico: a peça é montada já com as 2 páginas
 const fixo2 = t => !!t && Array.isArray(t.seq) && t.seq.length >= 1 && NOTICIA_CAPAS.includes(t.seq[0].modelo) && (t.seq.length === 1 || (t.seq.length === 2 && t.seq[1].modelo === 'post-card'));   // TODO estilo de notícia tem 2 páginas: capa + contracapa do mesmo estilo (com "Leia a legenda" na capa)
@@ -2854,6 +2882,7 @@ function estruturaTemplate(tpl, format, pags, b = {}, brand = '') {
   const meio = seq.slice(1, fimS ? -1 : undefined), resumo = meio.filter(x => x.papel === 'resumo' || x.papel === 'beneficios'), corpo = meio.filter(x => !resumo.includes(x));
   const capaD = { kicker: t(capa.kicker, 60) || undefined, titulo: t(capa.titulo, 120) || 'Seu título *aqui*', foto: t(capa.foto, 300) || undefined, particulas: t(capa.particulas, 120) || undefined, apoio: t(capa.apoio, 60) || undefined, cta: format === 'feed' ? (t(b.cta, 40) || 'Saiba mais') : undefined, ambiente: t(capa.ambiente, 160) || undefined };
   if (!capaD.foto && capaS.mascote !== false && masc.length && ['heroi', 'revista', 'capa-faixa', 'capa-mascote'].includes(capaS.modelo)) capaD.objeto = proxMascote('dynamic heroic pose pointing at the viewer, big confident smile');
+  if (capaS.modelo === 'kit-capa') Object.assign(capaD, capaS.opcoes || {}, { cta: undefined });
   if (capaS.modelo === 'noticia') { Object.assign(capaD, capaS.opcoes || {}); capaD.selo = t(capa.selo, 40) || undefined;   // selo padrão: o nome da marca (pílula vermelha só em notícia urgente)
     capaD.legenda = t(capa.legenda, 40) || undefined; delete capaD.ambiente; delete capaD.particulas; delete capaD.apoio; delete capaD.objeto; if (capa.kicker && !capaD.selo && t(capa.kicker, 40).length <= 28) capaD.selo = t(capa.kicker, 40); delete capaD.kicker; }
   if (capaS.modelo === 'manchete-foto') { for (const k of Object.keys(capaD)) delete capaD[k]; Object.assign(capaD, { titulo: t(capa.titulo, 140) || 'A manchete que *para* o dedo em até quatro linhas', foto: t(capa.foto, 300) || undefined, ...(capaS.opcoes || {}) }); }
@@ -2877,6 +2906,7 @@ function estruturaTemplate(tpl, format, pags, b = {}, brand = '') {
       else Object.assign(d, { titulo, itens: partes.map(x => { const [a, ...r] = x.split(/\s+[-–]\s+/); return { t: a.trim().slice(0, 60), d: r.join(' - ').trim().slice(0, 120) }; }) });
     } else if (modelo === 'frase') Object.assign(d, { titulo: txt ? `${titulo}. ${txt}` : titulo });
     else if (modelo === 'numero') Object.assign(d, { numero: String(++numero).padStart(2, '0'), titulo, texto });
+    else if (modelo === 'kit-texto') Object.assign(d, sl.opcoes || {}, { numero: String(++numero), titulo, texto });
     else Object.assign(d, { kicker: modelo === 'texto' ? `Ponto ${i + 1}` : undefined, titulo, texto });
     if (fotoLn && ['texto', 'numero'].includes(modelo)) d.foto = fotoLn;
     else if (sl.foto && ['texto', 'numero'].includes(modelo) && t(b.foto_interna, 200)) d.foto = t(b.foto_interna, 200);
@@ -2885,6 +2915,7 @@ function estruturaTemplate(tpl, format, pags, b = {}, brand = '') {
     paginas.push({ modelo, dados: d });
   });
   if (fimS && fimS.modelo === 'post-card') paginas.push({ modelo: 'post-card', dados: { titulo: t(b.card_texto, 340) || t(b.cta_titulo, 300) || 'Escreva aqui o texto da notícia, com a palavra mais *importante* em negrito.', nome: nomeBonito(brand) || undefined, foto: t(capa.foto, 300) || undefined } });
+  else if (fimS && fimS.modelo === 'kit-fim') paginas.push({ modelo: 'kit-fim', dados: { ...(fimS.opcoes || {}), titulo: t(b.cta_titulo, 160) || 'Gostou do *conteúdo*?', cta: t(b.cta, 40) || undefined } });
   else if (fimS) paginas.push({ modelo: 'cta', dados: { titulo: t(b.cta_titulo, 160) || (brand ? `Gostou? Siga a *${nomeBonito(brand)}* para mais` : 'Gostou? *Salve* e compartilhe'), cta: t(b.cta, 40) || 'Seguir agora', objeto: fimS.mascote ? proxMascote('waving goodbye with a friendly smile') : undefined } });
   return paginas;
 }
@@ -3186,7 +3217,7 @@ function fxOk(f, hex, num) {
   if (!f || typeof f !== 'object') return undefined;
   const o = { grain: f.grain ? num(f.grain, 0, 1, 0) : undefined, vignette: f.vignette ? num(f.vignette, 0, 1, 0) : undefined, tint: hex(f.tint?.color) ? { color: hex(f.tint.color), amount: num(f.tint.amount, 0, 1, .4) } : undefined,
     fade: fadeOk(f.fade, num), fadeFront: fadeOk(f.fadeFront, num),
-    textura: Array.isArray(f.textura) && f.textura.length ? f.textura.slice(0, 3).map(x => x && typeof x === 'object' ? limpaUndef({ tipo: ['papel', 'concreto', 'grao', 'grade', 'pontos', 'riscos', 'fumaca'].includes(x.tipo) ? x.tipo : undefined, asset: x.asset ? String(x.asset).replace(/[<>"']/g, '').slice(0, 80) : undefined, op: num(x.op, 0, 1, .5), cor: hex(x.cor), blend: ['overlay', 'multiply', 'screen', 'soft-light', 'normal'].includes(x.blend) ? x.blend : undefined }) : null).filter(x => x && (x.tipo || x.asset)) : undefined,
+    textura: Array.isArray(f.textura) && f.textura.length ? f.textura.slice(0, 3).map(x => x && typeof x === 'object' ? limpaUndef({ tipo: ['papel', 'concreto', 'grao', 'grade', 'quadriculado', 'pontos', 'riscos', 'fumaca'].includes(x.tipo) ? x.tipo : undefined, asset: x.asset ? String(x.asset).replace(/[<>"']/g, '').slice(0, 80) : undefined, op: num(x.op, 0, 1, .5), cor: hex(x.cor), blend: ['overlay', 'multiply', 'screen', 'soft-light', 'normal'].includes(x.blend) ? x.blend : undefined }) : null).filter(x => x && (x.tipo || x.asset)) : undefined,
     glows: Array.isArray(f.glows) ? f.glows.slice(0, 6).map(g => ({ x: num(g.x, -1, 2, .5), y: num(g.y, -1, 2, .5), r: num(g.r, .05, 2, .4), color: hex(g.color), opacity: num(g.opacity, 0, 1, .55) })) : undefined };
   if (o.glows && !o.glows.length) o.glows = undefined;
   return Object.values(o).some(v => v !== undefined) ? o : undefined;
@@ -3201,7 +3232,7 @@ function textoPro(t, hex, num, pick) {
 }
 function formaPro(sh, hex, num, pick) {
   const o = { grp: grpId(sh.grp), color2: hex(sh.color2), grad: sh.grad == null || sh.grad === '' ? undefined : num(sh.grad, -360, 360, 135), stroke: hex(sh.stroke), stroke_w: sh.stroke_w ? num(sh.stroke_w, .001, .05, .006) : undefined, glass: sh.glass ? true : undefined, dash: pick(sh.dash, ['tracejada', 'pontilhada'], undefined), blur: sh.blur ? num(sh.blur, 0, 200, 0) : undefined, glow: hex(sh.glow), front: sh.front ? true : undefined, cruza: sh.cruza ? true : undefined,
-    icon: pick(sh.icon, ICONES_TODOS, undefined), icon_color: hex(sh.icon_color), points: sh.points ? Math.round(num(sh.points, 4, 32, 12)) : undefined, inner: sh.inner ? num(sh.inner, .3, .95, .78) : undefined };
+    icon: pick(sh.icon, ICONES_TODOS, undefined), icon_color: hex(sh.icon_color), clip: typeof sh.clip === 'string' && /^polygon\([0-9.%, ]+\)$/.test(sh.clip) && sh.clip.length < 1200 ? sh.clip : undefined, tile: sh.tile ? true : undefined, points: sh.points ? Math.round(num(sh.points, 4, 32, 12)) : undefined, inner: sh.inner ? num(sh.inner, .3, .95, .78) : undefined };
   for (const k of Object.keys(o)) if (o[k] === undefined) delete o[k];
   return o;
 }
@@ -3219,6 +3250,7 @@ function dadosOk(d) {
   if (!d || typeof d !== 'object') return {};
   const t = (v, n = 400) => v == null || v === '' ? undefined : String(v).replace(/[<>]/g, '').slice(0, n), out = {};
   for (const k of ['kicker', 'titulo', 'apoio', 'cta', 'texto', 'numero', 'fantasma', 'icone', 'fundo', 'tratamento', 'particulas', 'ambiente']) { const v = t(d[k]); if (v) out[k] = v; }
+  if (/^k\d{2}$/.test(String(d.kit || ''))) out.kit = d.kit;   // kit de carrossel (public/arte-kits.js)
   if (d.contraste) out.contraste = true;
   for (const k of ['caixa_titulo', 'caixa_rotulo', 'caixa_botao']) if (['alta', 'baixa', 'frase', 'titulo', 'normal'].includes(d[k])) out[k] = d[k];
   if (d.recorte === false) out.recorte = false;

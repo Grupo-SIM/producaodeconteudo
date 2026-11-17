@@ -4,6 +4,7 @@
 // todas as páginas e profundidade (luz, granulado, objetos desfocados). Usado pelo servidor (ao receber a arte do Designer)
 // e pelo editor (trocar o modelo de uma página). O resultado é a especificação comum do arte-slide.js: tudo continua editável.
 import { METRICAS } from './arte-metricas.js';
+import { comporKit, KITS } from './arte-kits.js';
 
 // ───────── medidas de texto (larguras reais das fontes embutidas, medidas no navegador) ─────────
 const IDX = (() => { const m = new Map(); [...METRICAS.chars].forEach((c, i) => m.set(c, i)); return m; })();
@@ -284,6 +285,9 @@ export const MODELOS = [
   { id: 'agencia-cards', nome: 'Agência: dois cartões', uso: 'página interna', desc: 'Dois cartões de contorno arredondado na cor da marca: o primeiro com a frase de abertura e seta, o segundo com a virada em branco e o apoio fino; objeto 3D ao lado.', campos: ['titulo', 'apoio', 'texto', 'nota', 'objeto', 'icone'] },
   { id: 'agencia-lista', nome: 'Agência: lista em caixas', uso: 'página interna', desc: 'Título com ícone, até 4 caixas de contorno com os pontos, pergunta de fechamento com trecho entre aspas, linha de chamada na cor da marca e três avatares.', campos: ['titulo', 'itens', 'texto', 'apoio', 'icone'] },
   { id: 'agencia-cta', nome: 'Agência: chamada final', uso: 'última página', desc: 'Pergunta de venda com palavras em destaque, linha de convite, três avatares redondos e objeto 3D saindo pelo canto de baixo.', campos: ['titulo', 'apoio', 'objeto', 'icone'] },
+  { id: 'kit-capa', nome: 'Kit de carrossel: capa', uso: 'capa de carrossel', desc: 'Capa de um dos kits de carrossel (fundo e composição copiados das referências do dono). O kit vai em dados.kit.', campos: ['kit', 'kicker', 'titulo', 'texto', 'cta', 'foto', 'objeto', 'ambiente'] },
+  { id: 'kit-texto', nome: 'Kit de carrossel: miolo', uso: 'página interna', desc: 'Página interna do kit: número, título com destaque e texto, sobre o fundo do kit.', campos: ['kit', 'numero', 'kicker', 'titulo', 'texto', 'apoio', 'objeto', 'foto', 'icone', 'fantasma'] },
+  { id: 'kit-fim', nome: 'Kit de carrossel: final', uso: 'última página', desc: 'Página final do kit: chamada para seguir, salvar ou pedir orçamento.', campos: ['kit', 'titulo', 'texto', 'cta', 'objeto'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -808,6 +812,13 @@ const COMPOR = {
     s.texts.push(...mol.texts); s.items.push(...mol.items); s.shapes.push(...mol.shapes); return s;
   }
 };
+
+// kits de carrossel (public/arte-kits.js): recebem as ferramentas de texto daqui
+const KH = { texto, ajusta, quebraTexto, largura, genOuAsset, srcDe };
+COMPOR['kit-capa'] = (d, ctx) => comporKit('capa', d, ctx, KH);
+COMPOR['kit-texto'] = (d, ctx) => comporKit('texto', d, ctx, KH);
+COMPOR['kit-fim'] = (d, ctx) => comporKit('fim', d, ctx, KH);
+export { KITS };
 
 // contexto padrão a partir das cores da peça; o servidor completa com a Identidade da marca (fontes, logo, contatos, moldura)
 export function contexto(c = {}) {

@@ -506,6 +506,7 @@ const TEXTURAS = {
   papel: () => ({ img: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="420" height="420"><filter id="p"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="4" stitchTiles="stitch"/><feDiffuseLighting lighting-color="#fff" surfaceScale="1.6"><feDistantLight azimuth="45" elevation="62"/></feDiffuseLighting><feColorMatrix type="saturate" values="0"/></filter><rect width="420" height="420" filter="url(#p)"/></svg>'), size: '420px', blend: 'multiply', op: .85 }),
   concreto: () => ({ img: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><filter id="c"><feTurbulence type="fractalNoise" baseFrequency=".035 .06" numOctaves="5" seed="7" stitchTiles="stitch"/><feColorMatrix values="1.9 0 0 0 -.62  1.9 0 0 0 -.62  1.9 0 0 0 -.62  0 0 0 0 1"/></filter><rect width="600" height="600" filter="url(#c)"/></svg>'), size: '600px', blend: 'screen', op: .13 }),
   grao: () => ({ img: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 2 -.6"/></filter><rect width="220" height="220" filter="url(#g)"/></svg>'), size: '220px', blend: 'screen', op: .12 }),
+  quadriculado: (c) => ({ img: `linear-gradient(${c}2e 1.5px, transparent 1.5px), linear-gradient(90deg, ${c}2e 1.5px, transparent 1.5px), linear-gradient(${c}14 1px, transparent 1px), linear-gradient(90deg, ${c}14 1px, transparent 1px)`, size: '120px 120px, 120px 120px, 24px 24px, 24px 24px', blend: 'normal', op: 1 }),
   grade: (c) => ({ img: `linear-gradient(${c}22 1px, transparent 1px), linear-gradient(90deg, ${c}22 1px, transparent 1px)`, size: '54px 54px', blend: 'normal', op: .9, mask: 'radial-gradient(ellipse at 70% 30%, #000 0%, transparent 72%)' }),
   pontos: (c) => ({ img: `radial-gradient(${c}55 1.4px, transparent 1.6px)`, size: '16px 16px', blend: 'normal', op: .7, mask: 'linear-gradient(135deg, #000 0%, transparent 55%)' }),
   riscos: (c) => ({ img: `linear-gradient(115deg, transparent 0 38%, ${c}30 41%, transparent 44% 58%, ${c}1c 60%, transparent 63%), linear-gradient(115deg, transparent 0 70%, #ffffff10 72%, transparent 75%)`, size: '100% 100%', blend: 'screen', op: 1 }),
@@ -691,6 +692,7 @@ export function slideHtml(spec, s, i, total) {
     st += `border-radius:${sh.kind === 'circle' || sh.kind === 'ring' ? '50%' : sh.kind === 'pill' ? '999px' : Math.round((sh.radius || 0) * Math.min(w, h)) + 'px'};`;
     if (sh.kind === 'star') st += `clip-path:${starPoly(sh.points || 12, sh.inner || .78)};`;
     else if (POLI[sh.kind]) st += `clip-path:${POLI[sh.kind]};`;
+    else if (typeof sh.clip === 'string' && /^polygon\([0-9.%, ]+\)$/.test(sh.clip)) st += `clip-path:${sh.clip};`;   // recorte livre (papel rasgado)
     if (sh.glass) st += 'backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.18);';
     if (sh.blur) st += `filter:blur(${Math.min(200, sh.blur)}px);`;
     if (sh.glow) st += `box-shadow:0 0 ${Math.round(Math.min(w, h) * .25)}px ${rgba(sh.glow, .6)};`;
