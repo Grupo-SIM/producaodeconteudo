@@ -140,6 +140,57 @@ export const PLACAS = {
   k13: { n: 6, capa: 'impacto', z: { 1: Z(.08, .6, .88, 'base', 'left'), 2: Z(.06, .4, .08, 'topo', 'left', 'c'), 3: Z(.6, .36, .2, 'topo', 'left'), 4: Z(.06, .5, .1, 'topo', 'left'), 5: Z(.62, .34, .1, 'topo', 'left'), 6: Z(.08, .5, .2, 'topo', 'left', 'c') } },
   k14: { n: 5, capa: 'serifa', z: { 1: Z(.08, .5, .3, 'topo', 'left', 'c'), 5: Z(.55, .4, .3, 'topo', 'left', 'c'), meio: Z(.05, .58, .22, 'topo', 'left', 'c') } }
 };
+
+// ───────── VERSÃO 3: CAMADAS (como um PSD) ─────────
+// Fundo limpo de cada slide (kNN-bgM.jpg), elementos recortados separados (kNN-eM.png) posicionados UMA vez sobre a emenda
+// com "cruza" (o renderizador desenha a mesma imagem nos dois slides: transição perfeita) e textos como camadas com as medidas
+// tiradas da referência. Referência quadrada: escala 1080/lado e o quadrado fica centrado (fundo estendido em cima e embaixo).
+const RQ = (ref, y) => (y * 1080 / ref + 135) / 1350;   // y da referência quadrada → fração da página 4:5
+const CAMADAS = {
+  k02(papel, d, ctx, H) {
+    const A = ctx.accent, { i, total, W, T } = ctx, R = 667, k = W / R, y = v => F2(RQ(R, v));
+    const pg = papel === 'capa' ? 1 : papel === 'fim' ? 3 : 2;
+    const s = { bg: { placa: 'k02-bg' + pg, color: pg === 2 ? '#e9e5d9' : '#000000' }, shade: 0, pager: false, fx: {}, texts: [], items: [], shapes: [] };
+    // elementos: a peça inclinada atravessa a emenda capa→miolo; o rei grande atravessa a emenda do miolo→próximo
+    if (pg === 1) s.items.push({ placa: 'k02-e2', x: .099, y: y(236.5), size: Math.round(81.5 * k), shadow: 1 }, { placa: 'k02-e1', x: .8898, y: y(319), size: Math.round(203 * k), cruza: true, shadow: 2 });
+    if (pg === 2 && i < total - 1) s.items.push({ placa: 'k02-e3', x: .9078, y: .7467, size: Math.round(175.5 * k), cruza: true, shadow: 2 });
+    const pt = partes(d.titulo), fBand = { k: 'barlow', w: 500, lh: 1.05, ls: 0 }, fGig = { ...T.tit, k: T.tit.k || 'anton', lh: .9 }, fTx = { ...T.txt }, fTb = { ...T.txtB };
+    const rodape = () => {   // rodapé de agência: logo, pílula com redes + site, pílula do telefone e slogan
+      const yy = y(520), c = ctx.contatos || {}, fz = Math.round(9.5 * k);
+      if (ctx.logo) s.items.push({ asset: ctx.logo, x: F2(178 / R), y: F2(RQ(R, 535)), size: Math.round(125 * k), moldura: true });
+      else s.texts.push({ role: 'title', value: ctx.marca || 'Sua marca', x: F2(112 / R), y: F2(RQ(R, 535)), align: 'left', size: Math.round(15 * k), font: 'montserrat', weight: 800, color: pg === 2 ? '#111111' : '#ffffff', nowrap: true, shadow: false });
+      s.shapes.push({ kind: 'rect', x: F2(353 / R), y: yy, w: F2(165 / R), h: F2(24 * k / 1350), radius: .25, color: '#1c1c1c' }, { kind: 'rect', x: F2(501 / R), y: yy, w: F2(98 / R), h: F2(24 * k / 1350), radius: .25, color: '#1c1c1c' });
+      s.texts.push({ role: 'footer', value: `${c.instagram || '@suamarca'} // ${String(c.site || 'suamarca.com').toUpperCase()}`, x: F2(353 / R), y: yy, align: 'center', size: fz, font: 'montserrat', weight: 600, color: '#ffffff', icon: 'instagram', nowrap: true, shadow: false },
+        { role: 'footer', value: c.whatsapp || '82 9999-9999', x: F2(501 / R), y: yy, align: 'center', size: fz, font: 'montserrat', weight: 600, color: '#ffffff', icon: 'telefone', nowrap: true, shadow: false },
+        { role: 'body', value: ctx.slogan || 'A melhor agência de *Marketing Digital*', x: F2(270 / R), y: y(550), align: 'left', size: Math.round(11.5 * k), font: fTx.k, weight: 400, color: pg === 2 ? '#111111' : '#ffffff', hl: pg === 2 ? '#111111' : '#ffffff', hw: 700, nowrap: true, shadow: false });
+    };
+    if (pg === 1) {
+      // faixas brancas (fonte condensada fina, tinta preta) e a palavra gigante na cor de destaque
+      const L = H.ajusta(pt.antes || ' ', fBand, 262 * k, 90 * k, { maxSize: 41 * k, minSize: 24 * k, maxLinhas: 2 });
+      L.linhas.forEach((l, q) => s.texts.push({ role: 'title', value: l, x: F2(337 / R), y: y(235 + q * 43), align: 'center', size: Math.round(L.size), font: 'barlow', weight: 500, ls: 0, lh: 1, color: '#111111', band: '#ffffff', nowrap: true, shadow: false }));
+      const G = H.ajusta(semMarca(pt.dest).toUpperCase(), fGig, 370 * k, 112 * k, { maxSize: 130 * k, minSize: 50 * k, maxLinhas: 1 });
+      s.texts.push({ role: 'title', value: G.linhas.join('|'), x: F2(337 / R), y: y(350), align: 'center', size: Math.round(G.size), font: fGig.k, weight: fGig.w, ls: 0, lh: .9, color: A, upper: true, caixa: 'alta', nowrap: true, shadow: false });
+      s.texts.push({ role: 'cta', value: 'Arrasta para o lado', x: F2(218 / R), y: y(450), align: 'left', size: Math.round(10.5 * k), font: 'montserrat', weight: 700, bg: A, color: '#111111', shape: 'pill', upper: true, caixa: 'alta', icon: 'arrow-right', icon_end: true, icon_color: '#111111', nowrap: true, shadow: false });
+      s.shapes.push({ kind: 'pill', x: F2(415 / R), y: y(450), w: F2(69 / R), h: F2(35 * k / 1350), color: '#00000000', stroke: A, stroke_w: .002 }, { kind: 'icon', icon: 'arrow-right', icon_color: A, x: F2(415 / R), y: y(450), w: F2(30 / R), h: F2(20 * k / 1350) });
+    } else if (pg === 2) {
+      ['heart', 'send', 'message-square', 'bookmark'].forEach((ic, q) => s.shapes.push({ kind: 'icon', icon: ic, icon_color: '#555555', x: F2((543 + q * 18) / R), y: y(92), w: F2(13 / R), h: F2(13 * k / 1350) }));
+      const itens = Array.isArray(d.itens) && d.itens.length ? d.itens.slice(0, 3).map(x => typeof x === 'string' ? { t: x, d: '' } : x) : [{ t: (d.numero ? d.numero + '. ' : '') + semMarca(d.titulo || ''), d: d.texto || '' }];
+      itens.forEach((it, q) => {
+        const y0 = 127 + q * 123, tt = (itens.length > 1 && !/^\d/.test(it.t) ? `${q + 1}. ` : '') + semMarca(it.t);
+        s.texts.push({ role: 'title', value: tt, x: F2(121 / R), y: y(y0), align: 'left', size: Math.round(17.5 * k), font: fTb.k, weight: 600, ls: 0, color: '#111111', nowrap: true, shadow: false });
+        const B = H.quebraTexto(it.d || '', fTx, 285 * k, 62 * k, 15 * k, 11 * k);
+        if (it.d) s.texts.push({ role: 'body', value: B.linhas.join('|'), x: F2(121 / R), y: F2(RQ(R, y0 + 14) + (B.linhas.length * 1.3 * B.size / 2) / 1350), align: 'left', size: Math.round(B.size), font: fTx.k, weight: 400, lh: 1.3, color: '#2a2a2a', nowrap: true, shadow: false });
+      });
+    } else {
+      const G = H.ajusta(semMarca(d.titulo || 'Gosta desse tipo de conteúdo?'), { ...fTb, w: 600, lh: 1.15 }, 470 * k, 140 * k, { maxSize: 56 * k, minSize: 30 * k, maxLinhas: 2 });
+      s.texts.push({ role: 'title', value: G.linhas.join('|'), x: .5, y: y(285), align: 'center', size: Math.round(G.size), font: fTb.k, weight: 600, lh: 1.15, color: '#ffffff', nowrap: true, shadow: false });
+      s.texts.push({ role: 'title', value: d.cta || 'Curta-Salve-Compartilhe', x: .5, y: y(388), align: 'center', size: Math.round(21 * k), font: fTb.k, weight: 600, color: '#ffffff', upper: true, caixa: 'alta', nowrap: true, shadow: false });
+    }
+    rodape();
+    return s;
+  }
+};
+
 function comporPlaca(papel, d, ctx, H) {
   const P = PLACAS[d.kit], A = ctx.accent, { i, total, W } = ctx;
   const m = P.n - 2, num = papel === 'capa' ? 1 : papel === 'fim' ? P.n : 2 + ((i - 1) % Math.max(1, m)), placa = `${d.kit}-${num}`;
@@ -486,6 +537,7 @@ const COMP = {
 
 // ponto de entrada: monta a página do kit (arte real da referência quando há placas; senão o desenho por código)
 export function comporKit(papel, d, ctx, H) {
+  if (CAMADAS[d.kit] && !d.desenho) return CAMADAS[d.kit](papel, d, ctx, H);
   if (PLACAS[d.kit] && !d.desenho) return comporPlaca(papel, d, ctx, H);
   const k = kitDe(d.kit), fn = COMP[k.id];
   const s = fn(papel, d, ctx, H);
