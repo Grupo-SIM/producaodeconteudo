@@ -91,3 +91,4 @@ No bloco da arte de notícia entregue **uma única** manchete, final, assim: `T�
 ## Contracapa é opcional (decisão do dono, 16/11/2026)
 A contracapa (cartão do X sobre a foto) só entra no post quando você escreve a linha "Contracapa: ..." no roteiro. Sem essa linha, o post sai só com a capa. Vale para qualquer formato: se escrever a contracapa, ela é adicionada no fim.
 Texto padrão quando a ideia é só chamar para seguir: "Gostou da notícia? Siga a @marca e fique por dentro de tudo o que está movimentando o Brasil e o mundo."
+Tamanho da contracapa: ideal até 110 caracteres (3 linhas); teto 130. Passou disso, a arte encolhe a letra.

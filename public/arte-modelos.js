@@ -230,8 +230,7 @@ function postX(d, ctx, s) {
   s.shapes.push({ kind: 'rect', x: F2(cx / W), y: F2((yTop + hCard / 2) / H), w: F2(cardW / W), h: F2(hCard / H), radius: .16, color: '#ffffff', z: 3700 });
   if (!d.foto && ctx.logo) { s.items.push({ asset: ctx.logo, x: .5, y: F2((yTop * .5) / H), size: ctx.logoRatio > 1.4 ? Math.round(W * .95) : Math.round(W * .5), shadow: 1 }); }   // sem foto: a marca grande ocupa o alto, em vez de um vazio
   const ay = yTop + padT + av / 2, quad = ctx.logo && ctx.logoRatio > .7 && ctx.logoRatio < 1.4, avA = ctx.avatar || (quad ? ctx.logo : '');
-  if (avA) s.items.push({ asset: avA, x: F2((left + av / 2) / W), y: F2(ay / H), size: av, round: true, moldura: true });
-  else { s.shapes.push({ kind: 'circle', x: F2((left + av / 2) / W), y: F2(ay / H), w: F2(av / W), h: F2(av / H), color: '#0a0a0c', z: 3750 }); const ini = (nome.match(/[A-Za-zÀ-ÿ0-9]/) || ['N'])[0].toUpperCase(); s.texts.push({ role: 'badge', value: ini, x: F2((left + av / 2) / W), y: F2(ay / H), align: 'center', size: Math.round(av * .5), font: fontKey(fn, ctx), weight: 800, color: '#ffffff', nowrap: true, shadow: false }); }
+  s.items.push({ asset: avA || 'avatar-padrao', x: F2((left + av / 2) / W), y: F2(ay / H), size: av, round: true, front: true, avatar: true });   // imagem redonda trocável no editor (logo/ícone da marca); sem ícone cadastrado entra o “LOGO” padrão
   const ny = yTop + padT + hNome * .45;
   s.texts.push({ role: 'body', value: nome, x: F2(nx / W), y: F2(ny / H), align: 'left', size: nz, font: fontKey(fn, ctx), weight: 700, color: ink, nowrap: true, shadow: false });
   const vz = Math.round(nz * .95), vx = nx + largura(nome, fn, nz) * .975 + vz * .75;   // selo azul recortado (dois quadrados arredondados girados) com o check branco
@@ -245,7 +244,7 @@ function postX(d, ctx, s) {
 function noticiaNuvo(d, ctx) {
   const { W, H } = ctx, foto = genOuAsset(d.foto), s = base(ctx, '#000000', { grain: .15, vignette: .25 }), pb = d.pb ? { gray: 1, co: 1.1 } : { sa: 1.15, co: 1.05 };
   if (foto) { s.bg = { ...srcDe(foto, x => `${x}, photojournalism, realistic news photograph, vivid saturated colors, high resolution, sharp focus, no text, no watermark`), color: '#000000', pos: 'topo', fil: pb }; s.shade = .2; s.shade_dir = 'bottom'; }
-  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .48 }];
+  s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .4 }];   // fade só embaixo, sem cobrir o rosto
   s.shapes.push({ kind: 'rect', x: .5, y: .002, w: 1, h: .006, color: ctx.accent, moldura: true, front: true });
   const marca = String(ctx.marca || '').trim(), c = ctx.contatos || {}, site = String(d.site || c.site || '').replace(/^https?:\/\//, '').replace(/\/$/, ''), arroba = String(d.handle || c.instagram || '').replace(/^.*instagram\.com\//, '').replace(/^@?/, '@').replace(/\/$/, '');
   if (ctx.logo) { const lw = Math.round(W * .3); s.items.push({ asset: ctx.logo, x: .5, y: .085, size: lw, moldura: true, front: true }); }
@@ -613,7 +612,7 @@ const COMPOR = {
     const { W, H, mx, T } = ctx, foto = genOuAsset(d.foto), s = base(ctx, '#000000', { grain: .12, vignette: 0 });
     if (foto) s.bg = { ...srcDe(foto, x => `${x}, sharp editorial news photograph, subject in the upper two thirds of the frame, natural light, no text, no watermark`), color: '#000000', pos: 'topo' };
     else s.fx.glows = [{ x: .5, y: .3, r: .8, color: ctx.accent, opacity: .35 }];
-    s.fx.fadeFront = [{ dir: 'bottom', a: .94, ext: .52 }];
+    s.fx.fadeFront = [{ dir: 'bottom', a: 1, ext: .58 }];   // mesma altura do fade do 1 e 2 (Zyrion): o título fica sobre o escuro
     const nome = String(d.nome || ctx.marca || '').trim().replace(/\S+/g, w => w === w.toUpperCase() && w.length > 3 ? w[0] + w.slice(1).toLowerCase() : w), av = Math.round(W * .056), ay = H * .052, ax = mx * .62 + av / 2;
     if (d.topo === 'logo' && ctx.logo) {   // logo da marca (com mascote) solta no canto, sem avatar nem nome; sem logo cadastrada, cai no perfil (ícone + nome), como no “com perfil”
       { const r = ctx.logoRatio || .2, lw = Math.round(Math.min(W * .27, W * .14 / r)); s.items.push({ asset: ctx.logo, x: F2((mx * .62 + lw / 2) / W), y: F2((H * .045 + lw * r / 2) / H), size: lw, moldura: true, front: true }); }

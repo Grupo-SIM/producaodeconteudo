@@ -2621,8 +2621,11 @@ const templatesDaMarca = brand => {
   const doMarca = t => !t.marcas || t.marcas.some(m => mesmaMarca(m, brand));   // estilo da casa feito para marcas específicas
   const deriv = new Set(T.filter(t => t.brand && mesmaMarca(t.brand, brand) && t.deriva).map(t => t.deriva));   // a marca já tem a própria versão deste estilo da casa
   const proprios = new Set(T.filter(t => !t.casa && t.brand && mesmaMarca(t.brand, brand)).map(t => t.id));   // ajuste da própria marca de um estilo da casa (mesmo id): vale ele, não o original
-  return T.filter(t => doMarca(t) && (t.casa ? !deriv.has(t.id) && !proprios.has(t.id) : (!t.brand || mesmaMarca(t.brand, brand))));
+  const escolha = marcaTemplates()[String(brand).trim().toLowerCase()];   // checklist do dono na tela Marcas: só os templates marcados (vale mesmo para estilo feito para outra marca)
+  const sel = Array.isArray(escolha) ? new Set(escolha) : null;
+  return T.filter(t => (sel ? sel.has(t.id) : doMarca(t)) && (t.casa ? !deriv.has(t.id) && !proprios.has(t.id) : (!t.brand || mesmaMarca(t.brand, brand))));
 };
+const marcaTemplates = () => jparse(one("SELECT value FROM settings WHERE key='marca_templates'")?.value, {}) || {};
 const templatesTodos = () => {
   const rows = all('SELECT * FROM art_templates ORDER BY id DESC'), proprio = new Set(rows.filter(r => r.base).map(r => r.base));
   const vis = rows.filter(r => !(r.central && !r.base && proprio.has(tplCasaDe(r))));   // a versão do dono vence a da Central
@@ -4625,12 +4628,12 @@ if (!one("SELECT 1 x FROM settings WHERE key='texturas_banco_v1'")) {
   } catch (e) { console.error('banco de texturas:', e.message); }
 }
 // fotos padrão dos templates (Pexels, uso livre): a prévia e o template aplicado mostram uma foto de verdade, que o dono troca pela dele
-for (const nome of ['foto-padrao-1', 'foto-padrao-2']) {
+for (const nome of ['foto-padrao-1', 'foto-padrao-2', 'avatar-padrao']) {
   try {
-    const arq = path.join(__dirname, 'banco', 'fotos-padrao', nome + '.jpg'); if (!fs.existsSync(arq) || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", nome)) continue;
-    const buf = fs.readFileSync(arq), r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'foto', 'foto padrão, template, exemplo', 'Foto de exemplo dos templates (Pexels). Troque pela foto do post.', 'motion', nome + '.jpg', 'jpg', buf.length, 'Fotos padrão', T());
-    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.jpg'), buf);
-    const pr = probeAsset(+r.lastInsertRowid, 'jpg'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+    const ext = nome === 'avatar-padrao' ? 'png' : 'jpg', arq = path.join(__dirname, 'banco', 'fotos-padrao', nome + '.' + ext); if (!fs.existsSync(arq) || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", nome)) continue;
+    const buf = fs.readFileSync(arq), r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'foto', 'foto padrão, template, exemplo', 'Foto de exemplo dos templates (Pexels). Troque pela foto do post.', 'motion', nome + '.' + ext, ext, buf.length, 'Fotos padrão', T());
+    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+    const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   } catch (e) { console.error('foto padrão', nome, e.message); }
 }
 // Capa da Central: o "Templete 01 Central" tinha a capa com ajustes soltos (título centralizado, apoio fixo) que bagunçavam conforme o texto. Passa a usar o modelo "capa-mascote", réplica da arte aprovada (título à esquerda, apoio, mascote grande à direita)
@@ -7432,6 +7435,19 @@ async function api(req, res, url) {
     return send(res, 200, { ok: true });
   } }
   if (p === '/api/tpl-paginas/restaurar' && m === 'POST') { run("DELETE FROM settings WHERE key='tpl_ocultos'"); return send(res, 200, { ok: true }); }
+  if (p === '/api/art-templates/marca' && m === 'GET') {   // checklist da marca: todos os templates e quais o Designer usa nela
+    const brand = String(url.searchParams.get('brand') || '').trim(); if (!brand) throw fail(400, 'Falta a marca');
+    const usa = new Set(templatesDaMarca(brand).map(t => t.id)), esc0 = marcaTemplates()[brand.toLowerCase()];
+    const todos = templatesVisiveis('').filter(t => t.casa || !t.brand || mesmaMarca(t.brand, brand));
+    return send(res, 200, { personalizado: Array.isArray(esc0), itens: todos.map(t => ({ id: t.id, nome: t.nome, formatos: t.formatos || [], tema: t.tema || '', marcado: usa.has(t.id) })) });
+  }
+  if (p === '/api/art-templates/marca' && m === 'PUT') {
+    const b = await readBody(req, 2e4), brand = String(b.brand || '').trim(); if (!brand) throw fail(400, 'Falta a marca');
+    const mapa = marcaTemplates(), k = brand.toLowerCase();
+    if (b.padrao) delete mapa[k]; else mapa[k] = (Array.isArray(b.ids) ? b.ids : []).map(String).slice(0, 200);
+    run("INSERT OR REPLACE INTO settings(key,value) VALUES('marca_templates',?)", JSON.stringify(mapa));
+    log('designer', `Templates da marca ${brand} ${b.padrao ? 'voltaram ao padrão' : 'definidos: ' + mapa[k].length}`); changed(); return send(res, 200, { ok: true });
+  }
   if (p === '/api/art-templates' && m === 'GET') return send(res, 200, { templates: templatesDaMarca(url.searchParams.get('brand') || ''), todos: templatesVisiveis('').map(t => ({ id: t.id, nome: t.nome, brand: t.brand || '', formatos: t.formatos, tema: t.tema, casa: !!t.casa })), padrao: estilosPadrao(), apagados: (ap => TEMPLATES_CASA.filter(t => !t.oculto && ap.has(t.id)))(tplApagados(url.searchParams.get('brand') || '')).map(t => ({ id: t.id, nome: t.nome, formatos: t.formatos })) });
   if ((mt = p.match(/^\/api\/art-templates\/([^/]+)\/estrutura$/)) && m === 'GET') {   // o que cada página do estilo comporta (a galeria mostra; os agentes de copy recebem o mesmo)
     const bn = String(url.searchParams.get('brand') || '').trim(), marca = bn ? (one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', bn)?.name || '') : '';
