@@ -4821,7 +4821,7 @@ async function arteEditor(id, onClose, opts = {}) {
   const FILTROS_PRONTOS = [['Original', null], ['Preto e branco', { gray: 1, co: 1.1 }], ['Vívido', { sa: 1.4, co: 1.1 }], ['Suave', { sa: .85, co: .92, br: 1.06 }], ['Dramático', { co: 1.35, br: .9, sa: 1.1 }], ['Vintage', { sepia: .5, co: .95, sa: .9 }], ['Frio', { hue: -14, sa: 1.1 }], ['Quente', { hue: 14, sepia: .18, sa: 1.15 }], ['Brilhante', { br: 1.2, co: 1.05 }]];
   const filtrosUI = o => { const fl = (k, def) => [() => o.fil?.[k] ?? def, v => { o.fil = o.fil || {}; if (Math.abs(v - def) < .02) delete o.fil[k]; else o.fil[k] = r2(v); if (!Object.keys(o.fil).length) o.fil = undefined; }];
     const igual = f => JSON.stringify(f || null) === JSON.stringify(o.fil || null);
-    return h('details', { class: 'aefx2', open: !!o.fil }, h('summary', null, 'Filtros da imagem' + (o.fil ? ' (ativos)' : '')), h('div', { class: 'g' },
+    return h('details', { class: 'aefx2', open: true }, h('summary', null, 'Filtros da imagem' + (o.fil ? ' (ativos)' : '')), h('div', { class: 'g' },
       h('div', { class: 'aelp-chips' }, FILTROS_PRONTOS.map(([n, f]) => h('button', { type: 'button', class: igual(f) ? 'on' : '', onclick: () => { edit('', () => { o.fil = f ? { ...f } : undefined; }); drawPanel(); } }, n))),
         slideF('Brilho', ...fl('br', 1), .2, 2, .01, v => Math.round(v * 100) + '%'), slideF('Contraste', ...fl('co', 1), .2, 2, .01, v => Math.round(v * 100) + '%'), slideF('Saturação', ...fl('sa', 1), 0, 3, .01, v => Math.round(v * 100) + '%'),
         slideF('Matiz', ...fl('hue', 0), -180, 180, 1, v => Math.round(v) + '°'), slideF('Preto e branco', ...fl('gray', 0), 0, 1, .01, v => Math.round(v * 100) + '%'), slideF('Sépia', ...fl('sepia', 0), 0, 1, .01, v => Math.round(v * 100) + '%'),
@@ -5197,7 +5197,6 @@ async function arteEditor(id, onClose, opts = {}) {
   const TPL_NOTICIA = [['noticia', {}, 'Notícia Zyrion: foto inteira', 'Foto em página inteira, degradê escuro embaixo e manchete em caixa alta.'],
     ['noticia', { foto2: 1 }, 'Notícia Zyrion: tela dividida', 'Duas fotos lado a lado no alto, dissolvendo no preto. Bom para confronto ou antes e depois.'],
     ['noticia', { circulo: 1 }, 'Notícia Zyrion: foto com círculo', 'Foto de fundo e um círculo com a referência do assunto (rosto, logo, objeto).'],
-    ['noticia', { pb: 1 }, 'Notícia Zyrion: preto e branco', 'Igual à foto inteira, em preto e branco, para notícia triste.'],
     ['noticia', { estilo: 'nuvo' }, 'Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
     const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
