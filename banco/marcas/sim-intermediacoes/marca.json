@@ -2,6 +2,9 @@
   "marca": "Sim Intermediações",
   "mascotes": {},
   "logos": {
-    "logo-simint-completa": {}
+    "logo-simint-completa": {},
+    "logo-simint-pequena": {
+      "pequena": true
+    }
   }
 }
