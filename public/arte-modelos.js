@@ -303,7 +303,7 @@ export const MODELOS = [
   { id: 'colagem-pagina', nome: '12 · Colagem: miolo', uso: 'página interna', desc: 'Quatro cenários na ordem: colagem de rostos (chamada roxa, palavra gigante pink, apoio e texto), megafone (título verde e texto), foguete (pilha de títulos e texto) e alvo (chamada verde, palavra gigante pink e texto à direita). Textos retos, sem cortar palavras.', campos: ['kicker', 'titulo', 'apoio', 'fecho', 'texto'] },
   { id: 'colagem-fim', nome: '12 · Colagem: fim', uso: 'última página', desc: 'Pergunta roxa, lista pink com ícones (curta, comente, salve, compartilhe), mão de joinha e linha de CTA/contato da marca.', campos: ['titulo', 'itens', 'cta', 'texto'] },
   { id: 'espaco-capa', nome: '13 · Espaço: capa', uso: 'capa de carrossel', desc: 'Template aprovado (espaço azul neon): astronauta segurando o tablet; título preto na tela com a última linha gigante (ex.: “4 segredos de marketing|que ninguém te|conta!”), botão ciano “Arraste para o lado” com a seta e a barra de ferramentas no canto.', campos: ['titulo', 'cta'] },
-  { id: 'espaco-par', nome: '13 · Espaço: miolo', uso: 'página interna', desc: 'Pílula “Segredos do MKT ↓” (kicker) e 2 itens por página: seta, “01.” branco + título ciano em caixa alta e texto curto com *negrito*. A caneta digital cruza para a página seguinte e o computador com a barra de ferramentas cruza da penúltima para o fim.', campos: ['kicker', 'itens', 'n'] },
+  { id: 'espaco-par', nome: '13 · Espaço: miolo', uso: 'página interna', desc: '2 itens por página: seta, “01.” branco + título ciano em caixa alta e texto curto com *negrito*. A caneta digital cruza para a página seguinte e o computador com a barra de ferramentas cruza da penúltima para o fim.', campos: ['itens', 'n'] },
   { id: 'espaco-fim', nome: '13 · Espaço: fim', uso: 'última página', desc: '“Gostou do conteúdo?” branco, “compartilhe com os amigos!”, ícones ciano (curtir, comentar, enviar, salvar) e pílula ciano do CTA (ex.: “Quero orçamento”).', campos: ['titulo', 'texto', 'cta'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
@@ -784,13 +784,11 @@ COMPOR_EXTRA['espaco-par'] = (d, ctx) => {
   if (dir === 'caneta') s.items.push({ asset: 'tpl-espaco-caneta', x: 1, y: e.Y(640), size: 1250, cruza: true });
   if (dir === 'pc') s.items.push({ asset: 'tpl-espaco-computador', x: e.X(1100), y: e.Y(1010), size: 1080, cruza: true });
   const tf = fT(400, 0), bf = fX(400, 0), its = erItens(d).slice(0, 2), B = [];
-  const kk = String(d.kicker || 'Segredos do MKT').toUpperCase(), kf = fX(500, .3), kw = largura(kk, kf, 18) * 1.3 + 110;
-  B.push({ h: 44, gap: 0, make: y => { s.shapes.push({ kind: 'pill', x: e.X(x0 + kw / 2), y: e.Y(y + 22), w: e.X(kw), h: e.Y(44), color: 'transparent', stroke: '#ffffff', stroke_w: 2 / 1080 }); s.texts.push({ role: 'label', value: kk, x: e.X(x0 + 26), y: e.Y(y + 22), align: 'left', size: e.P(18), font: kf.k, weight: kf.w, ls: .3, lh: 1, color: '#ffffff', nowrap: true, shadow: false }); s.shapes.push({ kind: 'circle', x: e.X(x0 + kw - 26), y: e.Y(y + 22), w: e.X(28), h: e.Y(28), color: '#ffffff' }); s.shapes.push({ kind: 'icon', icon: 'arrow-down', icon_color: EP.navy, x: e.X(x0 + kw - 26), y: e.Y(y + 22), w: e.X(20), h: e.Y(20) }); return []; } });
   its.forEach((it, q) => {
     const n = String(erNum(d, ctx, q)).padStart(2, '0') + '.', tx = x0 + 62, tw = xr - tx;
     const tl = fgAst(erQuebra('*' + n + '* ' + String(it.t).toUpperCase().replace(/\*/g, ''), tf, 66, tw)).slice(0, 4);
     const bl = it.d ? fgAst(erQuebra(it.d, bf, 28, tw)).slice(0, 6) : [];
-    B.push({ h: tl.length * 64 + (bl.length ? 18 + bl.length * 38 : 0), gap: q ? 64 : 56, make: y => {
+    B.push({ h: tl.length * 64 + (bl.length ? 18 + bl.length * 38 : 0), gap: q ? 64 : 0, make: y => {
       s.shapes.push({ kind: 'ring', x: e.X(x0 + 20), y: e.Y(y + 32), w: e.X(38), h: e.Y(38), color: '#ffffff', stroke_w: 2.5 / 1080 }, { kind: 'icon', icon: 'arrow-right', icon_color: '#ffffff', x: e.X(x0 + 20), y: e.Y(y + 32), w: e.X(24), h: e.Y(24) });
       tl.forEach((l, k) => s.texts.push({ role: 'title', value: l, x: e.X(tx), y: e.Y(y + 33 + k * 64), align: 'left', size: e.P(66), font: tf.k, weight: tf.w, lh: 1, color: EP.ciano, hl: '#ffffff', nowrap: true, shadow: false }));
       bl.forEach((l, k) => s.texts.push({ role: 'body', value: l, x: e.X(tx), y: e.Y(y + tl.length * 64 + 18 + 19 + k * 38), align: 'left', size: e.P(28), font: bf.k, weight: bf.w, lh: 1, color: EP.claro, hl: '#ffffff', hw: 700, nowrap: true, shadow: false }));
