@@ -293,6 +293,9 @@ export const MODELOS = [
   { id: 'idv-capa', nome: '9 · Identidade visual: capa', uso: 'capa de carrossel', desc: 'Template aprovado (roxo, meta-design): papel texturizado com ferramentas do Photoshop, chamada de 2 linhas, título em caixa alta espaçado e a palavra gigante em itálico, @ da marca com avatar e o robô roxo cruzando para a página 2.', campos: ['kicker', 'titulo', 'apoio', 'handle'] },
   { id: 'idv-texto', nome: '9 · Identidade visual: miolo', uso: 'página interna', desc: 'Faixa roxa escura com estúdio e réguas; dois blocos em escada (ícone, título em 2 linhas e texto espaçado com **negrito**). O leão na poltrona cruza para a última página.', campos: ['itens'] },
   { id: 'idv-fim', nome: '9 · Identidade visual: fim', uso: 'última página', desc: 'Papel claro com "ID. VISUAL" vertical; dois blocos lado a lado e a caixa tracejada com cantos de seleção que leva o CTA (frase + botão roxo).', campos: ['itens', 'titulo', 'cta'] },
+  { id: 'xadrez-capa', nome: '10 · Xadrez: capa', uso: 'capa de carrossel', desc: 'Template aprovado (agência, xadrez): fundo preto geométrico, foto do assunto opcional no alto, etiquetas brancas e palavra-explosão mostarda, rei pequeno à esquerda e rei grande inclinado cruzando para a página 2; botão mostarda "Arrasta para o lado".', campos: ['kicker', 'titulo', 'apoio', 'cta', 'foto'] },
+  { id: 'xadrez-lista', nome: '10 · Xadrez: miolo', uso: 'página interna', desc: 'Fundo bege com forma orgânica; até 3 itens numerados ou frase forte com palavra em *destaque*. O rei em pé cruza da última página do miolo para o fim.', campos: ['itens', 'titulo', 'texto', 'n'] },
+  { id: 'xadrez-fim', nome: '10 · Xadrez: fim', uso: 'última página', desc: 'Fundo preto com prédios em P&B e formas geométricas; pergunta grande, linha de apoio e botão mostarda opcional.', campos: ['titulo', 'apoio', 'cta'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -506,18 +509,27 @@ COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
   usaFontes(ctx, 'barlow', 'rubik');
   const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(1), cx = 540;
   const l1 = String(d.kicker || 'Não Queime Seu').trim(), pal = String(d.titulo || 'DINHEIRO').replace(/[*|]/g, ' ').trim().toUpperCase(), l2 = String(d.apoio || 'Anunciando Errado').trim();
-  const af = { k: fMarca(ctx, 't') || 'anton', w: pesoDe(fMarca(ctx, 't') || 'anton', 800), ls: .01 }, bfz = fT(500, -.02), pz = Math.min(214, 820 / Math.max(1, largura(pal, af, 1))), pw = largura(pal, af, pz);
-  const z1 = Math.min(83, 83 * 820 / Math.max(820, largura(l1, bfz, 83))), z2 = Math.min(85, 85 * 820 / Math.max(820, largura(l2, bfz, 85))), t1 = fy(418), th = fy(76);
-  const wc = t1 + th + pz * .5 + 4, by = t1 + 34, bh = wc + pz * .5 + 30 - by, bw = Math.max(pw + 110, 880);
-  s.shapes.push({ kind: 'rect', x: e.X(cx), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: FG.preto, rot: -3 });
-  s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false, rot: -3 });
-  const w1 = largura(l1, bfz, z1) + 48; fgEtiqueta(s, e, l1, cx - w1 / 2 + 30, t1, th, z1);
-  const w2 = largura(l2, bfz, z2) + 48; fgEtiqueta(s, e, l2, cx - w2 / 2, by + bh - 30, th, z2);
-  const yb = by + bh - 30 + th + 58, pw2 = fy(307), ph = fy(68), ow = fy(136), x0 = cx - (pw2 + 10 + ow) / 2;
+  const af = { k: fMarca(ctx, 't') || 'anton', w: pesoDe(fMarca(ctx, 't') || 'anton', 800), ls: .01 }, bfz = fT(500, -.02), pz = Math.min(236, 860 / Math.max(1, largura(pal, af, 1))), pw = largura(pal, af, pz);
+  const z1 = Math.min(92, 92 * 860 / Math.max(860, largura(l1, bfz, 92))), z2 = Math.min(94, 94 * 860 / Math.max(860, largura(l2, bfz, 94))), t1 = fy(418), th = fy(84);
+  let by, bh;
+  if (d.__tagsAcima) {   // variação do Xadrez: as duas etiquetas em cima e a palavra-explosão embaixo, sem faixa preta
+    const w1 = largura(l1, bfz, z1) + 48, w2 = largura(l2, bfz, z2) + 48, t2 = t1 + th + 8, wc2 = t2 + th + pz * .5 + 6;
+    fgEtiqueta(s, e, l1, cx - w1 / 2 + 20, t1, th, z1); fgEtiqueta(s, e, l2, cx - w2 / 2, t2, th, z2);
+    s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc2), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false, rot: -2 });
+    by = wc2 + pz * .5 - th + 10; bh = 0;
+  } else {
+    const wc = t1 + th + pz * .5 + 4; by = t1 + 34; bh = wc + pz * .5 + 30 - by; const bw = Math.max(pw + 110, 880);
+    s.shapes.push({ kind: 'rect', x: e.X(cx), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: FG.preto, rot: -3 });
+    s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false, rot: -3 });
+    const w1 = largura(l1, bfz, z1) + 48; fgEtiqueta(s, e, l1, cx - w1 / 2 + 30, t1, th, z1);
+    const w2 = largura(l2, bfz, z2) + 48; fgEtiqueta(s, e, l2, cx - w2 / 2, by + bh - 30, th, z2);
+  }
+  const yb = d.__tagsAcima ? by + th + 40 : by + bh - 30 + th + 58, pw2 = fy(307), ph = fy(68), ow = fy(136), x0 = cx - (pw2 + 10 + ow) / 2;
   s.shapes.push({ kind: 'pill', x: e.X(x0 + pw2 / 2), y: e.Y(yb + ph / 2), w: e.X(pw2), h: e.Y(ph), color: FG.red });
   s.texts.push({ role: 'title', value: String(d.cta || 'Arrasta para o lado').toUpperCase(), x: e.X(x0 + pw2 / 2), y: e.Y(yb + ph / 2), align: 'center', size: e.P(22), font: FK.x, weight: pesoDe(FK.x, 500), ls: .05, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
   s.shapes.push({ kind: 'pill', x: e.X(x0 + pw2 + 10 + ow / 2), y: e.Y(yb + ph / 2), w: e.X(ow), h: e.Y(ph), color: 'transparent', stroke: FG.red, stroke_w: 2 / 1080 });
   s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(x0 + pw2 + 10 + ow / 2), y: e.Y(yb + ph / 2), w: e.X(48), h: e.Y(48), icon_color: FG.red });
+  { const ys = [...s.texts, ...s.shapes].map(o => o.y), mid = (Math.min(...ys) + Math.max(...ys)) / 2, dy = .5 - mid; for (const o of [...s.texts, ...s.shapes]) o.y = F2(o.y + dy); }   // bloco centralizado na página
   return s;
 };
 COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
@@ -533,7 +545,7 @@ COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
     B.push({ h: tl.length * 82, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 41 + i * 82), align: 'left', size: e.P(70), font: tf.k, weight: tf.w, ls: -.015, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
     if (bl.length) B.push({ h: bl.length * 46, gap: 40, make: y => { bl.forEach((l, i) => erLinha(s.texts, l, x, y + 23 + i * 46, 34, bf, '#f2f2f2', e)); return []; } });
   }
-  pilha(B, 600, ctx).itens;
+  pilha(B, 675, ctx).itens;
   // nota queimando na divisa: na última página do miolo (entra no fim, como no original) e, em carrossel longo, a cada 3 páginas
   const ult = (ctx.i || 0) === (ctx.total || 1) - 2, meio = !ult && (ctx.i || 0) % 3 === 2;
   if (ult || meio) s.items.push({ asset: 'tpl-fogo-nota', x: F2((fx(1977 - 1300 + 540) + (meio ? 40 : 0)) / 1080), y: F2(fy(925 + (meio ? 60 : 0)) / 1350), size: Math.round(fy(1080) * (meio ? .82 : 1)), cruza: true, ...(meio ? { flip: true, rot: 8 } : {}) });
@@ -603,6 +615,27 @@ COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
   s.texts.push({ role: 'title', value: cta + ' →', x: e.X(bx + bw / 2), y: e.Y(by + 137), align: 'center', size: e.P(cz), font: cf.k, weight: cf.w, ls: .12, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
   return s;
 };
+
+// ───────── Template "10 · Xadrez (mostarda)" (réplica aprovada do kit de agência com peças de xadrez, 18/11/2026) ─────────
+// Mesma estrutura do "8 · Fogo" (o mesmo modelo de agência): reaproveita as páginas do Fogo e troca fundo, cor de destaque e elementos.
+const XZ = { mostarda: '#e5b93a', escuro: '#141414', corpo: '#262626' };
+const xzCor = (s, de, para) => { for (const t of s.texts) { if (t.color === de) t.color = para; if (t.hl === de) t.hl = para; } for (const sh of s.shapes) { if (sh.color === de) sh.color = para; if (sh.stroke === de) sh.stroke = para; if (sh.icon_color === de) sh.icon_color = para; } return s; };
+const xzBotaoEscuro = s => { for (const t of s.texts) { const b = s.shapes.find(sh => sh.kind === 'pill' && sh.color === XZ.mostarda && Math.abs(sh.y - t.y) < .02 && Math.abs(sh.x - t.x) < .02); if (b) t.color = '#111111'; } return s; };
+COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
+  const s = xzBotaoEscuro(xzCor(COMPOR_EXTRA['fogo-capa']({ ...d, __tagsAcima: true }, ctx), FG.red, XZ.mostarda)); s.bg = { asset: 'tpl-xadrez-fundo-1', color: '#050505' };
+  const ft = genOuAsset(d.foto); if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto (opcional)
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(fx(134.5) / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true });
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true });
+  return s;
+};
+COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {
+  const s = COMPOR_EXTRA['fogo-lista'](d, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
+  s.items = s.items.filter(it => it.asset !== 'tpl-fogo-nota');
+  xzCor(xzCor(xzCor(s, '#ffffff', XZ.escuro), '#f2f2f2', XZ.corpo), FG.red, '#b8901c');
+  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2(fx(1115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
+  return s;
+};
+COMPOR_EXTRA['xadrez-fim'] = (d, ctx) => { const s = xzBotaoEscuro(xzCor(COMPOR_EXTRA['fogo-fim'](d, ctx), FG.red, XZ.mostarda)); s.bg = { asset: 'tpl-xadrez-fundo-3', color: '#050505' }; return s; };
 
 const COMPOR = {
   'erros-capa'(d, ctx) {
