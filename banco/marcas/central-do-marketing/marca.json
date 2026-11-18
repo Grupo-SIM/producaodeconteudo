@@ -22,6 +22,9 @@
     "logo-central-completa": {},
     "logo-central-pequena": {
       "pequena": true
+    },
+    "logo-central-branca": {
+      "mono": true
     }
   }
 }
