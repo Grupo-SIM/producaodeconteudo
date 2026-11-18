@@ -1,0 +1,11 @@
+{
+  "marca": "Atlas Hosting",
+  "mascotes": {},
+  "logos": {
+    "logo-atlas-completa": {},
+    "logo-atlas-escura": {},
+    "logo-atlas-pequena": {
+      "pequena": true
+    }
+  }
+}
