@@ -19,6 +19,9 @@
     }
   },
   "logos": {
-    "logo-seguidores-completa": {}
+    "logo-seguidores-completa": {},
+    "logo-seguidores-pequena": {
+      "pequena": true
+    }
   }
 }
