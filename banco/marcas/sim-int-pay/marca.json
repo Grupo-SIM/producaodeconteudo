@@ -6,6 +6,15 @@
     "logo-simintpay-pequena": {
       "pequena": true
     },
-    "logo-simintpay-escura": {}
+    "logo-simintpay-escura": {},
+    "logo-simintpay-faixa-fundo-branco": {
+      "faixa": "escura em fundo branco"
+    },
+    "logo-simintpay-faixa-fundo-preto": {
+      "faixa": "branca em fundo preto"
+    },
+    "logo-simintpay-fundo": {
+      "fundo": true
+    }
   }
 }
