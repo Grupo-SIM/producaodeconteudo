@@ -28,15 +28,17 @@
   "identidade": {
     "cores": [
       "Preto #010101 (primária)",
-      "Lilás #857CD5 (secundária)",
-      "Pêssego #F2AB7A (secundária)"
+      "Branco #FFFFFF (primária)"
     ],
     "apoio": [
-      "Magenta Suave #BD61AB (apoio)",
+      "Lilás #857CD5 (detalhe)",
+      "Pêssego #F2AB7A (detalhe)",
+      "Magenta Suave #BD61AB (detalhe)",
       "Cinza #626161"
     ],
-    "destaque": "#857CD5",
+    "destaque": "#FFFFFF",
     "ftit": "Montserrat Bold",
-    "ftxt": "Montserrat Regular"
+    "ftxt": "Montserrat Regular",
+    "fundo": "escuro (preto)"
   }
 }

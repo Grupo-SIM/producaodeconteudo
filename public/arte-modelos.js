@@ -1287,9 +1287,11 @@ function trocaCor(out, modelo, alvo) {
   const troca = o => { for (const k of ['color', 'hl', 'stroke', 'icon_color', 'bg']) if (typeof o[k] === 'string' && o[k].toLowerCase() === de) o[k] = para; };
   for (const o of [...(out.texts || []), ...(out.shapes || [])]) troca(o);
   // texto escuro em cima da pílula/quadrado da cor: mantém contraste com a cor nova
-  for (const sh of (out.shapes || []).filter(x => x.color === para)) for (const o of [...out.texts, ...out.shapes]) if (o !== sh && Math.abs(o.y - sh.y) < .01 && Math.abs(o.x - sh.x) < (sh.w || 0) / 2 && (o.color || o.icon_color)) { if (o.color && lum(o.color) < .2 || o.color && lum(o.color) > .8) o.color = escuro; if (o.icon_color && (lum(o.icon_color) < .2 || lum(o.icon_color) > .8)) o.icon_color = escuro; }
-  if (giro && out.bg?.asset?.startsWith(t.pecas)) out.bg.fil = { ...(out.bg.fil || {}), hue: giro };
-  for (const it of out.items || []) if (giro && String(it.asset || '').startsWith(t.pecas)) it.fil = { ...(it.fil || {}), hue: giro };
+  for (const sh of (out.shapes || []).filter(x => x.color === para && ['pill', 'rect', 'circle'].includes(x.kind))) for (const o of [...out.texts, ...out.shapes]) if (o !== sh && Math.abs(o.y - sh.y) < .01 && Math.abs(o.x - sh.x) < (sh.w || 0) / 2 && (o.color || o.icon_color)) { if (o.color && lum(o.color) < .2 || o.color && lum(o.color) > .8) o.color = escuro; if (o.icon_color && (lum(o.icon_color) < .2 || lum(o.icon_color) > .8)) o.icon_color = escuro; }
+  // marca preto e branco (cor sem saturação): o fundo e as peças perdem a cor em vez de girar o tom
+  const [r, g, b2] = rgb(para), cinza = Math.max(r, g, b2) - Math.min(r, g, b2) < 30, fil = cinza ? { sa: 0 } : giro ? { hue: giro } : null;
+  if (fil && out.bg?.asset?.startsWith(t.pecas)) out.bg.fil = { ...(out.bg.fil || {}), ...fil };
+  for (const it of out.items || []) if (fil && String(it.asset || '').startsWith(t.pecas)) it.fil = { ...(it.fil || {}), ...fil };
 }
 // stories: aperta o conteúdo para a faixa segura (12% a 84% da altura), sem mexer em fundo e decoração
 function zonaStories(s, ctx) {

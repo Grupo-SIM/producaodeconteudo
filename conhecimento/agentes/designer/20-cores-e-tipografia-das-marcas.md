@@ -20,9 +20,9 @@ As fontes que o sistema ainda não tinha entram como arquivo da marca:
 | Atlas Hosting | Azul Atlas `#1A97C3` | Azul Royal `#3259D2`, Violeta `#4F26DD`, Carvão `#1D1A1B`, Branco | Quicksand Bold · Quicksand | — |
 | Central do Marketing | Verde Central `#0DE450` | Preto `#111111`, Branco | Poppins Bold · Poppins | escuro |
 | Corte dos Ricos | Preto `#000000` | Branco Gelo `#F6F6F6`, Cinza Claro `#D7D7D7`, Cinza do Anel `#BBBBBB` | Noto Serif Bold · Open Sans | — |
-| Marketing Raiz | Lilás `#857CD5` | Preto `#010101`, Pêssego `#F2AB7A`, Magenta Suave `#BD61AB`, Cinza `#626161` | Montserrat Bold · Montserrat Regular | — |
+| Marketing Raiz | Preto `#010101` e Branco (principais; destaque branco) | Lilás `#857CD5`, Pêssego `#F2AB7A`, Magenta Suave `#BD61AB` só como detalhe; Cinza `#626161` | Montserrat Bold · Montserrat Regular | escuro |
 | PagaTG | Roxo `#834DEB` | Lilás Claro `#B495F2`, Preto, Branco | Poppins SemiBold · Poppins | — |
-| Seguidores em Alta | Laranja Foguete `#FB611D` (destaque), Roxo `#9B23B7` (primária) | Azul `#009CFF`, Branco Gelo `#FEF9FB` | Poppins SemiBold · Poppins | — |
+| Seguidores em Alta | Roxo `#9B23B7` | Azul `#009CFF`, Laranja Foguete `#FB611D` só como detalhe (a chama), Branco Gelo `#FEF9FB` | Poppins SemiBold · Poppins | — |
 | SimIntPay | Azul Pay `#5294FF` | Azul Marinho `#0A2F72`, Preto, Branco | Poppins SemiBold · Poppins | — |
 | Sim Intermediações | Magenta `#CC2F9C`, Roxo `#8C359B` (primária) | Rosa Violeta `#B7349E`, Preto, Branco | Montserrat Bold Italic · Montserrat | — |
 | Teron | Azul Elétrico `#1A71FE` | Azul Royal `#003FAE`, Azul Profundo `#00276D`, Navy `#001233` | Orbitron · Orbitron | escuro |
@@ -37,3 +37,8 @@ As fontes que o sistema ainda não tinha entram como arquivo da marca:
 - O destaque vai na palavra-chave, no botão e no CTA. As outras cores da paleta são base e apoio.
 - O mascote mantém as cores dele, mesmo quando elas forem diferentes da paleta. O Marketing Raiz, por exemplo, tem o mascote preto e dourado.
 - Nenhuma cor de fora da paleta entra na marca, a não ser foto e objeto com cor própria.
+
+## Troca de cor nos templates (em teste)
+- A cor-assinatura do template vira o **destaque** da marca. O fundo e as peças do template mudam de tom junto.
+- Em marca preto e branco (Marketing Raiz), o fundo e as peças ficam em preto e branco.
+- Correção do dono (18/11): no Seguidores em Alta a cor principal é o roxo, e o laranja é só detalhe; no Marketing Raiz as principais são preto e branco, e o lilás é detalhe.

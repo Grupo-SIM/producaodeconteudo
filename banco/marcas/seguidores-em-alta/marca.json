@@ -31,10 +31,10 @@
       "Azul #009CFF (secundária)"
     ],
     "apoio": [
-      "Laranja Foguete #FB611D (destaque)",
+      "Laranja Foguete #FB611D (detalhe: a chama do foguete)",
       "Branco Gelo #FEF9FB"
     ],
-    "destaque": "#FB611D",
+    "destaque": "#9B23B7",
     "ftit": "Poppins SemiBold",
     "ftxt": "Poppins"
   }
