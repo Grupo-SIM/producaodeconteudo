@@ -2,6 +2,9 @@
   "marca": "SimIntPay",
   "mascotes": {},
   "logos": {
-    "logo-simintpay-completa": {}
+    "logo-simintpay-completa": {},
+    "logo-simintpay-pequena": {
+      "pequena": true
+    }
   }
 }
