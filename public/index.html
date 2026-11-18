@@ -5295,7 +5295,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const ed = E.tplEd;
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
       h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Para excluir, passe o mouse e clique na lixeira. Para criar um template, use “Virar template” no rodapé.'),
-      ...grade('Meus templates'), ...grade('Notícia'), ...grade('Carrossel'), ...grade('Todos os formatos'),
+      ...grade('Meus templates'), ...grade('Notícia'), ...grade('Carrossel'),   // 'Todos os formatos' (modelos genéricos antigos) saiu do painel a pedido do dono: só aparecem templates aprovados
       oc.size ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: guard(async () => { await api('/tpl-paginas/restaurar', 'POST', {}); TPLS = null; tpl.paint(); }) }, 'Mostrar de novo os prontos escondidos (' + oc.size + ')') : null);
   };
   const toggleTpl = on => { tpl.el.hidden = !on; tplB.classList.toggle('on', on); if (on) { lib.el.hidden = true; libB.classList.remove('on'); elp.el.hidden = true; elB.classList.remove('on'); tpl.paint(); } setTimeout(fit, 30); };
