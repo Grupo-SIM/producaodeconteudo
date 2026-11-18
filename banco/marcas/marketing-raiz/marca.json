@@ -19,6 +19,9 @@
     }
   },
   "logos": {
-    "logo-raiz-escura": {}
+    "logo-raiz-escura": {},
+    "logo-raiz-pequena": {
+      "pequena": true
+    }
   }
 }
