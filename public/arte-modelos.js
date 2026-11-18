@@ -299,6 +299,9 @@ export const MODELOS = [
   { id: 'clientes-capa', nome: '11 · Tipos de clientes: capa', uso: 'capa de carrossel', desc: 'Template aprovado (verde neon, meta-design): busto de óculos dentro da moldura branca arredondada, título branco em caixa alta, apoio verde e botão de contorno "Arraste para o lado"; ícone do Facebook e maleta de dinheiro cruzando para a página 2.', campos: ['titulo', 'apoio', 'cta'] },
   { id: 'clientes-bloco', nome: '11 · Tipos de clientes: miolo', uso: 'página interna', desc: 'Prancheta cinza na tela do Photoshop: ícone verde, título, definição em negrito com trecho _sublinhado_ e nota com *palavras verdes*. Uma ideia por página; busto quebrado, cavalo e maleta cruzam as divisas.', campos: ['itens', 'nota', 'icone'] },
   { id: 'clientes-fim', nome: '11 · Tipos de clientes: fim', uso: 'última página', desc: 'Fundo escuro com brilho verde; logo da marca dentro do anel verde e o CTA (frase, apoio e botão verde).', campos: ['titulo', 'texto', 'cta'] },
+  { id: 'colagem-capa', nome: '12 · Colagem: capa', uso: 'capa de carrossel', desc: 'Template aprovado (colagem pink e roxo, versão limpa): gato astronauta e selo com coração no fundo; título em caixa alta branca com a última palavra em *amarelo* e pílula "Arraste para o lado →".', campos: ['titulo'] },
+  { id: 'colagem-pagina', nome: '12 · Colagem: miolo', uso: 'página interna', desc: 'Quatro cenários na ordem: colagem de rostos (chamada roxa, palavra gigante pink, apoio e texto), megafone (título verde e texto), foguete (pilha de títulos e texto) e alvo (chamada verde, palavra gigante pink e texto à direita). Textos retos, sem cortar palavras.', campos: ['kicker', 'titulo', 'apoio', 'fecho', 'texto'] },
+  { id: 'colagem-fim', nome: '12 · Colagem: fim', uso: 'última página', desc: 'Pergunta roxa, lista pink com ícones (curta, comente, salve, compartilhe), mão de joinha e linha de CTA/contato da marca.', campos: ['titulo', 'itens', 'cta', 'texto'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -692,6 +695,53 @@ COMPOR_EXTRA['clientes-fim'] = (d, ctx) => {
   const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(700, .08), cw = Math.max(340, largura(cta, cf, 26) + 100);
   B.push({ h: 76, gap: 44, make: y => { s.shapes.push({ kind: 'pill', x: .5, y: e.Y(y + 38), w: e.X(cw), h: e.Y(76), color: TC.verde }); s.texts.push({ role: 'title', value: cta, x: .5, y: e.Y(y + 38), align: 'center', size: e.P(26), font: cf.k, weight: cf.w, ls: .08, lh: 1, color: '#0b0b0b', nowrap: true, shadow: false }); return []; } });
   pilha(B, 0, ctx, { topo: 720 });
+  return s;
+};
+
+// ───────── Template "12 · Colagem (pink e roxo)" (réplica do kit colagem/zine, limpa pelo dono, 18/11/2026) ─────────
+// Arte original em 1300×1300 (6 páginas): o fundo de cada página já traz os elementos (gato, selo, colagem, megafone, foguete, alvo, mão);
+// o texto vai por cima. Medidas da arte (1300) → página 1080×1350: ×0,8308 e +135 no eixo y.
+const CG = { pink: '#ff1493', roxo: '#45125c', verde: '#3cff3c', amarelo: '#ffe14d', k: 1080 / 1300 };
+const cgBase = n => ({ bg: { asset: 'tpl-colagem-fundo-' + n, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
+// bloco de texto: linhas com "|" (ou quebradas na largura), medidas da arte original
+function cgTexto(s, e, txt, x, y, size, lh, color, { tit = true, w = 900, alto = true, hl, peso } = {}) {
+  if (!txt) return y;
+  const f = tit ? fT(peso || 400, 0) : fX(peso || 400, 0), k = CG.k, z = size * k, ls = String(alto ? String(txt).toUpperCase() : txt);
+  const linhas = fgAst(erQuebra(ls, f, z, w * k)), L = lh * k;
+  linhas.forEach((l, i) => s.texts.push({ role: tit ? 'title' : 'body', value: l, x: e.X(x * k), y: e.Y(y * k + 135 + L / 2 + i * L), align: 'left', size: e.P(z), font: f.k, weight: f.w, lh: 1, color, ...(hl ? { hl } : {}), nowrap: true, shadow: false }));
+  return y + linhas.length * lh;
+}
+function cgArraste(s, e, x, cor, d) {
+  const k = CG.k, txt = String(d.cta_arraste || 'Arraste para o lado').toUpperCase() + '  →', f = fX(500, .08), z = 20 * k, w = largura(txt, f, z) + 48 * k;
+  s.shapes.push({ kind: 'pill', x: e.X(x * k + w / 2), y: e.Y(1191 * k + 135), w: e.X(w), h: e.Y(52 * k), color: 'transparent', stroke: cor, stroke_w: 2 / 1080 });
+  s.texts.push({ role: 'label', value: txt, x: e.X(x * k + w / 2), y: e.Y(1191 * k + 135), align: 'center', size: e.P(z), font: f.k, weight: f.w, ls: .08, lh: 1, color: cor, nowrap: true, shadow: false });
+}
+COMPOR_EXTRA['colagem-capa'] = (d, ctx) => {
+  usaFontes(ctx, 'anton', 'rubik');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = cgBase(1);
+  cgTexto(s, e, d.titulo || 'Aumente a|visibilidade|da sua empresa|com essas dicas|de *arrazar!*', 343, 700, 84, 84, '#ffffff', { hl: CG.amarelo, w: 560 });
+  cgArraste(s, e, 343, CG.roxo, d); return s;
+};
+// miolo: 4 cenários na ordem da arte (colagem, megafone, foguete, alvo); copy maior repete os cenários na mesma ordem
+const CG_PG = [
+  (s, e, d) => { let y = cgTexto(s, e, d.kicker || '', 124, 190, 120, 110, CG.roxo); y = cgTexto(s, e, d.titulo || '', 124, Math.max(y, 290), 290, 255, CG.pink); y = cgTexto(s, e, d.apoio || '', 124, Math.max(y, 548), 105, 98, CG.roxo); cgTexto(s, e, d.texto || '', 130, Math.max(y + 50, 700), 40, 56, CG.roxo, { tit: false, alto: false, w: 580 }); cgArraste(s, e, 482, CG.roxo, d); },
+  (s, e, d) => { let y = cgTexto(s, e, d.kicker || '', 680, 690, 80, 80, CG.verde, { w: 560 }); y = cgTexto(s, e, d.titulo || '', 680, y, 80, 80, CG.verde, { w: 560 }); cgTexto(s, e, d.texto || '', 680, y + 30, 33, 46, '#ffffff', { tit: false, alto: false, w: 540 }); cgArraste(s, e, 680, CG.pink, d); },
+  (s, e, d) => { let y = cgTexto(s, e, d.kicker || '', 160, 140, 200, 180, CG.roxo, { w: 700 }); y = cgTexto(s, e, d.apoio || '', 160, y + 20, 92, 92, '#ffffff', { w: 640 }); y = cgTexto(s, e, d.titulo || '', 160, y, 150, 150, '#ffffff', { w: 640 }); y = cgTexto(s, e, d.fecho || '', 160, y, 100, 100, CG.roxo, { w: 800 }); cgTexto(s, e, d.texto || '', 160, y + 40, 33, 46, '#ffffff', { tit: false, alto: false, w: 600 }); cgArraste(s, e, 160, CG.roxo, d); },
+  (s, e, d) => { const y = cgTexto(s, e, d.kicker || '', 287, 140, 90, 90, CG.verde, { w: 420 }); cgTexto(s, e, d.titulo || '', 287, y + 10, 230, 220, CG.pink, { w: 420 }); cgTexto(s, e, d.texto || '', 730, 140, 30, 44, '#ffffff', { tit: false, alto: false, w: 430 }); cgArraste(s, e, 474, CG.pink, d); }
+];
+COMPOR_EXTRA['colagem-pagina'] = (d, ctx) => {
+  usaFontes(ctx, 'anton', 'rubik');
+  const j = Math.max(0, (ctx.i || 1) - 1) % 4, e = erEsc(ctx, ctx.W, ctx.H), s = cgBase(2 + j);
+  CG_PG[j](s, e, d); return s;
+};
+COMPOR_EXTRA['colagem-fim'] = (d, ctx) => {
+  usaFontes(ctx, 'anton', 'rubik');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = cgBase(6);
+  cgTexto(s, e, d.titulo || 'Gostou|do conteúdo?', 352, 245, 80, 80, CG.roxo, { w: 520 });
+  cgTexto(s, e, (Array.isArray(d.itens) ? d.itens.map(x => typeof x === 'string' ? x : x.t).join('|') : '') || 'Curta|Comente|Salve|Compartilhe', 450, 465, 94, 100, CG.pink, { w: 520 });
+  const c = ctx.contatos || {}, ln = [d.cta || '', d.texto || [c.whatsapp || c.telefone, c.site || c.instagram].filter(Boolean).join('  ·  ')].filter(Boolean);
+  if (ln[0]) cgTexto(s, e, ln[0], 352, 950, 46, 50, CG.roxo, { w: 800 });
+  if (ln[1]) cgTexto(s, e, ln[1], 352, 1060, 26, 34, CG.roxo, { tit: false, alto: false, w: 800 });
   return s;
 };
 
