@@ -660,8 +660,8 @@ COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
   s.texts.push({ role: 'label', value: String(d.cta || 'Arraste para o lado').toUpperCase(), x: e.X(504), y: e.Y(1073), align: 'center', size: e.P(15), font: FK.x, weight: pesoDe(FK.x, 700), ls: .2, color: TC.verde, nowrap: true, shadow: false });
   s.shapes.push({ kind: 'rect', x: e.X(675), y: e.Y(1072), w: e.X(36), h: e.Y(39), radius: .15, color: 'transparent', stroke: TC.verde, stroke_w: 2 / 1080 });
   s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(675), y: e.Y(1072), w: e.X(22), h: e.Y(22), icon_color: TC.verde });
-  s.items.push({ asset: 'tpl-clientes-facebook', x: F2(1080 / 1080), y: F2(1005 / 1350), size: 360, cruza: true });
-  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1160 / 1080), y: F2(1350 / 1350), size: 560, blur: 1, cruza: true });
+  s.items.push({ asset: 'tpl-clientes-facebook', x: F2(1080 / 1080), y: F2(1140 / 1350), size: 360, cruza: true });
+  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1160 / 1080), y: F2(1290 / 1350), size: 620, blur: 1, cruza: true });
   return s;
 };
 COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
@@ -675,7 +675,7 @@ COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
   if (d.nota) { const nf = fX(400, 0), nl = fgAst(erQuebra(d.nota, nf, 24, mw)); B.push({ h: nl.length * 45, gap: 40, make: y => { nl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x + 21), y: e.Y(y + 22 + i * 45), align: 'left', size: e.P(24), font: nf.k, weight: nf.w, lh: 1, color: TC.nota, hl: '#17b236', hw: 700, nowrap: true, shadow: false })); return []; } }); }
   pilha(B, 0, ctx, { topo: 290 });
   const fim = (ctx.i || 0) === (ctx.total || 1) - 2;
-  if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(943 / 1080), y: F2(1320 / 1350), size: 720, cruza: true });
+  if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(960 / 1080), y: F2(1285 / 1350), size: 870, cruza: true });
   else if (j === 0) s.items.push({ asset: 'tpl-clientes-busto-quebrado', x: F2(1120 / 1080), y: F2(634 / 1350), size: 1058, cruza: true });
   else s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(1038 / 1350), size: 1037, cruza: true });
   return s;
@@ -683,6 +683,7 @@ COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
 COMPOR_EXTRA['clientes-fim'] = (d, ctx) => {
   usaFontes(ctx, 'poppins', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = tcBase(5), cx = 540;
+  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(110 / 1080), y: F2(1300 / 1350), size: 640, blur: 2, cruza: true });   // segunda maleta da pilha entre o miolo e o fim, como na arte aprovada
   s.shapes.push({ kind: 'ring', x: e.X(cx), y: e.Y(500), w: e.X(250), h: e.Y(250), color: TC.verde, stroke_w: 3 / 1080 });
   s.items.push({ asset: ctx.logo || ctx.avatar || 'avatar-padrao', x: e.X(cx), y: e.Y(500), size: 180, round: !ctx.logo || (ctx.logoRatio > .7 && ctx.logoRatio < 1.4) });   // logo da marca no lugar do foguete (decisão do dono)
   const tf = fT(700, -.01), tl = erQuebra(d.titulo || 'Quer atrair os clientes certos?', tf, 52, 820).slice(0, 3), B = [];
