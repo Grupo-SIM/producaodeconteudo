@@ -2646,7 +2646,7 @@ function editAsset(a) {
   const player = g === 'video' ? h('video', { controls: true, preload: 'metadata', poster: '/api/assets/' + a.id + '/thumb', src: assetUrl(a), style: { width: '100%', maxHeight: '340px', borderRadius: '10px', background: '#000' } })
     : g === 'musica' || g === 'audio' ? h('audio', { controls: true, preload: 'metadata', src: assetUrl(a), style: { width: '100%' } }) : assetThumb(a, 200);
   const info = [fmtSize(a.size), a.ext.toUpperCase(), fmtDur(a.dur), a.w ? a.w + '×' + a.h : '', 'enviado ' + new Date(a.created_at).toLocaleDateString('pt-BR')].filter(Boolean).join(' · ');
-  modal(a.name, h('div', { class: 'stack' }, player, h('div', { class: 'small mut' }, info), fld('Nome (os agentes citam este nome)', nome), h('div', { class: 'fgrid' }, fld('Coleção', csel), fld('Tipo', ksel)), fld('Marca', bsel), fld('Pasta (os agentes procuram elementos pela pasta)', pastaI), fld('Etiquetas', tags), fld('Observação', note), ehVisual(a) ? fichaBox(a) : null, a.kind === 'mascote' && ['png', 'jpg', 'jpeg', 'webp'].includes(a.ext) ? mascoteBox(a) : null), [
+  modal(a.name, h('div', { class: 'stack' }, player, h('div', { class: 'small mut' }, info), fld('Nome (os agentes citam este nome)', nome), h('div', { class: 'fgrid' }, fld('Coleção', csel), fld('Tipo', ksel)), fld('Marca', bsel), fld('Pasta (os agentes procuram elementos pela pasta)', pastaI), fld('Etiquetas', tags), a.kind === 'logo' ? (() => { const tg = () => tags.value.replace(/\s*,?\s*logo (pequena|longa)/gi, '').replace(/^\s*,\s*/, '').trim(); const atual = /logo pequena/i.test(tags.value) ? 'pequena' : /logo longa/i.test(tags.value) ? 'longa' : ''; const sv = h('select', { onchange: e => { const b = tg(); tags.value = e.target.value ? (b ? b + ', ' : '') + 'logo ' + e.target.value : b; } }, h('option', { value: '' }, 'Não definida (o sistema escolhe)'), h('option', { value: 'longa', selected: atual === 'longa' }, 'Logo longa (ícone + nome)'), h('option', { value: 'pequena', selected: atual === 'pequena' }, 'Logo pequena (só o ícone)')); return fld('Versão da logo (a pequena vai nas notícias, cartões e círculos)', sv); })() : null, fld('Observação', note), ehVisual(a) ? fichaBox(a) : null, a.kind === 'mascote' && ['png', 'jpg', 'jpeg', 'webp'].includes(a.ext) ? mascoteBox(a) : null), [
     h('button', { class: 'btn danger', onclick: guard(async () => { if (!(await confirmar('Excluir este arquivo?', a.name + '.' + a.ext, 'Excluir'))) return; await api('/assets/' + a.id, 'DELETE'); S.assetsList = null; closeModal(); renderView(); }) }, 'Excluir'),
     h('a', { class: 'btn', href: assetUrl(a, true), style: { textDecoration: 'none', color: 'inherit' } }, 'Baixar'), h('div', { class: 'sp' }), h('button', { class: 'btn', onclick: closeModal }, 'Cancelar'),
     h('button', { class: 'btn primary', onclick: guard(async () => { await api('/assets/' + a.id, 'PUT', { name: nome.value, kind: ksel.value, brand: bsel.value, colecao: csel.value, pasta: pastaI.value, tags: tags.value, note: note.value }); S.assetsList = null; closeModal(); renderView(); toast('Salvo', 'ok'); }) }, 'Salvar')]);
@@ -3914,7 +3914,8 @@ function identidadePanel({ brand, AS, d, iv }) {
       ['Fundo padrão (escuro ou claro)', !!idn.paper, 'Escreva “escuro” ou “claro” em Fundo padrão: o painel calcula papel e texto.', 'ident'],
       ['Fonte do título', !!idn.ftit, 'Nome da fonte de título.', 'ident'],
       ['Arquivo da fonte', !!idn.fontAsset, 'Suba a fonte (.ttf/.otf) em Arquivos; sem ela a arte usa uma fonte padrão.', 'arq'],
-      ['Logo', !!logo, 'Suba a logo clara e a escura em Arquivos.', 'arq'],
+      ['Logo longa', !!logo, 'Suba a logo completa (ícone + nome) em Arquivos.', 'arq'],
+      ['Logo pequena', assets.some(a => a.kind === 'logo' && /logo pequena/i.test(a.tags || '')), 'Suba a logo pequena (só o ícone) em Arquivos e, na ficha dela, marque “Versão da logo: pequena”. É ela que vai nas notícias, nos cartões e nos círculos.', 'arq'],
       ['Fundos ou texturas', fundos.length > 0, 'Suba ao menos um fundo em Arquivos (ou use fundo por IA).', 'arq'],
       ['Composição definida', Object.keys(P.composicao || {}).length >= 2, 'Alinhamento, margens e densidade na aba Construção de imagem.', 'img'],
       ['Construção de imagem (IA)', Object.keys(P.fundo_ia || {}).length >= 2, 'Estilo, luz e negativo para as imagens saírem com a mesma cara.', 'img']
@@ -5218,8 +5219,8 @@ async function arteEditor(id, onClose, opts = {}) {
     ['colagem-capa', {}, '12 · Colagem: capa', 'Gato astronauta, selo e título com palavra amarela.'],
     ['colagem-pagina', {}, '12 · Colagem: miolo', 'Colagem, megafone, foguete e alvo, na ordem.'],
     ['colagem-fim', {}, '12 · Colagem: fim', 'Lista de engajamento, mão de joinha e CTA.']];
-  const tplDados = () => {   // o que já está na página vira os dados do template novo
-    const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
+  const tplDados = (s0) => {   // o que já está na página vira os dados do template novo
+    const s = s0 || cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
     // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram
     const tt = T('title'), tb = T('body'); if (tt) d.titulo = tt; if (tb && !s.modelo) d.texto = tb;
     if (!s.modelo) { d.cta ??= T('cta'); d.kicker ??= T('label'); d.selo ??= T('badge'); }
@@ -5274,7 +5275,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si, oc = new Set(TPLS.ocultos || []);
     const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
     const stories = x => /stories|vertical/.test(x || ''), meus = (TPLS.itens || []).filter(t => stories(t.format) === stories(data.format)).map(t => ({ ...t, custom: true, g: 'Meus templates' }));
-    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...TPL_CARROSSEL.map(([m, e, nome, ds]) => ({ m, e, nome, ds, g: 'Carrossel' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card' && !/^(erros|fogo|idv|xadrez|clientes|colagem)-/.test(x.id)).map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
+    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card' && !/^(erros|fogo|idv|xadrez|clientes|colagem)-/.test(x.id)).map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
     const tw = 104, th = Math.round(tw * H / W), ks = tw / W;
     const ib = (txt, tt, fn, cor) => h('button', { type: 'button', title: tt, onclick: e => { e.stopPropagation(); fn(); }, style: cor ? { color: cor } : null }, txt);   // mesmo visual dos botões das páginas (.aethb)
     const card = t => {
@@ -5291,11 +5292,28 @@ async function arteEditor(id, onClose, opts = {}) {
           api(`/contents/${id}/arte/modelo`, 'POST', { modelo: t.m, dados: d, i: si, total: n }).then(r => { tplCache.set(k, r.slide); pinta(r.slide); }).catch(() => box.style.opacity = .3); } }
       return b;
     };
+    // Carrossel: um card por template (o carrossel inteiro). Passando o mouse, a prévia passa pelas páginas; clicando, todas as páginas da arte mudam para o template
+    const TPL_CARR = [['7 · Lista de erros', 'erros-capa', 'erros-par', 'erros-fim'], ['8 · Fogo', 'fogo-capa', 'fogo-lista', 'fogo-fim'], ['9 · Identidade visual', 'idv-capa', 'idv-texto', 'idv-fim'], ['10 · Xadrez', 'xadrez-capa', 'xadrez-lista', 'xadrez-fim'], ['11 · Tipos de clientes', 'clientes-capa', 'clientes-bloco', 'clientes-fim'], ['12 · Colagem', 'colagem-capa', 'colagem-pagina', 'colagem-fim']];
+    const modK = (t, k) => k === 0 ? t[1] : k === n - 1 && n > 1 ? t[3] : t[2];
+    const carCard = t => {
+      const f = h('iframe', { scrolling: 'no', sandbox: 'allow-same-origin', style: { width: W + 'px', height: H + 'px', transform: `scale(${ks})` } });
+      const on = E.spec.slides.every((x, k) => x.modelo === modK(t, k));
+      const box = h('div', { class: 'aeth' + (on ? ' on' : ''), style: { width: tw + 'px', height: th + 'px', position: 'relative' } }, f), num = h('span', { style: { position: 'absolute', right: '4px', bottom: '4px', fontSize: '9px', background: 'rgba(0,0,0,.6)', color: '#fff', padding: '1px 5px', borderRadius: '6px' } }, '1/' + n); box.append(num);
+      const pintaK = (sl, k) => { const old = E.spec.slides[k]; E.spec.slides[k] = sl; let v; try { v = view(); } finally { E.spec.slides[k] = old; } f.srcdoc = AS.slideHtml(v, v.slides[k], k, n); num.textContent = (k + 1) + '/' + n; };
+      const pag = k => { const ch = sig + '|car|' + t[0] + '|' + k; if (tplCache.has(ch)) return Promise.resolve(tplCache.get(ch)); return api(`/contents/${id}/arte/modelo`, 'POST', { modelo: modK(t, k), dados: tplDados(E.spec.slides[k]), i: k, total: n }).then(r => (tplCache.set(ch, r.slide), r.slide)); };
+      let tm = null, k0 = 0;
+      pag(0).then(sl => pintaK(sl, 0)).catch(() => box.style.opacity = .3);
+      box.addEventListener('mouseenter', () => { clearInterval(tm); tm = setInterval(() => { k0 = (k0 + 1) % n; const k = k0; pag(k).then(sl => { if (tm && k0 === k) pintaK(sl, k); }).catch(() => {}); }, 900); });
+      box.addEventListener('mouseleave', () => { clearInterval(tm); tm = null; k0 = 0; pag(0).then(sl => pintaK(sl, 0)).catch(() => {}); });
+      const aplica = guard(async () => { const novos = []; for (let k = 0; k < n; k++) novos.push(await pag(k)); pushUndo(); novos.forEach((sl, k) => { E.spec.slides[k] = sl; }); E.sel = null; E.multi = null; markDirty(); repaint(); drawStrip(); drawPanel(); tpl.paint(); toast('Carrossel “' + t[0] + '” aplicado nas ' + n + ' páginas', 'ok'); });
+      return h('div', { title: 'Passe o mouse para ver as páginas. Clique para aplicar “' + t[0] + '” no carrossel inteiro (' + n + ' páginas).', onclick: aplica, style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', cursor: 'pointer' } }, box, h('small', { style: { fontSize: '10.5px', lineHeight: 1.2, textAlign: 'center', width: tw + 'px' } }, t[0]));
+    };
+    const carGrade = () => [h('h4', null, 'Carrossel'), h('div', { class: 'small mut', style: { marginBottom: '6px' } }, 'Um template é o carrossel inteiro: passe o mouse para ver as páginas e clique para aplicar em todas.'), h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(2, ${tw}px)`, gap: '12px 10px', justifyContent: 'space-between' } }, TPL_CARR.map(carCard))];
     const grade = g => { const L = LST.filter(t => t.g === g); return L.length ? [h('h4', null, g), h('div', { style: { display: 'grid', gridTemplateColumns: `repeat(2, ${tw}px)`, gap: '12px 10px', justifyContent: 'space-between' } }, L.map(card))] : []; };
     const ed = E.tplEd;
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
       h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Para excluir, passe o mouse e clique na lixeira. Para criar um template, use “Virar template” no rodapé.'),
-      ...grade('Meus templates'), ...grade('Notícia'), ...grade('Carrossel'),   // 'Todos os formatos' (modelos genéricos antigos) saiu do painel a pedido do dono: só aparecem templates aprovados
+      ...grade('Meus templates'), ...grade('Notícia'), ...(data.format === 'carrossel' || n > 1 ? carGrade() : []),   // 'Todos os formatos' (modelos genéricos antigos) saiu do painel a pedido do dono: só aparecem templates aprovados
       oc.size ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: guard(async () => { await api('/tpl-paginas/restaurar', 'POST', {}); TPLS = null; tpl.paint(); }) }, 'Mostrar de novo os prontos escondidos (' + oc.size + ')') : null);
   };
   const toggleTpl = on => { tpl.el.hidden = !on; tplB.classList.toggle('on', on); if (on) { lib.el.hidden = true; libB.classList.remove('on'); elp.el.hidden = true; elB.classList.remove('on'); tpl.paint(); } setTimeout(fit, 30); };
