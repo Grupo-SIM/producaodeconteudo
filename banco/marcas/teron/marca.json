@@ -9,6 +9,9 @@
     },
     "logo-teron-pequena-escura": {
       "simbolo_claro": true
+    },
+    "logo-teron-vertical-branca": {
+      "vertical": true
     }
   }
 }
