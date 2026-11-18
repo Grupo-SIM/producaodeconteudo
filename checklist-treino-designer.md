@@ -30,13 +30,13 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
-1. [ ] Carrossel: falta o kit 4 (espaço, ciano). O dono manda o arquivo de fundo sem textos em outra conversa.
+1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
 2. [ ] Identidade de cada marca: mascotes, pessoas que aparecem e 3 a 4 cores, cada uma com seu papel (1 destaque, 2 base escura, 3 apoio, 4 clara). Depois disso, a troca automática de cor nos templates aprovados, com prévia por marca para o dono aprovar (fotos e objetos com cor própria não trocam).
 3. [ ] Treino de capas para os carrosséis.
 4. [ ] Feed estático (refazer do zero a partir das referências do dono).
 5. [ ] Stories.
 6. [ ] Só depois disso: vídeo (Reels).
-Pendente técnico: os templates 7 a 12 e a Biblioteca de Artes estão no branch `claude/compassionate-darwin-b48wmn`; o PR para o `main` só é aberto quando o dono pedir.
+Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
 
 ## Onde paramos (14/11/2026, para a próxima conversa)
 - Sistema zerado: só trabalha o que o dono pede (Treino, + Novo conteúdo, Gerente) ou a grade de Produção diária (tudo em 0). Cérebro diário e relatório automático desligados.
