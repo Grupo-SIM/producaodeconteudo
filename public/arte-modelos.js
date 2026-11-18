@@ -623,8 +623,10 @@ const xzCor = (s, de, para) => { for (const t of s.texts) { if (t.color === de) 
 const xzBotaoEscuro = s => { for (const t of s.texts) { const b = s.shapes.find(sh => sh.kind === 'pill' && sh.color === XZ.mostarda && Math.abs(sh.y - t.y) < .02 && Math.abs(sh.x - t.x) < .02); if (b) t.color = '#111111'; } return s; };
 COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   const s = xzBotaoEscuro(xzCor(COMPOR_EXTRA['fogo-capa']({ ...d, __tagsAcima: true }, ctx), FG.red, XZ.mostarda)); s.bg = { asset: 'tpl-xadrez-fundo-1', color: '#050505' };
-  const ft = genOuAsset(d.foto); if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto (opcional)
-  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(fx(134.5) / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true });
+  const ft = genOuAsset(d.foto);
+  if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto, quando a copy pede
+  else s.items.unshift({ asset: 'tpl-xadrez-foto-capa', x: F2(fx(650) / 1080), y: F2(fy(215) / 1350), size: Math.round(fy(1300)) });   // padrão aprovado pelo dono: a foto da arte original (Coringa)
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(105 / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true });   // peça pequena inteira dentro da página
   s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true });
   return s;
 };
