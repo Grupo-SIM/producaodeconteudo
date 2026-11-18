@@ -6,5 +6,19 @@
     "logo-simint-pequena": {
       "pequena": true
     }
+  },
+  "identidade": {
+    "cores": [
+      "Roxo #8C359B (primária)",
+      "Magenta #CC2F9C (secundária)"
+    ],
+    "apoio": [
+      "Rosa Violeta #B7349E (apoio)",
+      "Preto #0A0A0A",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#CC2F9C",
+    "ftit": "Montserrat Bold Italic",
+    "ftxt": "Montserrat"
   }
 }

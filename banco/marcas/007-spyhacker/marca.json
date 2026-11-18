@@ -9,7 +9,7 @@
       "pele_cabelo": "Sem pele ou cabelo à mostra (luvas pretas, máscara).",
       "roupa": "Chapéu fedora preto com aba de contorno ciano; sobretudo longo de couro preto; moletom preto com capuz; calça preta; tênis de cano alto pretos com sola ciano.",
       "acessorios": "Colar com cadeado ciano neon brilhando no peito; relógio no pulso; notebook preto; às vezes mochila tática, copo térmico, celular e livros.",
-      "cores": "Preto #000000 como base; ciano neon #19d9f0 só nos brilhos (óculos, cadeado, contornos, sola).",
+      "cores": "Preto #000000 como base; ciano neon #13ECE9 só nos brilhos (óculos, cadeado, contornos, sola).",
       "estilo": "Render realista escuro, tudo preto com luz de contorno ciano neon, fundo recortado.",
       "personalidade": "Calmo, sério, discreto, confiante; observa e resolve sem alarde.",
       "poses_ok": "Sentado na cadeira gamer com o notebook, pensando com a mão na aba do chapéu; em pé apontando, segurando o notebook ou o celular; de braços cruzados.",
@@ -36,5 +36,21 @@
     "logo-atlas-hosting-simbolo": {
       "produto": "Atlas Hosting"
     }
+  },
+  "identidade": {
+    "cores": [
+      "Ciano Neon #13ECE9 (primária)",
+      "Verde-água #0F7D82 (secundária)"
+    ],
+    "apoio": [
+      "Turquesa #10B0B3 (apoio)",
+      "Grafite #252F30",
+      "Preto Carvão #0C0F0F"
+    ],
+    "destaque": "#13ECE9",
+    "fundo": "escuro (preto carvão)",
+    "ftit": "Rajdhani Bold",
+    "ftxt": "Rajdhani",
+    "fonte": "fonte-rajdhani-bold"
   }
 }

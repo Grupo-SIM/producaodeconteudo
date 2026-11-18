@@ -1,0 +1,19 @@
+{
+  "marca": "Grana na Hora",
+  "mascotes": {},
+  "logos": {},
+  "identidade": {
+    "cores": [
+      "Preto #070707 (primária)",
+      "Branco #FFFFFF (primária)"
+    ],
+    "apoio": [
+      "Cinza Claro #CACACA",
+      "Cinza #595959"
+    ],
+    "destaque": "#FFFFFF",
+    "ftit": "Cinzel Bold",
+    "ftxt": "Cinzel",
+    "fonte": "fonte-cinzel-bold"
+  }
+}

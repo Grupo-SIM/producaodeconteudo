@@ -16,5 +16,21 @@
     "logo-teron-vertical-escura": {
       "vertical": true
     }
+  },
+  "identidade": {
+    "cores": [
+      "Azul Elétrico #1A71FE (primária)",
+      "Azul Royal #003FAE (secundária)",
+      "Azul Profundo #00276D (secundária)"
+    ],
+    "apoio": [
+      "Navy #001233 (apoio)",
+      "Preto #020305",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#1A71FE",
+    "fundo": "escuro (navy)",
+    "ftit": "Orbitron",
+    "ftxt": "Orbitron"
   }
 }

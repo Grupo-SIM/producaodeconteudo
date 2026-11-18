@@ -7,5 +7,20 @@
     "logo-atlas-pequena": {
       "pequena": true
     }
+  },
+  "identidade": {
+    "cores": [
+      "Azul Atlas #1A97C3 (primária)",
+      "Azul Royal #3259D2 (secundária)"
+    ],
+    "apoio": [
+      "Violeta #4F26DD (apoio)",
+      "Carvão #1D1A1B (texto)",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#1A97C3",
+    "ftit": "Quicksand Bold",
+    "ftxt": "Quicksand",
+    "fonte": "fonte-quicksand-bold"
   }
 }

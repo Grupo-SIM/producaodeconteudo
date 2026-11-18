@@ -16,5 +16,18 @@
     "logo-simintpay-fundo": {
       "fundo": true
     }
+  },
+  "identidade": {
+    "cores": [
+      "Azul Pay #5294FF (primária)",
+      "Azul Marinho #0A2F72 (secundária)"
+    ],
+    "apoio": [
+      "Preto #020202",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#5294FF",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins"
   }
 }

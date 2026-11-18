@@ -4700,6 +4700,28 @@ try {
       fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
       const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
     }
+    for (const arqN of fs.readdirSync(dir).filter(x => /^fonte-[a-z0-9-]+\.(woff2?|ttf|otf)$/.test(x))) {   // fonte da marca (a do manual de cor e tipografia do dono)
+      const nome = arqN.replace(/\.[a-z0-9]+$/, ''), ext = arqN.split('.').pop(); if (one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
+      const buf = fs.readFileSync(path.join(dir, arqN));
+      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, 'fonte', 'fonte, oficial', 'Fonte oficial da marca (manual de cor e tipografia). Não apague.', '', arqN, ext, buf.length, 'Fontes', T());
+      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+    }
+    // cores e tipografia do manual do dono: entram uma vez na Identidade visual da marca (só nas linhas de cor e fonte; o resto do texto fica como está)
+    const iv = cfg.identidade, flag = 'idv_dono_v1:' + marca.toLowerCase();
+    if (iv && one('SELECT 1 x FROM brands WHERE name=? COLLATE NOCASE', marca) && !one('SELECT 1 x FROM settings WHERE key=?', flag)) {
+      const linhas = { CORES: [['Principais', (iv.cores || []).join(' | ')], ['Apoio/neutras', (iv.apoio || []).join(' | ')], ['Destaque', iv.destaque || ''], ['Fundo padrão', iv.fundo || '']], TIPOGRAFIA: [['Título', iv.ftit || ''], ['Texto', iv.ftxt || '']] };
+      const row = one("SELECT id, content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", marca);
+      let ls = row ? String(row.content).split('\n') : ['# IDENTIDADE VISUAL — ' + marca, '(Vale para peças estáticas e para vídeo. O Designer e o Editor devem seguir isto à risca.)', ''];
+      for (const [sec, kv] of Object.entries(linhas)) {
+        let i = ls.findIndex(l => l.trim() === '## ' + sec); if (i < 0) { ls.push('', '## ' + sec); i = ls.length - 1; }
+        let fim = ls.findIndex((l, j) => j > i && l.startsWith('## ')); if (fim < 0) fim = ls.length;
+        for (const [k, v] of kv) { if (!v) continue; const j = ls.findIndex((l, q) => q > i && q < fim && l.startsWith(k + ':')); if (j >= 0) ls[j] = k + ': ' + v; else { ls.splice(fim, 0, k + ': ' + v); fim++; } }
+      }
+      const txt = ls.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+      if (row) run('UPDATE knowledge SET content=?, updated_at=? WHERE id=?', txt, T(), row.id);
+      else run('INSERT INTO knowledge(title,category,content,brand,created_at,updated_at) VALUES(?,?,?,?,?,?)', 'Identidade visual — ' + marca, 'marca', txt, marca, T(), T());
+      run('INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)', flag, '1');
+    }
   }
 } catch (e) { console.error('mascotes das marcas', e.message); }
 // Capa da Central: o "Templete 01 Central" tinha a capa com ajustes soltos (título centralizado, apoio fixo) que bagunçavam conforme o texto. Passa a usar o modelo "capa-mascote", réplica da arte aprovada (título à esquerda, apoio, mascote grande à direita)

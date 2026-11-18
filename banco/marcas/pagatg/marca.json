@@ -6,5 +6,18 @@
     "logo-pagatg-pequena": {
       "pequena": true
     }
+  },
+  "identidade": {
+    "cores": [
+      "Roxo PagaTG #834DEB (primária)"
+    ],
+    "apoio": [
+      "Lilás Claro #B495F2 (apoio)",
+      "Preto #010101",
+      "Branco #FDFCFE"
+    ],
+    "destaque": "#834DEB",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins"
   }
 }

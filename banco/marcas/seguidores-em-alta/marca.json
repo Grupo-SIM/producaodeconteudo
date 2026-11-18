@@ -24,5 +24,18 @@
       "pequena": true
     },
     "logo-seguidores-escura": {}
+  },
+  "identidade": {
+    "cores": [
+      "Roxo #9B23B7 (primária)",
+      "Azul #009CFF (secundária)"
+    ],
+    "apoio": [
+      "Laranja Foguete #FB611D (destaque)",
+      "Branco Gelo #FEF9FB"
+    ],
+    "destaque": "#FB611D",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins"
   }
 }

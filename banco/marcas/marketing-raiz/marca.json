@@ -24,5 +24,19 @@
     "logo-raiz-pequena": {
       "pequena": true
     }
+  },
+  "identidade": {
+    "cores": [
+      "Preto #010101 (primária)",
+      "Lilás #857CD5 (secundária)",
+      "Pêssego #F2AB7A (secundária)"
+    ],
+    "apoio": [
+      "Magenta Suave #BD61AB (apoio)",
+      "Cinza #626161"
+    ],
+    "destaque": "#857CD5",
+    "ftit": "Montserrat Bold",
+    "ftxt": "Montserrat Regular"
   }
 }
