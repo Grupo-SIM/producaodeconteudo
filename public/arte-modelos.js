@@ -801,9 +801,9 @@ COMPOR_EXTRA['espaco-par'] = (d, ctx) => {
 COMPOR_EXTRA['espaco-fim'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(4), cx = 650, B = [];
-  const tf = fX(800, -.03), tl = erQuebra(d.titulo || 'Gostou do|conteúdo?', tf, 84, 600).slice(0, 3);
+  const tf = fX(800, -.03), tl = erQuebra(d.titulo || 'Gostou do|conteúdo?', tf, 84, 680).slice(0, 4);
   B.push({ h: tl.length * 86, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y + 43 + i * 86), align: 'center', size: e.P(84), font: tf.k, weight: tf.w, ls: -.03, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
-  const af = fX(400, -.01), al = erQuebra(d.texto || d.apoio || 'compartilhe|com os amigos!', af, 38, 560).slice(0, 3);
+  const af = fX(400, -.01), al = erQuebra(d.texto || d.apoio || 'compartilhe|com os amigos!', af, 38, 640).slice(0, 5);
   B.push({ h: al.length * 46, gap: 20, make: y => { al.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(cx), y: e.Y(y + 23 + i * 46), align: 'center', size: e.P(38), font: af.k, weight: af.w, ls: -.01, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
   B.push({ h: 40, gap: 44, make: y => { ['coracao', 'comentario', 'enviar', 'salvar'].forEach((ic, q) => s.shapes.push({ kind: 'icon', icon: ic, icon_color: EP.ciano, x: e.X(cx + (q - 1.5) * 64), y: e.Y(y + 20), w: e.X(38), h: e.Y(38) })); return []; } });
   const ct = String(d.cta || 'Quero orçamento').toUpperCase(), cf = fX(700, .02), cw = Math.max(300, largura(ct, cf, 24) + 90);
@@ -1273,6 +1273,8 @@ export function comporSlide(slide, ctxBase) {
   // título com acento: entrelinha mínima para o acento não bater na linha de cima (vale para todos os modelos que usam o título da marca)
   if (ctx.T?.tit && ctx.T.tit.lh < 1.14 && /[áàâãäéèêëíìîïóòôõöúùûüç]/i.test(String(d.titulo || d.frase || ''))) ctx = { ...ctx, T: { ...ctx.T, tit: { ...ctx.T.tit, lh: 1.14 } } };
   let out = fn(d, ctx);
+  // fonte da marca cadastrada como arquivo (ex.: Rajdhani): os templates escrevem com a chave equivalente; aqui o texto passa a usar o arquivo da marca
+  if (ctx.fonteMarca && out?.texts) { const kM = ctx.fonteMarcaK || 'poppins'; for (const t of out.texts) if (t.font === kM) delete t.font; }
   return { ...out, modelo: slide.modelo, dados: slide.dados || {} };
 }
 // stories: aperta o conteúdo para a faixa segura (12% a 84% da altura), sem mexer em fundo e decoração
