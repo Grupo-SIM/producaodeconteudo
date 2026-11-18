@@ -95,3 +95,10 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - **22 · Busto saindo do card** (007 Spyhacker): título condensado 2 linhas com 1ª palavra marcada e última na cor da marca; etiqueta inclinada; busto grande saindo de card arredondado. Aprovado de primeira.
 - **23 · Silêncio** (Central do Marketing): o fundo escuro precisa aparecer bastante: as manchas da cor da marca não podem dominar; escurecer as bordas. Palavra em pincel (Permanent Marker) cruzando o peito. Textinhos dos cantos em fonte FINA (Outfit 300, 30px, branco levemente transparente; `public/fonts/outfit-*`), discretos: não competem com o título.
 - Lição: o impacto vem do CONTRASTE: fundo escuro + 1 cor forte. Quando a cor da marca toma a arte toda, perde a chamada.
+
+## Referências 24 a 28 (18/11/2026) · aguardando o dono
+- **24 · Fita de isolamento + mão** (007 Spyhacker): mascote agachado com a mão enorme vindo para a câmera; fitas na cor da marca cruzando a cena; a fita grande da frente É o título ("ACESSO NEGADO"). Fita gerada pela IA sai com texto de outra pessoa: sempre pedir fita lisa e escrever o título por cima.
+- **25 · Mini sobre o gigante** (Central do Marketing): mascote pequeno sentado em cima de uma versão gigante da própria cabeça/objeto; título fino grande embaixo com o final na cor da marca; botão de liga/desliga "Modo descanso"; frase manuscrita inclinada no alto.
+- **26 · Palavras em volta** (Marketing Raiz): P&B com luz de palco; frase inteira quebrada em palavras 3D prateadas espalhadas em grade ao redor do mascote sentado, sem cobrir a cabeça.
+- **27 · Trono surreal** (Seguidores em Alta): mascote sentado num objeto gigante (cubo mágico) no espaço; palavra gigante branca ATRÁS do mascote (recorte na frente, pode cobrir um pedaço como na referência); etiqueta pequena acima.
+- **28 · Meio rosto caveira** (Vivendo de Bet): metade do rosto vira caveira com glitch; título "M" manuscrito + "EDOS" condensado atrás da cabeça; caixa de vidro com o apoio.
