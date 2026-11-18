@@ -15,6 +15,7 @@ O mascote é o ÚNICO personagem permitido na marca. Siga a ficha à risca: o qu
 | Corte dos Ricos | **Não tem mascote.** Não invente personagem: use foto, objeto ou só tipografia. | — |
 
 ## Regras
+- Decisão do dono: o ÚNICO rosto de cada marca é o mascote. Nenhuma marca usa pessoa real (dono, apresentador) nas artes.
 - O mascote de uma marca nunca aparece em outra.
 - Usar na capa e no CTA, grande, ao lado do título ou saindo pela borda de baixo, em fundo escuro.
 - Pose nova: gere a partir do PNG oficial, mantendo roupa, cores e o que a ficha diz que nunca muda.
