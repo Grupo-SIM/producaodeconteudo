@@ -15,7 +15,8 @@ Estratégia, segredos, jogo de mercado, decisões (ex.: "3 segredos que ninguém
 ## Ajustes do dono
 - Sem o rodapé da agência nas três páginas.
 - Sem o rodapé, o conteúdo fica **centralizado na altura**. Vale também para o 8 · Fogo.
-- A foto da capa (personagem do original) é o que menos importa. Use uma imagem ligada à copy só quando fizer sentido; sem foto, a capa fica só com o fundo e os reis. Nunca use personagem de filme nem pessoa famosa.
+- A foto da capa (o personagem do original) é o que menos importa. Use uma imagem ligada à copy só quando fizer sentido. Sem foto, a capa fica só com o fundo e os reis. Nunca use foto de exemplo nem foto aleatória, e nunca use personagem de filme nem pessoa famosa.
+- Na última página do miolo, o texto não passa por baixo do rei: a largura do texto é limitada.
 - Arraste só na capa.
 
 ## Visual fixo

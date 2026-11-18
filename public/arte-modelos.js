@@ -515,7 +515,7 @@ COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
   if (d.__tagsAcima) {   // variação do Xadrez: as duas etiquetas em cima e a palavra-explosão embaixo, sem faixa preta
     const w1 = largura(l1, bfz, z1) + 48, w2 = largura(l2, bfz, z2) + 48, t2 = t1 + th + 8, wc2 = t2 + th + pz * .5 + 6;
     fgEtiqueta(s, e, l1, cx - w1 / 2 + 20, t1, th, z1); fgEtiqueta(s, e, l2, cx - w2 / 2, t2, th, z2);
-    s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc2), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false, rot: -2 });
+    s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc2), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false });
     by = wc2 + pz * .5 - th + 10; bh = 0;
   } else {
     const wc = t1 + th + pz * .5 + 4; by = t1 + 34; bh = wc + pz * .5 + 30 - by; const bw = Math.max(pw + 110, 880);
@@ -534,7 +534,7 @@ COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
 };
 COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
   usaFontes(ctx, 'rubik', 'rubik');
-  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = fT(500, -.012), bf = fX(400, -.006), maxW = 1080 - x - 110, B = [];
+  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = fT(500, -.012), bf = fX(400, -.006), maxW = d.__maxW || 1080 - x - 110, B = [];
   const it = erItens(d).slice(0, 3), n0 = +d.n > 0 ? +d.n : null;
   if (it.length) it.forEach((o, j) => {
     const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, 44, maxW), bl = erQuebra(o.d, bf, 32, maxW);
@@ -556,7 +556,7 @@ COMPOR_EXTRA['fogo-fim'] = (d, ctx) => {
   const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(3), tf = fT(500, -.018), tl = fgAst(erQuebra(d.titulo || 'Gosta desse tipo|de conteúdo?', tf, 116, 900)).slice(0, 4);
   const tz = Math.min(116, ...tl.map(l => 116 * 900 / Math.max(900, largura(l, tf, 116)))), B = [];
   B.push({ h: tl.length * tz * 1.2, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: .5, y: e.Y(y + tz * .6 + i * tz * 1.2), align: 'center', size: e.P(tz), font: tf.k, weight: tf.w, ls: -.018, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
-  const ap = String(d.apoio || (d.cta ? '' : 'CURTA-SALVE-COMPARTILHE')).trim();
+  const ap = String(d.apoio || (d.cta ? '' : 'CURTA-SALVE-COMPARTILHE')).trim().toUpperCase();
   if (ap) { const af = fX(500, 0), al = erQuebra(ap, af, 42, 900); B.push({ h: al.length * 52, gap: 40, make: y => { al.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: .5, y: e.Y(y + 26 + i * 52), align: 'center', size: e.P(42), font: af.k, weight: af.w, ls: 0, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } }); }
   if (d.cta) { const cw = Math.max(360, largura(String(d.cta).toUpperCase(), fX(500, .05), 26) + 90); B.push({ h: 76, gap: 50, make: y => { s.shapes.push({ kind: 'pill', x: .5, y: e.Y(y + 38), w: e.X(cw), h: e.Y(76), color: FG.red }); s.texts.push({ role: 'title', value: String(d.cta).toUpperCase(), x: .5, y: e.Y(y + 38), align: 'center', size: e.P(26), font: FK.x, weight: pesoDe(FK.x, 500), ls: .05, lh: 1, color: '#ffffff', nowrap: true, shadow: false }); return []; } }); }
   pilha(B, fy(600), ctx).itens;
@@ -629,10 +629,10 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   return s;
 };
 COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {
-  const s = COMPOR_EXTRA['fogo-lista'](d, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
+  const s = COMPOR_EXTRA['fogo-lista']({ ...d, ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
   s.items = s.items.filter(it => it.asset !== 'tpl-fogo-nota');
   xzCor(xzCor(xzCor(s, '#ffffff', XZ.escuro), '#f2f2f2', XZ.corpo), FG.red, '#b8901c');
-  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2(fx(1115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
+  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1115) - 115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
   return s;
 };
 COMPOR_EXTRA['xadrez-fim'] = (d, ctx) => { const s = xzBotaoEscuro(xzCor(COMPOR_EXTRA['fogo-fim'](d, ctx), FG.red, XZ.mostarda)); s.bg = { asset: 'tpl-xadrez-fundo-3', color: '#050505' }; return s; };
