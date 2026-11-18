@@ -756,7 +756,7 @@ const epBase = n => ({ bg: { asset: 'tpl-espaco-fundo-' + n, color: '#020b14' },
 const epLogo = (s, e, ctx, x, y) => { if (ctx.logo) s.items.push({ asset: ctx.logo, x: e.X(x), y: e.Y(y), size: 150 }); };
 COMPOR_EXTRA['espaco-capa'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
-  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(400, 0), cx = 552, maxW = 640;
+  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = 552, maxW = 640;
   // título na tela do tablet: as linhas de cima menores e a última (a palavra-chave) gigante, como “CONTA!”
   let tl = String(d.titulo || '4 segredos de marketing|que ninguém te|conta!').toUpperCase().split('|').map(x => x.replace(/\*/g, '').trim()).filter(Boolean);
   if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 62, maxW) : []), p[p.length - 1]]; }
@@ -783,7 +783,7 @@ COMPOR_EXTRA['espaco-par'] = (d, ctx) => {
   const dir = ult ? 'pc' : j === 0 ? 'caneta' : '', x0 = j === 1 ? 230 : 110, xr = dir === 'pc' ? 770 : dir === 'caneta' ? 880 : 970;
   if (dir === 'caneta') s.items.push({ asset: 'tpl-espaco-caneta', x: 1, y: e.Y(640), size: 1250, cruza: true });
   if (dir === 'pc') s.items.push({ asset: 'tpl-espaco-computador', x: e.X(1100), y: e.Y(1010), size: 1080, cruza: true });
-  const tf = fT(400, 0), bf = fX(400, 0), its = erItens(d).slice(0, 2), B = [];
+  const tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), bf = fX(400, 0), its = erItens(d).slice(0, 2), B = [];
   its.forEach((it, q) => {
     const n = String(erNum(d, ctx, q)).padStart(2, '0') + '.', tx = x0 + 62, tw = xr - tx;
     const tl = fgAst(erQuebra('*' + n + '* ' + String(it.t).toUpperCase().replace(/\*/g, ''), tf, 66, tw)).slice(0, 4);
@@ -1272,9 +1272,24 @@ export function comporSlide(slide, ctxBase) {
   // título com acento: entrelinha mínima para o acento não bater na linha de cima (vale para todos os modelos que usam o título da marca)
   if (ctx.T?.tit && ctx.T.tit.lh < 1.14 && /[áàâãäéèêëíìîïóòôõöúùûüç]/i.test(String(d.titulo || d.frase || ''))) ctx = { ...ctx, T: { ...ctx.T, tit: { ...ctx.T.tit, lh: 1.14 } } };
   let out = fn(d, ctx);
+  // troca de cor por marca (em teste, só quando ctx.corMarca vem preenchido): a cor-assinatura do template vira a cor de destaque da marca;
+  // fundo e peças do template giram o tom junto (hue-rotate), fotos e objetos de outros kits ficam como estão
+  if (ctx.corMarca && out) trocaCor(out, String(slide.modelo || ''), ctx.corMarca);
   // fonte da marca cadastrada como arquivo (ex.: Rajdhani): os templates escrevem com a chave equivalente; aqui o texto passa a usar o arquivo da marca
   if (ctx.fonteMarca && out?.texts) { const kM = ctx.fonteMarcaK || 'poppins'; for (const t of out.texts) if (t.font === kM) delete t.font; }
   return { ...out, modelo: slide.modelo, dados: slide.dados || {} };
+}
+const COR_TPL = { espaco: { cor: '#12c9de', pecas: 'tpl-espaco-' } };
+const hueDe = h => { const [r, g, b] = rgb(h).map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; const x = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (x * 60 + 360) % 360; };
+function trocaCor(out, modelo, alvo) {
+  const t = COR_TPL[modelo.split('-')[0]]; if (!t || !/^#[0-9a-f]{6}$/i.test(alvo)) return;
+  const de = t.cor.toLowerCase(), para = alvo.toLowerCase(), giro = Math.round(((hueDe(para) - hueDe(de)) + 540) % 360 - 180), escuro = sobre(para);
+  const troca = o => { for (const k of ['color', 'hl', 'stroke', 'icon_color', 'bg']) if (typeof o[k] === 'string' && o[k].toLowerCase() === de) o[k] = para; };
+  for (const o of [...(out.texts || []), ...(out.shapes || [])]) troca(o);
+  // texto escuro em cima da pílula/quadrado da cor: mantém contraste com a cor nova
+  for (const sh of (out.shapes || []).filter(x => x.color === para)) for (const o of [...out.texts, ...out.shapes]) if (o !== sh && Math.abs(o.y - sh.y) < .01 && Math.abs(o.x - sh.x) < (sh.w || 0) / 2 && (o.color || o.icon_color)) { if (o.color && lum(o.color) < .2 || o.color && lum(o.color) > .8) o.color = escuro; if (o.icon_color && (lum(o.icon_color) < .2 || lum(o.icon_color) > .8)) o.icon_color = escuro; }
+  if (giro && out.bg?.asset?.startsWith(t.pecas)) out.bg.fil = { ...(out.bg.fil || {}), hue: giro };
+  for (const it of out.items || []) if (giro && String(it.asset || '').startsWith(t.pecas)) it.fil = { ...(it.fil || {}), hue: giro };
 }
 // stories: aperta o conteúdo para a faixa segura (12% a 84% da altura), sem mexer em fundo e decoração
 function zonaStories(s, ctx) {
