@@ -996,7 +996,7 @@ const COMPOR = {
     const tiI = imp && !nome ? ajusta(frase, f, W * .9, H * .3, { maxSize: W * .108, minSize: W * .05, maxLinhas: 5 }) : null, topI = tiI ? H * .915 - tiI.linhas.length * f.lh * tiI.size : 0;   // notícia sem nome: a manchete é o MAIOR que couber (até 5 linhas) e a linha/logo sobem junto quando ela é longa
     const yLinha = tiI ? Math.max(H * .5, topI - H * .034) : H * (imp ? (nome ? .672 : .695) : .697), x0 = W * .155, x1 = W * .845;
     s.shapes.push({ kind: 'line', x: .5, y: F2(yLinha / H), w: F2((x1 - x0) / W), h: .0028, color: '#ffffff', moldura: true, front: true });
-    if (ctx.logo) { const r = ctx.logoRatio || .2, lh = W * .08, lw = Math.min(W * .2, lh / r); s.items.push({ asset: ctx.logo, x: .5, y: F2((yLinha - (imp ? H * .052 : 0)) / H), size: Math.round(r > .6 ? lh : lw), moldura: true, front: true }); }
+    if (ctx.avatar || ctx.logo) { const r = ctx.avatar ? 1 : (ctx.logoRatio || .2), lh = W * .08, lw = Math.min(W * .2, lh / r); s.items.push({ asset: ctx.avatar || ctx.logo, x: .5, y: F2((yLinha - (imp ? H * .052 : 0)) / H), size: Math.round(r > .6 ? lh : lw), moldura: true, front: true }); }
     if (handle) s.texts.push({ role: 'label', value: handle.toUpperCase(), x: F2(x1 / W), y: F2((yLinha - H * .02) / H), align: 'right', size: Math.round(W * .0185), font: fontKey(f, ctx), weight: 700, ls: .02, color: '#ffffff', nowrap: true, shadow: false, front: true });
     const B = [], nz = Math.round(W * .043);
     if (nome) B.push({ h: nz * f.lh, gap: 0, make: y => texto(ctx, f, [nome], nz, { x: W / 2, yTop: y, align: 'center', role: 'title', color: '#ffffff', extra: { front: true } }).t });
@@ -1023,7 +1023,7 @@ const COMPOR = {
     const tf = { ...T.tit, k: 'impact', w: 400, ls: 0, lh: lhAcento(d.titulo), upper: true, caixa: undefined }, selo = String(d.editoria || d.selo || ctx.marca || ctx.nome || 'Notícia').trim(), legenda = String(d.legenda || 'Leia a legenda').trim();
     const ti = ajusta(d.titulo || '', tf, W * .88, H * .3, { maxSize: W * .088, maxLinhas: 5 }), hl = '#ffffff';   // referência Zyrion: manchete toda branca, sem palavra colorida
     const fs = { ...T.txtB, upper: true, caixa: undefined, ls: 0 }, sz = Math.round(Math.min(W * .03, (W * .7) / Math.max(1, largura(selo.toUpperCase(), fs, 1)))), hs = botaoH(sz), fl = Math.round(W * .021);
-    const mk = ctx.logo || ctx.avatar, mkR = ctx.logo ? (ctx.logoRatio || .2) : 1, logoW = Math.round(mk ? Math.min(W * .1, (W * .036) / mkR) : W * .036), logoH = mk ? logoW * mkR : logoW, hLinha = Math.max(logoH, W * .012);
+    const mk = ctx.avatar || ctx.logo, mkR = ctx.avatar ? 1 : (ctx.logoRatio || .2),   /* notícia: sempre a logo pequena (decisão do dono); sem ela, a longa */ logoW = Math.round(mk ? Math.min(W * .1, (W * .036) / mkR) : W * .036), logoH = mk ? logoW * mkR : logoW, hLinha = Math.max(logoH, W * .012);
     const base0 = ctx.storiesH ? H * .8 : H * .945, B = [];
     { const ls = Math.round(W * .02); B.push({ h: ls * 1.3, gap: 0, make: y => ({ role: 'label', value: selo, x: .5, y: F2((y + ls * .65) / H), align: 'center', size: ls, font: fontKey(fs, ctx), weight: 800, upper: true, ls: .04, color: '#ffffff', opacity: .92, nowrap: true, shadow: false, front: true }) }); }
     B.push({ h: ti.linhas.length * tf.lh * ti.size, gap: H * .016, make: y => texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: y, align: 'center', color: '#ffffff', extra: { hl, hw: tf.w, upper: true, front: true } }).t });

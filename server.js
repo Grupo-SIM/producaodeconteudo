@@ -2385,6 +2385,7 @@ function avatarMarca(brand) {
   try {
     if (!brand) return '';
     const logos = all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE ORDER BY id", brand);
+    const pequena = logos.find(a => /logo pequena/i.test(a.tags || '')); if (pequena) return pequena.name;   // a logo pequena que o dono marcou vale sempre
     const quadrada = logos.find(a => a.w && a.h && a.w / a.h > .7 && a.w / a.h < 1.4 && !/avatar-/.test(a.name)); if (quadrada) return quadrada.name;
     const nome = 'avatar-' + brand.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40), ja = logos.find(a => a.name === nome); if (ja && fs.existsSync(path.join(ASSET_DIR, ja.id + '.' + ja.ext))) return nome;
     const fonte = logos.filter(a => a.ext === 'png' && a.w / a.h > 1.6 && fs.existsSync(path.join(ASSET_DIR, a.id + '.png'))).sort((a, b) => (/pret|escur|black|dark/i.test(a.name) ? 1 : 0) - (/pret|escur|black|dark/i.test(b.name) ? 1 : 0))[0]; if (!fonte) return '';
@@ -2403,7 +2404,7 @@ function ctxMarca(brand, format, sp = {}) {
   const idv = identidadeDe(brand), [W, H] = ART_SIZE[format] || [1080, 1350];
   const ident = brand ? (one("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", brand)?.content || '') : '';
   const docs = brand ? all("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca'", brand).map(r => r.content).join('\n') : '';
-  const logos = brand ? all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp','svg') ORDER BY id", brand) : [];
+  const logos = brand ? all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp','svg') ORDER BY id", brand).filter(a => !/logo pequena/i.test(a.tags || '')) : [];   // a logo pequena não é a logo principal (longa)
   const clara = logos.find(a => /branc|clar|white|light|neg/i.test(a.name)) || logos.find(a => !/pret|escur|black|dark/i.test(a.name)) || logos[0];
   const escura = logos.find(a => a !== clara && /pret|escur|black|dark/i.test(a.name) && fs.existsSync(path.join(ASSET_DIR, a.id + '.' + a.ext)));   // logo escura sem arquivo no disco não pode sumir da página clara: cai na logo clara com cápsula
   const ratio = clara ? imgRatio(path.join(ASSET_DIR, clara.id + '.' + clara.ext)) : null;
