@@ -2424,8 +2424,9 @@ function ctxMarca(brand, format, sp = {}) {
   const texturas = brand ? all("SELECT name FROM assets WHERE kind='textura' AND colecao='arte' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp') ORDER BY id", brand).map(a => a.name) : [];
   const texEstilo = /tecnol|tech|digital|futur|ciber|cyber|hacker|neon|\bia\b|intelig/i.test(ident) ? 'tech' : '';
   const bancoTex = all("SELECT a.name, a.tags FROM assets a WHERE a.kind='textura' AND a.colecao='arte' AND a.brand='' AND a.ext IN ('jpg','jpeg','png','webp') ORDER BY a.id").map(t => ({ name: t.name, escuro: /escuro/.test(t.tags) }));
-  // troca de cor nos templates aprovados: a cor-assinatura do template vira o destaque da marca (o dono aprovou em 18/11; sp.cor_marca === false desliga na peça)
-  const corMarca = brand && sp.cor_marca !== false ? (hexOk(sp.accent) || idv.accent || undefined) : undefined;
+  // troca de cor nos templates aprovados: DESLIGADA por padrão (dono, 18/11/2026): o template sai nas cores da referência e é atribuído às marcas que combinam (Marcas → Formatos).
+  // Liga de novo com settings.tpl_cor_marca='1' ou sp.cor_marca === true na peça.
+  const corMarca = brand && (sp.cor_marca === true || (settings().tpl_cor_marca === '1' && sp.cor_marca !== false)) ? (hexOk(sp.accent) || idv.accent || undefined) : undefined;
   return { corMarca, bancoTex, W, H, accent: hexOk(sp.accent) || idv.accent || brandColors()[brand] || '#f59e0b', paper: hexOk(sp.paper) || idv.paper, ink: hexOk(sp.ink) || idv.ink, claro: apoioClaro, ftit: idv.ftit, ftxt: idv.ftxt, fonteMarca: !!idv.fontAsset, fonteMarcaK, fTit: fonteMarcaK, logo: clara?.name, avatar: avatarMarca(brand), logoEscura: escura?.name, logoRatio: ratio || .22, contatos: ct, molde, marca: brand, texturas, texEstilo, caixa: (() => { const t = styleParams(brand).tipografia || {}; return { titulo: t.caixa_titulo, botao: t.caixa_botao, rotulo: t.caixa_rotulo }; })(), margem: { estreitas: .06, medias: .08, amplas: .1 }[comp.margens] || .08 };
 }
 const hexOk = v => /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? String(v) : undefined;
@@ -2589,13 +2590,13 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }] },
   { id: 'post-objeto', oculto: true, nome: 'Post único com objeto-símbolo', nivel: 'robusto', formatos: ['feed'], uso: 'Post de 2 a 4 palavras com um objeto que simboliza a ideia (tempo é ouro, dinheiro, estratégia). Título partido pelo objeto.',
     seq: [{ modelo: 'dividido', papel: 'capa' }] },
-  { id: 'frase-personalidade', oculto: true, marcas: ['CENTRAL DO MARKETING'], nome: 'Frase de personalidade (retrato + citação)', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Frase marcante de uma pessoa (histórica ou atual) em post único: retrato em página inteira que escurece até o preto, fio com a logo da marca e o @ no meio, nome de quem disse e a frase em caixa alta centralizada. Foto = o retrato da pessoa; texto = a citação fiel.',
+  { id: 'frase-personalidade', marcas: ['CENTRAL DO MARKETING'], nome: 'Frase de personalidade (retrato + citação)', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Frase marcante de uma pessoa (histórica ou atual) em post único: retrato em página inteira que escurece até o preto, fio com a logo da marca e o @ no meio, nome de quem disse e a frase em caixa alta centralizada. Foto = o retrato da pessoa; texto = a citação fiel.',
     seq: [{ modelo: 'citacao', papel: 'capa' }] },
   { id: 'manchete-perfil', marcas: ['Seguidores em Alta'], nome: '5 · Manchete com perfil', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto em página inteira, perfil da marca no topo, manchete em caixa alta centralizada, “Leia a legenda” e barra na cor da marca. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa' }] },
-  { id: 'manchete-bet', oculto: true, marcas: ['Vivendo de Bet'], nome: '6 · Manchete sobre foto com logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do esporte/aposta em post único: foto em página inteira, logo da marca no canto, manchete em caixa alta centralizada, “Leia a legenda” e fio colorido no rodapé. Foto = a imagem real do assunto.',
+  { id: 'manchete-bet', marcas: ['Vivendo de Bet'], nome: '6 · Manchete sobre foto com logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do esporte/aposta em post único: foto em página inteira, logo da marca no canto, manchete em caixa alta centralizada, “Leia a legenda” e fio colorido no rodapé. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'logo', rodape: 'fio' } }] },
-  { id: 'manchete-raiz', oculto: true, marcas: ['Marketing Raiz'], nome: 'Manchete sobre foto com fio e logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto (ou colagem de fotos) no alto que escurece até o preto, fio branco, manchete em itálico com sombra na cor da marca, logo e “Leia a legenda” embaixo. Foto = a imagem real do assunto.',
+  { id: 'manchete-raiz', marcas: ['Marketing Raiz'], nome: 'Manchete sobre foto com fio e logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto (ou colagem de fotos) no alto que escurece até o preto, fio branco, manchete em itálico com sombra na cor da marca, logo e “Leia a legenda” embaixo. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'nenhum', linha: true, rodape: 'logo', italico: true, sombra: true } }] },
   { id: 'noticia-jornal', nome: '1 · Notícia Zyrion', nivel: 'robusto', formatos: ['carrossel'], paginas: 2, uso: 'Notícia no estilo de jornal em 2 páginas: capa com a foto da notícia, degradê, selo “Notícia urgente!” e manchete em caixa alta; contra-capa com um cartão branco (avatar, nome verificado e o texto da notícia). Estrutura fixa, sem miolo.',
     seq: [{ modelo: 'noticia', papel: 'capa' }, { modelo: 'post-card', papel: 'fim' }] },
@@ -3264,7 +3265,7 @@ function dadosOk(d) {
 }
 // Limpa e limita a especificação (vinda do Designer ou do editor visual): só campos conhecidos, números dentro de faixa, sem HTML
 function sanitizeArteSpec(found, format, doAgente = false) {
-  const hex = v => /^#[0-9a-fA-F]{3,8}$/.test(String(v || '')) ? String(v) : undefined;
+  const hex = v => String(v || '').toLowerCase() === 'transparent' ? '#00000000' : /^#[0-9a-fA-F]{3,8}$/.test(String(v || '')) ? String(v) : undefined;   // 'transparent' (contorno sem preenchimento) não pode cair na cor da marca
   const num = (v, a, b, d) => { v = Number(v); return Number.isFinite(v) ? Math.max(a, Math.min(b, v)) : d; };
   const txt = (v, n) => String(v ?? '').replace(/[<>]/g, '').slice(0, n);
   const pick = (v, list, d) => list.includes(v) ? v : d;
