@@ -1,0 +1,10 @@
+{
+  "marca": "Corte dos Ricos",
+  "mascotes": {},
+  "logos": {
+    "logo-corte-completa": {},
+    "logo-corte-pequena": {
+      "pequena": true
+    }
+  }
+}
