@@ -89,3 +89,9 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - **19 · Produto na mão** (Vivendo de Bet): céu azul, "Monte sua banca / Certa (serifa itálica gigante) / com (manuscrito)"; mascote estendendo o objeto da marca para a câmera; sem caixa extra; botão centralizado.
 - **20 · Exausto na mesa** (Central do Marketing): copiar a cena INTEIRA (sem zoom): mascote ajoelhado, desabado com a cabeça na mesa; "TIPOS DE" condensado + palavra manuscrita centralizados; linha e apoio à direita; botão centralizado.
 - Regra que se repetiu: "Leia a legenda ↓" CENTRALIZADO embaixo, salvo quando a referência pede outro lugar.
+
+## Referências 21 a 23 (18/11/2026) · 22 aprovada; 21 e 23 em ajuste
+- **21 · Sentado na nuvem** (Marketing Raiz): copiar a cena INTEIRA, inclusive a nuvem de fumaça que cobre a parte de baixo de borda a borda (não cortar a nuvem). Fundo da cor da marca, mais escuro e dramático. Título em 3 tamanhos branco; o mascote recortado fica NA FRENTE do título grande, e a última linha vai ao lado da cabeça, sem ser coberta.
+- **22 · Busto saindo do card** (007 Spyhacker): título condensado 2 linhas com 1ª palavra marcada e última na cor da marca; etiqueta inclinada; busto grande saindo de card arredondado. Aprovado de primeira.
+- **23 · Silêncio** (Central do Marketing): o fundo escuro precisa aparecer bastante: as manchas da cor da marca não podem dominar; escurecer as bordas. Palavra em pincel (Permanent Marker) cruzando o peito.
+- Lição: o impacto vem do CONTRASTE: fundo escuro + 1 cor forte. Quando a cor da marca toma a arte toda, perde a chamada.
