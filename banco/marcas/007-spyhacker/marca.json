@@ -28,6 +28,10 @@
     },
     "logo-atlas-hosting": {
       "produto": "Atlas Hosting"
+    },
+    "logo-atlas-hosting-clara": {
+      "produto": "Atlas Hosting",
+      "claro": true
     }
   }
 }
