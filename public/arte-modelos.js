@@ -626,6 +626,7 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   const ft = genOuAsset(d.foto);
   if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto, quando a copy pede
   else s.items.unshift({ asset: 'tpl-xadrez-foto-capa', x: F2(fx(650) / 1080), y: F2(fy(215) / 1350), size: Math.round(fy(1300)) });   // padrão aprovado pelo dono: a foto da arte original (Coringa)
+  { const dy = 70 / 1350; for (const o of [...s.texts, ...s.shapes]) o.y = F2(o.y + dy); const f0 = s.items[0]; if (f0?.asset === 'tpl-xadrez-foto-capa') { const h0 = fy(430), k = (h0 + 70) / h0; f0.size = Math.round(f0.size * k); f0.y = F2(((h0 + 70) / 2) / 1350); } else if (f0) f0.y = F2(f0.y + dy); }   // ajuste do dono: foto, título e botão um pouco mais para baixo
   s.items.push({ asset: 'tpl-xadrez-rei', x: F2(105 / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true });   // peça pequena inteira dentro da página
   s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true });
   return s;
