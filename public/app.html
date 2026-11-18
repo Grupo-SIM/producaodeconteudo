@@ -950,8 +950,8 @@ VIEWS.marcas = async () => {
   if (tab === 'formatos' && sel) carregaTplMarca(sel.name);
 };
 // checklist de templates da marca: o Designer só usa os marcados
-async function carregaTplMarca(marca) {
-  const el = $('#mtpl'); if (!el) return; let r; try { r = await api('/api/art-templates/marca?brand=' + encodeURIComponent(marca)); } catch (e) { el.textContent = 'Não consegui carregar os templates.'; return; }
+async function carregaTplMarca(marca, alvo) {
+  const el = alvo || $('#mtpl'); if (!el) return; S._tplEl = el; let r; try { r = await api('/api/art-templates/marca?brand=' + encodeURIComponent(marca)); } catch (e) { el.textContent = 'Não consegui carregar os templates.'; return; }
   const fmt = { feed: 'Feed', carrossel: 'Carrossel', stories: 'Stories' }, ord = [...r.itens].sort((a, b) => (parseInt(a.nome) || 99) - (parseInt(b.nome) || 99) || a.nome.localeCompare(b.nome));
   const grupo = t => t.tema === 'noticia' || /not[ií]cia|manchete/i.test(t.nome) ? 'Jornalístico' : (t.formatos || []).includes('stories') && t.formatos.length === 1 ? 'Stories' : (t.formatos || []).includes('carrossel') ? 'Carrossel' : 'Feed estático';
   const G = ['Jornalístico', 'Feed estático', 'Carrossel', 'Stories'];
@@ -963,11 +963,12 @@ async function carregaTplMarca(marca) {
     + `<p class="small muted" style="margin-top:10px">${r.personalizado ? 'Lista escolhida por você.' : 'Padrão do sistema: marque ou desmarque para escolher.'}</p>`;
   S._tplMarca = marca;
 }
-function tplMarcaTodos(on) { document.querySelectorAll('.mtck').forEach(c => c.checked = on); tplMarcaSalva(S._tplMarca); }
+function tplMarcaTodos(on) { (S._tplEl || document).querySelectorAll('.mtck').forEach(c => c.checked = on); tplMarcaSalva(S._tplMarca); }
 async function tplMarcaSalva(marca, padrao) {
-  document.querySelectorAll('.mtg').forEach(g => { const c = g.querySelectorAll('.mtck'), i = g.querySelector('b i'); if (i && c.length) i.textContent = [...c].filter(x => x.checked).length + ' de ' + c.length; });
-  const ids = [...document.querySelectorAll('.mtck')].filter(c => c.checked).map(c => c.value);
-  try { await api('/api/art-templates/marca', { method: 'PUT', body: padrao ? { brand: marca, padrao: true } : { brand: marca, ids } }); toast(padrao ? 'Templates voltaram ao padrão' : 'Salvo: o Designer usa ' + ids.length + ' template(s) nesta marca'); if (padrao) carregaTplMarca(marca); } catch (e) { toast('Não consegui salvar'); }
+  const R = S._tplEl && S._tplEl.isConnected ? S._tplEl : document;
+  R.querySelectorAll('.mtg').forEach(g => { const c = g.querySelectorAll('.mtck'), i = g.querySelector('b i'); if (i && c.length) i.textContent = [...c].filter(x => x.checked).length + ' de ' + c.length; });
+  const ids = [...R.querySelectorAll('.mtck')].filter(c => c.checked).map(c => c.value);
+  try { await api('/api/art-templates/marca', { method: 'PUT', body: padrao ? { brand: marca, padrao: true } : { brand: marca, ids } }); toast(padrao ? 'Templates voltaram ao padrão' : 'Salvo: o Designer usa ' + ids.length + ' template(s) nesta marca'); if (padrao) carregaTplMarca(marca, R === document ? undefined : R); } catch (e) { toast('Não consegui salvar'); }
 }
 // ── edição direto no modal: acha o trecho no documento da marca, edita e salva no mesmo documento
 const docsMarca = nome => (S._docs || []).filter(x => (x.brand || '').toLowerCase() === nome.toLowerCase());
@@ -1010,13 +1011,13 @@ async function detMarca(id) {
   S._docs = docs;
   const sec = cat => docs.filter(x => cat.includes(x.category)).map(x => `<details class="box" style="margin-bottom:6px;padding:10px"><summary>${esc(x.title)}</summary><textarea class="f" id="kd${x.id}" rows="10" style="margin-top:8px">${esc(x.content)}</textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm ok" onclick="salvaDoc(${x.id})">Salvar</button><button class="btn sm dg" onclick="apagaDoc(${x.id},${id})">Apagar</button></div></details>`).join('') + `<button class="btn sm" onclick="novoDoc(${id},'${cat[0]}')">+ Documento</button>`;
   modal(`<div class="hd"><h2>${esc(b.name)}</h2><button class="btn sm" onclick="renMarca(${id})">Renomear</button><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
-    <div class="tabs"><button class="on" onclick="mTab(this,'v')">Visual</button><button onclick="mTab(this,'z')">Voz</button><button onclick="mTab(this,'o')">Público, produto e outros</button><button onclick="mTab(this,'f')">Formatos e metas</button><button onclick="mTab(this,'c')">Contas</button></div>
+    <div class="tabs"><button class="on" onclick="mTab(this,'v')">Visual</button><button onclick="mTab(this,'z')">Voz</button><button onclick="mTab(this,'o')">Público, produto e outros</button><button onclick="mTab(this,'f')">Formatos</button><button onclick="mTab(this,'c')">Contas</button></div>
     <div data-m="v">${sec(['marca', 'diretrizes'])}</div><div data-m="z" class="hidden">${sec(['tom_de_voz'])}</div>
     <div data-m="o" class="hidden">${sec([...new Set(['publico', 'nicho', 'produto', ...docs.map(x => x.category).filter(c => !['marca', 'diretrizes', 'tom_de_voz'].includes(c))])])}</div>
-    <div data-m="f" class="hidden">${(MT.formatos || fs).map(f => { const q = (MT.metas || []).find(x => x.brand.toLowerCase() === b.name.toLowerCase() && x.raia === f.id)?.qtd || 0; return `<div class="ver"><b style="width:160px">${esc(f.nome)}</b><span><input class="metain" style="width:56px" type="number" min="0" max="20" value="${q}" onchange="salvaMeta(${JSON.stringify(esc(b.name))},'${f.id}',this.value)"> por dia</span></div>`; }).join('')}<p class="small muted" style="margin-top:8px">Quantos posts desta marca por dia em cada formato (0 = nada sozinho). A grade de todas as marcas fica em Produção diária.</p></div>
+    <div data-m="f" class="hidden"><h5>Templates que o Designer usa nesta marca</h5><p class="small muted" style="margin:0 0 8px">Marque só o que esta marca pode usar. O Designer faz a arte apenas com os marcados. A quantidade de posts por dia fica em <a href="#" onclick="fecha();go('producao');return false">Produção diária</a>.</p><div class="mtplm small muted" data-marca="${esc(b.name)}">Carregando…</div></div>
     <div data-m="c" class="hidden"><p class="muted">Conexão com as redes: em breve. Hoje a publicação é manual.</p></div></div>`);
 }
-function mTab(b, k) { b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('[data-m]').forEach(e => e.classList.toggle('hidden', e.dataset.m !== k)); }
+function mTab(b, k) { if (k === 'f') { const m = document.querySelector('[data-m="f"] .mtplm'); if (m && !m.dataset.ok) { m.dataset.ok = 1; carregaTplMarca(m.dataset.marca, m); } } b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('[data-m]').forEach(e => e.classList.toggle('hidden', e.dataset.m !== k)); }
 async function salvaDoc(kid) { const x = S._docs.find(d => d.id === kid); await tryDo(() => api('/api/knowledge/' + kid, { method: 'PUT', body: { ...x, content: $('#kd' + kid).value } }), 'Salvo'); x.content = $('#kd' + kid).value; }
 async function apagaDoc(kid, bid) { if (!confirm('Apagar este documento?')) return; await tryDo(() => api('/api/knowledge/' + kid, { method: 'DELETE' }), 'Apagado'); detMarca(bid); }
 async function novoDoc(bid, cat) { const b = S.brands.find(x => x.id === bid), t = prompt('Título do documento'); if (!t) return; await tryDo(() => api('/api/knowledge', { body: { title: t, category: cat, content: 'Escreva aqui.', brand: b.name } }), 'Criado'); detMarca(bid); }
