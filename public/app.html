@@ -682,10 +682,11 @@ async function abrirItem(id, parte) {
   if (i && i.estado === 'esperando' && i.etapa === 'revisao') return abrirEditor(id);
   const d = await api('/api/v2/itens/' + id);
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="pill ${d.estado}">${esc(d.estado_nome)}${d.estado === 'etapa' ? ' · ' + esc(d.etapa_nome) : ''}</span><button class="btn sm" onclick="fecha()">Fechar</button></div>
-    <div class="mb"><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(RAIA_NOME(d))}</dd>${d.estado === 'parado' ? `<dt>O que houve</dt><dd>${esc(explica(d.motivo).titulo)}</dd><dt>O que fazer</dt><dd>${esc(explica(d.motivo).faca)}</dd><dt>Detalhe técnico</dt><dd class="small muted">${esc(d.motivo || '')}</dd>` : d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
+    <div class="mb"><div id="atlasi"></div><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(RAIA_NOME(d))}</dd>${d.estado === 'parado' ? `<dt>O que houve</dt><dd>${esc(explica(d.motivo).titulo)}</dd><dt>O que fazer</dt><dd>${esc(explica(d.motivo).faca)}</dd><dt>Detalhe técnico</dt><dd class="small muted">${esc(d.motivo || '')}</dd>` : d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
     ${d.roteiro ? `<h3 style="margin:16px 0 6px;font-size:13px" class="muted">Roteiro</h3><div class="doc" style="min-height:0">${esc(d.roteiro)}</div>` : ''}
     ${versoesHtml(d)}</div>
     <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}${d.status !== 'discarded' && ['etapa', 'ajuste', 'fila'].includes(d.estado) ? (d.pausado ? `<button class="btn ok" onclick="pausaItemModal(${id},false)">Continuar</button><span class="muted small" style="align-self:center">parada por você</span>` : `<button class="btn" style="border-color:#6b2a2e;color:#ff9b9b" onclick="pausaItemModal(${id},true)" title="Para o agente agora; a peça fica onde está até você mandar continuar">Parar agente</button>`) : ''}${d.estado === 'parado' ? `<button class="btn ok" style="margin-left:auto" onclick="resolver([${id}])">Resolvido</button>` : ''}</div>`);
+  atlasNoItem(id);
 }
 function versoesHtml(d) {
   if (!d.versoes?.length) return '';
@@ -808,14 +809,15 @@ VIEWS.publicacao = () => {
 async function verPronto(id, parte) {
   const d0 = await api('/api/v2/itens/' + id);
   if (!parte) parte = d0.raia === 'materia' && d0.materia ? 'materia' : d0.tem_arte ? 'post' : 'texto';
-  if (parte === 'post' && d0.tem_arte) return verPost(id, d0);
+  if (parte === 'post' && d0.tem_arte) return verPost(id, d0).then(() => atlasNoItem(id));
   const d = d0, txt = (parte === 'materia' ? d.materia : (d.materia || d.legenda || d.roteiro) || '').trim(); S._vp = { d, txt, id };
   const html = esc(txt).replace(/^#+\s*(.+)$/gm, '<h3>$1</h3>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
   const ic = (p, t, f) => `<button class="ibtn" title="${t}" onclick="${f}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg></button>`;
   modal(`<div class="hd"><h2>${esc(d.titulo)}</h2><span class="muted small">${esc(d.marca)} · ${esc(RAIA_NOME(d))}</span><span style="flex:1"></span>
     ${ic('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', 'Baixar em PDF', 'baixaPdf()')}${ic('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/>', 'Copiar texto', 'copiaVp()')}${d.tem_video ? ic('<path d="m10 9 5 3-5 3z"/><rect x="3" y="5" width="18" height="14" rx="2"/>', 'Baixar vídeo', `location.href='/api/contents/${id}/render/file'`) : ''}${ic('<path d="M18 6 6 18M6 6l12 12"/>', 'Fechar', 'fecha()')}</div>
-    <div class="mb"><article class="leitura"><p>${html || '<span class="muted">Sem texto.</span>'}</p></article></div>
+    <div class="mb"><div id="atlasi"></div><article class="leitura"><p>${html || '<span class="muted">Sem texto.</span>'}</p></article></div>
     <div class="ft"><span class="muted small" style="margin-right:auto">Depois de publicar, marque aqui e cole o link.</span><button class="btn ok" onclick="marcarPostado(${id},'${parte === 'materia' ? 'materia' : 'post'}')">${parte === 'materia' ? 'Marcar publicado no site' : 'Marcar onde postei'}</button></div>`);
+  atlasNoItem(id);
 }
 // post pronto (carrossel, estático, cards da notícia): só os slides aprovados e a legenda, para baixar e postar
 async function verPost(id, d) {
@@ -937,8 +939,8 @@ VIEWS.marcas = async () => {
       esq = `<h5>Templates que o Designer usa nesta marca</h5><p class="small muted" style="margin:0 0 8px">Marque só o que esta marca pode usar. O Designer faz a arte apenas com os marcados. A quantidade de posts por dia fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p><div id="mtpl" class="small muted">Carregando…</div>`;
       dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
-      esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest', 'Site e blog'].map(r => linha(r, 'conectar · em breve')).join('')}<p class="small muted" style="margin-top:8px">Hoje a postagem é manual, pela tela Publicação.</p>`;
-      dir = achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('');
+      esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
+      dir = `<h5>Sites no Atlas</h5><div id="atlasd" class="small muted">Carregando…</div>`;
     }
     det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
       <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
@@ -948,7 +950,91 @@ VIEWS.marcas = async () => {
   $('#main').innerHTML = `<div class="top"><h1>Marcas</h1><input class="f busca" placeholder="Buscar marca…" value="${esc(S.qMarca || '')}" oninput="S.qMarca=this.value;clearTimeout(S.tq);S.tq=setTimeout(()=>{render();setTimeout(()=>{const i=$('.busca');i.focus();i.setSelectionRange(99,99)},30)},250)"><span style="flex:1"></span>${[['', 'Todas'], ['nicho', 'Nicho'], ['institucional', 'Institucionais']].map(([k, n]) => `<button class="chip ${(S.tipoMarca || '') === k ? 'on' : ''}" onclick="S.tipoMarca='${k}';render()">${n} (${k ? brands.filter(b => tipo(b).tipo === k).length : brands.length})</button>`).join('')}<button class="chip" onclick="novaMarca()">+ Nova marca</button></div>
     ${brands.length ? `<div class="mlay"><div class="mcards">${brands.filter(b => (!S.qMarca || b.name.toLowerCase().includes(S.qMarca.toLowerCase())) && (!S.tipoMarca || tipo(b).tipo === S.tipoMarca)).map(b => `<div class="box mc ${b.id === sel?.id ? 'on' : ''}" onclick="S.marcaSel=${b.id};render()">${av(b)}<b>${esc(b.name)}</b>${etq(b)}</div>`).join('')}</div>${det}</div>` : '<div class="empty">Nenhuma marca ainda. Crie aqui ou peça ao gerente.</div>'}`;
   if (tab === 'formatos' && sel) carregaTplMarca(sel.name);
+  if (tab === 'contas' && sel) carregaAtlasMarca(sel.name);
 };
+// ───────── sites no Atlas: os agentes postam nos sites do Atlas Hosting ligados a esta marca
+async function carregaAtlasMarca(marca) {
+  const el = $('#atlasd'); if (!el) return;
+  try {
+    const [est, { destinos }] = await Promise.all([api('/api/v2/atlas/estado'), api('/api/v2/atlas/destinos?marca=' + encodeURIComponent(marca))]);
+    S._atlas = est;
+    if (!est.configurado) { el.innerHTML = '<p class="small muted">Ligação com o Atlas desligada: o servidor precisa de ATLAS_URL e ATLAS_API_TOKEN no .env.</p>'; return; }
+    el.innerHTML = destinos.map(d => `<div class="box" style="padding:10px;margin-bottom:8px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>${esc(d.nome || d.dominio || d.site_id)}</b><span class="tg">${esc(est.formatos[d.formato]?.nome || d.formato)}</span>${d.ativo ? '' : '<span class="tg out">pausado</span>'}<span style="flex:1"></span>
+        <button class="btn sm" onclick="atlasGerar(${d.id})">Gerar 1 agora</button><button class="btn sm" onclick='atlasForm(${JSON.stringify(marca)}, ${d.id})'>Editar</button></div>
+      <div class="small muted" style="margin-top:6px">${esc(d.dominio || 'sem endereço publicado')} · ${d.tipo === 'wordpress' ? 'WordPress' : 'Criador de Sites'} · ${d.meta_dia ? d.meta_dia + ' por dia' : 'só quando você pedir'} · ${d.publica_sozinho ? '<b>publica sem aprovação</b>' : 'publica depois da sua aprovação'} · ${d.publicados} publicado(s)</div>
+      <div class="tagsw" style="margin-top:6px">${d.agentes.map(a => `<span class="tg">${esc(est.nomes[a] || a)}</span>`).join('')}</div></div>`).join('')
+      + `<button class="btn sm ok" onclick='atlasConectar(${JSON.stringify(marca)})'>Conectar site do Atlas</button>`;
+  } catch (e) { el.textContent = e.message; }
+}
+async function atlasConectar(marca) {
+  S._atlasMarca = marca;
+  modal(`<div class="hd"><h2>Sites no Atlas</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb" id="atlass"><p class="muted">Buscando os sites da sua conta no Atlas…</p></div>`);
+  try {
+    const { sites } = await api('/api/v2/atlas/sites'); S._atlasSites = sites;
+    $('#atlass').innerHTML = sites.length ? `<p class="small muted">Escolha o site em que os agentes vão postar para ${esc(marca)}. Um site pode receber mais de uma marca ou formato.</p>${sites.map((x, i) => `<div class="kvr li" onclick="atlasForm(S._atlasMarca, null, ${i})"><span><b>${esc(x.nome)}</b> <span class="muted">${esc(x.dominio || 'ainda não publicado')}</span></span><span>${x.tipo === 'wordpress' ? 'WordPress' : 'Criador de Sites'}${x.destinos.length ? ' · ' + x.destinos.length + ' conexão(ões)' : ''}</span></div>`).join('')}`
+      : '<p class="muted">Nenhum site encontrado na conta do Atlas.</p>';
+  } catch (e) { $('#atlass').innerHTML = `<p class="muted">${esc(e.message)}</p>`; }
+}
+function atlasAgentesHtml(formato, marcados) {
+  const est = S._atlas, F = est.formatos[formato];
+  return [`<label class="small" style="display:block;opacity:.7"><input type="checkbox" checked disabled> ${esc(est.nomes.roteirista)} (sempre)</label>`,
+    ...F.agentes.map(a => { const obr = F.obrigatorios.includes(a); return `<label class="small" style="display:block"><input type="checkbox" class="atag" value="${a}" ${obr || marcados.includes(a) ? 'checked' : ''} ${obr ? 'disabled' : ''}> ${esc(est.nomes[a] || a)}${obr ? ' (obrigatório)' : ''}</label>`; })].join('');
+}
+async function atlasForm(marca, destinoId, siteIdx) {
+  try {
+    if (!S._atlas) S._atlas = await api('/api/v2/atlas/estado');
+    let d = null, site = null;
+    if (destinoId) d = (await api('/api/v2/atlas/destinos?marca=' + encodeURIComponent(marca))).destinos.find(x => x.id === destinoId);
+    else site = S._atlasSites[siteIdx];
+    if (!d && !site) return toast('Site não encontrado');
+    const formato = d?.formato || 'blog', cats = site?.categorias || [];
+    S._atlasMarca = marca; S._atlasNovo = site;
+    modal(`<div class="hd"><h2>${esc(d ? (d.nome || d.dominio) : site.nome)}</h2><button class="btn sm" onclick="fecha()">Fechar</button></div><div class="mb">
+      <p class="small muted">${esc(marca)} · ${esc((d || site).dominio || 'site ainda não publicado')}</p>
+      <label class="small">O que os agentes publicam</label>
+      <select class="f" id="atf" onchange="$('#atag').innerHTML=atlasAgentesHtml(this.value,[...document.querySelectorAll('.atag:checked')].map(x=>x.value))">${Object.entries(S._atlas.formatos).map(([k, f]) => `<option value="${k}" ${k === formato ? 'selected' : ''}>${esc(f.nome)}</option>`).join('')}</select>
+      <p class="small muted" style="margin:4px 0 10px">Matéria usa as notícias do Agente de Notícias da marca; Post de blog usa as pautas do Gerente.</p>
+      <label class="small">Agentes que trabalham neste site</label><div id="atag" style="margin:4px 0 10px">${atlasAgentesHtml(formato, d?.agentes || ['revisorcopy', 'gerente', 'seo', 'designer'])}</div>
+      <label class="small">Categoria no site (vazio = a seção que o Roteirista escolher)</label>
+      <input class="f" id="atc" list="atcl" value="${esc(d?.categoria || '')}"><datalist id="atcl">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist>
+      <label class="small" style="display:block;margin-top:10px">Foco dos assuntos (opcional)</label>
+      <textarea class="f" id="atfo" rows="3" placeholder="Ex.: tutoriais para quem está começando a vender online">${esc(d?.foco || '')}</textarea>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:10px;flex-wrap:wrap">
+        <label class="small"><input class="metain" style="width:56px" type="number" min="0" max="20" id="atm" value="${d?.meta_dia ?? 1}"> por dia (0 = só quando você pedir)</label>
+        <label class="small"><input type="checkbox" id="ats" ${d?.publica_sozinho ? 'checked' : ''}> Publicar sem aprovação</label>
+        ${d ? `<label class="small"><input type="checkbox" id="ata" ${d.ativo ? 'checked' : ''}> Ativo</label>` : ''}
+      </div>
+      <p class="small muted" style="margin-top:6px">Sem "Publicar sem aprovação", cada post espera você na Mesa de revisão e vai para o site quando você aprova.</p>
+      <div style="display:flex;gap:6px;margin-top:14px"><button class="btn ok" onclick="atlasSalva(${d ? d.id : 'null'})">${d ? 'Salvar' : 'Conectar'}</button>${d ? `<button class="btn dg" onclick="atlasRemove(${d.id})">Desconectar</button>` : ''}</div></div>`);
+  } catch (e) { toast(e.message); }
+}
+async function atlasSalva(id) {
+  const body = { brand: S._atlasMarca, formato: $('#atf').value, categoria: $('#atc').value, foco: $('#atfo').value, meta_dia: +$('#atm').value || 0, publica_sozinho: $('#ats').checked,
+    agentes: [...document.querySelectorAll('.atag:checked')].map(x => x.value), ...($('#ata') ? { ativo: $('#ata').checked } : {}) };
+  if (body.publica_sozinho && !confirm('Este site vai publicar sozinho, sem passar pela sua aprovação. Confirmar?')) return;
+  if (!id) { const st = S._atlasNovo; Object.assign(body, { tipo: st.tipo, site_id: String(st.id), nome: st.nome, dominio: st.dominio || '' }); }
+  try { await api('/api/v2/atlas/destinos' + (id ? '/' + id : ''), { method: id ? 'PUT' : 'POST', body }); toast(id ? 'Salvo' : 'Site conectado'); fecha(); }
+  catch (e) { toast(e.message); }
+}
+async function atlasRemove(id) {
+  if (!confirm('Desconectar este site? Os posts já publicados continuam no site.')) return;
+  try { await api('/api/v2/atlas/destinos/' + id, { method: 'DELETE' }); toast('Site desconectado'); fecha(); } catch (e) { toast(e.message); }
+}
+async function atlasGerar(id) { await tryDo(() => api('/api/v2/atlas/destinos/' + id + '/gerar', { body: {} }), 'Pedido na fila: aparece no Fluxo'); }
+async function atlasRepublica(id) { try { const r = await api('/api/v2/atlas/itens/' + id + '/publicar', { body: {} }); toast(r.url ? 'Publicado no site' : (r.aviso || 'Enviado')); fecha(); abrirItem(id); } catch (e) { toast(e.message); } }
+// No item: em qual site do Atlas ele vai sair e como está a publicação
+async function atlasNoItem(id) {
+  const el = document.getElementById('atlasi'); if (!el) return;
+  try {
+    const r = await api('/api/v2/atlas/itens/' + id); if (!r.destino) { el.remove(); return; }
+    const st = { ok: 'Publicado', salvo: 'Salvo no site (ainda não foi ao ar)', erro: 'Falhou', enviando: 'Enviando…' }[r.status] || (r.pronto ? 'Pronto para publicar' : 'Sai no site depois da sua aprovação');
+    el.innerHTML = `<div class="box" style="padding:10px;margin:8px 0"><b>Site no Atlas:</b> ${esc(r.destino.nome || r.destino.dominio)} · ${esc(st)}${r.url ? ` · <a href="${esc(r.url)}" target="_blank" rel="noopener">abrir</a>` : ''}
+      ${r.erro ? `<div class="small" style="margin-top:4px">${esc(r.erro)}</div>` : ''}
+      <div class="small muted" style="margin-top:4px">Agentes: ${(r.agentes || []).map(a => esc(S._atlas?.nomes?.[a] || a)).join(', ')}</div>
+      ${r.pronto && r.status !== 'enviando' ? `<button class="btn sm" style="margin-top:6px" onclick="atlasRepublica(${id})">${r.status === 'ok' ? 'Publicar no site de novo' : 'Publicar no site agora'}</button>` : ''}</div>`;
+  } catch { el.remove(); }
+}
 // checklist de templates da marca: o Designer só usa os marcados
 async function carregaTplMarca(marca, alvo) {
   const el = alvo || $('#mtpl'); if (!el) return; S._tplEl = el; let r; try { r = await api('/api/art-templates/marca?brand=' + encodeURIComponent(marca)); } catch (e) { el.textContent = 'Não consegui carregar os templates.'; return; }

@@ -280,7 +280,7 @@ export function criarFluxoV2(ctx) {
       // matéria do site é aprovada sozinha: não depende da arte (que pode estar em ajuste) nem muda o estado do post
       // aprovar o post aprova só o post: a matéria que você ainda não aprovou continua na Mesa
       if (b.parte !== 'materia' && c.materia && !c.materia_aprovada) setContent(id, { materia_aprovada: 'pendente' });
-      if (b.parte === 'materia' && c.materia) { setContent(id, { materia_aprovada: T() }); log(null, `Você aprovou a matéria do site de "${c.title}"`, id); changed(); return { ok: true }; }
+      if (b.parte === 'materia' && c.materia) { setContent(id, { materia_aprovada: T() }); log(null, `Você aprovou a matéria do site de "${c.title}"`, id); ctx.depoisDeAprovar?.(id); changed(); return { ok: true }; }
       if (c.status === 'awaiting_script') contentAct(id, 'approve_script', b);
       else contentAct(id, 'approve', b);
       setContent(id, { em_ajuste: 0, ajuste_motivo: '' });

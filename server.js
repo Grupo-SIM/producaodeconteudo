@@ -8,6 +8,7 @@ import zlib from 'node:zlib';
 import os from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
 import { criarFluxoV2 } from './fluxo-v2.mjs';
+import { criarAtlas, extrairArtigo } from './atlas-sites.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import dns from 'node:dns';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -268,7 +269,10 @@ const KINDS_TEXTO = ['texto', 'carta_vendas'];   // tipos de conteúdo que são 
 const isVideo = f => f === 'video_vertical' || f === 'video_horizontal';
 const textoPuro = c => c.format === 'feed' && KINDS_TEXTO.includes(c.kind);   // texto/carta de vendas no feed = só o texto, sem arte
 const agenteLigado = id => !!one('SELECT 1 x FROM agents WHERE id=? AND enabled=1', id);
-const producaoDe = c => textoPuro(c) ? [] : (PRODUCTION[c.format] || []).filter(agenteLigado);   // agente desativado não recebe tarefa (ficaria parada na fila)
+let atlasV = null;   // sites no Atlas (atlas-sites.mjs): criado junto com o fluxo v2
+// Item de um site do Atlas usa só os agentes escolhidos para aquele site (o agente desligado no painel continua de fora)
+const agenteDoItem = (c, id) => { const a = atlasV?.agentesDo(c); return agenteLigado(id) && (!a || a.includes(id)); };
+const producaoDe = c => textoPuro(c) ? [] : (PRODUCTION[c.format] || []).filter(id => agenteDoItem(c, id));   // agente desativado não recebe tarefa (ficaria parada na fila)
 let MANUAL = !API_KEY;   // sem chave de API e sem assinatura conectada: modo chat (pedido colado à mão)
 
 // ── Assinatura do Claude (Claude Code com login claude.ai, igual ao claude-worker do Atlas): roda os agentes sem chave de API
@@ -2304,6 +2308,7 @@ function paraAprovacao(c0, txtLog) {
   try { const pack = montarPacote(c); extra = { pack: JSON.stringify(pack), caption: pack.legenda_final || c.caption }; log('publicador', `Pacote de postagem montado: "${c.title}"`, c.id); } catch {}
   setContent(c.id, { status: 'awaiting_approval', error: '', ...extra });
   log('gerente', txtLog, c.id);
+  atlasV?.chegouNaMesa(c.id);
 }
 
 // ───────────────────────── Arte estática: spec do Designer → fundo por IA (opcional) → PNG para baixar ─────────────────────────
@@ -4551,7 +4556,7 @@ function manuaisBloco(codes) {
   if (!rows.length && !cap) return '';
   return `# MANUAIS DESTE PEDIDO\nO painel carregou só os manuais que este pedido usa. Siga-os; as regras M00 valem sempre.\n\n${rows.map(r => `<manual codigo="${r.code}">\n${r.conteudo}\n</manual>`).join('\n\n')}${cap ? `\n\n# CAPACIDADES ATUAIS DA PRODUÇÃO\n${cap.conteudo}` : ''}`;
 }
-const copyRevOn = () => agenteLigado('revisorcopy') && settings().copy_review !== '0';
+const copyRevOn = c => (c ? agenteDoItem(c, 'revisorcopy') : agenteLigado('revisorcopy')) && settings().copy_review !== '0';
 function lerLaudoCopy(txt) {
   const t = String(txt || ''), v = (t.match(/VEREDITO\s*:?\**\s*[:*]*\s*(aprovada|ajustes|refazer)/i) || [])[1]?.toLowerCase() || '';
   const n = Number((t.match(/NOTA\s*:?\**\s*[:*]*\s*([1-5](?:[.,]\d)?)/i) || [])[1]?.replace(',', '.'));
@@ -5085,6 +5090,7 @@ function radarPauta(it, o = {}) {
   if (!tpl) throw fail(400, `A marca ${it.brand || '(sem marca)'} ainda não tem template de notícia. Escolha na mesa do Agente de Notícias.`);
   const quer = tpl.seq.length === 1 && tpl.formatos.includes('feed') ? 'feed' : RADAR_FMTS.includes(o.formato) ? o.formato : (cfgM.formato || 'carrossel'), formato = tpl.formatos.includes(quer) ? quer : (tpl.formatos.find(f => RADAR_FMTS.includes(f)) || quer);
   const id = createContent({ title: limpaTituloFonte(xmlDec(String(o.titulo || it.titulo))).slice(0, 200), format: formato, kind: 'noticia', goal: '', brand: it.brand || '', platform: 'Instagram', estilo_arte: tpl.layoutId ? 'l:' + tpl.layoutId : 't:' + tpl.id, brief: radarBrief(it, { ...o, estilo: tpl.nome, nicho: cfgM.nicho || '' }) }, 'radar');
+  atlasV?.vincularPorMarca(id, it.brand, 'materia');
   run("UPDATE radar_items SET status='pauta', content_id=?, motivo=?, nota=? WHERE id=?", id, String(o.porque || '').slice(0, 300), String(o.nota || '').slice(0, 200), it.id);
   { const fr = one('SELECT foto_asset FROM radar_items WHERE id=?', it.id), a = fr?.foto_asset ? assetDaMarca(it.brand, fr.foto_asset) : null;
     if (a) run('UPDATE contents SET brief = brief || ? WHERE id=?', `\nFOTO DA NOTÍCIA (já está na Biblioteca como "${a.name}"): use esta foto na capa. NUNCA use mascote nem imagem gerada em notícia. ${a.note || ''}. Cite o crédito da foto na legenda.`, id);
@@ -5473,8 +5479,18 @@ const separaMateria = t => { const m = String(t || '').match(MATERIA_RE); return
 const jornalDaMarca = brand => { const m = radarCfg().marcas[brand] || {}; return (m.jornal || '') + (m.secoes ? '\nSeções (editorias) do jornal: ' + m.secoes + '\nEscolha UMA dessas seções para a matéria, a que corresponde ao assunto, e escreva-a na linha "Seção:". Se nenhuma servir, não invente: abra PEDIDO AO GERENTE.' : ''); };
 const MAX_SEO = MANUAL ? 1 : 2;   // no modo chat, 1 devolução da matéria por SEO (cada volta é um ciclo de copiar/colar)
 function depoisDaCopy(c, materia = c.materia) {   // notícia com matéria passa pelo Agente de SEO antes do Revisor
-  if (c.kind === 'noticia' && materia && agenteLigado('seo') && (jparse(c.seo_review, {})?.rodadas || 0) < MAX_SEO + 1 && !(jparse(c.seo_review, {})?.fim)) enqueue(c.id, 'seo', 'seo');
-  else enqueue(c.id, 'gerente', 'revisao');
+  if (c.kind === 'noticia' && materia && agenteDoItem(c, 'seo') && (jparse(c.seo_review, {})?.rodadas || 0) < MAX_SEO + 1 && !(jparse(c.seo_review, {})?.fim)) enqueue(c.id, 'seo', 'seo');
+  else revisaoOuSegue(c);
+}
+// Revisor do roteiro; num site do Atlas sem o Revisor, a copy segue direto para a produção ou para a sua Mesa
+function revisaoOuSegue(c0) {
+  if (agenteDoItem(c0, 'gerente')) return enqueue(c0.id, 'gerente', 'revisao');
+  const c = getContent(c0.id), needed = settings().auto_produce === '1' ? producaoDe(c) : [];
+  if (needed.length) {
+    setContent(c.id, { status: 'producing', prod_revisions: 0 });
+    for (const ag of needed) enqueue(c.id, ag, ag === 'designer' ? 'arte' : 'video');
+    log('gerente', `"${c.title}" seguiu para a produção sem o Revisor (escolha do site no Atlas)`, c.id);
+  } else paraAprovacao(c, `"${c.title}" chegou sem passar pelo Revisor (escolha do site no Atlas): aguardando sua aprovação`);
 }
 const HANDLERS = {
   async radar(job) {
@@ -5524,7 +5540,7 @@ const HANDLERS = {
       if (le.length && MANUAL) log('roteirista', `Conferência do painel: ${le.length} ponto(s) fora dos limites (${le.join(' | ').slice(0, 300)}). No modo chat segue para a revisão sem pedir de novo.`, c.id);
       if (le.length && volta < 2 && !MANUAL) { log('roteirista', `Conferência do painel achou ${le.length} erro(s) mecânico(s): volta ao Roteirista sem gastar o Revisor`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: 'CONFERÊNCIA DO PAINEL (limites objetivos, corrija todos e mude só isso):\n- ' + le.join('\n- '), lint: volta + 1 }); return r; } }
     const deSeo = /^LAUDO DO AGENTE DE SEO/.test(String(input.feedback || ''));   // ajuste só da matéria a pedido do SEO: não repete a revisão de copy do post, volta direto ao SEO
-    if (copyRevOn() && !deSeo) enqueue(c.id, 'revisorcopy', 'revcopy'); else depoisDaCopy(c, materia || c.materia);
+    if (copyRevOn(c) && !deSeo) enqueue(c.id, 'revisorcopy', 'revcopy'); else depoisDaCopy(c, materia || c.materia);
     return r;
   },
 
@@ -5536,7 +5552,7 @@ const HANDLERS = {
     const ok = v === 'aprovada', fim = ok || rodadas > MAX_SEO;
     setContent(c.id, { seo_review: JSON.stringify({ veredito: v, nota, laudo: r.text, rodadas, fim, ts: T() }) });
     brainEvent('roteirista', ok ? 'revisao_aprovada' : 'revisao_reprovada', c, `Agente de SEO: ${v} (matéria do site${nota ? ', nota ' + nota + '/5' : ''})`, String(r.text).slice(0, 1200));
-    if (fim) { log('seo', ok ? `Aprovou a matéria de "${c.title}"` : `A matéria de "${c.title}" ainda tem pendências de SEO após ${rodadas - 1} ajuste(s): segue com o laudo para você decidir`, c.id); enqueue(c.id, 'gerente', 'revisao'); }
+    if (fim) { log('seo', ok ? `Aprovou a matéria de "${c.title}"` : `A matéria de "${c.title}" ainda tem pendências de SEO após ${rodadas - 1} ajuste(s): segue com o laudo para você decidir`, c.id); revisaoOuSegue(c); }
     else { log('seo', `Devolveu a matéria de "${c.title}" (${v}) — rodada ${rodadas}/${MAX_SEO}`, c.id); enqueue(c.id, 'roteirista', 'roteiro', { feedback: `LAUDO DO AGENTE DE SEO (${v}) SOBRE A MATÉRIA DO SITE. Aplique só as correções obrigatórias na matéria e mantenha o post das redes como está. Entregue tudo de novo (post + "## MATÉRIA"):\n${r.text.slice(0, 4000)}` }); }
     return r;
   },
@@ -5934,7 +5950,8 @@ const HANDLERS = {
       createContent({
         title, format, kind, goal, brand, product_id: goal === 'produto' ? prod.id : null,
         platform: String(p.plataforma || input.platform || '').slice(0, 40),
-        brief: ((angulo ? `ÂNGULO (definido pelo Gerente): ${angulo}\n` : '') + String(p.briefing || '')).slice(0, 4000)
+        brief: ((angulo ? `ÂNGULO (definido pelo Gerente): ${angulo}\n` : '') + String(p.briefing || '')).slice(0, 4000),
+        destino_id: +input.destino_id || null
       }, job.origin === 'manual' ? 'manual' : 'autopilot');   // só o modo autônomo conta na meta diária
       if (left) left[format]--;
       made++;
@@ -6138,6 +6155,7 @@ function checkProduction(contentId) {
     setContent(c.id, { error: '' });
     // Treino do Designer: o dono revisa tudo, então a peça vai direto para a Mesa dele (sem a revisão automática do Revisor)
     if (c.created_by === 'treino_designer') { paraAprovacao(c.id, `Treino do Designer: "${c.title}" pronta para você revisar`); return; }
+    if (!agenteDoItem(c, 'gerente')) { paraAprovacao(c.id, `Entrega de "${c.title}" pronta (site do Atlas sem o Revisor): aguardando sua aprovação`); return; }
     enqueue(c.id, 'gerente', 'gerencia');
     log('gerente', `Entrega de "${c.title}" pronta — entrou na revisão do Revisor`, c.id);
   }
@@ -6237,6 +6255,7 @@ function createContent(f, createdBy = 'manual', runAt = null) {
   const r = run('INSERT INTO contents(title,format,kind,platform,brief,goal,product_id,brand,status,estilo_video,estilo_arte,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     f.title, f.format, f.kind, f.platform || '', f.brief || '', f.goal || '', f.product_id || null, f.brand || '', 'producing', f.format === 'video_vertical' ? (f.estilo_video === 'auto' || estiloVideo(String(f.estilo_video || ''))?.id || 'auto') : '', ['carrossel', 'feed', 'stories'].includes(f.format) ? (f.estilo_arte || '') : '', createdBy, T(), T());
   const id = +r.lastInsertRowid;
+  if (f.destino_id) atlasV?.vincular(id, f.destino_id);   // antes do Roteirista: os agentes do site valem desde a 1ª etapa
   enqueue(id, 'roteirista', 'roteiro', {}, 'auto', runAt);
   if (runAt) log(null, `"${f.title}" agendado para ${fmtQuando(runAt)}`, id);
   else log(createdBy === 'autopilot' ? 'roteirista' : null, `Novo conteúdo na fila: "${f.title}"`, id);
@@ -6773,6 +6792,7 @@ function contentAct(id, act, b = {}) {
       if (!pack) { pack = montarPacote(c); setContent(id, { pack: JSON.stringify(pack), caption: pack.legenda_final || c.caption }); log('publicador', `Pacote de postagem pronto: "${c.title}"`, id); }
       enviarWebhook(getContent(id), pack);
     }
+    atlasV?.depoisDeAprovar(id);
   } else if (act === 'approve_script') {
     if (!(c.status === 'awaiting_script' || (c.status === 'blocked' && !jaProduzida)) || !c.script) throw fail(400, 'Este roteiro não está esperando aprovação');
     const need = producaoDe(c);
@@ -6823,6 +6843,20 @@ function contentAct(id, act, b = {}) {
 }
 
 var ctxFluxo; const fluxoV2 = criarFluxoV2(ctxFluxo = { paraAgora: id => paraAgoraConteudo(id), agentesPausados: () => agentesPausados(), pump: () => setImmediate(pump), db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, isVideo, textoPuro, carregaBasesAgentes, enqueue: (...a) => enqueue(...a), settings: () => settings(), manual: () => MANUAL, path, fs, dirname: __dirname });
+atlasV = criarAtlas({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, settings: () => settings(), enqueue: (...a) => enqueue(...a), pump: () => setImmediate(pump),
+  fluxoAcao: (id, nome, b) => fluxoV2.acao(id, nome, b, null), extrair: (c, formato) => extrairArtigo(formato === 'materia' ? c.materia : c.script), capaDe: c => capaDoItem(c) });
+ctxFluxo.depoisDeAprovar = id => atlasV?.depoisDeAprovar(id);
+// Capa do post no site: a 1ª arte do Designer ou, na notícia, a foto da própria notícia
+function capaDoItem(c) {
+  try {
+    const f = c.art_status === 'ok' ? arteFiles(c.id)[0] : null;
+    if (f) return { buf: fs.readFileSync(path.join(ARTE_DIR(c.id), f)), tipo: 'image/png' };
+    const fr = one("SELECT foto_asset FROM radar_items WHERE content_id=? AND foto_asset<>'' ORDER BY id DESC LIMIT 1", c.id), a = fr ? assetDaMarca(c.brand, fr.foto_asset) : null;
+    const tipos = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+    if (a && tipos[a.ext]) return { buf: fs.readFileSync(assetPath(a)), tipo: tipos[a.ext] };
+  } catch (e) { console.error('capa do item:', e.message); }
+  return null;
+}
 
 async function api(req, res, url) {
   const p = url.pathname, m = req.method;
@@ -6897,6 +6931,7 @@ async function api(req, res, url) {
   }
   if (p === '/api/state' && m === 'GET') return send(res, 200, stateSnapshot());
 
+  if (p.startsWith('/api/v2/atlas/')) return atlasV.rota(req, res, p, m, user);
   if (p.startsWith('/api/v2/')) return fluxoV2.rota(req, res, p, m, user);
 
   // ── Conteúdos
