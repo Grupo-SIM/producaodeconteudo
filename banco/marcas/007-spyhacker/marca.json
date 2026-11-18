@@ -1,0 +1,21 @@
+{
+  "marca": "007 Spyhacker",
+  "mascotes": {
+    "mascote-spyhacker-notebook": {
+      "nome": "Spyhacker",
+      "resumo": "Hacker espião misterioso, de rosto sempre escondido, que protege e entende de tecnologia.",
+      "corpo": "Adulto, corpo atlético e alongado, proporção realista.",
+      "rosto": "Nunca aparece: máscara preta lisa cobrindo o rosto inteiro e óculos escuros com brilho ciano neon.",
+      "pele_cabelo": "Sem pele ou cabelo à mostra (luvas pretas, máscara).",
+      "roupa": "Chapéu fedora preto com aba de contorno ciano; sobretudo longo de couro preto; moletom preto com capuz; calça preta; tênis de cano alto pretos com sola ciano.",
+      "acessorios": "Colar com cadeado ciano neon brilhando no peito; relógio no pulso; notebook preto; às vezes mochila tática, copo térmico, celular e livros.",
+      "cores": "Preto #000000 como base; ciano neon #19d9f0 só nos brilhos (óculos, cadeado, contornos, sola).",
+      "estilo": "Render realista escuro, tudo preto com luz de contorno ciano neon, fundo recortado.",
+      "personalidade": "Calmo, sério, discreto, confiante; observa e resolve sem alarde.",
+      "poses_ok": "Sentado na cadeira gamer com o notebook, pensando com a mão na aba do chapéu; em pé apontando, segurando o notebook ou o celular; de braços cruzados.",
+      "nunca": "Nunca mostrar o rosto, a pele ou o cabelo; nunca trocar o chapéu fedora, o sobretudo ou o cadeado ciano; nunca usar outra cor de brilho que não seja ciano; nunca deixar colorido ou cartoon fofo.",
+      "uso": "Capa e CTA dos posts do 007 Spyhacker (segurança, hospedagem, Atlas Hosting), em fundos escuros; grande, saindo pela borda de baixo ou ao lado do título.",
+      "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "marca": "Marketing Raiz",
+  "mascotes": {
+    "mascote-raiz-rei": {
+      "nome": "Rei do Marketing Raiz",
+      "resumo": "Estrategista com cabeça e tronco de rei do xadrez, preto e dourado: quem joga o jogo do mercado.",
+      "corpo": "Adulto, corpo realista; o tronco e a cabeça são a peça do rei do xadrez, preta com anéis dourados.",
+      "rosto": "Não tem rosto: o topo da peça é a coroa dourada com cruz; na frente da coroa, o símbolo dourado da marca (gráfico com circuitos).",
+      "pele_cabelo": "Sem pele ou cabelo à mostra (luvas pretas).",
+      "roupa": "Sobretudo longo de couro preto com forro dourado e gola alta; calça preta; sapatos pretos com detalhes dourados e a coroa dourada na lateral.",
+      "acessorios": "Relógio dourado; celular preto numa mão e notebook prata debaixo do braço.",
+      "cores": "Preto #000000 como base; dourado #c9962e na coroa, nos anéis, no forro e nos detalhes.",
+      "estilo": "Render realista, preto brilhante com luz dourada quente, fundo recortado.",
+      "personalidade": "Estratégico, elegante, poderoso, focado em resultado.",
+      "poses_ok": "Andando olhando o celular com o notebook debaixo do braço; em pé de frente; apontando; de braços cruzados.",
+      "nunca": "Nunca trocar a peça do rei por um rosto; nunca tirar a coroa nem o símbolo da marca; nunca usar outra cor de destaque que não seja o dourado.",
+      "uso": "Capa e CTA dos posts do Marketing Raiz, em fundos escuros; combina com o template 10 · Xadrez.",
+      "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
+    }
+  }
+}
