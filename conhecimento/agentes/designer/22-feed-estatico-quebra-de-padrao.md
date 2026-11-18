@@ -75,3 +75,8 @@ Mascote = o único personagem (ficha 19). Corte dos Ricos não tem mascote: usa 
 - Como gerar: edição em cima da própria referência (fal-ai/flux-pro/kontext/max/multi com [referência, PNG oficial do mascote]): "troque a pessoa pelo personagem da 2ª imagem, mesma pose, mesmo tamanho e posição; tire todos os textos". Gerar do zero não acerta a escala.
 - Sem microtextos de marca ("Central do Marketing · ..."): não polui. Texto = título + apoio curto + "Leia a legenda ↓".
 - Mascote grande: na ref. A ele ocupa a metade de baixo inteira e é cortado pela borda.
+
+## APROVADOS pelo dono (18/11/2026)
+Arte final, referência e layout em `banco/tpl-estatico/` (falta virar template no sistema).
+- **14 · Palavra gigante + mascote** (`aprovado-14-palavra-gigante-central.png`): fundo #ECEBEA; palavra gigante Anton 470px preta, topo 150px; mascote recortado NA FRENTE da palavra, entrando pela parte de baixo dela (cabeça nunca atrás do texto) e cortado pela borda de baixo, na MESMA pose da referência (gerada com kontext/max/multi [referência, mascote]); palavra manuscrita Caveat 700 190px na cor da marca, -9°, com sombra dura preta; subtítulo 30px caixa alta à direita na altura do ombro (não desce com o mascote); botão "Leia a legenda ↓" na cor da marca, canto de baixo à direita. Sem microtextos.
+- **15 · Escala absurda** (`aprovado-15-escala-absurda-spy.png`): a cena é a referência editada (pessoa → mascote, objeto na cor da marca, sem textos); título Montserrat 900 250px no topo; o texto de apoio fica EMBAIXO, logo acima do botão (primeiro o título e a arte, depois a mensagem); botão preto "Leia a legenda ↓" centralizado.
