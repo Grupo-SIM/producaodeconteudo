@@ -12,7 +12,7 @@ Segredos, dicas, verdades ou erros de marketing, tráfego e tecnologia, em lista
    - A caneta digital cruza para a página seguinte.
    - O computador com a barra de ferramentas cruza da penúltima página para o fim.
    - Copy maior repete o miolo, alternando os fundos 2 e 3.
-3. **Fim (`espaco-fim`):** "Gostou do conteúdo?", o texto "compartilhe com os amigos!", os ícones ciano (curtir, comentar, enviar, salvar) e a pílula do CTA (ex.: "Quero orçamento").
+3. **Fim (`espaco-fim`):** "Gostou do conteúdo?", o texto "compartilhe com os amigos!" e a pílula do CTA (ex.: "Quero orçamento").
 
 ## Visual fixo
 - Ciano `#12c9de`, azul-escuro `#04222b`.
@@ -22,3 +22,5 @@ Segredos, dicas, verdades ou erros de marketing, tráfego e tecnologia, em lista
 
 ## Ajustes do dono
 - Saiu a pílula "Segredos do MKT" com o círculo da seta no topo do miolo.
+- Saíram os ícones de curtir, comentar, enviar e salvar do fim (testado com copy real no 007 Spyhacker).
+- Primeiro teste com copy real aprovado: copy nº 6 ("site fora do ar") no 007 Spyhacker, com Rajdhani e a logo da marca.

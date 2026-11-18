@@ -304,7 +304,7 @@ export const MODELOS = [
   { id: 'colagem-fim', nome: '12 · Colagem: fim', uso: 'última página', desc: 'Pergunta roxa, lista pink com ícones (curta, comente, salve, compartilhe), mão de joinha e linha de CTA/contato da marca.', campos: ['titulo', 'itens', 'cta', 'texto'] },
   { id: 'espaco-capa', nome: '13 · Espaço: capa', uso: 'capa de carrossel', desc: 'Template aprovado (espaço azul neon): astronauta segurando o tablet; título preto na tela com a última linha gigante (ex.: “4 segredos de marketing|que ninguém te|conta!”), botão ciano “Arraste para o lado” com a seta e a barra de ferramentas no canto.', campos: ['titulo', 'cta'] },
   { id: 'espaco-par', nome: '13 · Espaço: miolo', uso: 'página interna', desc: '2 itens por página: seta, “01.” branco + título ciano em caixa alta e texto curto com *negrito*. A caneta digital cruza para a página seguinte e o computador com a barra de ferramentas cruza da penúltima para o fim.', campos: ['itens', 'n'] },
-  { id: 'espaco-fim', nome: '13 · Espaço: fim', uso: 'última página', desc: '“Gostou do conteúdo?” branco, “compartilhe com os amigos!”, ícones ciano (curtir, comentar, enviar, salvar) e pílula ciano do CTA (ex.: “Quero orçamento”).', campos: ['titulo', 'texto', 'cta'] },
+  { id: 'espaco-fim', nome: '13 · Espaço: fim', uso: 'última página', desc: '“Gostou do conteúdo?” branco, “compartilhe com os amigos!”, pílula ciano do CTA (sem ícones de curtir/compartilhar, decisão do dono) (ex.: “Quero orçamento”).', campos: ['titulo', 'texto', 'cta'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -805,7 +805,6 @@ COMPOR_EXTRA['espaco-fim'] = (d, ctx) => {
   B.push({ h: tl.length * 86, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y + 43 + i * 86), align: 'center', size: e.P(84), font: tf.k, weight: tf.w, ls: -.03, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
   const af = fX(400, -.01), al = erQuebra(d.texto || d.apoio || 'compartilhe|com os amigos!', af, 38, 640).slice(0, 5);
   B.push({ h: al.length * 46, gap: 20, make: y => { al.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(cx), y: e.Y(y + 23 + i * 46), align: 'center', size: e.P(38), font: af.k, weight: af.w, ls: -.01, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
-  B.push({ h: 40, gap: 44, make: y => { ['coracao', 'comentario', 'enviar', 'salvar'].forEach((ic, q) => s.shapes.push({ kind: 'icon', icon: ic, icon_color: EP.ciano, x: e.X(cx + (q - 1.5) * 64), y: e.Y(y + 20), w: e.X(38), h: e.Y(38) })); return []; } });
   const ct = String(d.cta || 'Quero orçamento').toUpperCase(), cf = fX(700, .02), cw = Math.max(300, largura(ct, cf, 24) + 90);
   B.push({ h: 68, gap: 48, make: y => { s.shapes.push({ kind: 'pill', x: e.X(cx), y: e.Y(y + 34), w: e.X(cw), h: e.Y(68), color: EP.ciano }); s.texts.push({ role: 'title', value: ct, x: e.X(cx), y: e.Y(y + 34), align: 'center', size: e.P(24), font: cf.k, weight: cf.w, ls: .02, lh: 1, color: EP.navy, nowrap: true, shadow: false }); return []; } });
   pilha(B, 600, ctx);
