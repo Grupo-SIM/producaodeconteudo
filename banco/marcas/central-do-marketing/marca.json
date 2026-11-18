@@ -29,6 +29,18 @@
     "logo-central-escura": {},
     "logo-central-preta": {
       "mono": "preta"
+    },
+    "logo-central-faixa-preta-fundo-branco": {
+      "faixa": "preta em fundo branco"
+    },
+    "logo-central-faixa-branca-fundo-preto": {
+      "faixa": "branca em fundo preto"
+    },
+    "logo-central-faixa-verde-fundo-branco": {
+      "faixa": "verde em fundo branco"
+    },
+    "logo-central-faixa-verde-fundo-preto": {
+      "faixa": "verde em fundo preto"
     }
   }
 }
