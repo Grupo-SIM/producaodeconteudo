@@ -20,6 +20,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 14/11/2026 · Teste 37 (Zyrion): foto de fundo sem letras/números; foto chocante e ligada ao assunto; capa até 100 caracteres e contracapa até 130, texto maior volta para o Copy encurtar; no editor, o fundo pode ser apagado (clique no fundo + Delete ou botão).
 - 14/11/2026 · Feed jornalístico: referências Zyrion (capa dividida, foto + círculo, foto única; contracapa com cartão de post do X) e Nuvo. Base `09-feed-jornalistico.md`; fotos de banco em alta, vivas; preto e branco em notícia triste.
 - 18/11/2026 · Carrossel: 13 referências de arte salvas (R01 a R13 em `conhecimento/agentes/designer/referencias-carrossel/`, ficha em `10-carrossel-referencias-de-arte.md`). Só arte; a copy já foi treinada. Novos arquivos do dono entram como R14 em diante.
+- 18/11/2026 · Carrossel: primeiro template aprovado, **7 · Lista de erros** (réplica do kit editorial P&B + ajustes do dono: sem pílula de @ e barra de busca no topo, sem rodapé de contato, arraste só na capa, caixa do último slide vira o CTA com botão). Ficha: `conhecimento/agentes/designer/11-carrossel-template-lista-de-erros.md`. Próximo: replicar o próximo kit igual e ajustar.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Onde paramos (14/11/2026, para a próxima conversa)

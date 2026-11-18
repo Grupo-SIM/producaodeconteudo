@@ -2589,10 +2589,12 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'noticia', papel: 'capa', opcoes: { estilo: 'nuvo' } }, { modelo: 'post-card', papel: 'fim' }] },
   { id: 'noticia', oculto: true, nome: 'Notícia / novidade do mercado', nivel: 'robusto', formatos: ['carrossel', 'feed', 'stories'], uso: 'Notícia, novidade, lançamento, mudança de regra ou acontecimento que o público precisa saber agora: manchete forte na capa, o que aconteceu, o que muda para quem segue, e a chamada para acompanhar.',
     seq: [{ modelo: 'capa-faixa', papel: 'capa' }, { modelo: 'texto', foto: true }, { modelo: 'texto', repetir: true }, { modelo: 'frase' }, { modelo: 'cta', papel: 'fim' }] },
+  { id: 'lista-erros', nome: '7 · Lista de erros (editorial P&B)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de lista ("7 erros que...", "5 sinais de..."): réplica aprovada do kit editorial P&B. Capa com número pincelado, título serifado magenta e apoio condensado; miolo com 2 itens por página (rótulo “ERRO N :”, título colorido com ✓✓ e explicação curta com trecho _sublinhado_); última página com o último item e a caixa magenta da chamada com botão. Fundos, cores e fontes fixos do template; só o texto muda. Botão de arraste só na capa (decisão do dono). Título de item até 30 caracteres e explicação até 3 linhas curtas.',
+    seq: [{ modelo: 'erros-capa', papel: 'capa' }, { modelo: 'erros-par', repetir: true }, { modelo: 'erros-fim', papel: 'fim' }] },
   { id: 'stories-sequencia', oculto: true, nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }
 ];
-const TEMA_CASA = { mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
+const TEMA_CASA = { 'lista-erros': 'lista', mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
 for (const t of TEMPLATES_CASA) t.tema = TEMA_CASA[t.id] || 'geral';
 const TEMAS = { educativo: 'Educativo', lista: 'Lista', tutorial: 'Tutorial', oferta: 'Oferta', noticia: 'Notícia', opiniao: 'Opinião', geral: 'Geral' };
 db.exec(`CREATE TABLE IF NOT EXISTS art_templates(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, uso TEXT DEFAULT '', nivel TEXT DEFAULT 'simples', formatos TEXT DEFAULT '["carrossel"]', seq TEXT NOT NULL, exemplo TEXT DEFAULT '', brand TEXT DEFAULT '', usos INTEGER DEFAULT 0, created_at TEXT NOT NULL)`);
@@ -3119,7 +3121,7 @@ function templatesBloco(c, escolhidoId = '') {
   const fmt = ['feed', 'carrossel', 'stories'].includes(c.format) ? c.format : null; if (!fmt) return '';
   const lcb = String(c.brand || '').toLowerCase(), daMarca = t => (!!c.brand && mesmaMarca(t.brand, c.brand)) || (t.visual_marcas || []).some(m => String(m).toLowerCase() === lcb), L = templatesDaMarca(c.brand).filter(t => t.formatos.includes(fmt)).sort((a, b) => daMarca(b) - daMarca(a)), masc = mascotesDe(c.brand), padrao = estiloPadrao(c.brand, fmt), temaC = temaDoConteudo(c);
   if (!L.length) return '';
-  const nomeM = { heroi: 'capa herói', revista: 'capa revista', 'capa-faixa': 'capa com faixas', 'capa-minimal': 'capa minimalista', dividido: 'título partido', texto: 'texto', numero: 'número', lista: 'lista', frase: 'frase', pilulas: 'pílulas', cta: 'chamada final', noticia: 'capa de jornal', 'post-card': 'cartão de notícia' };
+  const nomeM = { 'erros-capa': 'capa da lista de erros', 'erros-par': 'dois itens da lista de erros', 'erros-fim': 'fim da lista de erros', heroi: 'capa herói', revista: 'capa revista', 'capa-faixa': 'capa com faixas', 'capa-minimal': 'capa minimalista', dividido: 'título partido', texto: 'texto', numero: 'número', lista: 'lista', frase: 'frase', pilulas: 'pílulas', cta: 'chamada final', noticia: 'capa de jornal', 'post-card': 'cartão de notícia' };
   return `\n\n# TEMPLATES DE ARTE (escolha UM pela copy)
 Leia o roteiro e escolha o template cujo tema e "quando usar" mais combinam com o conteúdo. Cada marca tem seus estilos (notícia, carrossel educativo, oferta, tutorial…): os marcados com "visual da marca" já foram ajustados pelo dono para esta marca, então prefira-os quando o tema bater. Coloque "template":"id" no JSON e escreva as páginas NA ORDEM da estrutura (o modelo de cada página pode ficar de fora: o painel completa pelo template, inclusive o mascote e o fundo claro). Simples = conteúdo direto e rápido de ler; robusto = capa de impacto e mais mídia.
 ${escolhidoId && templateDe(escolhidoId) ? `O DONO ESCOLHEU o template "${escolhidoId}" (${templateDe(escolhidoId).nome}) para esta peça: use exatamente "template":"${escolhidoId}".\n` : ''}${temaC ? `O painel leu o roteiro como tema "${TEMAS[temaC]}": ${L.filter(t => t.tema === temaC).map(t => t.id).join(', ') || 'nenhum estilo deste tema neste formato'}.\n` : ''}${padrao ? `Estilo padrão desta marca: ${padrao}.\n` : ''}${L.map(t => `- ${t.id} — ${t.nome}${daMarca(t) ? ' [visual da marca]' : ''} · tema ${TEMAS[t.tema] || 'Geral'} (${t.nivel}). Quando usar: ${t.uso || 'livre'}. Estrutura: ${t.seq.map(x => (nomeM[x.modelo] || x.modelo) + (x.mascote ? ' + mascote' : '') + (x.foto ? ' + foto' : '') + (x.fundo === 'claro' ? ' (claro)' : '') + (x.repetir ? ' (repete)' : '')).join(' → ')}`).join('\n')}
@@ -4639,6 +4641,17 @@ for (const nome of ['foto-padrao-1', 'foto-padrao-2', 'avatar-padrao']) {
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   } catch (e) { console.error('foto padrão', nome, e.message); }
 }
+// peças do template de carrossel "7 · Lista de erros" (aprovado pelo dono em 18/11/2026): fundos da faixa contínua e elementos recortados da arte original
+try {
+  const dir = path.join(__dirname, 'banco', 'tpl-erros');
+  for (const arqN of fs.existsSync(dir) ? fs.readdirSync(dir).sort() : []) {
+    const m = arqN.match(/^(tpl-erros-[a-z0-9-]+)\.(png|jpg)$/); if (!m || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", m[1])) continue;
+    const [, nome, ext] = m, buf = fs.readFileSync(path.join(dir, arqN)), fundo = nome.includes('fundo');
+    const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, fundo ? 'fundo' : 'outro', 'template, carrossel, lista de erros', 'Peça do template de carrossel “7 · Lista de erros”. Não apague.', '', arqN, ext, buf.length, 'Templates/Lista de erros', T());
+    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+    const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+  }
+} catch (e) { console.error('template lista de erros', e.message); }
 // Capa da Central: o "Templete 01 Central" tinha a capa com ajustes soltos (título centralizado, apoio fixo) que bagunçavam conforme o texto. Passa a usar o modelo "capa-mascote", réplica da arte aprovada (título à esquerda, apoio, mascote grande à direita)
 if (!db.prepare("SELECT 1 x FROM settings WHERE key='capa_mascote_v4'").get()) {
   try {

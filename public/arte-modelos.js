@@ -284,6 +284,9 @@ export const MODELOS = [
   { id: 'agencia-cards', nome: 'Agência: dois cartões', uso: 'página interna', desc: 'Dois cartões de contorno arredondado na cor da marca: o primeiro com a frase de abertura e seta, o segundo com a virada em branco e o apoio fino; objeto 3D ao lado.', campos: ['titulo', 'apoio', 'texto', 'nota', 'objeto', 'icone'] },
   { id: 'agencia-lista', nome: 'Agência: lista em caixas', uso: 'página interna', desc: 'Título com ícone, até 4 caixas de contorno com os pontos, pergunta de fechamento com trecho entre aspas, linha de chamada na cor da marca e três avatares.', campos: ['titulo', 'itens', 'texto', 'apoio', 'icone'] },
   { id: 'agencia-cta', nome: 'Agência: chamada final', uso: 'última página', desc: 'Pergunta de venda com palavras em destaque, linha de convite, três avatares redondos e objeto 3D saindo pelo canto de baixo.', campos: ['titulo', 'apoio', 'objeto', 'icone'] },
+  { id: 'erros-capa', nome: '7 · Lista de erros: capa', uso: 'capa de carrossel', desc: 'Template aprovado (editorial P&B): fundo branco com foto vintage recortada e raízes, número pincelado magenta com círculo à mão, título serifado magenta em 2 linhas, apoio condensado cinza com trecho sublinhado e botão magenta “Arraste para o lado”.', campos: ['numero', 'titulo', 'apoio', 'cta'] },
+  { id: 'erros-par', nome: '7 · Lista de erros: dois itens', uso: 'página interna', desc: 'Dois itens em zigue-zague: rótulo “ERRO N :” em pincel com mãozinha, título condensado colorido com ✓✓ e explicação de 2 ou 3 linhas com trechos _sublinhados_. A numeração segue a página sozinha. Sem botão de arraste.', campos: ['itens', 'n'] },
+  { id: 'erros-fim', nome: '7 · Lista de erros: último item e chamada', uso: 'última página', desc: 'Último item da lista (opcional) e caixa de contorno magenta com o fechamento, a frase de apoio com foguete e o botão arredondado do CTA.', campos: ['itens', 'titulo', 'texto', 'cta', 'n'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -427,7 +430,86 @@ function agencia(d, ctx, tipo) {
   }
   return s;
 }
+// ───────── Template "7 · Lista de erros" (réplica aprovada do kit editorial P&B, 18/11/2026) ─────────
+// Faixa contínua de 5 fundos (fotos vintage e raízes já postas), magenta + verde-água fixos, Barlow Condensed e DM Serif Display.
+// Texto: "|" quebra a linha; _trecho_ sai sublinhado. Medidas em px de 1080×1350, iguais às da arte original.
+const ER = { mag: '#f41ae2', verde: '#2ed1b4', tinta: '#3a3a3a', linha: '#222222' };
+const ER_F = { tit: { k: 'barlow', w: 500, ls: -.022 }, txt: { k: 'barlow', w: 500, ls: -.009 } };
+const erEsc = (ctx, W, H) => { const k = W / 1080; return { k, X: v => F2(v * k / W), Y: v => F2(v * k / H), P: v => Math.round(v * k) }; };
+// uma linha com trechos sublinhados (_assim_): cada trecho vira um texto posicionado pela largura real da fonte
+function erLinha(out, linha, x, yc, size, f, color, e, extra = {}) {
+  let cx = x;
+  for (const [i, seg] of String(linha).split('_').entries()) {
+    if (!seg) continue;
+    const w = largura(seg, f, size);
+    out.push({ role: 'body', value: seg.replace(/^ | $/g, '\u00a0'), x: e.X(cx), y: e.Y(yc), align: 'left', size: e.P(size), font: f.k, weight: f.w, ls: f.ls, lh: 1, color, nowrap: true, shadow: false, ...(i % 2 ? { deco: 'sub' } : {}), ...extra });
+    cx += w;
+  }
+}
+// quebra o texto (sem "|") na largura do bloco; com "|", respeita as quebras do Copy
+const erQuebra = (txt, f, size, maxW) => String(txt || '').includes('|') ? String(txt).split('|').map(s => s.trim()).filter(Boolean) : quebra(String(txt || '').replace(/_/g, '\u0002'), f, size, maxW).map(l => l.replace(/\u0002/g, '_'));
+const erFix = ls => { let ab = false; return ls.map(l => { const n = (l.match(/_/g) || []).length; const r = (ab ? '_' : '') + l + ((ab ? n + 1 : n) % 2 ? '_' : ''); if (n % 2) ab = !ab; return r.replace(/__/g, ''); }); };   // sublinhado que atravessa a quebra continua na linha de baixo
+// um item: rótulo "ERRO N :" (pincel), mãozinha, título colorido com ✓✓ e explicação com sublinhados
+function erItem(s, ctx, e, n, it, x, y, cor, maxT) {
+  const W = 1080, tz = 58, tf = ER_F.tit, bz = 35, bf = ER_F.txt, chk = cor === 'mag' ? 'tpl-erros-check-verde' : 'tpl-erros-check-magenta';
+  if (n >= 1 && n <= 7) s.items.push({ asset: 'tpl-erros-rotulo-' + n, x: e.X(x - 5 + 100), y: e.Y(y + 27), size: e.P(200) });
+  else s.texts.push({ role: 'label', value: `Erro ${n} :`, x: e.X(x), y: e.Y(y + 28), align: 'left', size: e.P(50), font: 'marker', weight: 400, color: '#4a4a4a', nowrap: true, shadow: false });
+  s.items.push({ asset: 'tpl-erros-mao', x: e.X(x - 33), y: e.Y(y + 27), size: e.P(50) });
+  const tl = quebra(limpa(it.t || ''), tf, tz, maxT || W - x - 150), y0 = y + 65;
+  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x + 5), y: e.Y(y0 + 29 + i * 62), align: 'left', size: e.P(tz), font: tf.k, weight: tf.w, ls: tf.ls, lh: 1, color: ER[cor], nowrap: true, shadow: false }));
+  const ul = tl[tl.length - 1] || ''; s.items.push({ asset: chk, x: e.X(x + 5 + largura(ul, tf, tz) + 12 + 27), y: e.Y(y0 + 32 + (tl.length - 1) * 62), size: e.P(54) });
+  const yb = y0 + tl.length * 62 + 11, bl = erFix(erQuebra(it.d, bf, bz, W - x - 140));
+  bl.forEach((l, i) => erLinha(s.texts, l, x + 10, yb + 21 + i * 43, bz, bf, ER.tinta, e));
+  return yb + bl.length * 43;
+}
+const erItens = d => (Array.isArray(d.itens) ? d.itens : []).map(x => typeof x === 'string' ? { t: x, d: '' } : { t: x.t || x.titulo || '', d: x.d || x.texto || '' }).filter(x => x.t);
+const erBase = (ctx, k) => ({ bg: { asset: 'tpl-erros-fundo-' + k, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
+// botão retangular magenta "Arraste para o lado ⟶" (só na capa) e botão arredondado da caixa de CTA
+function erBotao(s, e, x, y, w, h, txt, { pill = false, fz = 24 } = {}) {
+  s.shapes.push({ kind: 'rect', x: e.X(x + w / 2), y: e.Y(y + h / 2), w: e.X(w), h: e.Y(h), radius: pill ? .5 : .06, color: ER.mag, stroke: ER.linha, stroke_w: 1.5 / 1080 });
+  const fb = { k: 'barlow', w: 700, ls: 0 }, fr = { k: 'barlow', w: 500, ls: 0 }, m = String(txt || '').match(/^(\S+)(\s.*)?$/) || ['', txt, ''], a = m[1] || '', b = m[2] || '';
+  const tw = largura(a, fb, fz) + largura(b, fr, fz), ax = pill ? x + (w - tw - fz * 1.6) / 2 : x + 30, cy = y + h / 2;
+  s.texts.push({ role: 'title', value: a, x: e.X(ax), y: e.Y(cy), align: 'left', size: e.P(fz), font: 'barlow', weight: 700, color: '#ffffff', nowrap: true, shadow: false });
+  if (b) s.texts.push({ role: 'title', value: b.replace(/^ /, '\u00a0'), x: e.X(ax + largura(a, fb, fz)), y: e.Y(cy), align: 'left', size: e.P(fz), font: 'barlow', weight: 500, color: '#ffffff', nowrap: true, shadow: false });
+  const az = fz * 1.5; s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(pill ? ax + tw + fz * .5 + az / 2 : x + w - 14 - az / 2), y: e.Y(cy), w: e.X(az), h: e.Y(az), icon_color: '#111111' });
+}
+// posições dos dois itens em cada fundo do miolo (onde as fotos deixam espaço), iguais à arte original
+const ER_POS = { 2: [[250, 388, 'mag'], [366, 775, 'mag']], 3: [[193, 388, 'verde'], [308, 775, 'verde']], 4: [[128, 388, 'mag'], [243, 775, 'mag']] };
+const erNum = (d, ctx, j) => +d.n > 0 ? +d.n + j : Math.max(0, (ctx.i || 0) - 1) * 2 + 1 + j;
+
 const COMPOR = {
+  'erros-capa'(d, ctx) {
+    const e = erEsc(ctx, ctx.W, ctx.H), s = erBase(ctx, 1), num = String(d.numero || '7').trim().slice(0, 2);
+    if (num === '7') s.items.push({ asset: 'tpl-erros-sete', x: e.X(225), y: e.Y(508), size: e.P(240) });
+    else { s.texts.push({ role: 'number', value: num, x: e.X(225), y: e.Y(500), align: 'center', size: e.P(num.length > 1 ? 200 : 260), font: 'marker', weight: 400, color: ER.mag, nowrap: true, shadow: false }); s.shapes.push({ kind: 'ring', x: e.X(225), y: e.Y(500), w: e.X(230), h: e.Y(195), color: '#1a1a1a', stroke_w: 4 / 1080, rot: -12 }); }
+    const tl = String(d.titulo || 'Erros|comuns').split('|').map(x => x.trim()).filter(Boolean).slice(0, 2), sf = { k: 'dmserif', w: 400, ls: -.017 };
+    const tz = Math.min(118, ...tl.map(l => 118 * 400 / Math.max(400, largura(l, sf, 118))));
+    tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(338), y: e.Y(405 + 49 + i * 98), align: 'left', size: e.P(tz), font: 'dmserif', weight: 400, ls: -.017, lh: 1, color: ER.mag, nowrap: true, shadow: false }));
+    const af = { k: 'barlow', w: 500, ls: -.022 }, al = erFix(String(d.apoio || 'que _prejudicam_|sua marca|no digital').split('|').map(x => x.trim()).filter(Boolean).slice(0, 4));
+    const az = Math.min(74, ...al.map(l => 74 * 390 / Math.max(390, largura(l.replace(/_/g, ''), af, 74))));
+    al.forEach((l, i) => erLinha(s.texts, l, 338, 588 + 37 + i * 73, az, af, ER.tinta, e));
+    erBotao(s, e, 329, 881, 284, 68, d.cta || 'Arraste para o lado');
+    return s;
+  },
+  'erros-par'(d, ctx) {
+    const e = erEsc(ctx, ctx.W, ctx.H), k = 2 + ((Math.max(1, ctx.i || 1) - 1) % 3), s = erBase(ctx, k), it = erItens(d).slice(0, 2);
+    it.forEach((x, j) => { const [px, py, cor] = ER_POS[k][j]; erItem(s, ctx, e, erNum(d, ctx, j), x, px, py, cor); });
+    return s;
+  },
+  'erros-fim'(d, ctx) {
+    const e = erEsc(ctx, ctx.W, ctx.H), s = erBase(ctx, 5), it = erItens(d)[0]; let yCx = 766;
+    if (it) { const fim = erItem(s, ctx, e, erNum(d, ctx, 0), it, 155, 384, 'verde', 520); yCx = Math.max(700, fim + 100); } else yCx = 520;
+    const bx = 160, bw = 565, tf = { k: 'barlow', w: 500, ls: -.022 }, tl = erQuebra(d.titulo || 'Evite esses erros e conquiste|o mercado!', tf, 50, bw - 82).slice(0, 3);
+    const nf = { k: 'barlow', w: 500, ls: -.022 }, nl = erFix(erQuebra(d.texto || '_Sua marca merece ser vista e lembrada._|Fale com a gente e receba uma|solução personalizada.', nf, 27, bw - 140)).slice(0, 4);
+    const hCaixa = 18 + tl.length * 50 + 20 + nl.length * 34 + 28 + 82 + 40;
+    s.shapes.push({ kind: 'rect', x: e.X(bx + bw / 2), y: e.Y(yCx + hCaixa / 2), w: e.X(bw), h: e.Y(hCaixa), radius: 34 / hCaixa, color: 'transparent', stroke: ER.mag, stroke_w: 1.5 / 1080 });
+    tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(bx + 41), y: e.Y(yCx + 18 + 25 + i * 50), align: 'left', size: e.P(50), font: 'barlow', weight: 500, ls: -.022, lh: 1, color: ER.tinta, nowrap: true, shadow: false }));
+    const yn = yCx + 18 + tl.length * 50 + 20;
+    s.items.push({ asset: 'tpl-erros-foguete', x: e.X(bx + 68), y: e.Y(yn + nl.length * 17), size: e.P(55) });
+    nl.forEach((l, i) => erLinha(s.texts, l, bx + 102, yn + 17 + i * 34, 27, nf, i ? '#555555' : '#333333', e));
+    erBotao(s, e, bx + 41, yn + nl.length * 34 + 28, 484, 82, d.cta || 'Chame no direct', { pill: true, fz: 32 });
+    return s;
+  },
   heroi(d, ctx) {
     const { W, H, mx, T } = ctx, foto = genOuAsset(d.foto), obj = !foto && genOuAsset(d.objeto), s = base(ctx, ctx.paper), mol = moldura(ctx, d, ctx.paper);
     const larga = !foto && !obj && String(d.titulo || '').split(/\s+/).length > 5;   // sem imagem e título longo: o texto ocupa a largura e o ladrilho fica só no fundo
