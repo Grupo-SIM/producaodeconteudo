@@ -643,7 +643,7 @@ function desviaDoTexto(s, ctx) {
     if (!bate()) continue;
     const topo = Math.min(...alvo.map(c => c[1])), base = Math.max(...alvo.map(c => c[3])), b = bx();
     const desce = base + folga - b[1], sobe = b[3] - (topo - folga);   // quanto andar para ficar todo abaixo ou todo acima do bloco de texto
-    const y0 = it.y; it.y = +(y0 + (desce <= sobe ? desce : -sobe)).toFixed(4);
+    const y0 = it.y; if (it.desvia === 'baixo') { it.y = +(y0 + desce).toFixed(4); continue; } it.y = +(y0 + (desce <= sobe ? desce : -sobe)).toFixed(4);
     if (bate()) it.y = +(y0 + (desce <= sobe ? -sobe : desce)).toFixed(4);
   }
   return s;
@@ -659,8 +659,8 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto, quando a copy pede
   else s.items.unshift({ asset: 'tpl-xadrez-foto-capa', x: F2(fx(650) / 1080), y: F2(fy(215) / 1350), size: Math.round(fy(1300)) });   // padrão aprovado pelo dono: a foto da arte original (Coringa)
   { const dy = 70 / 1350; for (const o of [...s.texts, ...s.shapes]) o.y = F2(o.y + dy); const f0 = s.items[0]; if (f0?.asset === 'tpl-xadrez-foto-capa') { const h0 = fy(430), k = (h0 + 70) / h0; f0.size = Math.round(f0.size * k); f0.y = F2(((h0 + 70) / 2) / 1350); } else if (f0) f0.y = F2(f0.y + dy); }   // ajuste do dono: foto, título e botão um pouco mais para baixo
-  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(105 / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true, desvia: true });   // peça pequena inteira dentro da página
-  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true, desvia: true });
+  // rei pequeno da esquerda saiu (dono, 18/11/2026): só o rei grande, cruzando para a página 2
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true, desvia: 'baixo' });   // desce, nunca sobe: em cima compete com a foto
   return desviaDoTexto(s, ctx);
 };
 COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {   // __z 1.3: texto 30% maior que o do Fogo (decisão do dono, 18/11/2026)
@@ -1309,7 +1309,7 @@ const COR_TPL = {
   erros: { cor: '#f41ae2', apoio: ['#2ed1b4'], pref: 'tpl-erros-', fundo: true, pecas: true },
   fogo: { cor: '#e3243b', pref: 'tpl-fogo-', fundo: false, pecas: false },
   idv: { cor: '#7b43e2', apoio: ['#d6b8ff', '#4a2a8a'], pref: 'tpl-idv-', fundo: true, pecas: true },
-  xadrez: { cor: '#e5b93a', apoio: ['#b8901c'], pref: 'tpl-xadrez-', fundo: true, pecas: false },
+  xadrez: { cor: '#e5b93a', pref: 'tpl-xadrez-', fundo: false, pecas: false, leitura: true },   // leitura igual à referência (dono, 18/11/2026): fundo e texto do miolo não mudam por marca
   clientes: { cor: '#2ee84a', pref: 'tpl-clientes-', fundo: true, pecas: true },
   colagem: { cor: '#ff1493', apoio: ['#45125c', '#3cff3c', '#ffe14d'], pref: 'tpl-colagem-', fundo: true, pecas: true }
 };
@@ -1324,6 +1324,7 @@ function giraHex(h, graus, cinza) {
 }
 function trocaCor(out, modelo, alvo) {
   const t = COR_TPL[modelo.split('-')[0]]; if (!t || !/^#[0-9a-f]{6}$/i.test(alvo)) return;
+  if (t.leitura && !/-(capa|fim)$/.test(modelo)) return;   // páginas de leitura ficam como a referência
   const [r0, g0, b0] = rgb(alvo), semCor = Math.max(r0, g0, b0) - Math.min(r0, g0, b0) < 30;
   if (semCor) alvo = lum(out.paper || '#000000') < .4 ? '#ffffff' : '#0a0a0a';   // marca preto e branco: em página escura o destaque é o branco, em página clara o preto
   const de = t.cor.toLowerCase(), para = alvo.toLowerCase(), giro = Math.round(((hueDe(para) - hueDe(de)) + 540) % 360 - 180), escuro = sobre(para);

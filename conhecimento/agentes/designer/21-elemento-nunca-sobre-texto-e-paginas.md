@@ -12,3 +12,7 @@
 
 ## 3. Os educativos cobrem história real e venda
 Teste no 10 · Xadrez (Toy Story 2 e Controle Patrimonial): funciona usando página de frase forte (história) e página de lista para os recursos do produto (venda).
+
+## 4. Ajustes do dono no Xadrez (18/11/2026)
+- Na capa, a peça desvia para BAIXO (`desvia: 'baixo'`): para cima ela compete com a foto. O rei pequeno da esquerda saiu; fica só o rei grande cruzando para a página 2.
+- Leitura igual à referência: fundo, texto e destaque do miolo NÃO trocam de cor por marca (`leitura: true` no `COR_TPL`). A cor da marca entra só na capa e no fim.
