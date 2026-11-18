@@ -17,5 +17,15 @@
       "uso": "Capa e CTA dos posts do Vivendo de Bet (futebol e esportes), em fundos escuros; grande, saindo pela borda de baixo ou ao lado do título.",
       "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
     }
+  },
+  "logos": {
+    "logo-vdb-branca": {},
+    "logo-vdb-escura": {},
+    "logo-vdb-preta": {
+      "mono": "preta"
+    },
+    "logo-vdb-fundo": {
+      "fundo": true
+    }
   }
 }
