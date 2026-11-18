@@ -661,7 +661,7 @@ COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
   s.shapes.push({ kind: 'rect', x: e.X(675), y: e.Y(1072), w: e.X(36), h: e.Y(39), radius: .15, color: 'transparent', stroke: TC.verde, stroke_w: 2 / 1080 });
   s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(675), y: e.Y(1072), w: e.X(22), h: e.Y(22), icon_color: TC.verde });
   s.items.push({ asset: 'tpl-clientes-facebook', x: F2(1080 / 1080), y: F2(1140 / 1350), size: 360, cruza: true });
-  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1160 / 1080), y: F2(1290 / 1350), size: 620, blur: 1, cruza: true });
+  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1150 / 1080), y: F2(1360 / 1350), size: 560, blur: 1, cruza: true });
   return s;
 };
 COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
