@@ -4707,7 +4707,7 @@ try {
       fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
     }
     // cores e tipografia do manual do dono: entram uma vez na Identidade visual da marca (só nas linhas de cor e fonte; o resto do texto fica como está)
-    const iv = cfg.identidade, flag = 'idv_dono_v3:' + marca.toLowerCase();
+    const iv = cfg.identidade, flag = 'idv_dono_v4:' + marca.toLowerCase();
     if (iv && one('SELECT 1 x FROM brands WHERE name=? COLLATE NOCASE', marca) && !one('SELECT 1 x FROM settings WHERE key=?', flag)) {
       const linhas = { CORES: [['Principais', (iv.cores || []).join(' | ')], ['Apoio/neutras', (iv.apoio || []).join(' | ')], ['Destaque', iv.destaque || ''], ['Fundo padrão', iv.fundo || '']], TIPOGRAFIA: [['Título', iv.ftit || ''], ['Texto', iv.ftxt || '']] };
       const row = one("SELECT id, content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", marca);

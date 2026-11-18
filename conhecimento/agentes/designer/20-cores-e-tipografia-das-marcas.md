@@ -17,7 +17,7 @@ As fontes que o sistema ainda não tinha entram como arquivo da marca:
 | Marca | Principal / destaque | Paleta | Título · Texto | Fundo |
 |---|---|---|---|---|
 | 007 Spyhacker | Ciano Neon `#13ECE9` | Verde-água `#0F7D82`, Turquesa `#10B0B3`, Grafite `#252F30`, Preto Carvão `#0C0F0F` | Rajdhani Bold · Rajdhani | escuro |
-| Atlas Hosting | Azul Atlas `#1A97C3` | Azul Royal `#3259D2`, Violeta `#4F26DD`, Carvão `#1D1A1B`, Branco | Quicksand Bold · Quicksand | — |
+| Atlas Hosting | Azul Atlas `#1A97C3` sobre Azul Noite `#000F19` (base) | Azul Claro `#33B5FF` (secundária), Azul Royal `#3259D2`, Violeta `#4F26DD`, Branco | Quicksand Bold · Quicksand | escuro |
 | Central do Marketing | Verde Central `#0DE450` | Preto `#111111`, Branco | Poppins Bold · Poppins | escuro |
 | Corte dos Ricos | Preto `#000000` | Branco Gelo `#F6F6F6`, Cinza Claro `#D7D7D7`, Cinza do Anel `#BBBBBB` | Noto Serif Bold · Open Sans | — |
 | Marketing Raiz | Preto `#010101` e Branco (principais) | Lilás `#857CD5`, Pêssego `#F2AB7A`, Magenta Suave `#BD61AB` só como detalhe; Cinza `#626161` | Montserrat Bold · Montserrat Regular | claro |
@@ -42,4 +42,9 @@ As fontes que o sistema ainda não tinha entram como arquivo da marca:
 - A cor-assinatura do template vira o **destaque** da marca. O fundo e as peças do template mudam de tom junto.
 - Em marca preto e branco (Marketing Raiz), o fundo e as peças ficam em preto e branco.
 - Correção do dono (18/11): no Seguidores em Alta a cor principal é o roxo, e o laranja é só detalhe; no Marketing Raiz as principais são preto e branco, e o lilás é detalhe.
-- Conferido nos sites das marcas (18/11): SimIntPay e Sim Intermediações usam roxo/violeta como cor principal (a logo tem outras cores), PagaTG e Central batem com o manual, Marketing Raiz é preto e branco em fundo claro, Teron é preto e branco com brilho azul. O 007 Spyhacker usa no site um ciano mais claro (`#6FDCF4`) que o da logo (`#13ECE9`). O site do Atlas não abriu.
+- Conferido nos sites das marcas (18/11): SimIntPay e Sim Intermediações usam roxo/violeta como cor principal (a logo tem outras cores), PagaTG e Central batem com o manual, Marketing Raiz é preto e branco em fundo claro, Teron é preto e branco com brilho azul. O 007 Spyhacker usa no site um ciano mais claro (`#6FDCF4`) que o da logo (`#13ECE9`). O site do Atlas é atlashosting.com.br (o .com é de outra empresa): base azul noite e botão azul claro.
+
+## Regras do dono para as cores (18/11)
+- **A base é sempre a cor mais escura da marca.** Ela é o fundo e o que dá a cara da marca. As cores mais claras são secundárias, para destaque e detalhe.
+- **A variação é bem-vinda, sem fugir da identidade.** Dentro da mesma família de cor dá para variar conforme a arte e o contexto. No 007 Spyhacker, por exemplo, tanto o ciano neon da logo (`#13ECE9`) quanto o ciano claro do site (`#6FDCF4`) servem. Não é regra exata: escolha o tom que funciona melhor naquela arte.
+- **O site da marca é a referência** quando o manual e o site discordarem.
