@@ -2404,7 +2404,7 @@ function ctxMarca(brand, format, sp = {}) {
   const idv = identidadeDe(brand), [W, H] = ART_SIZE[format] || [1080, 1350];
   const ident = brand ? (one("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", brand)?.content || '') : '';
   const docs = brand ? all("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca'", brand).map(r => r.content).join('\n') : '';
-  const logos = brand ? all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp','svg') ORDER BY id", brand).filter(a => !/logo pequena/i.test(a.tags || '')) : [];   // a logo pequena não é a logo principal (longa)
+  const logos = brand ? all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp','svg') ORDER BY id", brand).filter(a => !/logo pequena|logo com fundo/i.test(a.tags || '')) : [];   // a logo pequena e a com fundo (avatar) não são a logo principal (longa)
   const clara = logos.find(a => /branc|clar|white|light|neg/i.test(a.name)) || logos.find(a => !/pret|escur|black|dark/i.test(a.name)) || logos[0];
   const escura = logos.find(a => a !== clara && /pret|escur|black|dark/i.test(a.name) && fs.existsSync(path.join(ASSET_DIR, a.id + '.' + a.ext)));   // logo escura sem arquivo no disco não pode sumir da página clara: cai na logo clara com cápsula
   const ratio = clara ? imgRatio(path.join(ASSET_DIR, clara.id + '.' + clara.ext)) : null;
@@ -4694,11 +4694,11 @@ try {
       salvaMascoteFicha({ id: +r.lastInsertRowid, ficha: null }, ficha);
     }
     for (const [nome, o] of Object.entries(cfg.logos || {})) {   // logos oficiais: a pequena (só o símbolo) leva a tag "logo pequena"
-      const arq = path.join(dir, nome + '.png'); if (!fs.existsSync(arq) || one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
-      const buf = fs.readFileSync(arq);
-      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, 'logo', o?.pequena ? 'logo, logo pequena, oficial' : 'logo, oficial', 'Logo oficial da marca, enviada pelo dono. Não apague.', '', nome + '.png', 'png', buf.length, 'Logo', T());
-      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.png'), buf);
-      const pr = probeAsset(+r.lastInsertRowid, 'png'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+      const ext = ['png', 'jpg'].find(x => fs.existsSync(path.join(dir, nome + '.' + x))); if (!ext || one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
+      const buf = fs.readFileSync(path.join(dir, nome + '.' + ext));   // fundo: true = logo quadrada já com fundo (foto de perfil, avatar)
+      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, 'logo', o?.pequena ? 'logo, logo pequena, oficial' : o?.fundo ? 'logo, logo com fundo, avatar, foto de perfil, oficial' : 'logo, oficial', o?.fundo ? 'Logo oficial com fundo (quadrada): foto de perfil e avatar em círculo. Não apague.' : 'Logo oficial da marca, enviada pelo dono. Não apague.', '', nome + '.' + ext, ext, buf.length, 'Logo', T());
+      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+      const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
     }
   }
 } catch (e) { console.error('mascotes das marcas', e.message); }

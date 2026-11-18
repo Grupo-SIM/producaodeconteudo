@@ -22,6 +22,9 @@
     "logo-spyhacker-completa": {},
     "logo-spyhacker-pequena": {
       "pequena": true
+    },
+    "logo-spyhacker-fundo": {
+      "fundo": true
     }
   }
 }
