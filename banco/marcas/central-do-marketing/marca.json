@@ -26,6 +26,9 @@
     "logo-central-branca": {
       "mono": true
     },
-    "logo-central-escura": {}
+    "logo-central-escura": {},
+    "logo-central-preta": {
+      "mono": "preta"
+    }
   }
 }
