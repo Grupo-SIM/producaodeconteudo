@@ -108,3 +108,10 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 4ª rodada: 24 listras pretas com a MESMA largura em todas as faixas (16px), botão branco com texto preto; 25 arte puxada para a direita para o texto não encostar na lâmpada, fala ao lado do rosto; 28 letra manuscrita do MESMO tamanho (altura das maiúsculas) do resto da palavra, mesma linha de base; destaque em negrito.
 - 5ª rodada: 24 APROVADA SEM as listras pretas (faixa lisa com "ACESSO NEGADO ✕"), botão preto com texto branco e seta na cor da marca; 25 APROVADA; 28 M com respiro antes do E (não colado). Máscara da 28 ainda pendente de decisão.
 - 28 aprovada pelo dono como está (metade caveira, sem o efeito de máscara saindo).
+
+## Referências 29 a 33 (18/11/2026, última leva) · aguardando o dono
+- **29 · Coroa** (Vivendo de Bet): retrato grande P&B só com a coroa dourada colorida, fundo liso da cor da marca; título embaixo "Copie minha / *Estratégia*" (pincel) + linha espaçada de bônus.
+- **30 · Capuz** (Central do Marketing): mascote puxando o capuz com as duas mãos; "Dá uma olhada no que" + "eu faço" gigante em degradê da cor da marca acima da cabeça.
+- **31 · Letras gigantes** (007 Spyhacker): iniciais serifadas enormes atrás do mascote (recorte na frente), nome espaçado no topo, serviços em serifa pequena embaixo.
+- **32 · Estátua** (Marketing Raiz): busto de mármore com listras e borboletas douradas; palavra gigante condensada dourada embaixo + apoio com marca-texto. A IA insiste em pôr rosto humano no busto em vez da peça de xadrez (pendente).
+- **33 · Parado na multidão** (Seguidores em Alta): mascote nítido no meio de gente borrada em movimento; título em 2 cores condensado + apoio com marca-texto na cor da marca.
