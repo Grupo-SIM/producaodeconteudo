@@ -296,6 +296,9 @@ export const MODELOS = [
   { id: 'xadrez-capa', nome: '10 · Xadrez: capa', uso: 'capa de carrossel', desc: 'Template aprovado (agência, xadrez): fundo preto geométrico, foto do assunto opcional no alto, etiquetas brancas e palavra-explosão mostarda, rei pequeno à esquerda e rei grande inclinado cruzando para a página 2; botão mostarda "Arrasta para o lado".', campos: ['kicker', 'titulo', 'apoio', 'cta', 'foto'] },
   { id: 'xadrez-lista', nome: '10 · Xadrez: miolo', uso: 'página interna', desc: 'Fundo bege com forma orgânica; até 3 itens numerados ou frase forte com palavra em *destaque*. O rei em pé cruza da última página do miolo para o fim.', campos: ['itens', 'titulo', 'texto', 'n'] },
   { id: 'xadrez-fim', nome: '10 · Xadrez: fim', uso: 'última página', desc: 'Fundo preto com prédios em P&B e formas geométricas; pergunta grande, linha de apoio e botão mostarda opcional.', campos: ['titulo', 'apoio', 'cta'] },
+  { id: 'clientes-capa', nome: '11 · Tipos de clientes: capa', uso: 'capa de carrossel', desc: 'Template aprovado (verde neon, meta-design): busto de óculos dentro da moldura branca arredondada, título branco em caixa alta, apoio verde e botão de contorno "Arraste para o lado"; ícone do Facebook e maleta de dinheiro cruzando para a página 2.', campos: ['titulo', 'apoio', 'cta'] },
+  { id: 'clientes-bloco', nome: '11 · Tipos de clientes: miolo', uso: 'página interna', desc: 'Prancheta cinza na tela do Photoshop: ícone verde, título, definição em negrito com trecho _sublinhado_ e nota com *palavras verdes*. Uma ideia por página; busto quebrado, cavalo e maleta cruzam as divisas.', campos: ['itens', 'nota', 'icone'] },
+  { id: 'clientes-fim', nome: '11 · Tipos de clientes: fim', uso: 'última página', desc: 'Fundo escuro com brilho verde; logo da marca dentro do anel verde e o CTA (frase, apoio e botão verde).', campos: ['titulo', 'texto', 'cta'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -639,6 +642,57 @@ COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {
   return s;
 };
 COMPOR_EXTRA['xadrez-fim'] = (d, ctx) => { const s = xzBotaoEscuro(xzCor(COMPOR_EXTRA['fogo-fim'](d, ctx), FG.red, XZ.mostarda)); s.bg = { asset: 'tpl-xadrez-fundo-3', color: '#050505' }; return s; };
+
+// ───────── Template "11 · Tipos de clientes (verde neon)" (réplica aprovada do kit de meta-design verde, 18/11/2026) ─────────
+// Kit quadrado 1080 levado a 1080×1350 (+135 no eixo y). Fundos já trazem a tela do Photoshop, a moldura da capa, o anel e as hashtags.
+const TC = { verde: '#2ee84a', tinta: '#3a3a3a', nota: '#777777', icones: ['flame', 'thermometer', 'snowflake'], bx: [319, 389, 393] };
+const tcBase = k => ({ bg: { asset: 'tpl-clientes-fundo-' + k, color: '#1a1a1a' }, paper: '#e4e4e4', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
+COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
+  usaFontes(ctx, 'poppins', 'poppins');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = tcBase(1), cx = 525;
+  s.items.push({ asset: 'tpl-clientes-busto-oculos', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037, fil: { gray: .4, sepia: .2, hue: 60 } });
+  const tf = fT(800, 0), tl = erQuebra(String(d.titulo || 'Tipos de|clientes').toUpperCase(), tf, 74, 560).slice(0, 3), tz = Math.min(74, ...tl.map(l => 74 * 560 / Math.max(560, largura(l, tf, 74))));
+  const y0 = 710 - (tl.length - 2) * 74;
+  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + 37 + i * 74), align: 'center', size: e.P(tz), font: tf.k, weight: tf.w, lh: 1, color: '#ffffff', nowrap: true, shadow: true }));
+  const af = fX(600, 0), ap = String(d.apoio || 'no tráfego pago'), az = Math.min(54, 54 * 560 / Math.max(560, largura(ap, af, 54)));
+  s.texts.push({ role: 'title', value: ap, x: e.X(cx), y: e.Y(890), align: 'center', size: e.P(az), font: af.k, weight: af.w, lh: 1, color: TC.verde, nowrap: true, shadow: false });
+  s.shapes.push({ kind: 'rect', x: e.X(504), y: e.Y(1072), w: e.X(282), h: e.Y(39), radius: .15, color: 'transparent', stroke: TC.verde, stroke_w: 2 / 1080 });
+  s.texts.push({ role: 'label', value: String(d.cta || 'Arraste para o lado').toUpperCase(), x: e.X(504), y: e.Y(1073), align: 'center', size: e.P(15), font: FK.x, weight: pesoDe(FK.x, 700), ls: .2, color: TC.verde, nowrap: true, shadow: false });
+  s.shapes.push({ kind: 'rect', x: e.X(675), y: e.Y(1072), w: e.X(36), h: e.Y(39), radius: .15, color: 'transparent', stroke: TC.verde, stroke_w: 2 / 1080 });
+  s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(675), y: e.Y(1072), w: e.X(22), h: e.Y(22), icon_color: TC.verde });
+  s.items.push({ asset: 'tpl-clientes-facebook', x: F2(1080 / 1080), y: F2(1005 / 1350), size: 360, cruza: true });
+  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1160 / 1080), y: F2(1215 / 1350), size: 560, blur: 1, cruza: true });
+  return s;
+};
+COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
+  usaFontes(ctx, 'poppins', 'poppins');
+  const j = Math.max(0, (ctx.i || 1) - 1) % 3, e = erEsc(ctx, ctx.W, ctx.H), s = tcBase(2 + j), x = TC.bx[j], mw = [440, 490, 520][j], B = [];
+  const it = erItens(d)[0] || { t: d.titulo || '', d: d.texto || '' }, ic = d.icone || TC.icones[j];
+  const tf = fT(600, -.026), tz = Math.min(58, 58 * mw / Math.max(mw, largura(limpa(it.t), tf, 58)));
+  B.push({ h: 70, gap: 0, make: y => { s.shapes.push({ kind: 'icon', icon: ic, x: e.X(x - 2), y: e.Y(y + 10), w: e.X(118), h: e.Y(118), icon_color: TC.verde }); s.texts.push({ role: 'title', value: limpa(it.t), x: e.X(x), y: e.Y(y + 35), align: 'left', size: e.P(tz), font: tf.k, weight: tf.w, ls: -.026, lh: 1, color: '#222222', nowrap: true, shadow: false }); return []; } });
+  const bf = fX(700, .01), bl = erFix(erQuebra(it.d, bf, 33, mw));
+  B.push({ h: bl.length * 54, gap: 30, make: y => { bl.forEach((l, i) => erLinha(s.texts, l, x + 21, y + 27 + i * 54, 33, bf, TC.tinta, e)); return []; } });
+  if (d.nota) { const nf = fX(400, 0), nl = fgAst(erQuebra(d.nota, nf, 24, mw)); B.push({ h: nl.length * 45, gap: 40, make: y => { nl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x + 21), y: e.Y(y + 22 + i * 45), align: 'left', size: e.P(24), font: nf.k, weight: nf.w, lh: 1, color: TC.nota, hl: '#17b236', hw: 700, nowrap: true, shadow: false })); return []; } }); }
+  pilha(B, 0, ctx, { topo: 290 });
+  const fim = (ctx.i || 0) === (ctx.total || 1) - 2;
+  if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(943 / 1080), y: F2(1185 / 1350), size: 720, cruza: true });
+  else if (j === 0) s.items.push({ asset: 'tpl-clientes-busto-quebrado', x: F2(1120 / 1080), y: F2(634 / 1350), size: 1058, cruza: true });
+  else s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(903 / 1350), size: 1037, cruza: true });
+  return s;
+};
+COMPOR_EXTRA['clientes-fim'] = (d, ctx) => {
+  usaFontes(ctx, 'poppins', 'poppins');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = tcBase(5), cx = 540;
+  s.shapes.push({ kind: 'ring', x: e.X(cx), y: e.Y(500), w: e.X(250), h: e.Y(250), color: TC.verde, stroke_w: 3 / 1080 });
+  s.items.push({ asset: ctx.logo || ctx.avatar || 'avatar-padrao', x: e.X(cx), y: e.Y(500), size: 180, round: !ctx.logo || (ctx.logoRatio > .7 && ctx.logoRatio < 1.4) });   // logo da marca no lugar do foguete (decisão do dono)
+  const tf = fT(700, -.01), tl = erQuebra(d.titulo || 'Quer atrair os clientes certos?', tf, 52, 820).slice(0, 3), B = [];
+  B.push({ h: tl.length * 62, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: .5, y: e.Y(y + 31 + i * 62), align: 'center', size: e.P(52), font: tf.k, weight: tf.w, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
+  if (d.texto) { const xf = fX(400, 0), xl = erQuebra(d.texto, xf, 28, 760); B.push({ h: xl.length * 40, gap: 24, make: y => { xl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: .5, y: e.Y(y + 20 + i * 40), align: 'center', size: e.P(28), font: xf.k, weight: xf.w, lh: 1, color: '#dddddd', nowrap: true, shadow: false })); return []; } }); }
+  const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(700, .08), cw = Math.max(340, largura(cta, cf, 26) + 100);
+  B.push({ h: 76, gap: 44, make: y => { s.shapes.push({ kind: 'pill', x: .5, y: e.Y(y + 38), w: e.X(cw), h: e.Y(76), color: TC.verde }); s.texts.push({ role: 'title', value: cta, x: .5, y: e.Y(y + 38), align: 'center', size: e.P(26), font: cf.k, weight: cf.w, ls: .08, lh: 1, color: '#0b0b0b', nowrap: true, shadow: false }); return []; } });
+  pilha(B, 0, ctx, { topo: 720 });
+  return s;
+};
 
 const COMPOR = {
   'erros-capa'(d, ctx) {
