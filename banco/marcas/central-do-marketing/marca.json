@@ -17,5 +17,10 @@
       "uso": "Capa e CTA dos posts da Central do Marketing, em fundos escuros; grande, ao lado do título ou saindo pela borda de baixo.",
       "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
     }
+  },
+  "logos": {
+    "logo-central-pequena": {
+      "pequena": true
+    }
   }
 }
