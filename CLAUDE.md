@@ -8,7 +8,7 @@ Sempre que um treino novo entrar (novo formato de copy, novo formato que o Desig
 - `conhecimento/agentes/<agente>/`: a base do agente.
 - `conhecimento/produtos.json`: produtos confirmados pelo dono.
 - Templates de arte (`TEMPLATES_CASA` em `server.js`, numerados "N · Nome"): só template APROVADO pelo dono fica visível; o resto leva `oculto: true`. O visível aparece sozinho na checklist de Marcas → Formatos e metas (agrupado em Jornalístico, Feed estático, Carrossel, Stories): confira lá a cada template novo aprovado ou removido.
-Hoje: Editor de vídeo só faz motion. Designer: jornalístico aprovado (1 a 5 + contracapa 6) e o primeiro carrossel aprovado (7 · Lista de erros, modelos `erros-capa`, `erros-par`, `erros-fim` em `public/arte-modelos.js`, peças em `banco/tpl-erros/`); estático, outros carrosséis e stories vão ser refeitos do zero a partir de referências do dono (kits: arte final + fundo da faixa + elementos soltos, replicados igual e depois ajustados).
+Hoje: Editor de vídeo só faz motion. Designer: jornalístico aprovado (1 a 5 + contracapa 6) e os carrosséis aprovados 7 · Lista de erros (`erros-*`, peças em `banco/tpl-erros/`) e 8 · Fogo (`fogo-*`, peças em `banco/tpl-fogo/`), modelos em `public/arte-modelos.js`; fundos e elementos aprovados podem ser misturados entre templates conforme o assunto (`conhecimento/agentes/designer/13-recursos-aprovados-misturar.md`). Pasta nova de peças entra em `TPL_PASTAS` no `server.js`; estático, outros carrosséis e stories vão ser refeitos do zero a partir de referências do dono (kits: arte final + fundo da faixa + elementos soltos, replicados igual e depois ajustados).
 
 ## Deploy
 Push no `main` gera a imagem `ghcr.io/grupo-sim/producaodeconteudo:latest`; o dono faz o Deploy no Komodo.

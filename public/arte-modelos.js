@@ -287,6 +287,9 @@ export const MODELOS = [
   { id: 'erros-capa', nome: '7 · Lista de erros: capa', uso: 'capa de carrossel', desc: 'Template aprovado (editorial P&B): fundo branco com foto vintage recortada e raízes, número pincelado magenta com círculo à mão, título serifado magenta em 2 linhas, apoio condensado cinza com trecho sublinhado e botão magenta “Arraste para o lado”.', campos: ['numero', 'titulo', 'apoio', 'cta'] },
   { id: 'erros-par', nome: '7 · Lista de erros: dois itens', uso: 'página interna', desc: 'Dois itens em zigue-zague: rótulo “ERRO N :” em pincel com mãozinha, título condensado colorido com ✓✓ e explicação de 2 ou 3 linhas com trechos _sublinhados_. A numeração segue a página sozinha. Sem botão de arraste.', campos: ['itens', 'n'] },
   { id: 'erros-fim', nome: '7 · Lista de erros: último item e chamada', uso: 'última página', desc: 'Último item da lista (opcional) e caixa de contorno magenta com o fechamento, a frase de apoio com foguete e o botão arredondado do CTA.', campos: ['itens', 'titulo', 'texto', 'cta', 'n'] },
+  { id: 'fogo-capa', nome: '8 · Fogo: capa', uso: 'capa de carrossel', desc: 'Template aprovado: fundo de fogo com dinheiro queimando, título em etiquetas brancas (kicker em cima, apoio embaixo) e a palavra-explosão em vermelho numa faixa preta inclinada; botão vermelho “Arrasta para o lado” com botão de contorno e seta.', campos: ['kicker', 'titulo', 'apoio', 'cta'] },
+  { id: 'fogo-lista', nome: '8 · Fogo: miolo', uso: 'página interna', desc: 'Fundo preto; até 3 itens “1. Título” com explicação, ou uma frase grande com palavra em *vermelho* e apoio. A nota de R$ 100 queimando cruza a divisa na última página do miolo (e a cada 3 páginas em carrossel longo). Sem botão de arraste.', campos: ['itens', 'titulo', 'texto', 'n'] },
+  { id: 'fogo-fim', nome: '8 · Fogo: fim', uso: 'última página', desc: 'Fundo preto com prédios e formas geométricas; pergunta ou fechamento grande centralizado, linha de apoio em caixa alta e botão vermelho opcional com o CTA.', campos: ['titulo', 'apoio', 'cta'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -447,7 +450,7 @@ function erLinha(out, linha, x, yc, size, f, color, e, extra = {}) {
   }
 }
 // quebra o texto (sem "|") na largura do bloco; com "|", respeita as quebras do Copy
-const erQuebra = (txt, f, size, maxW) => String(txt || '').includes('|') ? String(txt).split('|').map(s => s.trim()).filter(Boolean) : quebra(String(txt || '').replace(/_/g, '\u0002'), f, size, maxW).map(l => l.replace(/\u0002/g, '_'));
+const erQuebra = (txt, f, size, maxW) => String(txt || '').split('|').map(s => s.trim()).filter(Boolean).flatMap(p => quebra(p.replace(/[_*]/g, m => m === '_' ? '\u0002' : '\u0003'), f, size, maxW).map(l => l.replace(/\u0002/g, '_').replace(/\u0003/g, '*')));
 const erFix = ls => { let ab = false; return ls.map(l => { const n = (l.match(/_/g) || []).length; const r = (ab ? '_' : '') + l + ((ab ? n + 1 : n) % 2 ? '_' : ''); if (n % 2) ab = !ab; return r.replace(/__/g, ''); }); };   // sublinhado que atravessa a quebra continua na linha de baixo
 // um item: rótulo "ERRO N :" (pincel), mãozinha, título colorido com ✓✓ e explicação com sublinhados
 function erItem(s, ctx, e, n, it, x, y, cor, maxT) {
@@ -462,6 +465,7 @@ function erItem(s, ctx, e, n, it, x, y, cor, maxT) {
   bl.forEach((l, i) => erLinha(s.texts, l, x + 10, yb + 21 + i * 43, bz, bf, ER.tinta, e));
   return yb + bl.length * 43;
 }
+const fgAst = ls => { let ab = false; return ls.map(l => { const n = (l.match(/\*/g) || []).length; const r = (ab ? '*' : '') + l + ((ab ? n + 1 : n) % 2 ? '*' : ''); if (n % 2) ab = !ab; return r.replace(/\*\*/g, ''); }); };
 const erItens = d => (Array.isArray(d.itens) ? d.itens : []).map(x => typeof x === 'string' ? { t: x, d: '' } : { t: x.t || x.titulo || '', d: x.d || x.texto || '' }).filter(x => x.t);
 const erBase = (ctx, k) => ({ bg: { asset: 'tpl-erros-fundo-' + k, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 // botão retangular magenta "Arraste para o lado ⟶" (só na capa) e botão arredondado da caixa de CTA
@@ -476,6 +480,63 @@ function erBotao(s, e, x, y, w, h, txt, { pill = false, fz = 24 } = {}) {
 // posições dos dois itens em cada fundo do miolo (onde as fotos deixam espaço), iguais à arte original
 const ER_POS = { 2: [[250, 388, 'mag'], [366, 775, 'mag']], 3: [[193, 388, 'verde'], [308, 775, 'verde']], 4: [[128, 388, 'mag'], [243, 775, 'mag']] };
 const erNum = (d, ctx, j) => +d.n > 0 ? +d.n + j : Math.max(0, (ctx.i || 0) - 1) * 2 + 1 + j;
+
+// ───────── Template "8 · Fogo" (réplica aprovada do kit "Não queime seu dinheiro", 18/11/2026) ─────────
+// Arte original em 1300×1300: os fundos cobrem a página 1080×1350 (escala 1,0385 e corte de 135 px de cada lado) e as medidas são convertidas por fx/fy.
+const COMPOR_EXTRA = {};
+const FG = { red: '#e3243b', preto: '#0b0b0b' }, fx = v => v * 1.0385 - 135, fy = v => v * 1.0385;
+const fgBase = (k) => ({ bg: { asset: 'tpl-fogo-fundo-' + k, color: '#050505' }, paper: '#050505', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
+function fgEtiqueta(s, e, txt, x, y, h, fz) {
+  const f = { k: 'barlow', w: 500, ls: -.02 }, w = largura(txt, f, fz) + 48;
+  s.shapes.push({ kind: 'rect', x: e.X(x + w / 2), y: e.Y(y + h / 2), w: e.X(w), h: e.Y(h), color: '#ffffff' });
+  s.texts.push({ role: 'title', value: txt, x: e.X(x + 22), y: e.Y(y + h / 2 - 4), align: 'left', size: e.P(fz), font: 'barlow', weight: 500, ls: -.02, lh: 1, color: FG.preto, nowrap: true, shadow: false });
+  return w;
+}
+COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
+  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(1), cx = 540;
+  const l1 = String(d.kicker || 'Não Queime Seu').trim(), pal = String(d.titulo || 'DINHEIRO').replace(/[*|]/g, ' ').trim().toUpperCase(), l2 = String(d.apoio || 'Anunciando Errado').trim();
+  const af = { k: 'anton', w: 400, ls: .01 }, bfz = { k: 'barlow', w: 500, ls: -.02 }, pz = Math.min(214, 820 / Math.max(1, largura(pal, af, 1))), pw = largura(pal, af, pz);
+  const z1 = Math.min(83, 83 * 820 / Math.max(820, largura(l1, bfz, 83))), z2 = Math.min(85, 85 * 820 / Math.max(820, largura(l2, bfz, 85))), t1 = fy(418), th = fy(76);
+  const wc = t1 + th + pz * .5 + 4, by = t1 + 34, bh = wc + pz * .5 + 30 - by, bw = Math.max(pw + 110, 880);
+  s.shapes.push({ kind: 'rect', x: e.X(cx), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: FG.preto, rot: -3 });
+  s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc), align: 'center', size: e.P(pz), font: 'anton', weight: 400, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false, rot: -3 });
+  const w1 = largura(l1, bfz, z1) + 48; fgEtiqueta(s, e, l1, cx - w1 / 2 + 30, t1, th, z1);
+  const w2 = largura(l2, bfz, z2) + 48; fgEtiqueta(s, e, l2, cx - w2 / 2, by + bh - 30, th, z2);
+  const yb = by + bh - 30 + th + 58, pw2 = fy(307), ph = fy(68), ow = fy(136), x0 = cx - (pw2 + 10 + ow) / 2;
+  s.shapes.push({ kind: 'pill', x: e.X(x0 + pw2 / 2), y: e.Y(yb + ph / 2), w: e.X(pw2), h: e.Y(ph), color: FG.red });
+  s.texts.push({ role: 'title', value: String(d.cta || 'Arrasta para o lado').toUpperCase(), x: e.X(x0 + pw2 / 2), y: e.Y(yb + ph / 2), align: 'center', size: e.P(22), font: 'rubik', weight: 500, ls: .05, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
+  s.shapes.push({ kind: 'pill', x: e.X(x0 + pw2 + 10 + ow / 2), y: e.Y(yb + ph / 2), w: e.X(ow), h: e.Y(ph), color: 'transparent', stroke: FG.red, stroke_w: 2 / 1080 });
+  s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(x0 + pw2 + 10 + ow / 2), y: e.Y(yb + ph / 2), w: e.X(48), h: e.Y(48), icon_color: FG.red });
+  return s;
+};
+COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
+  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = { k: 'rubik', w: 500, ls: -.012 }, bf = { k: 'rubik', w: 400, ls: -.006 }, maxW = 1080 - x - 110, B = [];
+  const it = erItens(d).slice(0, 3), n0 = +d.n > 0 ? +d.n : null;
+  if (it.length) it.forEach((o, j) => {
+    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, 44, maxW), bl = erQuebra(o.d, bf, 32, maxW);
+    B.push({ h: tl.length * 55 + 12 + bl.length * 41, gap: j ? 74 : 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 27 + i * 55), align: 'left', size: e.P(44), font: 'rubik', weight: 500, ls: -.012, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); bl.forEach((l, i) => erLinha(s.texts, l, x, y + tl.length * 55 + 12 + 20 + i * 41, 32, bf, '#f2f2f2', e)); return []; } });
+  });
+  else {   // página de frase: título grande com palavra em vermelho (*assim*) e apoio
+    const tf = { k: 'rubik', w: 500, ls: -.015 }, tl = fgAst(erQuebra(String(d.titulo || ''), tf, 70, maxW)), bl = erQuebra(d.texto, bf, 34, maxW);
+    B.push({ h: tl.length * 82, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 41 + i * 82), align: 'left', size: e.P(70), font: 'rubik', weight: 500, ls: -.015, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
+    if (bl.length) B.push({ h: bl.length * 46, gap: 40, make: y => { bl.forEach((l, i) => erLinha(s.texts, l, x, y + 23 + i * 46, 34, bf, '#f2f2f2', e)); return []; } });
+  }
+  pilha(B, 600, ctx).itens;
+  // nota queimando na divisa: na última página do miolo (entra no fim, como no original) e, em carrossel longo, a cada 3 páginas
+  const ult = (ctx.i || 0) === (ctx.total || 1) - 2, meio = !ult && (ctx.i || 0) % 3 === 2;
+  if (ult || meio) s.items.push({ asset: 'tpl-fogo-nota', x: F2((fx(1977 - 1300 + 540) + (meio ? 40 : 0)) / 1080), y: F2(fy(925 + (meio ? 60 : 0)) / 1350), size: Math.round(fy(1080) * (meio ? .82 : 1)), cruza: true, ...(meio ? { flip: true, rot: 8 } : {}) });
+  return s;
+};
+COMPOR_EXTRA['fogo-fim'] = (d, ctx) => {
+  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(3), tf = { k: 'rubik', w: 500, ls: -.018 }, tl = fgAst(erQuebra(d.titulo || 'Gosta desse tipo|de conteúdo?', tf, 116, 900)).slice(0, 4);
+  const tz = Math.min(116, ...tl.map(l => 116 * 900 / Math.max(900, largura(l, tf, 116)))), B = [];
+  B.push({ h: tl.length * tz * 1.2, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: .5, y: e.Y(y + tz * .6 + i * tz * 1.2), align: 'center', size: e.P(tz), font: 'rubik', weight: 500, ls: -.018, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
+  const ap = String(d.apoio || (d.cta ? '' : 'CURTA-SALVE-COMPARTILHE')).trim();
+  if (ap) { const al = erQuebra(ap, { k: 'rubik', w: 500, ls: 0 }, 42, 900); B.push({ h: al.length * 52, gap: 40, make: y => { al.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: .5, y: e.Y(y + 26 + i * 52), align: 'center', size: e.P(42), font: 'rubik', weight: 500, ls: 0, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } }); }
+  if (d.cta) { const cw = Math.max(360, largura(String(d.cta).toUpperCase(), { k: 'rubik', w: 500, ls: .05 }, 26) + 90); B.push({ h: 76, gap: 50, make: y => { s.shapes.push({ kind: 'pill', x: .5, y: e.Y(y + 38), w: e.X(cw), h: e.Y(76), color: FG.red }); s.texts.push({ role: 'title', value: String(d.cta).toUpperCase(), x: .5, y: e.Y(y + 38), align: 'center', size: e.P(26), font: 'rubik', weight: 500, ls: .05, lh: 1, color: '#ffffff', nowrap: true, shadow: false }); return []; } }); }
+  pilha(B, fy(600), ctx).itens;
+  return s;
+};
 
 const COMPOR = {
   'erros-capa'(d, ctx) {
@@ -890,6 +951,7 @@ const COMPOR = {
     s.texts.push(...mol.texts); s.items.push(...mol.items); s.shapes.push(...mol.shapes); return s;
   }
 };
+Object.assign(COMPOR, COMPOR_EXTRA);
 
 // contexto padrão a partir das cores da peça; o servidor completa com a Identidade da marca (fontes, logo, contatos, moldura)
 export function contexto(c = {}) {

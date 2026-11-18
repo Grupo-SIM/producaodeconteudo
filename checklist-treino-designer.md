@@ -21,6 +21,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 14/11/2026 · Feed jornalístico: referências Zyrion (capa dividida, foto + círculo, foto única; contracapa com cartão de post do X) e Nuvo. Base `09-feed-jornalistico.md`; fotos de banco em alta, vivas; preto e branco em notícia triste.
 - 18/11/2026 · Carrossel: 13 referências de arte salvas (R01 a R13 em `conhecimento/agentes/designer/referencias-carrossel/`, ficha em `10-carrossel-referencias-de-arte.md`). Só arte; a copy já foi treinada. Novos arquivos do dono entram como R14 em diante.
 - 18/11/2026 · Carrossel: primeiro template aprovado, **7 · Lista de erros** (réplica do kit editorial P&B + ajustes do dono: sem pílula de @ e barra de busca no topo, sem rodapé de contato, arraste só na capa, caixa do último slide vira o CTA com botão). Ficha: `conhecimento/agentes/designer/11-carrossel-template-lista-de-erros.md`. Próximo: replicar o próximo kit igual e ajustar.
+- 18/11/2026 · Carrossel: segundo template aprovado, **8 · Fogo** (réplica do kit "Não queime seu dinheiro" sem o rodapé da agência; arraste só na capa, nada no slide 2). Ficha `12-carrossel-template-fogo.md`. Regra nova: fundos e elementos aprovados são recursos que se misturam entre templates conforme o assunto (`13-recursos-aprovados-misturar.md`). O dono vai mandar mais elementos e kits; seguir um kit por vez: replicar igual, ajustar e aprovar.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Onde paramos (14/11/2026, para a próxima conversa)

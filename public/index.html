@@ -4061,7 +4061,7 @@ async function viewArte() {
       h('div', { class: 'row', style: { gap: '5px', flexWrap: 'wrap' } }, badge('Layout', 'acc'), !S.atBrand && l.brand ? badge(l.brand) : null, l.noticia ? badge('Notícias', 'ok') : null, topo ? badge('Recente', 'ok') : null, noCerebro()),
       h('div', { class: 'small mut' }, `${AT_FMT[l.format]?.[0] || l.format} · atualizado há ${ago(l.updated_at) || 'pouco'} · usado ${l.uses}x`),
       h('div', { class: 'row', style: { gap: '6px', flexWrap: 'wrap' } }, h('button', { class: 'btn sm primary', onclick: () => usarLayout(l) }, 'Usar'), maisMenu(h('button', { class: 'btn sm', onclick: () => replicarLayout(l) }, 'Usar em outra marca'), h('button', { class: 'btn sm', onclick: () => { S.atTab = 'layouts'; renderView(); } }, 'Editar / apagar')))));
-  const NOME_MOD = { 'erros-capa': 'Lista de erros: capa', 'erros-par': 'Lista de erros: dois itens', 'erros-fim': 'Lista de erros: fim', heroi: 'Capa herói', revista: 'Capa revista', 'capa-faixa': 'Capa com faixas', 'capa-minimal': 'Capa minimalista', dividido: 'Título partido', texto: 'Texto', numero: 'Número', lista: 'Lista', frase: 'Frase', pilulas: 'Pílulas', cta: 'Chamada final', noticia: 'Capa de jornal', 'post-card': 'Cartão de notícia', citacao: 'Frase de personalidade', 'manchete-foto': 'Manchete sobre foto' };
+  const NOME_MOD = { 'fogo-capa': 'Fogo: capa', 'fogo-lista': 'Fogo: miolo', 'fogo-fim': 'Fogo: fim', 'erros-capa': 'Lista de erros: capa', 'erros-par': 'Lista de erros: dois itens', 'erros-fim': 'Lista de erros: fim', heroi: 'Capa herói', revista: 'Capa revista', 'capa-faixa': 'Capa com faixas', 'capa-minimal': 'Capa minimalista', dividido: 'Título partido', texto: 'Texto', numero: 'Número', lista: 'Lista', frase: 'Frase', pilulas: 'Pílulas', cta: 'Chamada final', noticia: 'Capa de jornal', 'post-card': 'Cartão de notícia', citacao: 'Frase de personalidade', 'manchete-foto': 'Manchete sobre foto' };
   const TEMAS = [['educativo', 'Educativo'], ['lista', 'Lista'], ['tutorial', 'Tutorial'], ['oferta', 'Oferta'], ['noticia', 'Notícia'], ['opiniao', 'Opinião'], ['geral', 'Geral']], temaNome = k => (TEMAS.find(x => x[0] === k) || [])[1] || 'Geral';
   const FMTS = Object.keys(AT_FMT); if (S.atFmtF && !FMTS.includes(S.atFmtF)) S.atFmtF = ''; S.atFmt = S.atFmtF || 'carrossel';
   const fmtDe = t => t.fmt || S.atFmtF || (t.formatos.includes('carrossel') ? 'carrossel' : t.formatos[0] || 'carrossel');   // sem filtro de formato, cada estilo abre no seu formato principal
@@ -5202,7 +5202,10 @@ async function arteEditor(id, onClose, opts = {}) {
   // carrossel aprovado: cada página tem o seu modelo (capa, miolo, fim)
   const TPL_CARROSSEL = [['erros-capa', {}, '7 · Lista de erros: capa', 'Número pincelado, título serifado magenta, apoio condensado e botão “Arraste para o lado”.'],
     ['erros-par', {}, '7 · Lista de erros: dois itens', 'Dois itens em zigue-zague com rótulo “ERRO N :”, título colorido e explicação sublinhada.'],
-    ['erros-fim', {}, '7 · Lista de erros: fim com chamada', 'Último item e caixa magenta com a chamada e o botão.']];
+    ['erros-fim', {}, '7 · Lista de erros: fim com chamada', 'Último item e caixa magenta com a chamada e o botão.'],
+    ['fogo-capa', {}, '8 · Fogo: capa', 'Fogo e dinheiro queimando, etiquetas brancas e palavra-explosão vermelha.'],
+    ['fogo-lista', {}, '8 · Fogo: miolo', 'Fundo preto com até 3 itens numerados ou uma frase forte.'],
+    ['fogo-fim', {}, '8 · Fogo: fim', 'Pergunta grande centralizada e CTA sobre os prédios.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
     const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
     // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram
@@ -5259,7 +5262,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si, oc = new Set(TPLS.ocultos || []);
     const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
     const stories = x => /stories|vertical/.test(x || ''), meus = (TPLS.itens || []).filter(t => stories(t.format) === stories(data.format)).map(t => ({ ...t, custom: true, g: 'Meus templates' }));
-    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...TPL_CARROSSEL.map(([m, e, nome, ds]) => ({ m, e, nome, ds, g: 'Carrossel' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card' && !x.id.startsWith('erros-')).map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
+    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...TPL_CARROSSEL.map(([m, e, nome, ds]) => ({ m, e, nome, ds, g: 'Carrossel' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card' && !/^(erros|fogo)-/.test(x.id)).map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
     const tw = 104, th = Math.round(tw * H / W), ks = tw / W;
     const ib = (txt, tt, fn, cor) => h('button', { type: 'button', title: tt, onclick: e => { e.stopPropagation(); fn(); }, style: cor ? { color: cor } : null }, txt);   // mesmo visual dos botões das páginas (.aethb)
     const card = t => {
