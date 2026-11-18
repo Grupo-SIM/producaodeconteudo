@@ -4,6 +4,9 @@
   "logos": {
     "logo-teron-pequena": {
       "pequena": true
+    },
+    "logo-teron-pequena-escura": {
+      "simbolo_claro": true
     }
   }
 }
