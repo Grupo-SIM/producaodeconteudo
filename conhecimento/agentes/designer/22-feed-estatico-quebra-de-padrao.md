@@ -68,3 +68,10 @@ Mascote = o único personagem (ficha 19). Corte dos Ricos não tem mascote: usa 
 - Mascote ou objeto = PNG recortado (pose da biblioteca ou gerada a partir do PNG oficial, ficha 19).
 - Camadas na ordem: fundo → palavra gigante → mascote/objeto → palavra manuscrita/apoio → CTA e microtextos.
 - CTA padrão: pílula ou linha pequena "Leia a legenda ↓" no rodapé, longe do mascote.
+
+## Regra do dono (18/11/2026): referência é para COPIAR
+- Toda referência que o dono manda é copiada literalmente: mesma composição, escala, enquadramento, cores, posição e tamanho do texto. Só troca a pessoa pelo mascote da marca.
+- O ângulo novo vem da COPY, não do desenho. Ex.: na ref. B (bota gigante), o mascote encostado na bota vira "FORA · Você vai sair do mercado" (a bota está empurrando ele para fora).
+- Como gerar: edição em cima da própria referência (fal-ai/flux-pro/kontext/max/multi com [referência, PNG oficial do mascote]): "troque a pessoa pelo personagem da 2ª imagem, mesma pose, mesmo tamanho e posição; tire todos os textos". Gerar do zero não acerta a escala.
+- Sem microtextos de marca ("Central do Marketing · ..."): não polui. Texto = título + apoio curto + "Leia a legenda ↓".
+- Mascote grande: na ref. A ele ocupa a metade de baixo inteira e é cortado pela borda.
