@@ -96,7 +96,7 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - **23 · Silêncio** (Central do Marketing): o fundo escuro precisa aparecer bastante: as manchas da cor da marca não podem dominar; escurecer as bordas. Palavra em pincel (Permanent Marker) cruzando o peito. Textinhos dos cantos em fonte FINA (Outfit 300, 30px, branco levemente transparente; `public/fonts/outfit-*`), discretos: não competem com o título.
 - Lição: o impacto vem do CONTRASTE: fundo escuro + 1 cor forte. Quando a cor da marca toma a arte toda, perde a chamada.
 
-## Referências 24 a 28 (18/11/2026) · aguardando o dono
+## Referências 24 a 28 (18/11/2026) · 24, 25, 27 e 28 APROVADAS; 26 descartada
 - **24 · Fita de isolamento + mão** (007 Spyhacker): mascote agachado com a mão enorme vindo para a câmera; fitas na cor da marca cruzando a cena; a fita grande da frente É o título ("ACESSO NEGADO"). Fita gerada pela IA sai com texto de outra pessoa: sempre pedir fita lisa e escrever o título por cima.
 - **25 · Mini sobre o gigante** (Central do Marketing): mascote pequeno sentado em cima de uma versão gigante da própria cabeça/objeto; título fino grande embaixo com o final na cor da marca; botão de liga/desliga "Modo descanso"; frase manuscrita inclinada no alto.
 - **26 · Palavras em volta** (Marketing Raiz): P&B com luz de palco; frase inteira quebrada em palavras 3D prateadas espalhadas em grade ao redor do mascote sentado, sem cobrir a cabeça.
@@ -107,3 +107,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 3ª rodada: 24 listras pretas das faixas BEM finas; 25 luz da lâmpada mais forte (brilho verde) e fala perto do rosto; 28 M maior que o resto da palavra e encostado; caixa com UMA fonte só, destaque só em "TODO APOSTADOR" na cor da marca.
 - 4ª rodada: 24 listras pretas com a MESMA largura em todas as faixas (16px), botão branco com texto preto; 25 arte puxada para a direita para o texto não encostar na lâmpada, fala ao lado do rosto; 28 letra manuscrita do MESMO tamanho (altura das maiúsculas) do resto da palavra, mesma linha de base; destaque em negrito.
 - 5ª rodada: 24 APROVADA SEM as listras pretas (faixa lisa com "ACESSO NEGADO ✕"), botão preto com texto branco e seta na cor da marca; 25 APROVADA; 28 M com respiro antes do E (não colado). Máscara da 28 ainda pendente de decisão.
+- 28 aprovada pelo dono como está (metade caveira, sem o efeito de máscara saindo).
