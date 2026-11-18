@@ -644,7 +644,7 @@ COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {
 COMPOR_EXTRA['xadrez-fim'] = (d, ctx) => { const s = xzBotaoEscuro(xzCor(COMPOR_EXTRA['fogo-fim'](d, ctx), FG.red, XZ.mostarda)); s.bg = { asset: 'tpl-xadrez-fundo-3', color: '#050505' }; return s; };
 
 // ───────── Template "11 · Tipos de clientes (verde neon)" (réplica aprovada do kit de meta-design verde, 18/11/2026) ─────────
-// Kit quadrado 1080 levado a 1080×1350 (+135 no eixo y). Fundos já trazem a tela do Photoshop, a moldura da capa, o anel e as hashtags.
+// Kit quadrado 1080 levado a 1080×1350 (+135 no eixo y; maleta e cavalo, que saem pela borda de baixo, +270 para ficar na mesma altura em relação ao rodapé). Fundos já trazem a tela do Photoshop, a moldura da capa, o anel e as hashtags.
 const TC = { verde: '#2ee84a', tinta: '#3a3a3a', nota: '#777777', icones: ['flame', 'thermometer', 'snowflake'], bx: [319, 389, 393] };
 const tcBase = k => ({ bg: { asset: 'tpl-clientes-fundo-' + k, color: '#1a1a1a' }, paper: '#e4e4e4', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
@@ -661,7 +661,7 @@ COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
   s.shapes.push({ kind: 'rect', x: e.X(675), y: e.Y(1072), w: e.X(36), h: e.Y(39), radius: .15, color: 'transparent', stroke: TC.verde, stroke_w: 2 / 1080 });
   s.shapes.push({ kind: 'icon', icon: 'move-right', x: e.X(675), y: e.Y(1072), w: e.X(22), h: e.Y(22), icon_color: TC.verde });
   s.items.push({ asset: 'tpl-clientes-facebook', x: F2(1080 / 1080), y: F2(1005 / 1350), size: 360, cruza: true });
-  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1160 / 1080), y: F2(1215 / 1350), size: 560, blur: 1, cruza: true });
+  s.items.push({ asset: 'tpl-clientes-maleta', x: F2(1160 / 1080), y: F2(1350 / 1350), size: 560, blur: 1, cruza: true });
   return s;
 };
 COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
@@ -675,9 +675,9 @@ COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
   if (d.nota) { const nf = fX(400, 0), nl = fgAst(erQuebra(d.nota, nf, 24, mw)); B.push({ h: nl.length * 45, gap: 40, make: y => { nl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x + 21), y: e.Y(y + 22 + i * 45), align: 'left', size: e.P(24), font: nf.k, weight: nf.w, lh: 1, color: TC.nota, hl: '#17b236', hw: 700, nowrap: true, shadow: false })); return []; } }); }
   pilha(B, 0, ctx, { topo: 290 });
   const fim = (ctx.i || 0) === (ctx.total || 1) - 2;
-  if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(943 / 1080), y: F2(1185 / 1350), size: 720, cruza: true });
+  if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(943 / 1080), y: F2(1320 / 1350), size: 720, cruza: true });
   else if (j === 0) s.items.push({ asset: 'tpl-clientes-busto-quebrado', x: F2(1120 / 1080), y: F2(634 / 1350), size: 1058, cruza: true });
-  else s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(903 / 1350), size: 1037, cruza: true });
+  else s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(1038 / 1350), size: 1037, cruza: true });
   return s;
 };
 COMPOR_EXTRA['clientes-fim'] = (d, ctx) => {
