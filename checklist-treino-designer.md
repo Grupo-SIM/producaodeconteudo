@@ -31,7 +31,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
 1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
-2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Próximo: troca automática de cor nos templates aprovados, com prévia por marca para o dono aprovar (fotos e objetos com cor própria não trocam).
+2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
 3. [ ] Treino de capas para os carrosséis.
 4. [ ] Feed estático (refazer do zero a partir das referências do dono).
 5. [ ] Stories.

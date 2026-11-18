@@ -38,8 +38,12 @@ As fontes que o sistema ainda não tinha entram como arquivo da marca:
 - O mascote mantém as cores dele, mesmo quando elas forem diferentes da paleta. O Marketing Raiz, por exemplo, tem o mascote preto e dourado.
 - Nenhuma cor de fora da paleta entra na marca, a não ser foto e objeto com cor própria.
 
-## Troca de cor nos templates (em teste)
-- A cor-assinatura do template vira o **destaque** da marca. O fundo e as peças do template mudam de tom junto.
+## Troca de cor nos templates (ligada em 18/11, aprovada pelo dono)
+- Vale para todos os templates aprovados, do 7 ao 13. A cor-assinatura do template vira o **destaque** da marca, e as cores de apoio do template mudam de tom junto, mantendo a relação entre elas.
+- O fundo e as peças do template também mudam de tom.
+- Fogo, nota de dinheiro e as peças de xadrez **não** mudam, porque têm cor própria.
+- Fotos, mascotes e objetos de outros kits também não mudam.
+- Para desligar numa peça: `cor_marca: false`.
 - Em marca preto e branco (Marketing Raiz), o fundo e as peças ficam em preto e branco.
 - Correção do dono (18/11): no Seguidores em Alta a cor principal é o roxo, e o laranja é só detalhe; no Marketing Raiz as principais são preto e branco, e o lilás é detalhe.
 - Conferido nos sites das marcas (18/11): SimIntPay e Sim Intermediações usam roxo/violeta como cor principal (a logo tem outras cores), PagaTG e Central batem com o manual, Marketing Raiz é preto e branco em fundo claro, Teron é preto e branco com brilho azul. O 007 Spyhacker usa no site um ciano mais claro (`#6FDCF4`) que o da logo (`#13ECE9`). O site do Atlas é atlashosting.com.br (o .com é de outra empresa): base azul noite e botão azul claro.

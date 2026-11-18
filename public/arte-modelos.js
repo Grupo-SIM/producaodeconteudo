@@ -1233,7 +1233,7 @@ Object.assign(COMPOR, COMPOR_EXTRA);
 export function contexto(c = {}) {
   const W = c.W || 1080, H = c.H || 1350, paper = c.paper || '#0b0b0f', accent = c.accent || '#f59e0b';
   const escuro = lum(paper) < .4;
-  const ctx = { W, H, accent, paper: escuro ? paper : '#0b0b0f', ink: c.ink && lum(c.ink) > .5 ? c.ink : '#ffffff', inkEscura: c.inkEscura || '#0a0a0c', claro: c.claro || (escuro ? '#eceae5' : paper), mx: Math.round(W * (c.margem || .08)), i: c.i || 0, total: c.total || 1, logo: c.logo, avatar: c.avatar, logoEscura: c.logoEscura, logoRatio: c.logoRatio || .2, contatos: c.contatos || {}, molde: c.molde || {}, marca: c.marca || '', bancoTex: c.bancoTex || [], texturas: c.texturas || [], texEstilo: c.texEstilo || '', ftit: c.ftit, ftxt: c.ftxt, fTit: c.fTit, fTxt: c.fTxt, fonteMarca: !!c.fonteMarca, fonteMarcaK: c.fonteMarcaK, caixa: c.caixa || {} };
+  const ctx = { W, H, accent, paper: escuro ? paper : '#0b0b0f', ink: c.ink && lum(c.ink) > .5 ? c.ink : '#ffffff', inkEscura: c.inkEscura || '#0a0a0c', claro: c.claro || (escuro ? '#eceae5' : paper), mx: Math.round(W * (c.margem || .08)), i: c.i || 0, total: c.total || 1, logo: c.logo, avatar: c.avatar, logoEscura: c.logoEscura, logoRatio: c.logoRatio || .2, contatos: c.contatos || {}, molde: c.molde || {}, marca: c.marca || '', bancoTex: c.bancoTex || [], texturas: c.texturas || [], texEstilo: c.texEstilo || '', ftit: c.ftit, ftxt: c.ftxt, fTit: c.fTit, fTxt: c.fTxt, fonteMarca: !!c.fonteMarca, fonteMarcaK: c.fonteMarcaK, corMarca: c.corMarca, caixa: c.caixa || {} };
   if (H / W > 1.6) ctx.storiesH = true;
   ctx.T = tipografia(ctx);
   return ctx;
@@ -1279,21 +1279,39 @@ export function comporSlide(slide, ctxBase) {
   if (ctx.fonteMarca && out?.texts) { const kM = ctx.fonteMarcaK || 'poppins'; for (const t of out.texts) if (t.font === kM) delete t.font; }
   return { ...out, modelo: slide.modelo, dados: slide.dados || {} };
 }
-const COR_TPL = { espaco: { cor: '#12c9de', pecas: 'tpl-espaco-', escuro: true } };
+// cor-assinatura de cada template aprovado (vira o destaque da marca) e as cores de apoio (giram o tom junto, mantendo a relação entre elas).
+// fundo: o fundo do template gira junto; pecas: as peças soltas giram junto (false quando têm cor própria: fogo, nota de dinheiro, reis dourados)
+const COR_TPL = {
+  espaco: { cor: '#12c9de', pref: 'tpl-espaco-', fundo: true, pecas: true },
+  erros: { cor: '#f41ae2', apoio: ['#2ed1b4'], pref: 'tpl-erros-', fundo: true, pecas: true },
+  fogo: { cor: '#e3243b', pref: 'tpl-fogo-', fundo: false, pecas: false },
+  idv: { cor: '#7b43e2', apoio: ['#d6b8ff', '#4a2a8a'], pref: 'tpl-idv-', fundo: true, pecas: true },
+  xadrez: { cor: '#e5b93a', pref: 'tpl-xadrez-', fundo: true, pecas: false },
+  clientes: { cor: '#2ee84a', pref: 'tpl-clientes-', fundo: true, pecas: true },
+  colagem: { cor: '#ff1493', apoio: ['#45125c', '#3cff3c', '#ffe14d'], pref: 'tpl-colagem-', fundo: true, pecas: true }
+};
 const hueDe = h => { const [r, g, b] = rgb(h).map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; const x = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (x * 60 + 360) % 360; };
+// gira o tom de uma cor (mesma conta do hue-rotate do CSS) ou tira a cor (marca preto e branco)
+function giraHex(h, graus, cinza) {
+  const [r, g, b] = rgb(h);
+  if (cinza) { const y = Math.round(.2126 * r + .7152 * g + .0722 * b); return hex([y, y, y]); }
+  const a = graus * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+  const m = [.213 + c * .787 - s * .213, .715 - c * .715 - s * .715, .072 - c * .072 + s * .928, .213 - c * .213 + s * .143, .715 + c * .285 + s * .140, .072 - c * .072 - s * .283, .213 - c * .213 - s * .787, .715 - c * .715 + s * .715, .072 + c * .928 + s * .072];
+  return hex([m[0] * r + m[1] * g + m[2] * b, m[3] * r + m[4] * g + m[5] * b, m[6] * r + m[7] * g + m[8] * b].map(v => Math.max(0, Math.min(255, Math.round(v)))));
+}
 function trocaCor(out, modelo, alvo) {
   const t = COR_TPL[modelo.split('-')[0]]; if (!t || !/^#[0-9a-f]{6}$/i.test(alvo)) return;
   const [r0, g0, b0] = rgb(alvo), semCor = Math.max(r0, g0, b0) - Math.min(r0, g0, b0) < 30;
-  if (semCor) alvo = t.escuro ? '#ffffff' : '#0a0a0a';   // marca preto e branco: em template escuro o destaque é o branco, em template claro o preto
+  if (semCor) alvo = lum(out.paper || '#000000') < .4 ? '#ffffff' : '#0a0a0a';   // marca preto e branco: em página escura o destaque é o branco, em página clara o preto
   const de = t.cor.toLowerCase(), para = alvo.toLowerCase(), giro = Math.round(((hueDe(para) - hueDe(de)) + 540) % 360 - 180), escuro = sobre(para);
-  const troca = o => { for (const k of ['color', 'hl', 'stroke', 'icon_color', 'bg']) if (typeof o[k] === 'string' && o[k].toLowerCase() === de) o[k] = para; };
+  const mapa = { [de]: para }; for (const a of t.apoio || []) mapa[a.toLowerCase()] = giraHex(a, giro, semCor);
+  const troca = o => { for (const k of ['color', 'hl', 'stroke', 'icon_color', 'bg', 'icon_bg']) if (typeof o[k] === 'string' && mapa[o[k].toLowerCase()]) o[k] = mapa[o[k].toLowerCase()]; };
   for (const o of [...(out.texts || []), ...(out.shapes || [])]) troca(o);
-  // texto escuro em cima da pílula/quadrado da cor: mantém contraste com a cor nova
-  for (const sh of (out.shapes || []).filter(x => x.color === para && ['pill', 'rect', 'circle'].includes(x.kind))) for (const o of [...out.texts, ...out.shapes]) if (o !== sh && Math.abs(o.y - sh.y) < .01 && Math.abs(o.x - sh.x) < (sh.w || 0) / 2 && (o.color || o.icon_color)) { if (o.color && lum(o.color) < .2 || o.color && lum(o.color) > .8) o.color = escuro; if (o.icon_color && (lum(o.icon_color) < .2 || lum(o.icon_color) > .8)) o.icon_color = escuro; }
-  // marca preto e branco (cor sem saturação): o fundo e as peças perdem a cor em vez de girar o tom
-  const [r, g, b2] = rgb(para), cinza = Math.max(r, g, b2) - Math.min(r, g, b2) < 30, fil = cinza ? { sa: 0 } : giro ? { hue: giro } : null;
-  if (fil && out.bg?.asset?.startsWith(t.pecas)) out.bg.fil = { ...(out.bg.fil || {}), ...fil };
-  for (const it of out.items || []) if (fil && String(it.asset || '').startsWith(t.pecas)) it.fil = { ...(it.fil || {}), ...fil };
+  // texto e ícone em cima de pílula/quadrado na cor nova: mantém o contraste
+  for (const sh of (out.shapes || []).filter(x => x.color === para && ['pill', 'rect', 'circle'].includes(x.kind))) for (const o of [...out.texts, ...out.shapes]) if (o !== sh && Math.abs(o.y - sh.y) < .01 && Math.abs(o.x - sh.x) < (sh.w || 0) / 2) { if (o.color && (lum(o.color) < .2 || lum(o.color) > .8)) o.color = escuro; if (o.icon_color && (lum(o.icon_color) < .2 || lum(o.icon_color) > .8)) o.icon_color = escuro; }
+  const fil = semCor ? { sa: 0 } : giro ? { hue: giro } : null; if (!fil) return;
+  if (t.fundo && String(out.bg?.asset || '').startsWith(t.pref)) out.bg.fil = { ...(out.bg.fil || {}), ...fil };
+  if (t.pecas) for (const it of out.items || []) if (String(it.asset || '').startsWith(t.pref)) it.fil = { ...(it.fil || {}), ...fil };
 }
 // stories: aperta o conteúdo para a faixa segura (12% a 84% da altura), sem mexer em fundo e decoração
 function zonaStories(s, ctx) {
