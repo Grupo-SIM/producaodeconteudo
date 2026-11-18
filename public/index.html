@@ -2519,9 +2519,9 @@ const assetThumb = (a, h2 = 120) => {
   return h('div', { style: { ...box, color: 'var(--mut)' } }, svg(GROUP_ICON[g], 34));
 };
 const KIND_LABEL = { logo: 'Logo', fundo: 'Fundo / layout de fundo', mascote: 'MASCOTE da marca (personagem oficial)', foto: 'Foto / imagem', textura: 'Textura / padrão', fonte: 'Fonte (arquivo)', musica: 'Música (trilha)', efeito: 'Efeito sonoro', narracao: 'Narração gravada', audio: 'Áudio (outro)', video: 'Vídeo / footage', outro: 'Outro' };
-const COLECAO = { motion: 'Motion', hardcopy: 'VSL' };
-const COL_HELP = { motion: 'Imagens, fotos, elementos, fundos e vídeos para o estilo motion 2D: texto animado com objetos e fundos em cena.', hardcopy: 'Imagens, vídeos e animações para o estilo VSL: cada cena é uma imagem ou vídeo inteiro, com o texto por cima.', none: 'Logos, mascotes, fontes, músicas e narrações. Servem aos dois estilos.' };
-const COL_ICON = { motion: MI.font, hardcopy: MI.video, none: MI.file };
+const COLECAO = { arte: 'Artes', motion: 'Motion', hardcopy: 'VSL' };
+const COL_HELP = { arte: 'Biblioteca de Artes do Designer: só fundos, elementos e texturas aprovados pelo dono. Separada dos vídeos: o Editor não usa e o Designer só usa estes.', motion: 'Imagens, fotos, elementos, fundos e vídeos para o estilo motion 2D: texto animado com objetos e fundos em cena.', hardcopy: 'Imagens, vídeos e animações para o estilo VSL: cada cena é uma imagem ou vídeo inteiro, com o texto por cima.', none: 'Logos, mascotes, fontes, músicas e narrações. Servem aos dois estilos.' };
+const COL_ICON = { arte: MI.img, motion: MI.font, hardcopy: MI.video, none: MI.file };
 const KIND_BY_EXT = ext => IMG_EXT.includes(ext) ? 'foto' : AUD_EXT.includes(ext) ? 'musica' : VID_EXT.includes(ext) ? 'video' : FONT_EXT.includes(ext) ? 'fonte' : 'outro';
 const MEDIA_LIMIT = ext => VID_EXT.includes(ext) ? 120 : AUD_EXT.includes(ext) ? 60 : 25;
 // envio binário com barra de progresso (sem base64: aguenta vídeos grandes)
@@ -2550,7 +2550,7 @@ async function arquivosDoDrop(dt) {
 function uploadAssets(brandPref, preFiles, preKind) {   // coleção pré-selecionada = a que está aberta na Biblioteca
   const brands = (S.kb?.brands || []).map(x => x.name);
   const bsel = h('select', null, h('option', { value: '' }, 'Geral (todas as marcas)'), brands.map(n => h('option', { value: n, selected: n === brandPref }, n)));
-  const csel = h('select', null, Object.entries(COLECAO).map(([k, v]) => h('option', { value: k, selected: k === (S.mb?.col === 'hardcopy' ? 'hardcopy' : 'motion') }, 'Seção ' + v)), h('option', { value: 'none', selected: S.mb?.col === 'none' }, 'Geral (logos, fontes, músicas, narrações)'));
+  const csel = h('select', null, Object.entries(COLECAO).map(([k, v]) => h('option', { value: k, selected: k === (['hardcopy', 'arte'].includes(S.mb?.col) ? S.mb.col : 'motion') }, 'Seção ' + v)), h('option', { value: 'none', selected: S.mb?.col === 'none' }, 'Geral (logos, fontes, músicas, narrações)'));
   const ksel = h('select', null, h('option', { value: '' }, 'Detectar pelo nome, pasta e tipo do arquivo'), Object.entries(KIND_LABEL).map(([k, v]) => h('option', { value: k, selected: k === preKind }, v)));
   const tags = h('input', { type: 'text', placeholder: 'Ex.: calma, tecnologia, vertical, fundo escuro' });
   const note = h('input', { type: 'text', placeholder: 'Ex.: cidade à noite com luzes em movimento (ajuda o Editor a escolher)' });
@@ -2821,10 +2821,10 @@ async function viewMedia(embedded) {
   const [al, bd] = await Promise.all([api('/assets'), api('/knowledge')]);
   S.kb = bd; S.assetsList = al.assets;
   const M = S.mb = Object.assign({ tipo: 'all', brand: 'all', q: '', sort: 'recent', col: 'motion' }, S.mb || {});
-  if (!['motion', 'hardcopy', 'none', 'all'].includes(M.col)) M.col = 'motion';
+  if (!['arte', 'motion', 'hardcopy', 'none', 'all'].includes(M.col)) M.col = 'motion';
   const inCol = (a, c) => c === 'all' || (c === 'none' ? !a.colecao : a.colecao === c);
   const GR_ALL = [['img', 'Imagens'], ['video', 'Vídeos e animações'], ['musica', 'Músicas'], ['audio', 'Narrações e efeitos'], ['fonte', 'Fontes'], ['outro', 'Outros']];
-  const GR_COL = M.col === 'motion' || M.col === 'hardcopy' ? ['img', 'video'] : M.col === 'none' ? ['img', 'musica', 'audio', 'fonte', 'outro'] : GR_ALL.map(g => g[0]);
+  const GR_COL = M.col === 'arte' ? ['img'] : M.col === 'motion' || M.col === 'hardcopy' ? ['img', 'video'] : M.col === 'none' ? ['img', 'musica', 'audio', 'fonte', 'outro'] : GR_ALL.map(g => g[0]);
   const GR = [['all', 'Tudo'], ...GR_ALL.filter(g => GR_COL.includes(g[0]))];
   if (!GR.some(g => g[0] === M.tipo)) M.tipo = 'all';
   const cnt = (k, c = M.col) => al.assets.filter(a => inCol(a, c) && (k === 'all' || mediaGroup(a) === k)).length;
@@ -2838,7 +2838,7 @@ async function viewMedia(embedded) {
     h('span', { class: 'lib-ci' }, svg(COL_ICON[k], 22)), h('div', { class: 'sp' }, h('b', null, label), h('div', { class: 'small mut', style: { lineHeight: 1.45 } }, COL_HELP[k]),
       h('div', { class: 'lib-cnts' }, k === 'none' ? [h('span', null, h('b', null, cnt('musica', k) + cnt('audio', k)), ' áudios'), h('span', null, h('b', null, cnt('img', k)), ' imagens'), h('span', null, h('b', null, cnt('fonte', k)), ' fontes')] : [h('span', null, h('b', null, cnt('img', k)), ' imagens'), h('span', null, h('b', null, cnt('video', k)), ' vídeos e animações')])));
   root.append(painelFichas(al.assets));
-  root.append(h('div', { class: 'lib-secs' }, secCard('motion', 'Motion'), secCard('hardcopy', 'VSL'), secCard('none', 'Geral')));
+  root.append(h('div', { class: 'lib-secs' }, secCard('arte', 'Artes (Designer)'), secCard('motion', 'Motion'), secCard('hardcopy', 'VSL'), secCard('none', 'Geral')));
   const secName = M.col === 'all' ? 'a biblioteca' : M.col === 'none' ? 'Geral' : 'a seção ' + COLECAO[M.col];
   const drop = h('div', { class: 'lib-drop' }, svg(MI.up, 22), h('div', null, h('b', null, M.col === 'all' ? 'Arraste arquivos aqui' : 'Arraste para ' + secName), h('div', { class: 'small mut' }, M.col === 'motion' ? 'Imagens, fotos, fundos e vídeos para o estilo Motion. Ou clique para escolher.' : M.col === 'hardcopy' ? 'Imagens, vídeos e animações para o estilo VSL. Ou clique para escolher.' : M.col === 'none' ? 'Logos, mascotes, fontes, músicas e narrações. Ou clique para escolher.' : 'Ou clique para escolher. Vários de uma vez.')));
   const pick = h('input', { type: 'file', multiple: true, style: { display: 'none' } }); pick.addEventListener('change', () => { if (pick.files.length) uploadAssets(secBrand, pick.files); });
@@ -4061,7 +4061,7 @@ async function viewArte() {
       h('div', { class: 'row', style: { gap: '5px', flexWrap: 'wrap' } }, badge('Layout', 'acc'), !S.atBrand && l.brand ? badge(l.brand) : null, l.noticia ? badge('Notícias', 'ok') : null, topo ? badge('Recente', 'ok') : null, noCerebro()),
       h('div', { class: 'small mut' }, `${AT_FMT[l.format]?.[0] || l.format} · atualizado há ${ago(l.updated_at) || 'pouco'} · usado ${l.uses}x`),
       h('div', { class: 'row', style: { gap: '6px', flexWrap: 'wrap' } }, h('button', { class: 'btn sm primary', onclick: () => usarLayout(l) }, 'Usar'), maisMenu(h('button', { class: 'btn sm', onclick: () => replicarLayout(l) }, 'Usar em outra marca'), h('button', { class: 'btn sm', onclick: () => { S.atTab = 'layouts'; renderView(); } }, 'Editar / apagar')))));
-  const NOME_MOD = { heroi: 'Capa herói', revista: 'Capa revista', 'capa-faixa': 'Capa com faixas', 'capa-minimal': 'Capa minimalista', dividido: 'Título partido', texto: 'Texto', numero: 'Número', lista: 'Lista', frase: 'Frase', pilulas: 'Pílulas', cta: 'Chamada final', noticia: 'Capa de jornal', 'post-card': 'Cartão de notícia', citacao: 'Frase de personalidade', 'manchete-foto': 'Manchete sobre foto' };
+  const NOME_MOD = { 'colagem-capa': 'Colagem: capa', 'colagem-pagina': 'Colagem: miolo', 'colagem-fim': 'Colagem: fim', 'clientes-capa': 'Tipos de clientes: capa', 'clientes-bloco': 'Tipos de clientes: miolo', 'clientes-fim': 'Tipos de clientes: fim', 'xadrez-capa': 'Xadrez: capa', 'xadrez-lista': 'Xadrez: miolo', 'xadrez-fim': 'Xadrez: fim', 'idv-capa': 'Identidade visual: capa', 'idv-texto': 'Identidade visual: miolo', 'idv-fim': 'Identidade visual: fim', 'fogo-capa': 'Fogo: capa', 'fogo-lista': 'Fogo: miolo', 'fogo-fim': 'Fogo: fim', 'erros-capa': 'Lista de erros: capa', 'erros-par': 'Lista de erros: dois itens', 'erros-fim': 'Lista de erros: fim', heroi: 'Capa herói', revista: 'Capa revista', 'capa-faixa': 'Capa com faixas', 'capa-minimal': 'Capa minimalista', dividido: 'Título partido', texto: 'Texto', numero: 'Número', lista: 'Lista', frase: 'Frase', pilulas: 'Pílulas', cta: 'Chamada final', noticia: 'Capa de jornal', 'post-card': 'Cartão de notícia', citacao: 'Frase de personalidade', 'manchete-foto': 'Manchete sobre foto' };
   const TEMAS = [['educativo', 'Educativo'], ['lista', 'Lista'], ['tutorial', 'Tutorial'], ['oferta', 'Oferta'], ['noticia', 'Notícia'], ['opiniao', 'Opinião'], ['geral', 'Geral']], temaNome = k => (TEMAS.find(x => x[0] === k) || [])[1] || 'Geral';
   const FMTS = Object.keys(AT_FMT); if (S.atFmtF && !FMTS.includes(S.atFmtF)) S.atFmtF = ''; S.atFmt = S.atFmtF || 'carrossel';
   const fmtDe = t => t.fmt || S.atFmtF || (t.formatos.includes('carrossel') ? 'carrossel' : t.formatos[0] || 'carrossel');   // sem filtro de formato, cada estilo abre no seu formato principal
@@ -4170,8 +4170,8 @@ async function viewArte() {
 }
 
 /* ───────── Biblioteca lateral (arte e vídeo): clique, arraste para a tela ou envie do computador ───────── */
-async function uploadAsset(f, brand) {
-  const r = await fetch('/api/assets/upload?' + new URLSearchParams({ filename: f.name, brand: brand || '' }), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/octet-stream', 'X-Nerd': '1' }, body: f });
+async function uploadAsset(f, brand, colecao) {
+  const r = await fetch('/api/assets/upload?' + new URLSearchParams({ filename: f.name, brand: brand || '', ...(colecao ? { colecao } : {}) }), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/octet-stream', 'X-Nerd': '1' }, body: f });
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j;
 }
 function libDrawer(o) {
@@ -4187,7 +4187,7 @@ function libDrawer(o) {
   });
   const usarWeb = guard(async (it, modo) => {
     toast(modo === 'recorte' ? 'Baixando e recortando o fundo…' : 'Baixando a foto…');
-    const j = await api('/imagens/importar', 'POST', { url: it.full, brand: o.brand || '', nome: web.q, recorte: modo === 'recorte', credito: `Foto: ${it.autor} (${it.fonte}, ${it.licenca}) ${it.link}`, ping: it.ping || '' });
+    const j = await api('/imagens/importar', 'POST', { url: it.full, brand: o.brand || '', colecao: o.colecao || '', nome: web.q, recorte: modo === 'recorte', credito: `Foto: ${it.autor} (${it.fonte}, ${it.licenca}) ${it.link}`, ping: it.ping || '' });
     o.onUpload(j); const a = o.list().find(x => x.id === j.id) || { ...j, url: `/api/assets/${j.id}/file` };
     if (modo === 'fundo' && o.onBg) o.onBg(a); else o.onAdd(a);
     toast('Foto adicionada (crédito guardado na Biblioteca)', 'ok');
@@ -4210,7 +4210,7 @@ function libDrawer(o) {
       it.addEventListener('click', () => o.onAdd(a)); return it;
     }) : [h('div', { class: 'mut small', style: { gridColumn: '1/-1', padding: '10px' } }, 'Nada por aqui. Envie um arquivo do seu computador ou arraste-o para esta área.')]));
   };
-  const send = async files => { for (const f of [...files].slice(0, 12)) { try { const j = await uploadAsset(f, o.brand); o.onUpload(j, f); } catch (e) { toast(f.name + ': ' + e.message, 'err'); } } toast('Enviado para a biblioteca', 'ok'); paint(); };
+  const send = async files => { for (const f of [...files].slice(0, 12)) { try { const j = await uploadAsset(f, o.brand, o.colecao); o.onUpload(j, f); } catch (e) { toast(f.name + ': ' + e.message, 'err'); } } toast('Enviado para a biblioteca', 'ok'); paint(); };
   search.addEventListener('input', () => { if (kind === 'web') return; q = search.value.trim(); paint(); });
   search.addEventListener('keydown', e => { if (e.key === 'Enter' && kind === 'web') { e.preventDefault(); buscarWeb(); } });
   file.addEventListener('change', () => { send(file.files); file.value = ''; });
@@ -4468,14 +4468,14 @@ async function arteEditor(id, onClose, opts = {}) {
     };
     search.addEventListener('input', () => { q = search.value.trim(); paintG(); });
     file.addEventListener('change', guard(async () => {
-      const f = file.files[0]; if (!f) return; const r = await fetch('/api/assets/upload?' + new URLSearchParams({ filename: f.name, brand: data.brand || '' }), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/octet-stream', 'X-Nerd': '1' }, body: f });
+      const f = file.files[0]; if (!f) return; const r = await fetch('/api/assets/upload?' + new URLSearchParams({ filename: f.name, brand: data.brand || '', colecao: 'arte' }), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/octet-stream', 'X-Nerd': '1' }, body: f });
       const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Falha no envio'); E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }); toast('Imagem enviada para a biblioteca da marca', 'ok'); paintG();
     }));
     modal(titulo, h('div', { class: 'stack' }, tabsB, h('div', { class: 'row', style: { gap: '8px' } }, h('div', { class: 'sp' }, search), h('button', { class: 'btn sm', onclick: () => file.click() }, svg(MI.up, 15), 'Enviar do computador'), file), grid), [h('button', { class: 'btn', onclick: closeModal }, 'Fechar')]); paintG();
   };
   const addAssetAt = (a, x, y) => { if (!need('items', 30, 'imagens')) return; pushUndo(); (cur().items ||= []).push({ asset: a.name, x: r2(clamp(x ?? .5, 0, 1)), y: r2(clamp(y ?? .5, 0, 1)), size: Math.round(W * (a.kind === 'logo' ? .22 : .3)), rot: 0 }); E.multi = null; E.sel = { kind: 'item', k: cur().items.length - 1 }; afterAdd(); };
   const bgAsset = a => { pushUndo(); const s = cur(); s.bg ||= {}; delete s.bg.gen; delete s.__ia; s.bg.asset = a.name; markDirty(); drawPanel(); repaint(); drawStrip(); toast('Fundo do slide ' + (E.si + 1) + ' trocado', 'ok'); };
-  const lib = libDrawer({ list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Minha biblioteca']], match: () => true,
+  const lib = libDrawer({ colecao: 'arte', list: () => E.assets.filter(a => !/^noticia-\d/.test(a.name || '')), thumb: a => a.url, accept: 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml', brand: data.brand, web: true, kinds: [['todos', 'Minha biblioteca']], match: () => true,
     onAdd: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } addAssetAt(a); }, onBg: a => { if (pickCb) { const f = pickCb; pickCb = null; toggleLib(false); return f(a); } bgAsset(a); }, onCirc: a => { addAssetAt(a, .72, .24); const it = cur().items[cur().items.length - 1]; if (it) { it.round = true; it.size = Math.round(W * .42); it.shadow = 1; it.front = true; } markDirty(); drawPanel(); repaint(); drawStrip(); }, onClose: () => toggleLib(false), onUpload: (j, f) => E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }) });
   const toggleLib = on => { lib.el.hidden = !on; libB.classList.toggle('on', on); if (on) { lib.paint(); elp.el.hidden = true; elB.classList.remove('on'); tpl.el.hidden = true; tplB.classList.remove('on'); } setTimeout(fit, 30); };
   const libB = h('button', { title: 'Biblioteca de imagens da marca', onclick: () => toggleLib(lib.el.hidden) }, svg(AI.image), 'Biblioteca');
@@ -4483,7 +4483,7 @@ async function arteEditor(id, onClose, opts = {}) {
   cv.addEventListener('drop', async e => {
     const rc = wrap.getBoundingClientRect(), x = (e.clientX - rc.left) / rc.width, y = (e.clientY - rc.top) / rc.height, nm = e.dataTransfer.getData('text/x-asset');
     if (nm) { e.preventDefault(); const a = E.assets.find(z => z.name === nm); if (a) addAssetAt(a, x, y); return; }
-    if (e.dataTransfer.files?.length) { e.preventDefault(); const f = e.dataTransfer.files[0]; if (!/^image\//.test(f.type)) return toast('Só imagens (PNG, JPG, WebP, GIF, SVG)', 'bad'); try { const j = await uploadAsset(f, data.brand); const a = { id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }; E.assets.unshift(a); lib.paint(); addAssetAt(a, x, y); } catch (er) { toast(er.message, 'err'); } }
+    if (e.dataTransfer.files?.length) { e.preventDefault(); const f = e.dataTransfer.files[0]; if (!/^image\//.test(f.type)) return toast('Só imagens (PNG, JPG, WebP, GIF, SVG)', 'bad'); try { const j = await uploadAsset(f, data.brand, 'arte'); const a = { id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` }; E.assets.unshift(a); lib.paint(); addAssetAt(a, x, y); } catch (er) { toast(er.message, 'err'); } }
   });
   const need = (arr, max, nome) => { if ((cur()[arr] || []).length >= max) { toast(`Limite de ${max} ${nome} por slide`, 'bad'); return false; } return true; };
   const afterAdd = () => { markDirty(); drawPanel(); repaint(); drawStrip(); };
@@ -5143,7 +5143,7 @@ async function arteEditor(id, onClose, opts = {}) {
   const elp = { el: h('div', { class: 'aelp aelp2', hidden: true }) }, EL = { tab: 'icones', q: '', cat: '', tipo: '', q3: '', cat3: '', lim3: 120 };
   const dragElem = (node, payload) => { node.draggable = true; node.addEventListener('dragstart', e => { e.dataTransfer.setData('text/x-elem', JSON.stringify(payload)); e.dataTransfer.effectAllowed = 'copy'; }); };
   const usar3d = guard(async (id, x, y) => {
-    const j = await api('/banco3d/usar', 'POST', { id, brand: data.brand || '' });
+    const j = await api('/banco3d/usar', 'POST', { id, brand: data.brand || '', colecao: 'arte' });
     if (!E.assets.some(z => z.id === j.id)) E.assets.unshift({ id: j.id, name: j.name, kind: j.kind, brand: data.brand || '', url: `/api/assets/${j.id}/file` });
     const a = E.assets.find(z => z.id === j.id); addAssetAt(a, x, y);
   });
@@ -5199,6 +5199,25 @@ async function arteEditor(id, onClose, opts = {}) {
     ['noticia', { circulo: 1 }, '3 · Notícia Zyrion: foto com círculo', 'Foto de fundo e um círculo com a referência do assunto (rosto, logo, objeto).'],
     ['noticia', { estilo: 'nuvo' }, '4 · Notícia Nuvo', 'Logo no topo, foto única, pílula com o site, nome da marca vazado atrás e “Siga @marca”.'],
     ['post-card', {}, '6 · Contracapa (cartão do X)', 'Página à parte e opcional: foto com fade e o cartão de post da marca. Crie uma página nova e aplique.']];
+  // carrossel aprovado: cada página tem o seu modelo (capa, miolo, fim)
+  const TPL_CARROSSEL = [['erros-capa', {}, '7 · Lista de erros: capa', 'Número pincelado, título serifado magenta, apoio condensado e botão “Arraste para o lado”.'],
+    ['erros-par', {}, '7 · Lista de erros: dois itens', 'Dois itens em zigue-zague com rótulo “ERRO N :”, título colorido e explicação sublinhada.'],
+    ['erros-fim', {}, '7 · Lista de erros: fim com chamada', 'Último item e caixa magenta com a chamada e o botão.'],
+    ['fogo-capa', {}, '8 · Fogo: capa', 'Fogo e dinheiro queimando, etiquetas brancas e palavra-explosão vermelha.'],
+    ['fogo-lista', {}, '8 · Fogo: miolo', 'Fundo preto com até 3 itens numerados ou uma frase forte.'],
+    ['fogo-fim', {}, '8 · Fogo: fim', 'Pergunta grande centralizada e CTA sobre os prédios.'],
+    ['idv-capa', {}, '9 · Identidade visual: capa', 'Chamada, título espaçado, palavra gigante em itálico e o robô roxo.'],
+    ['idv-texto', {}, '9 · Identidade visual: miolo', 'Faixa roxa com dois blocos de texto em escada.'],
+    ['idv-fim', {}, '9 · Identidade visual: fim', 'Dois blocos e a caixa tracejada do CTA.'],
+    ['xadrez-capa', {}, '10 · Xadrez: capa', 'Etiquetas brancas, palavra-explosão mostarda e reis 3D.'],
+    ['xadrez-lista', {}, '10 · Xadrez: miolo', 'Fundo bege com até 3 itens numerados.'],
+    ['xadrez-fim', {}, '10 · Xadrez: fim', 'Pergunta grande sobre os prédios em P&B.'],
+    ['clientes-capa', {}, '11 · Tipos de clientes: capa', 'Busto na moldura branca, título e apoio verde.'],
+    ['clientes-bloco', {}, '11 · Tipos de clientes: miolo', 'Prancheta do Photoshop com uma ideia por página.'],
+    ['clientes-fim', {}, '11 · Tipos de clientes: fim', 'Logo da marca no anel verde e o CTA.'],
+    ['colagem-capa', {}, '12 · Colagem: capa', 'Gato astronauta, selo e título com palavra amarela.'],
+    ['colagem-pagina', {}, '12 · Colagem: miolo', 'Colagem, megafone, foguete e alvo, na ordem.'],
+    ['colagem-fim', {}, '12 · Colagem: fim', 'Lista de engajamento, mão de joinha e CTA.']];
   const tplDados = () => {   // o que já está na página vira os dados do template novo
     const s = cur(), d = JSON.parse(JSON.stringify(s.dados || {})), T = r => (s.texts || []).filter(t => t.role === r && !t.decor).sort((a, b) => String(b.value || '').length - String(a.value || '').length)[0]?.value;   // o título é o texto mais longo (a palavra gigante do Nuvo não é o título)
     // o que se vê na página manda (título, texto e foto de fundo); dados antigos de outro conteúdo não entram
@@ -5255,7 +5274,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const s = cur(), si = E.si, n = E.spec.slides.length, base = tplDados(), sig = JSON.stringify(base) + si, oc = new Set(TPLS.ocultos || []);
     const dd = s.dados || {}, tplAtual = (m, e) => s.modelo === m && (m !== 'noticia' || ((e.estilo || '') === (dd.estilo || '') && !!e.foto2 === !!dd.foto2 && !!e.circulo === !!dd.circulo && !!e.pb === !!dd.pb));
     const stories = x => /stories|vertical/.test(x || ''), meus = (TPLS.itens || []).filter(t => stories(t.format) === stories(data.format)).map(t => ({ ...t, custom: true, g: 'Meus templates' }));
-    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card').map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
+    const LST = [...meus, ...TPL_NOTICIA.map(([m, e, nome, ds]) => ({ m, e, nome: nome.replace('Notícia Zyrion: ', 'Zyrion · '), ds, g: 'Notícia' })), ...TPL_CARROSSEL.map(([m, e, nome, ds]) => ({ m, e, nome, ds, g: 'Carrossel' })), ...MODS.filter(x => x.id !== 'noticia' && x.id !== 'post-card' && !/^(erros|fogo|idv|xadrez|clientes|colagem)-/.test(x.id)).map(x => ({ m: x.id, e: {}, nome: x.nome, ds: x.uso + ' · ' + x.desc, g: 'Todos os formatos' }))].filter(t => t.custom || !oc.has(tplChave(t)));
     const tw = 104, th = Math.round(tw * H / W), ks = tw / W;
     const ib = (txt, tt, fn, cor) => h('button', { type: 'button', title: tt, onclick: e => { e.stopPropagation(); fn(); }, style: cor ? { color: cor } : null }, txt);   // mesmo visual dos botões das páginas (.aethb)
     const card = t => {
@@ -5276,7 +5295,7 @@ async function arteEditor(id, onClose, opts = {}) {
     const ed = E.tplEd;
     tpl.el.replaceChildren(h('div', { class: 'aelp-h' }, h('b', null, 'Templates'), h('button', { class: 'btn sm', onclick: () => toggleTpl(false) }, '×')),
       h('div', { class: 'small mut' }, 'Clique para trocar a página ' + (si + 1) + '. Para excluir, passe o mouse e clique na lixeira. Para criar um template, use “Virar template” no rodapé.'),
-      ...grade('Meus templates'), ...grade('Notícia'), ...grade('Todos os formatos'),
+      ...grade('Meus templates'), ...grade('Notícia'), ...grade('Carrossel'), ...grade('Todos os formatos'),
       oc.size ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: guard(async () => { await api('/tpl-paginas/restaurar', 'POST', {}); TPLS = null; tpl.paint(); }) }, 'Mostrar de novo os prontos escondidos (' + oc.size + ')') : null);
   };
   const toggleTpl = on => { tpl.el.hidden = !on; tplB.classList.toggle('on', on); if (on) { lib.el.hidden = true; libB.classList.remove('on'); elp.el.hidden = true; elB.classList.remove('on'); tpl.paint(); } setTimeout(fit, 30); };

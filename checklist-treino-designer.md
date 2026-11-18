@@ -19,7 +19,23 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 ## Correções do dono
 - 14/11/2026 · Teste 37 (Zyrion): foto de fundo sem letras/números; foto chocante e ligada ao assunto; capa até 100 caracteres e contracapa até 130, texto maior volta para o Copy encurtar; no editor, o fundo pode ser apagado (clique no fundo + Delete ou botão).
 - 14/11/2026 · Feed jornalístico: referências Zyrion (capa dividida, foto + círculo, foto única; contracapa com cartão de post do X) e Nuvo. Base `09-feed-jornalistico.md`; fotos de banco em alta, vivas; preto e branco em notícia triste.
+- 18/11/2026 · Carrossel: as 13 referências do começo (engenharia reversa) foram apagadas a pedido do dono; vale só o que está nos templates aprovados.
+- 18/11/2026 · Carrossel: primeiro template aprovado, **7 · Lista de erros** (réplica do kit editorial P&B + ajustes do dono: sem pílula de @ e barra de busca no topo, sem rodapé de contato, arraste só na capa, caixa do último slide vira o CTA com botão). Ficha: `conhecimento/agentes/designer/11-carrossel-template-lista-de-erros.md`. Próximo: replicar o próximo kit igual e ajustar.
+- 18/11/2026 · Carrossel: segundo template aprovado, **8 · Fogo** (réplica do kit "Não queime seu dinheiro" sem o rodapé da agência; arraste só na capa, nada no slide 2). Ficha `12-carrossel-template-fogo.md`. Regra nova: fundos e elementos aprovados são recursos que se misturam entre templates conforme o assunto (`13-recursos-aprovados-misturar.md`). O dono vai mandar mais elementos e kits; seguir um kit por vez: replicar igual, ajustar e aprovar.
+- 18/11/2026 · Carrossel: terceiro template aprovado, **9 · Identidade visual (roxo)** (réplica do kit roxo; a caixa de curtida/contato virou a caixa do CTA). Ficha `14-carrossel-template-identidade-roxo.md`. Regras do dono: texto = copy do Roteirista; fonte = a da marca (sem fonte, a da arte); copy maior ganha páginas sem perder as transições. Biblioteca de Artes separada da de vídeo, só com peças aprovadas.
+- 18/11/2026 · Carrossel: quarto template aprovado, **10 · Xadrez (mostarda)** (réplica do kit de agência com xadrez; sem rodapé; conteúdo centralizado na altura, ajuste que vale também para o Fogo; foto da capa opcional). Ficha `15-carrossel-template-xadrez.md`. O dono vai mandar depois um treino de capas para todos os carrosséis.
+- 18/11/2026 · Carrossel: quinto template aprovado, **11 · Tipos de clientes (verde neon)** (no fim, o foguete vira a logo da marca e o contato vira o CTA). Ficha `16-carrossel-template-tipos-clientes.md`. Pendentes: kit 4 (espaço, ciano: falta o arquivo de fundo) e kit 7 (colagem: faltam os elementos). Depois vem o treino de capas.
+- 18/11/2026 · Carrossel: sexto template aprovado, **12 · Colagem (pink e roxo)**, versão limpa (texto reto, sem cortar palavras, elementos afastados, textos maiores, pílula de arraste curta, textos nos lugares do original). Ficha `17-carrossel-template-colagem.md`. Falta só o kit 4 (espaço, ciano: falta o arquivo de fundo).
 (registrar aqui e na base do Designer a cada rodada)
+
+## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
+1. [ ] Carrossel: falta o kit 4 (espaço, ciano). O dono manda o arquivo de fundo sem textos em outra conversa.
+2. [ ] Identidade de cada marca: mascotes, pessoas que aparecem e 3 a 4 cores, cada uma com seu papel (1 destaque, 2 base escura, 3 apoio, 4 clara). Depois disso, a troca automática de cor nos templates aprovados, com prévia por marca para o dono aprovar (fotos e objetos com cor própria não trocam).
+3. [ ] Treino de capas para os carrosséis.
+4. [ ] Feed estático (refazer do zero a partir das referências do dono).
+5. [ ] Stories.
+6. [ ] Só depois disso: vídeo (Reels).
+Pendente técnico: os templates 7 a 12 e a Biblioteca de Artes estão no branch `claude/compassionate-darwin-b48wmn`; o PR para o `main` só é aberto quando o dono pedir.
 
 ## Onde paramos (14/11/2026, para a próxima conversa)
 - Sistema zerado: só trabalha o que o dono pede (Treino, + Novo conteúdo, Gerente) ou a grade de Produção diária (tudo em 0). Cérebro diário e relatório automático desligados.

@@ -206,10 +206,11 @@ for (const [col, def] of [['dur', 'REAL DEFAULT 0'], ['w', 'INTEGER DEFAULT 0'],
   if (!db.prepare('PRAGMA table_info(assets)').all().some(c => c.name === col)) db.exec(`ALTER TABLE assets ADD COLUMN ${col} ${def}`);
 }
 if (!db.prepare("SELECT 1 x FROM settings WHERE key='lib_sec_v1'").get()) { db.exec("UPDATE assets SET colecao='motion' WHERE colecao IN ('elementos','fundos') OR (colecao='' AND kind IN ('fundo','textura','foto','mascote')); UPDATE assets SET colecao='' WHERE kind IN ('logo','fonte','musica','efeito','narracao','audio'); INSERT INTO settings(key,value) VALUES('lib_sec_v1','1')"); }
+if (!db.prepare("SELECT 1 x FROM settings WHERE key='lib_arte_v1'").get()) { db.exec("UPDATE assets SET colecao='arte' WHERE brand='' AND (name LIKE 'tpl-%' OR name IN ('foto-padrao-1','foto-padrao-2','avatar-padrao')); INSERT INTO settings(key,value) VALUES('lib_arte_v1','1')"); }
 const ASSET_DIR = path.join(DATA_DIR, 'assets'); fs.mkdirSync(ASSET_DIR, { recursive: true });
 // Coleções da biblioteca: para que serve cada arquivo no vídeo
 // Biblioteca em duas seções de estilo de vídeo (motion e VSL); '' = arquivos gerais (logos, fontes, músicas, narrações) usados pelos dois
-const COLECOES = { motion: 'Motion', hardcopy: 'VSL' };
+const COLECOES = { motion: 'Motion', hardcopy: 'VSL', arte: 'Artes' };   // arte = Biblioteca de Artes do Designer (só o que o dono aprovou); motion e VSL = Biblioteca de Vídeo
 const SEM_SECAO = ['logo', 'fonte', 'musica', 'efeito', 'narracao', 'audio'];
 const colecaoDe = (v, kind) => SEM_SECAO.includes(kind) ? '' : COLECOES[v] ? v : v === 'none' ? '' : (['fundo', 'textura', 'foto', 'mascote', 'video'].includes(kind) ? 'motion' : '');
 const POSE_DIR = path.join(DATA_DIR, 'poses'); fs.mkdirSync(POSE_DIR, { recursive: true });
@@ -988,7 +989,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function callClaude({ agent, user, maxTokens = 4096, search = false, images = [] }) {
   const s = settings();
   const ctx = als.getStore();
-  const kb = buildKnowledge(user, ctx?.brand || '', !!ctx?.scoped);
+  const kb = buildKnowledge(user, ctx?.brand || '', !!ctx?.scoped, agent?.id || '');
   if (ctx?.dry) throw new DryRun({ agent, core: kb.core, extra: kb.extra, user, sys: agentPrompt(agent, ctx?.brand || '', user) }); // só monta o pedido
   if (ctx?.text != null) return { text: ctx.text, tin: 0, tout: 0 }; // resposta colada pelo usuário (modo chat)
   if (!API_KEY && !ASSINATURA.connected) throw new Error('Modo chat: este pedido espera a resposta colada no painel');
@@ -1100,7 +1101,7 @@ const VOICE_PROV = { elevenlabs: 'ElevenLabs', murf: 'Murf', outra: 'Outra IA de
 const voiceLine = e => e.category === 'tom_de_voz' && (e.voice_id || e.voice_name) ? `\nVOZ DA NARRAÇÃO${e.brand ? ' da marca ' + e.brand : ''}: ${e.voice_name || '(sem nome)'} — ${VOICE_PROV[e.voice_provider] || 'IA de voz'}${e.voice_id ? ' — ID ' + e.voice_id : ''}. É esta voz que narra os vídeos da marca: escreva o texto falado no ritmo e no estilo dela e não mencione outra voz.` : '';
 const kbBlock = e => `### [${e.category}]${e.brand ? ' [Marca: ' + e.brand + ']' : ''} ${e.title}\n${e.content.trim()}${voiceLine(e)}`;
 
-function buildKnowledge(queryText, brand = '', scoped = false) {
+function buildKnowledge(queryText, brand = '', scoped = false, ag = '') {
   const budget = Math.max(5000, +settings().kb_budget || 60000);
   // peça sem marca ("Geral") usa só o que é geral; tarefas globais (pautas, Cérebro, relatório) enxergam todas as marcas
   const entries = (scoped && !brand) ? all("SELECT * FROM knowledge WHERE brand='' ORDER BY id") : brand ? all("SELECT * FROM knowledge WHERE brand='' OR brand=? COLLATE NOCASE ORDER BY brand, id", brand) : all('SELECT * FROM knowledge ORDER BY id');
@@ -1119,12 +1120,22 @@ function buildKnowledge(queryText, brand = '', scoped = false) {
     if (b.length > left) continue;
     picked.push(b); left -= b.length;
   }
-  return { core: (core ? core + '\n\n' : '') + assetCatalog(brand, scoped), extra: picked.join('\n\n') };
+  return { core: (core ? core + '\n\n' : '') + assetCatalog(brand, scoped, ag), extra: picked.join('\n\n') };
 }
 
+// Biblioteca de Artes (Designer): só peças aprovadas pelo dono, separadas da Biblioteca de Vídeo
+function catalogoArte(rows) {
+  const out = ['### [BIBLIOTECA DE ARTES — catálogo]', 'Só peças aprovadas pelo dono (fundos, elementos, texturas e fotos de exemplo dos templates), mais a logo e a fonte da marca. Cite sempre pelo nome exato. Fundos e elementos de um template aprovado podem ser usados em outro quando combinarem com o assunto da copy. Não invente arquivo: se faltar, escreva “ARQUIVO FALTANDO: <o que falta>”.'];
+  if (!rows.length) { out.push('(Nenhuma peça aprovada ainda.)'); return out.join('\n'); }
+  const g = new Map(); for (const a of rows) { const k = a.pasta || (a.kind === 'logo' || a.kind === 'fonte' ? 'Identidade da marca' : 'Sem pasta'); if (!g.has(k)) g.set(k, []); g.get(k).push(a); }
+  for (const [k, l] of g) out.push('', `**${k}:** ` + l.map(a => `${a.name} (${a.kind}${a.w ? ', ' + a.w + 'x' + a.h : ''}${a.brand ? '' : ', geral'})`).join('; '));
+  return out.join('\n');
+}
 // Catálogo dos arquivos da marca (logo, fundos, mascote…): os agentes citam pelo nome exato
-function assetCatalog(brand = '', scoped = false) {
+function assetCatalog(brand = '', scoped = false, ag = '') {
   const rows = (scoped && !brand) ? all("SELECT * FROM assets WHERE brand='' ORDER BY kind, name") : brand ? all("SELECT * FROM assets WHERE brand='' OR brand=? COLLATE NOCASE ORDER BY brand COLLATE NOCASE, kind, name", brand) : all('SELECT * FROM assets ORDER BY brand COLLATE NOCASE, kind, name');
+  if (ag === 'designer') return catalogoArte(rows.filter(a => a.colecao === 'arte' || ['logo', 'fonte'].includes(a.kind)));
+  if (ag === 'editor') { const vid = rows.filter(a => a.colecao !== 'arte'); rows.length = 0; rows.push(...vid); }
   const out = ['### [ARQUIVOS DA MARCA — catálogo]', 'A biblioteca tem duas seções: “Motion” = imagens, fotos, elementos, fundos e vídeos para o estilo motion 2D (imagem solta entra como item {"type":"img","asset":…}; fundo de cena vai em bg); “VSL” = imagens, vídeos e animações para o estilo VSL, em que cada cena é uma imagem ou vídeo inteiro com o texto por cima (bg, shade 0.25 a 0.4). Arquivos sem seção (logos, fontes, músicas, narrações) servem aos dois estilos.', 'Cite SEMPRE os arquivos pelo nome exato desta lista (ex.: “logo-clara”, “fundo-floresta-01”) ao indicar logo, fundo, mascote, foto, textura, fonte ou trilha. Não invente arquivos. Se a peça precisar de um arquivo que não está na lista, escreva “ARQUIVO FALTANDO: <o que falta>”.'];
   if (!rows.length) { out.push('(Nenhum arquivo cadastrado ainda.)'); return out.join('\n'); }
   const mascs = rows.filter(a => a.kind === 'mascote' && IMG_EXT.includes(a.ext));
@@ -2409,9 +2420,9 @@ function ctxMarca(brand, format, sp = {}) {
   const comp = styleParams(brand).composicao || {}, apoioClaro = [...(idv.apoio || []), ...(idv.cores || [])].find(x => lumHex(x) > .55 && lumHex(x) < .97);
   const fk = t => (/impact\s*extravagant/i.test(t) && 'impactx') || (/\bimpact\b/i.test(t) && 'impact') || (/anton/i.test(t) && 'anton') || (/bebas/i.test(t) && 'bebas') || (/oswald/i.test(t) && 'oswald') || (/archivo/i.test(t) && 'archivo') || (/montserrat/i.test(t) && 'montserrat') || (/poppins/i.test(t) && 'poppins') || (/\binter\b/i.test(t) && 'inter') || (/sora/i.test(t) && 'sora') || (/orbitron/i.test(t) && 'tech') || (/dm\s*sans/i.test(t) && 'dmsans') || (/space\s*grotesk/i.test(t) && 'grotesk') || (/outfit/i.test(t) && 'outfit') || (/jakarta/i.test(t) && 'jakarta') || (/rubik/i.test(t) && 'rubik') || (/raleway/i.test(t) && 'raleway') || (/nunito/i.test(t) && 'nunito') || (/\broboto\b/i.test(t) && 'roboto') || (/spartan/i.test(t) && 'spartan') || (/manrope/i.test(t) && 'manrope') || (/barlow/i.test(t) && 'barlow') || (/big\s*shoulders/i.test(t) && 'bigshoulders') || (/staatliches/i.test(t) && 'staatliches') || (/bungee/i.test(t) && 'bungee') || (/passion\s*one/i.test(t) && 'passion') || (/playfair/i.test(t) && 'playfair') || (/\blora\b/i.test(t) && 'lora') || (/merriweather/i.test(t) && 'merriweather') || (/dm\s*serif/i.test(t) && 'dmserif') || (/abril/i.test(t) && 'abril') || (/cormorant/i.test(t) && 'cormorant') || (/pacifico/i.test(t) && 'pacifico') || (/dancing/i.test(t) && 'dancing') || (/caveat/i.test(t) && 'caveat') || (/permanent\s*marker/i.test(t) && 'marker') || (/lobster/i.test(t) && 'lobster') || (/bangers/i.test(t) && 'bangers') || (/\bsyne\b/i.test(t) && 'syne') || (/unbounded/i.test(t) && 'unbounded') || (/righteous/i.test(t) && 'righteous') || (/jetbrains/i.test(t) && 'jetbrains') || (/space\s*mono/i.test(t) && 'spacemono') || undefined;
   const fonteMarcaK = idv.fontAsset ? (fk(idv.ftit || '') || 'poppins') : undefined;
-  const texturas = brand ? all("SELECT name FROM assets WHERE kind='textura' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp') ORDER BY id", brand).map(a => a.name) : [];
+  const texturas = brand ? all("SELECT name FROM assets WHERE kind='textura' AND colecao='arte' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp') ORDER BY id", brand).map(a => a.name) : [];
   const texEstilo = /tecnol|tech|digital|futur|ciber|cyber|hacker|neon|\bia\b|intelig/i.test(ident) ? 'tech' : '';
-  const bancoTex = all("SELECT a.name, a.tags FROM assets a WHERE a.kind='textura' AND a.brand='' AND a.ext IN ('jpg','jpeg','png','webp') ORDER BY a.id").map(t => ({ name: t.name, escuro: /escuro/.test(t.tags) }));
+  const bancoTex = all("SELECT a.name, a.tags FROM assets a WHERE a.kind='textura' AND a.colecao='arte' AND a.brand='' AND a.ext IN ('jpg','jpeg','png','webp') ORDER BY a.id").map(t => ({ name: t.name, escuro: /escuro/.test(t.tags) }));
   return { bancoTex, W, H, accent: hexOk(sp.accent) || idv.accent || brandColors()[brand] || '#f59e0b', paper: hexOk(sp.paper) || idv.paper, ink: hexOk(sp.ink) || idv.ink, claro: apoioClaro, ftit: idv.ftit, ftxt: idv.ftxt, fonteMarca: !!idv.fontAsset, fonteMarcaK, fTit: fonteMarcaK, logo: clara?.name, avatar: avatarMarca(brand), logoEscura: escura?.name, logoRatio: ratio || .22, contatos: ct, molde, marca: brand, texturas, texEstilo, caixa: (() => { const t = styleParams(brand).tipografia || {}; return { titulo: t.caixa_titulo, botao: t.caixa_botao, rotulo: t.caixa_rotulo }; })(), margem: { estreitas: .06, medias: .08, amplas: .1 }[comp.margens] || .08 };
 }
 const hexOk = v => /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? String(v) : undefined;
@@ -2469,7 +2480,7 @@ function paraColunas(slides, tpl, format, brand) {
     return { ...s, modelo: 'coluna', dados: { paragrafos, ...(itens?.length ? { itens } : {}), ...(d0.objeto ? { objeto: d0.objeto } : e.dados.objeto ? { objeto: e.dados.objeto } : {}), fundo: d0.fundo || e.dados.fundo } }; });
 }
 // Notícia nunca leva mascote nem imagem de marca como fundo: só a foto da matéria (ou fundo liso com a cor da marca)
-const FOTO_MODELOS = ['noticia', 'manchete-foto', 'post-card', 'citacao'];
+const FOTO_MODELOS = ['xadrez-capa', 'noticia', 'manchete-foto', 'post-card', 'citacao'];
 function semMascoteNoticia(sl, brand, nf) {
   if (!sl || typeof sl !== 'object') return sl;
   const tipo = n => { const a = assetDaMarca(brand, String(n || '').split(' (')[0]); return a ? a.kind : ''; }, o = { ...sl };
@@ -2589,10 +2600,22 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'noticia', papel: 'capa', opcoes: { estilo: 'nuvo' } }, { modelo: 'post-card', papel: 'fim' }] },
   { id: 'noticia', oculto: true, nome: 'Notícia / novidade do mercado', nivel: 'robusto', formatos: ['carrossel', 'feed', 'stories'], uso: 'Notícia, novidade, lançamento, mudança de regra ou acontecimento que o público precisa saber agora: manchete forte na capa, o que aconteceu, o que muda para quem segue, e a chamada para acompanhar.',
     seq: [{ modelo: 'capa-faixa', papel: 'capa' }, { modelo: 'texto', foto: true }, { modelo: 'texto', repetir: true }, { modelo: 'frase' }, { modelo: 'cta', papel: 'fim' }] },
+  { id: 'lista-erros', nome: '7 · Lista de erros (editorial P&B)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de lista ("7 erros que...", "5 sinais de..."): réplica aprovada do kit editorial P&B. Capa com número pincelado, título serifado magenta e apoio condensado; miolo com 2 itens por página (rótulo “ERRO N :”, título colorido com ✓✓ e explicação curta com trecho _sublinhado_); última página com o último item e a caixa magenta da chamada com botão. Fundos, cores e fontes fixos do template; só o texto muda. Botão de arraste só na capa (decisão do dono). Título de item até 30 caracteres e explicação até 3 linhas curtas.',
+    seq: [{ modelo: 'erros-capa', papel: 'capa' }, { modelo: 'erros-par', repetir: true }, { modelo: 'erros-fim', papel: 'fim' }] },
+  { id: 'fogo', nome: '8 · Fogo (dinheiro queimando)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de alerta sobre dinheiro perdido, erro caro ou desperdício (anúncio errado, cliente que não paga, gasto escondido): réplica aprovada do kit "Não queime seu dinheiro". Capa com fogo, título em etiquetas brancas e a palavra-explosão vermelha na faixa preta; miolo preto com até 3 itens numerados ou uma frase forte com palavra em *vermelho*; fim com a pergunta grande e o CTA. Sem rodapé de agência; arraste só na capa (decisão do dono). Os fundos e a nota queimando podem ser usados em outros carrosséis quando combinarem com o assunto.',
+    seq: [{ modelo: 'fogo-capa', papel: 'capa' }, { modelo: 'fogo-lista', repetir: true }, { modelo: 'fogo-fim', papel: 'fim' }] },
+  { id: 'identidade-roxo', nome: '9 · Identidade visual (roxo)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel educativo em blocos (conceito explicado em 2 a 6 tópicos curtos): réplica aprovada do kit roxo de meta-design. Capa com chamada de 2 linhas, título espaçado e palavra gigante em itálico, @ da marca e o robô roxo; miolo roxo com 2 blocos por página (título curto + texto de 5 a 7 linhas com **negrito**); fim claro com 2 blocos e a caixa tracejada do CTA. Sem ícones de curtida nem contato. Fonte do texto = a da marca.',
+    seq: [{ modelo: 'idv-capa', papel: 'capa' }, { modelo: 'idv-texto', repetir: true }, { modelo: 'idv-fim', papel: 'fim' }] },
+  { id: 'xadrez', nome: '10 · Xadrez (mostarda)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de estratégia, segredos, jogo de mercado ou decisões (ex.: "3 segredos que ninguém te conta"): réplica aprovada do kit de agência com peças de xadrez. Capa preta com etiquetas brancas, palavra-explosão mostarda e reis 3D (foto do assunto opcional no alto); miolo bege com até 3 itens numerados ou frase forte; fim preto com prédios e a pergunta/CTA. Sem rodapé de agência; arraste só na capa. As peças de xadrez podem ir para outros carrosséis quando o assunto for estratégia.',
+    seq: [{ modelo: 'xadrez-capa', papel: 'capa' }, { modelo: 'xadrez-lista', repetir: true }, { modelo: 'xadrez-fim', papel: 'fim' }] },
+  { id: 'tipos-clientes', nome: '11 · Tipos de clientes (verde neon)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de tipos, categorias ou estágios (tipos de cliente, níveis, fases do funil): réplica aprovada do kit verde de meta-design. Capa com o busto de óculos na moldura branca, título em caixa alta e apoio verde; miolo na prancheta do Photoshop com uma ideia por página (ícone, título, definição em negrito com trecho _sublinhado_ e nota com *palavras verdes*), com busto quebrado, cavalo e maleta cruzando as divisas; fim com a logo da marca no anel verde e o CTA (decisão do dono: sai o selo do foguete e o contato). Combina com a Central do Marketing.',
+    seq: [{ modelo: 'clientes-capa', papel: 'capa' }, { modelo: 'clientes-bloco', repetir: true }, { modelo: 'clientes-fim', papel: 'fim' }] },
+  { id: 'colagem', nome: '12 · Colagem (pink e roxo)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de dicas com cara jovem e criativa (visibilidade, redes, campanhas): réplica do kit colagem/zine, na versão limpa aprovada pelo dono (textos retos, sem cortar palavras, elementos afastados do texto). Capa com o gato e o selo; miolo em 4 cenários fixos (colagem, megafone, foguete, alvo), cada um com chamada, palavra gigante e texto; fim com lista de engajamento e CTA. Copy maior repete os cenários na mesma ordem.',
+    seq: [{ modelo: 'colagem-capa', papel: 'capa' }, { modelo: 'colagem-pagina', repetir: true }, { modelo: 'colagem-fim', papel: 'fim' }] },
   { id: 'stories-sequencia', oculto: true, nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }
 ];
-const TEMA_CASA = { mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
+const TEMA_CASA = { colagem: 'educativo', 'tipos-clientes': 'educativo', xadrez: 'educativo', 'identidade-roxo': 'educativo', 'lista-erros': 'lista', fogo: 'educativo', mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
 for (const t of TEMPLATES_CASA) t.tema = TEMA_CASA[t.id] || 'geral';
 const TEMAS = { educativo: 'Educativo', lista: 'Lista', tutorial: 'Tutorial', oferta: 'Oferta', noticia: 'Notícia', opiniao: 'Opinião', geral: 'Geral' };
 db.exec(`CREATE TABLE IF NOT EXISTS art_templates(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, uso TEXT DEFAULT '', nivel TEXT DEFAULT 'simples', formatos TEXT DEFAULT '["carrossel"]', seq TEXT NOT NULL, exemplo TEXT DEFAULT '', brand TEXT DEFAULT '', usos INTEGER DEFAULT 0, created_at TEXT NOT NULL)`);
@@ -3119,7 +3142,7 @@ function templatesBloco(c, escolhidoId = '') {
   const fmt = ['feed', 'carrossel', 'stories'].includes(c.format) ? c.format : null; if (!fmt) return '';
   const lcb = String(c.brand || '').toLowerCase(), daMarca = t => (!!c.brand && mesmaMarca(t.brand, c.brand)) || (t.visual_marcas || []).some(m => String(m).toLowerCase() === lcb), L = templatesDaMarca(c.brand).filter(t => t.formatos.includes(fmt)).sort((a, b) => daMarca(b) - daMarca(a)), masc = mascotesDe(c.brand), padrao = estiloPadrao(c.brand, fmt), temaC = temaDoConteudo(c);
   if (!L.length) return '';
-  const nomeM = { heroi: 'capa herói', revista: 'capa revista', 'capa-faixa': 'capa com faixas', 'capa-minimal': 'capa minimalista', dividido: 'título partido', texto: 'texto', numero: 'número', lista: 'lista', frase: 'frase', pilulas: 'pílulas', cta: 'chamada final', noticia: 'capa de jornal', 'post-card': 'cartão de notícia' };
+  const nomeM = { 'colagem-capa': 'capa da colagem', 'colagem-pagina': 'miolo da colagem', 'colagem-fim': 'fim da colagem', 'clientes-capa': 'capa dos tipos de clientes', 'clientes-bloco': 'miolo dos tipos de clientes', 'clientes-fim': 'fim dos tipos de clientes', 'xadrez-capa': 'capa do xadrez', 'xadrez-lista': 'miolo do xadrez', 'xadrez-fim': 'fim do xadrez', 'idv-capa': 'capa da identidade visual', 'idv-texto': 'miolo da identidade visual', 'idv-fim': 'fim da identidade visual', 'fogo-capa': 'capa do fogo', 'fogo-lista': 'miolo do fogo', 'fogo-fim': 'fim do fogo', 'erros-capa': 'capa da lista de erros', 'erros-par': 'dois itens da lista de erros', 'erros-fim': 'fim da lista de erros', heroi: 'capa herói', revista: 'capa revista', 'capa-faixa': 'capa com faixas', 'capa-minimal': 'capa minimalista', dividido: 'título partido', texto: 'texto', numero: 'número', lista: 'lista', frase: 'frase', pilulas: 'pílulas', cta: 'chamada final', noticia: 'capa de jornal', 'post-card': 'cartão de notícia' };
   return `\n\n# TEMPLATES DE ARTE (escolha UM pela copy)
 Leia o roteiro e escolha o template cujo tema e "quando usar" mais combinam com o conteúdo. Cada marca tem seus estilos (notícia, carrossel educativo, oferta, tutorial…): os marcados com "visual da marca" já foram ajustados pelo dono para esta marca, então prefira-os quando o tema bater. Coloque "template":"id" no JSON e escreva as páginas NA ORDEM da estrutura (o modelo de cada página pode ficar de fora: o painel completa pelo template, inclusive o mascote e o fundo claro). Simples = conteúdo direto e rápido de ler; robusto = capa de impacto e mais mídia.
 ${escolhidoId && templateDe(escolhidoId) ? `O DONO ESCOLHEU o template "${escolhidoId}" (${templateDe(escolhidoId).nome}) para esta peça: use exatamente "template":"${escolhidoId}".\n` : ''}${temaC ? `O painel leu o roteiro como tema "${TEMAS[temaC]}": ${L.filter(t => t.tema === temaC).map(t => t.id).join(', ') || 'nenhum estilo deste tema neste formato'}.\n` : ''}${padrao ? `Estilo padrão desta marca: ${padrao}.\n` : ''}${L.map(t => `- ${t.id} — ${t.nome}${daMarca(t) ? ' [visual da marca]' : ''} · tema ${TEMAS[t.tema] || 'Geral'} (${t.nivel}). Quando usar: ${t.uso || 'livre'}. Estrutura: ${t.seq.map(x => (nomeM[x.modelo] || x.modelo) + (x.mascote ? ' + mascote' : '') + (x.foto ? ' + foto' : '') + (x.fundo === 'claro' ? ' (claro)' : '') + (x.repetir ? ' (repete)' : '')).join(' → ')}`).join('\n')}
@@ -4634,11 +4657,24 @@ if (!one("SELECT 1 x FROM settings WHERE key='texturas_banco_v1'")) {
 for (const nome of ['foto-padrao-1', 'foto-padrao-2', 'avatar-padrao']) {
   try {
     const ext = nome === 'avatar-padrao' ? 'png' : 'jpg', arq = path.join(__dirname, 'banco', 'fotos-padrao', nome + '.' + ext); if (!fs.existsSync(arq) || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", nome)) continue;
-    const buf = fs.readFileSync(arq), r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'foto', 'foto padrão, template, exemplo', 'Foto de exemplo dos templates (Pexels). Troque pela foto do post.', 'motion', nome + '.' + ext, ext, buf.length, 'Fotos padrão', T());
+    const buf = fs.readFileSync(arq), r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'foto', 'foto padrão, template, exemplo', 'Foto de exemplo dos templates (Pexels). Troque pela foto do post.', 'arte', nome + '.' + ext, ext, buf.length, 'Fotos padrão', T());
     fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   } catch (e) { console.error('foto padrão', nome, e.message); }
 }
+// peças dos templates de carrossel aprovados (banco/tpl-*: fundos da faixa contínua e elementos recortados das artes do dono).
+// São recursos livres: o Designer pode usar o fundo de um template com os elementos de outro, sempre ligados ao assunto da copy.
+const TPL_PASTAS = { 'tpl-erros': 'Lista de erros', 'tpl-fogo': 'Fogo (dinheiro queimando)', 'tpl-idv': 'Identidade visual (roxo)', 'tpl-xadrez': 'Xadrez (mostarda)', 'tpl-clientes': 'Tipos de clientes (verde neon)', 'tpl-colagem': 'Colagem (pink e roxo)' };
+for (const [pasta, rotulo] of Object.entries(TPL_PASTAS)) try {
+  const dir = path.join(__dirname, 'banco', pasta);
+  for (const arqN of fs.existsSync(dir) ? fs.readdirSync(dir).sort() : []) {
+    const m = arqN.match(/^(tpl-[a-z]+-[a-z0-9-]+)\.(png|jpg)$/); if (!m || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", m[1])) continue;
+    const [, nome, ext] = m, buf = fs.readFileSync(path.join(dir, arqN)), fundo = nome.includes('fundo');
+    const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, fundo ? 'fundo' : 'outro', 'template, carrossel, ' + rotulo.toLowerCase(), 'Peça aprovada do template de carrossel “' + rotulo + '”. Pode ser usada em outros carrosséis quando combinar com o assunto. Não apague.', 'arte', arqN, ext, buf.length, 'Templates/' + rotulo, T());
+    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+    const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+  }
+} catch (e) { console.error('template', pasta, e.message); }
 // Capa da Central: o "Templete 01 Central" tinha a capa com ajustes soltos (título centralizado, apoio fixo) que bagunçavam conforme o texto. Passa a usar o modelo "capa-mascote", réplica da arte aprovada (título à esquerda, apoio, mascote grande à direita)
 if (!db.prepare("SELECT 1 x FROM settings WHERE key='capa_mascote_v4'").get()) {
   try {
@@ -6451,7 +6487,7 @@ async function baixaImagemSegura(u, max = 20e6, referer = '') {
   return { buf, ext };
 }
 // baixa a foto escolhida (opcional: recorta o fundo pelo fal.ai) e guarda na Biblioteca da marca com o crédito
-async function importaImagem({ url: u, brand, nome, recorte = false, credito = '', ping = '', kind = 'foto', ref = '' }) {
+async function importaImagem({ url: u, brand, nome, recorte = false, credito = '', ping = '', kind = 'foto', ref = '', colecao = '' }) {
   let { buf, ext } = await baixaImagemSegura(u);
   if (recorte) {
     if (!falKey()) throw fail(400, falMsg('Para recortar o fundo é preciso a FAL_KEY no .env'));
@@ -6462,7 +6498,7 @@ async function importaImagem({ url: u, brand, nome, recorte = false, credito = '
   const b = (() => { const t = String(brand ?? '').trim().slice(0, 80); if (!t) return ''; run('INSERT OR IGNORE INTO brands(name,created_at) VALUES(?,?)', t, T()); return one('SELECT name FROM brands WHERE name=?', t)?.name || t; })(); let base = slugName(nome) || 'foto-banco', name = base, n = 2;
   while (one('SELECT id FROM assets WHERE brand=? AND name=?', b, name)) name = base + '-' + n++;
   const k = ASSET_KINDS.includes(kind) ? kind : 'foto';
-  const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)', b, name, k, 'banco de imagens' + (recorte ? ', recorte' : ''), String(credito || '').slice(0, 600), colecaoDe('', k), name + '.' + ext, ext, buf.length, T());
+  const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)', b, name, k, 'banco de imagens' + (recorte ? ', recorte' : ''), String(credito || '').slice(0, 600), colecaoDe(colecao, k), name + '.' + ext, ext, buf.length, T());
   const id = +r.lastInsertRowid; fs.writeFileSync(path.join(ASSET_DIR, id + '.' + ext), buf);
   const pr = probeAsset(id, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, id); changed();
   return { id, name, kind: k, brand: b };
@@ -6480,13 +6516,13 @@ function banco3dBytes(id) {
   const fd = fs.openSync(path.join(__dirname, 'banco3d', 'pack.bin'), 'r');
   try { const buf = Buffer.alloc(r[5]); fs.readSync(fd, buf, 0, r[5], r[4]); return buf; } finally { fs.closeSync(fd); }
 }
-function usaBanco3d(id, brand) {
+function usaBanco3d(id, brand, colecao = '') {
   const r = banco3d().byId.get(String(id || '')); if (!r) throw fail(404, 'Elemento 3D não encontrado');
   const b = (() => { const t = String(brand ?? '').trim().slice(0, 80); if (!t) return ''; run('INSERT OR IGNORE INTO brands(name,created_at) VALUES(?,?)', t, T()); return one('SELECT name FROM brands WHERE name=?', t)?.name || t; })();
   const name = slugName('3d-' + r[0]), ja = one('SELECT * FROM assets WHERE brand=? AND name=?', b, name);
   if (ja) return { id: ja.id, name: ja.name, kind: ja.kind, brand: b, ext: ja.ext };
   const buf = banco3dBytes(r[0]); if (!buf) throw fail(500, 'Banco 3D incompleto: falta o arquivo pack.bin');
-  const k = 'outro', ins = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)', b, name, k, '3d, banco 3d, ' + r[1].toLowerCase(), 'Fluent Emoji 3D (Microsoft, licença MIT): ' + r[1], '', name + '.webp', 'webp', buf.length, T());
+  const k = 'outro', ins = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)', b, name, k, '3d, banco 3d, ' + r[1].toLowerCase(), 'Fluent Emoji 3D (Microsoft, licença MIT): ' + r[1], colecao === 'arte' ? 'arte' : '', name + '.webp', 'webp', buf.length, T());
   const id2 = +ins.lastInsertRowid; fs.writeFileSync(path.join(ASSET_DIR, id2 + '.webp'), buf);
   const pr = probeAsset(id2, 'webp'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, id2); changed();
   return { id: id2, name, kind: k, brand: b, ext: 'webp' };
@@ -7132,7 +7168,7 @@ async function api(req, res, url) {
     res.writeHead(200, { 'content-type': { png: 'image/png', webp: 'image/webp' }[out.ext] || 'image/jpeg', 'cache-control': 'private, max-age=3600' }); return res.end(out.buf);
   }
   if (p === '/api/banco3d' && m === 'GET') { const b = banco3d(); return send(res, 200, { cats: b.cats, items: b.items.map(r => r.slice(0, 4)) }); }
-  if (p === '/api/banco3d/usar' && m === 'POST') { const b = await readBody(req, 2e4); const a = usaBanco3d(str(b.id, 80, 'Elemento'), b.brand); return send(res, 200, a); }
+  if (p === '/api/banco3d/usar' && m === 'POST') { const b = await readBody(req, 2e4); const a = usaBanco3d(str(b.id, 80, 'Elemento'), b.brand, b.colecao); return send(res, 200, a); }
   if (p === '/api/assets/remover-fundo' && m === 'POST') {
     const b = await readBody(req, 2e4);
     const a = await removeFundoAsset(b.brand, str(b.name, 120, 'Imagem'));
@@ -7140,7 +7176,7 @@ async function api(req, res, url) {
   }
   if (p === '/api/imagens/importar' && m === 'POST') {
     const b = await readBody(req, 2e4);
-    const a = await importaImagem({ url: str(b.url, 2000, 'Link'), brand: b.brand, nome: str(b.nome || '', 80, 'Nome', false), recorte: !!b.recorte, credito: str(b.credito || '', 600, 'Crédito', false), ping: String(b.ping || ''), kind: b.kind });
+    const a = await importaImagem({ url: str(b.url, 2000, 'Link'), brand: b.brand, nome: str(b.nome || '', 80, 'Nome', false), recorte: !!b.recorte, credito: str(b.credito || '', 600, 'Crédito', false), ping: String(b.ping || ''), kind: b.kind, colecao: b.colecao === 'arte' ? 'arte' : '' });
     log(null, `Imagem do banco ${b.recorte ? '(recortada) ' : ''}guardada na Biblioteca: ${a.name}`); return send(res, 200, a);
   }
   if (p === '/api/assets/catalogo' && m === 'GET') return send(res, 200, { texto: assetCatalog(brandName(url.searchParams.get('brand') || ''), false) });   // exatamente o que os agentes leem da biblioteca
@@ -7660,7 +7696,7 @@ async function api(req, res, url) {
       const sp = jparse(c.art_spec); if (!sp?.slides?.length) throw fail(400, 'Esta peça ainda não tem uma arte para editar (a especificação visual não foi entregue).');
       const [w, h] = ART_SIZE[c.format] || [1080, 1350], idv = identidadeDe(c.brand), comp = styleParams(c.brand).composicao || {};
       const IMG = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'], FONT = ['ttf', 'otf', 'woff', 'woff2'];
-      const lib = all("SELECT id,name,kind,brand,ext FROM assets WHERE (brand=? COLLATE NOCASE OR brand='') ORDER BY (brand<>'') DESC, kind, name", c.brand || '');
+      const lib = all("SELECT id,name,kind,brand,ext,colecao FROM assets WHERE (brand=? COLLATE NOCASE OR brand='') ORDER BY (brand<>'') DESC, kind, name", c.brand || '');
       const find = n => { n = slugName(n); return lib.find(a => a.name === n && (a.brand || '').toLowerCase() === (c.brand || '').toLowerCase()) || lib.find(a => a.name === n && !a.brand); };
       const spec = JSON.parse(JSON.stringify(sp));
       if (!spec.editada) spec.slides.forEach((s, i) => { if (s.modelo) return; try { composicaoAplica(s, comp, i, []); } catch { /* composição opcional */ } });
@@ -7677,7 +7713,7 @@ async function api(req, res, url) {
         id, title: c.title, brand: c.brand, format: c.format, teste: c.teste, status: c.status, w, h, spec, resolved, font, pano_url: panoUrl, base_ajustes: base ? arteDiff(base, sp).length : 0,
         defaults: { accent: idv.accent || brandColors()[c.brand] || '#f59e0b', ink: idv.ink || '#ffffff', paper: idv.paper || '#0b0b0d', fonte: idv.fontAsset || '' },
         palette: [...new Set([idv.accent, brandColors()[c.brand], idv.ink, idv.paper, ...(idv.apoio || []), ...(idv.cores || [])].filter(x => /^#[0-9a-f]{6}$/i.test(x || '')).map(x => x.toLowerCase()))].slice(0, 12),
-        assets: lib.filter(a => IMG.includes(a.ext)).map(a => ({ id: a.id, name: a.name, kind: a.kind, brand: a.brand, url: `/api/assets/${a.id}/file`, thumb: `/api/assets/${a.id}/thumb` })),
+        assets: lib.filter(a => IMG.includes(a.ext) && (a.colecao === 'arte' || a.kind === 'logo')).map(a => ({ id: a.id, name: a.name, kind: a.kind, brand: a.brand, url: `/api/assets/${a.id}/file`, thumb: `/api/assets/${a.id}/thumb` })),
         layout_origem: (() => { const m0 = /^l:(\d+)$/.exec(c.estilo_arte || ''), lo = m0 ? one('SELECT id,name,brand FROM art_layouts WHERE id=?', +m0[1]) : null; return lo ? { id: lo.id, name: lo.name, brand: lo.brand } : null; })(),
         checks: checksLer(c.art_checks), arte: arteInfo(id), layouts: all("SELECT * FROM art_layouts ORDER BY (brand=? COLLATE NOCASE) DESC, (brand='') DESC, brand COLLATE NOCASE, id DESC LIMIT 400", c.brand || '').filter(l => sameDims(l.format, c.format)).map(layoutPub), fal: !!falKey() && settings().art_gen === '1'
       });
@@ -7832,7 +7868,7 @@ async function api(req, res, url) {
     if (mt[2] === 'diff' && m === 'GET') { const d = jparse(c.spec_base) && jparse(c.spec) ? videoDiff(jparse(c.spec_base), jparse(c.spec)) : []; return send(res, 200, { items: d.map((x, i) => ({ i, txt: x.txt, learn: !!x.learn })) }); }
     if (mt[2] === 'editor' && m === 'GET') {
       const sp = jparse(c.spec); if (!sp?.scenes?.length) throw fail(400, 'Este vídeo ainda não tem cenas para editar (o Editor não entregou o spec).');
-      const lib = all("SELECT id,name,kind,brand,ext,dur,colecao FROM assets WHERE (brand=? COLLATE NOCASE OR brand='') ORDER BY (brand<>'') DESC, kind, name", c.brand || '');
+      const lib = all("SELECT id,name,kind,brand,ext,dur,colecao FROM assets WHERE (brand=? COLLATE NOCASE OR brand='') AND COALESCE(colecao,'')<>'arte' ORDER BY (brand<>'') DESC, kind, name", c.brand || '');
       const base = jparse(c.spec_base), ri = renderInfo(id);
       return send(res, 200, {
         id, title: c.title, brand: c.brand, format: c.format, teste: c.teste, status: c.status, spec: sp, looks: LOOKS_VALIDOS, estilo: c.estilo_video || '',
