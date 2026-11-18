@@ -1,0 +1,25 @@
+{
+  "marca": "PagaTG",
+  "mascotes": {},
+  "logos": {
+    "logo-pagatg-completa": {},
+    "logo-pagatg-pequena": {
+      "pequena": true
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Roxo PagaTG #834DEB (primária)"
+    ],
+    "apoio": [
+      "Lilás Claro #B495F2 (apoio)",
+      "Roxo Profundo #22143D (fundo do site)",
+      "Preto #010101",
+      "Branco #FDFCFE"
+    ],
+    "destaque": "#834DEB",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins",
+    "fundo": "escuro (roxo profundo)"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "marca": "Vivendo de Bet",
+  "mascotes": {
+    "mascote-vdb-pombo-bola": {
+      "nome": "Pombo do VDB",
+      "resumo": "Pombo craque de futebol, camisa 10 do Vivendo de Bet, confiante e malandro.",
+      "corpo": "Pombo antropomórfico, porte atlético, em pé como jogador, asas no lugar dos braços.",
+      "rosto": "Cabeça de pombo cinza com pescoço verde e roxo iridescente, olho atento, bico laranja; óculos esportivos de lente verde espelhada.",
+      "pele_cabelo": "Penas cinza; pescoço verde e roxo; pontas das asas verdes.",
+      "roupa": "Uniforme preto com detalhes verde neon: camisa com \"VDB\" e número 10, short com o 10, meiões pretos com listras verdes e \"VDB\", chuteiras pretas com trava verde.",
+      "acessorios": "Óculos esportivos verdes; braçadeira de capitão verde; bola preta e verde.",
+      "cores": "Preto #000000 como base; verde neon #21DC0D nos detalhes, nos números e nos brilhos.",
+      "estilo": "Render 3D realista de penas, luz de contorno verde, fundo recortado.",
+      "personalidade": "Confiante, esperto, competitivo, cara de quem sabe o que faz.",
+      "poses_ok": "Pé em cima da bola; chutando; comemorando gol; apontando; de braços (asas) cruzadas.",
+      "nunca": "Nunca tirar a camisa 10 com \"VDB\" nem os óculos verdes; nunca trocar o verde neon por outra cor; nunca deixar cartoon fofo; nunca mostrar dinheiro em pilhas ou promessa de ganho.",
+      "uso": "Capa e CTA dos posts do Vivendo de Bet (futebol e esportes), em fundos escuros; grande, saindo pela borda de baixo ou ao lado do título.",
+      "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
+    }
+  },
+  "logos": {
+    "logo-vdb-branca": {},
+    "logo-vdb-escura": {},
+    "logo-vdb-preta": {
+      "mono": "preta"
+    },
+    "logo-vdb-fundo": {
+      "fundo": true
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Verde Neon #21DC0D (primária)",
+      "Branco #FFFFFF (primária)"
+    ],
+    "apoio": [
+      "Verde Escuro #116106",
+      "Preto #000000"
+    ],
+    "destaque": "#21DC0D",
+    "ftit": "Anton",
+    "ftxt": "Anton"
+  }
+}

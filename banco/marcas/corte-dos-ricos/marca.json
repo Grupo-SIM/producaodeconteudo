@@ -1,0 +1,24 @@
+{
+  "marca": "Corte dos Ricos",
+  "mascotes": {},
+  "logos": {
+    "logo-corte-completa": {},
+    "logo-corte-pequena": {
+      "pequena": true
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Preto #000000 (primária)"
+    ],
+    "apoio": [
+      "Branco Gelo #F6F6F6",
+      "Cinza Claro #D7D7D7",
+      "Cinza do Anel #BBBBBB (apoio)"
+    ],
+    "destaque": "#BBBBBB",
+    "ftit": "Noto Serif Bold",
+    "ftxt": "Open Sans Regular",
+    "fonte": "fonte-noto-serif-bold"
+  }
+}

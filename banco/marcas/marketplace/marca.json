@@ -1,0 +1,18 @@
+{
+  "marca": "Marketplace",
+  "mascotes": {},
+  "logos": {},
+  "identidade": {
+    "cores": [
+      "Laranja Marketplace #FF5F00 (primária)"
+    ],
+    "apoio": [
+      "Laranja Claro #FF7E3C (apoio)",
+      "Pêssego Claro #FFDCD0 (apoio)",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#FF5F00",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "marca": "Sim Intermediações",
+  "mascotes": {},
+  "logos": {
+    "logo-simint-completa": {},
+    "logo-simint-pequena": {
+      "pequena": true
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Violeta #8351F1 (primária, botões do site)",
+      "Roxo #8C359B (logo)",
+      "Magenta #CC2F9C (logo)"
+    ],
+    "apoio": [
+      "Rosa Violeta #B7349E",
+      "Preto #070410",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#8351F1",
+    "ftit": "Montserrat Bold Italic",
+    "ftxt": "Montserrat",
+    "fundo": "escuro (preto arroxeado)"
+  }
+}

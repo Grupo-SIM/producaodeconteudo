@@ -2404,7 +2404,7 @@ function ctxMarca(brand, format, sp = {}) {
   const idv = identidadeDe(brand), [W, H] = ART_SIZE[format] || [1080, 1350];
   const ident = brand ? (one("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", brand)?.content || '') : '';
   const docs = brand ? all("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca'", brand).map(r => r.content).join('\n') : '';
-  const logos = brand ? all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp','svg') ORDER BY id", brand).filter(a => !/logo pequena/i.test(a.tags || '')) : [];   // a logo pequena não é a logo principal (longa)
+  const logos = brand ? all("SELECT * FROM assets WHERE kind='logo' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp','svg') ORDER BY id", brand).filter(a => !/logo pequena|logo com fundo|monocromática|símbolo para fundo claro|logo vertical/i.test(a.tags || '')) : [];   // a logo pequena e a com fundo (avatar) não são a logo principal (longa)
   const clara = logos.find(a => /branc|clar|white|light|neg/i.test(a.name)) || logos.find(a => !/pret|escur|black|dark/i.test(a.name)) || logos[0];
   const escura = logos.find(a => a !== clara && /pret|escur|black|dark/i.test(a.name) && fs.existsSync(path.join(ASSET_DIR, a.id + '.' + a.ext)));   // logo escura sem arquivo no disco não pode sumir da página clara: cai na logo clara com cápsula
   const ratio = clara ? imgRatio(path.join(ASSET_DIR, clara.id + '.' + clara.ext)) : null;
@@ -2424,7 +2424,9 @@ function ctxMarca(brand, format, sp = {}) {
   const texturas = brand ? all("SELECT name FROM assets WHERE kind='textura' AND colecao='arte' AND brand=? COLLATE NOCASE AND ext IN ('png','jpg','jpeg','webp') ORDER BY id", brand).map(a => a.name) : [];
   const texEstilo = /tecnol|tech|digital|futur|ciber|cyber|hacker|neon|\bia\b|intelig/i.test(ident) ? 'tech' : '';
   const bancoTex = all("SELECT a.name, a.tags FROM assets a WHERE a.kind='textura' AND a.colecao='arte' AND a.brand='' AND a.ext IN ('jpg','jpeg','png','webp') ORDER BY a.id").map(t => ({ name: t.name, escuro: /escuro/.test(t.tags) }));
-  return { bancoTex, W, H, accent: hexOk(sp.accent) || idv.accent || brandColors()[brand] || '#f59e0b', paper: hexOk(sp.paper) || idv.paper, ink: hexOk(sp.ink) || idv.ink, claro: apoioClaro, ftit: idv.ftit, ftxt: idv.ftxt, fonteMarca: !!idv.fontAsset, fonteMarcaK, fTit: fonteMarcaK, logo: clara?.name, avatar: avatarMarca(brand), logoEscura: escura?.name, logoRatio: ratio || .22, contatos: ct, molde, marca: brand, texturas, texEstilo, caixa: (() => { const t = styleParams(brand).tipografia || {}; return { titulo: t.caixa_titulo, botao: t.caixa_botao, rotulo: t.caixa_rotulo }; })(), margem: { estreitas: .06, medias: .08, amplas: .1 }[comp.margens] || .08 };
+  // troca de cor nos templates aprovados: a cor-assinatura do template vira o destaque da marca (o dono aprovou em 18/11; sp.cor_marca === false desliga na peça)
+  const corMarca = brand && sp.cor_marca !== false ? (hexOk(sp.accent) || idv.accent || undefined) : undefined;
+  return { corMarca, bancoTex, W, H, accent: hexOk(sp.accent) || idv.accent || brandColors()[brand] || '#f59e0b', paper: hexOk(sp.paper) || idv.paper, ink: hexOk(sp.ink) || idv.ink, claro: apoioClaro, ftit: idv.ftit, ftxt: idv.ftxt, fonteMarca: !!idv.fontAsset, fonteMarcaK, fTit: fonteMarcaK, logo: clara?.name, avatar: avatarMarca(brand), logoEscura: escura?.name, logoRatio: ratio || .22, contatos: ct, molde, marca: brand, texturas, texEstilo, caixa: (() => { const t = styleParams(brand).tipografia || {}; return { titulo: t.caixa_titulo, botao: t.caixa_botao, rotulo: t.caixa_rotulo }; })(), margem: { estreitas: .06, medias: .08, amplas: .1 }[comp.margens] || .08 };
 }
 const hexOk = v => /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? String(v) : undefined;
 // Expande as páginas com "modelo" na especificação comum (textos, imagens, formas, efeitos). Página sem modelo fica como veio.
@@ -2613,10 +2615,12 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'clientes-capa', papel: 'capa' }, { modelo: 'clientes-bloco', repetir: true }, { modelo: 'clientes-fim', papel: 'fim' }] },
   { id: 'colagem', nome: '12 · Colagem (pink e roxo)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de dicas com cara jovem e criativa (visibilidade, redes, campanhas): réplica do kit colagem/zine, na versão limpa aprovada pelo dono (textos retos, sem cortar palavras, elementos afastados do texto). Capa com o gato e o selo; miolo em 4 cenários fixos (colagem, megafone, foguete, alvo), cada um com chamada, palavra gigante e texto; fim com lista de engajamento e CTA. Copy maior repete os cenários na mesma ordem.',
     seq: [{ modelo: 'colagem-capa', papel: 'capa' }, { modelo: 'colagem-pagina', repetir: true }, { modelo: 'colagem-fim', papel: 'fim' }] },
+  { id: 'espaco', nome: '13 · Espaço (azul neon)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de segredos, dicas ou verdades de marketing/tecnologia (ex.: "4 segredos de marketing que ninguém te conta"): réplica do kit espacial azul do dono. Capa com o astronauta segurando o tablet e o título preto na tela (última linha gigante), botão ciano "Arraste para o lado"; miolo com a pílula "Segredos do MKT" e 2 itens numerados por página (título ciano + texto com *negrito*), caneta digital e computador com barra de ferramentas cruzando as divisas; fim com "Gostou do conteúdo?", ícones e pílula do CTA.',
+    seq: [{ modelo: 'espaco-capa', papel: 'capa' }, { modelo: 'espaco-par', repetir: true }, { modelo: 'espaco-fim', papel: 'fim' }] },
   { id: 'stories-sequencia', oculto: true, nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }
 ];
-const TEMA_CASA = { colagem: 'educativo', 'tipos-clientes': 'educativo', xadrez: 'educativo', 'identidade-roxo': 'educativo', 'lista-erros': 'lista', fogo: 'educativo', mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
+const TEMA_CASA = { espaco: 'lista', colagem: 'educativo', 'tipos-clientes': 'educativo', xadrez: 'educativo', 'identidade-roxo': 'educativo', 'lista-erros': 'lista', fogo: 'educativo', mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
 for (const t of TEMPLATES_CASA) t.tema = TEMA_CASA[t.id] || 'geral';
 const TEMAS = { educativo: 'Educativo', lista: 'Lista', tutorial: 'Tutorial', oferta: 'Oferta', noticia: 'Notícia', opiniao: 'Opinião', geral: 'Geral' };
 db.exec(`CREATE TABLE IF NOT EXISTS art_templates(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, uso TEXT DEFAULT '', nivel TEXT DEFAULT 'simples', formatos TEXT DEFAULT '["carrossel"]', seq TEXT NOT NULL, exemplo TEXT DEFAULT '', brand TEXT DEFAULT '', usos INTEGER DEFAULT 0, created_at TEXT NOT NULL)`);
@@ -3143,7 +3147,7 @@ function templatesBloco(c, escolhidoId = '') {
   const fmt = ['feed', 'carrossel', 'stories'].includes(c.format) ? c.format : null; if (!fmt) return '';
   const lcb = String(c.brand || '').toLowerCase(), daMarca = t => (!!c.brand && mesmaMarca(t.brand, c.brand)) || (t.visual_marcas || []).some(m => String(m).toLowerCase() === lcb), L = templatesDaMarca(c.brand).filter(t => t.formatos.includes(fmt)).sort((a, b) => daMarca(b) - daMarca(a)), masc = mascotesDe(c.brand), padrao = estiloPadrao(c.brand, fmt), temaC = temaDoConteudo(c);
   if (!L.length) return '';
-  const nomeM = { 'colagem-capa': 'capa da colagem', 'colagem-pagina': 'miolo da colagem', 'colagem-fim': 'fim da colagem', 'clientes-capa': 'capa dos tipos de clientes', 'clientes-bloco': 'miolo dos tipos de clientes', 'clientes-fim': 'fim dos tipos de clientes', 'xadrez-capa': 'capa do xadrez', 'xadrez-lista': 'miolo do xadrez', 'xadrez-fim': 'fim do xadrez', 'idv-capa': 'capa da identidade visual', 'idv-texto': 'miolo da identidade visual', 'idv-fim': 'fim da identidade visual', 'fogo-capa': 'capa do fogo', 'fogo-lista': 'miolo do fogo', 'fogo-fim': 'fim do fogo', 'erros-capa': 'capa da lista de erros', 'erros-par': 'dois itens da lista de erros', 'erros-fim': 'fim da lista de erros', heroi: 'capa herói', revista: 'capa revista', 'capa-faixa': 'capa com faixas', 'capa-minimal': 'capa minimalista', dividido: 'título partido', texto: 'texto', numero: 'número', lista: 'lista', frase: 'frase', pilulas: 'pílulas', cta: 'chamada final', noticia: 'capa de jornal', 'post-card': 'cartão de notícia' };
+  const nomeM = { 'espaco-capa': 'capa do espaço', 'espaco-par': 'dois itens do espaço', 'espaco-fim': 'fim do espaço', 'colagem-capa': 'capa da colagem', 'colagem-pagina': 'miolo da colagem', 'colagem-fim': 'fim da colagem', 'clientes-capa': 'capa dos tipos de clientes', 'clientes-bloco': 'miolo dos tipos de clientes', 'clientes-fim': 'fim dos tipos de clientes', 'xadrez-capa': 'capa do xadrez', 'xadrez-lista': 'miolo do xadrez', 'xadrez-fim': 'fim do xadrez', 'idv-capa': 'capa da identidade visual', 'idv-texto': 'miolo da identidade visual', 'idv-fim': 'fim da identidade visual', 'fogo-capa': 'capa do fogo', 'fogo-lista': 'miolo do fogo', 'fogo-fim': 'fim do fogo', 'erros-capa': 'capa da lista de erros', 'erros-par': 'dois itens da lista de erros', 'erros-fim': 'fim da lista de erros', heroi: 'capa herói', revista: 'capa revista', 'capa-faixa': 'capa com faixas', 'capa-minimal': 'capa minimalista', dividido: 'título partido', texto: 'texto', numero: 'número', lista: 'lista', frase: 'frase', pilulas: 'pílulas', cta: 'chamada final', noticia: 'capa de jornal', 'post-card': 'cartão de notícia' };
   return `\n\n# TEMPLATES DE ARTE (escolha UM pela copy)
 Leia o roteiro e escolha o template cujo tema e "quando usar" mais combinam com o conteúdo. Cada marca tem seus estilos (notícia, carrossel educativo, oferta, tutorial…): os marcados com "visual da marca" já foram ajustados pelo dono para esta marca, então prefira-os quando o tema bater. Coloque "template":"id" no JSON e escreva as páginas NA ORDEM da estrutura (o modelo de cada página pode ficar de fora: o painel completa pelo template, inclusive o mascote e o fundo claro). Simples = conteúdo direto e rápido de ler; robusto = capa de impacto e mais mídia.
 ${escolhidoId && templateDe(escolhidoId) ? `O DONO ESCOLHEU o template "${escolhidoId}" (${templateDe(escolhidoId).nome}) para esta peça: use exatamente "template":"${escolhidoId}".\n` : ''}${temaC ? `O painel leu o roteiro como tema "${TEMAS[temaC]}": ${L.filter(t => t.tema === temaC).map(t => t.id).join(', ') || 'nenhum estilo deste tema neste formato'}.\n` : ''}${padrao ? `Estilo padrão desta marca: ${padrao}.\n` : ''}${L.map(t => `- ${t.id} — ${t.nome}${daMarca(t) ? ' [visual da marca]' : ''} · tema ${TEMAS[t.tema] || 'Geral'} (${t.nivel}). Quando usar: ${t.uso || 'livre'}. Estrutura: ${t.seq.map(x => (nomeM[x.modelo] || x.modelo) + (x.mascote ? ' + mascote' : '') + (x.foto ? ' + foto' : '') + (x.fundo === 'claro' ? ' (claro)' : '') + (x.repetir ? ' (repete)' : '')).join(' → ')}`).join('\n')}
@@ -4665,7 +4669,7 @@ for (const nome of ['foto-padrao-1', 'foto-padrao-2', 'avatar-padrao']) {
 }
 // peças dos templates de carrossel aprovados (banco/tpl-*: fundos da faixa contínua e elementos recortados das artes do dono).
 // São recursos livres: o Designer pode usar o fundo de um template com os elementos de outro, sempre ligados ao assunto da copy.
-const TPL_PASTAS = { 'tpl-erros': 'Lista de erros', 'tpl-fogo': 'Fogo (dinheiro queimando)', 'tpl-idv': 'Identidade visual (roxo)', 'tpl-xadrez': 'Xadrez (mostarda)', 'tpl-clientes': 'Tipos de clientes (verde neon)', 'tpl-colagem': 'Colagem (pink e roxo)' };
+const TPL_PASTAS = { 'tpl-erros': 'Lista de erros', 'tpl-fogo': 'Fogo (dinheiro queimando)', 'tpl-idv': 'Identidade visual (roxo)', 'tpl-xadrez': 'Xadrez (mostarda)', 'tpl-clientes': 'Tipos de clientes (verde neon)', 'tpl-colagem': 'Colagem (pink e roxo)', 'tpl-espaco': 'Espaço (azul neon)' };
 for (const [pasta, rotulo] of Object.entries(TPL_PASTAS)) try {
   const dir = path.join(__dirname, 'banco', pasta);
   for (const arqN of fs.existsSync(dir) ? fs.readdirSync(dir).sort() : []) {
@@ -4676,6 +4680,52 @@ for (const [pasta, rotulo] of Object.entries(TPL_PASTAS)) try {
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   }
 } catch (e) { console.error('template', pasta, e.message); }
+// mascotes e logos oficiais das marcas (banco/marcas/<pasta>/: marca.json + PNG sem fundo), enviados pelo dono no treino do Designer.
+// Entram uma vez como arquivo "mascote" da marca, já com a ficha técnica; o dono pode editar depois na Biblioteca.
+try {
+  const dirM = path.join(__dirname, 'banco', 'marcas');
+  for (const pasta of fs.existsSync(dirM) ? fs.readdirSync(dirM).sort() : []) {
+    const dir = path.join(dirM, pasta), cfgA = path.join(dir, 'marca.json'); if (!fs.existsSync(cfgA)) continue;
+    const cfg = JSON.parse(fs.readFileSync(cfgA, 'utf8')), marca = String(cfg.marca || '').trim(); if (!marca) continue;
+    for (const [nome, ficha] of Object.entries(cfg.mascotes || {})) {
+      const arqN = nome + '.png', arq = path.join(dir, arqN); if (!fs.existsSync(arq) || one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
+      const buf = fs.readFileSync(arq);
+      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, 'mascote', 'mascote, personagem, oficial', 'Mascote oficial da marca, enviado pelo dono. Não apague.', '', arqN, 'png', buf.length, 'Mascote', T());
+      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.png'), buf);
+      const pr = probeAsset(+r.lastInsertRowid, 'png'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+      salvaMascoteFicha({ id: +r.lastInsertRowid, ficha: null }, ficha);
+    }
+    for (const [nome, o] of Object.entries(cfg.logos || {})) {   // logos oficiais: a pequena (só o símbolo) leva a tag "logo pequena"
+      const ext = ['png', 'jpg'].find(x => fs.existsSync(path.join(dir, nome + '.' + x))); if (!ext || one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
+      const buf = fs.readFileSync(path.join(dir, nome + '.' + ext));   // fundo: true = logo quadrada já com fundo (foto de perfil, avatar)
+      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, o?.produto ? 'outro' : 'logo', o?.produto ? 'logo do produto, ' + o.produto + ', oficial' : o?.faixa ? 'logo, logo com fundo, faixa, oficial' : o?.pequena ? 'logo, logo pequena, oficial' : o?.vertical ? 'logo, logo vertical, oficial' : o?.simbolo_claro ? 'logo, símbolo para fundo claro, oficial' : o?.mono ? (o.mono === 'preta' ? 'logo, logo preta, monocromática, oficial' : 'logo, logo branca, monocromática, oficial') : o?.fundo ? 'logo, logo com fundo, avatar, foto de perfil, oficial' : 'logo, oficial', o?.faixa ? 'Logo oficial com fundo retangular (' + o.faixa + '): para faixa, rodapé, apresentação ou fundo de vídeo. Não apague.' : o?.produto ? 'Logo oficial do produto ' + o.produto + (o.claro ? ' (colorida, texto escuro: para fundo claro).' : ' (branca: só em fundo escuro).') + ' Use quando o post falar do produto. Não apague.' : o?.vertical ? 'Logo oficial na versão vertical (símbolo em cima, nome embaixo): para capa centralizada, perfil, abertura de vídeo e espaço alto. Não apague.' : o?.simbolo_claro ? 'Símbolo oficial (versão escura) para círculos e cartões em fundo claro; em fundo escuro use a logo pequena. Não apague.' : o?.mono ? (o.mono === 'preta' ? 'Logo oficial toda preta (monocromática): para fundo claro ou colorido, quando a versão com cor brigaria, e para impressão em uma cor. Não apague.' : 'Logo oficial toda branca (monocromática): para cima de foto ou fundo colorido, onde a versão com cor brigaria. Não apague.') : o?.fundo ? 'Logo oficial com fundo (quadrada): foto de perfil e avatar em círculo. Não apague.' : 'Logo oficial da marca, enviada pelo dono. Não apague.', '', nome + '.' + ext, ext, buf.length, 'Logo', T());
+      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+      const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+    }
+    for (const arqN of fs.readdirSync(dir).filter(x => /^fonte-[a-z0-9-]+\.(woff2?|ttf|otf)$/.test(x))) {   // fonte da marca (a do manual de cor e tipografia do dono)
+      const nome = arqN.replace(/\.[a-z0-9]+$/, ''), ext = arqN.split('.').pop(); if (one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
+      const buf = fs.readFileSync(path.join(dir, arqN));
+      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, 'fonte', 'fonte, oficial', 'Fonte oficial da marca (manual de cor e tipografia). Não apague.', '', arqN, ext, buf.length, 'Fontes', T());
+      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+    }
+    // cores e tipografia do manual do dono: entram uma vez na Identidade visual da marca (só nas linhas de cor e fonte; o resto do texto fica como está)
+    const iv = cfg.identidade, flag = 'idv_dono_v4:' + marca.toLowerCase();
+    if (iv && one('SELECT 1 x FROM brands WHERE name=? COLLATE NOCASE', marca) && !one('SELECT 1 x FROM settings WHERE key=?', flag)) {
+      const linhas = { CORES: [['Principais', (iv.cores || []).join(' | ')], ['Apoio/neutras', (iv.apoio || []).join(' | ')], ['Destaque', iv.destaque || ''], ['Fundo padrão', iv.fundo || '']], TIPOGRAFIA: [['Título', iv.ftit || ''], ['Texto', iv.ftxt || '']] };
+      const row = one("SELECT id, content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", marca);
+      let ls = row ? String(row.content).split('\n') : ['# IDENTIDADE VISUAL — ' + marca, '(Vale para peças estáticas e para vídeo. O Designer e o Editor devem seguir isto à risca.)', ''];
+      for (const [sec, kv] of Object.entries(linhas)) {
+        let i = ls.findIndex(l => l.trim() === '## ' + sec); if (i < 0) { ls.push('', '## ' + sec); i = ls.length - 1; }
+        let fim = ls.findIndex((l, j) => j > i && l.startsWith('## ')); if (fim < 0) fim = ls.length;
+        for (const [k, v] of kv) { if (!v) continue; const j = ls.findIndex((l, q) => q > i && q < fim && l.startsWith(k + ':')); if (j >= 0) ls[j] = k + ': ' + v; else { ls.splice(fim, 0, k + ': ' + v); fim++; } }
+      }
+      const txt = ls.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+      if (row) run('UPDATE knowledge SET content=?, updated_at=? WHERE id=?', txt, T(), row.id);
+      else run('INSERT INTO knowledge(title,category,content,brand,created_at,updated_at) VALUES(?,?,?,?,?,?)', 'Identidade visual — ' + marca, 'marca', txt, marca, T(), T());
+      run('INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)', flag, '1');
+    }
+  }
+} catch (e) { console.error('mascotes das marcas', e.message); }
 // Capa da Central: o "Templete 01 Central" tinha a capa com ajustes soltos (título centralizado, apoio fixo) que bagunçavam conforme o texto. Passa a usar o modelo "capa-mascote", réplica da arte aprovada (título à esquerda, apoio, mascote grande à direita)
 if (!db.prepare("SELECT 1 x FROM settings WHERE key='capa_mascote_v4'").get()) {
   try {

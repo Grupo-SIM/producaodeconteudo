@@ -1,0 +1,41 @@
+{
+  "marca": "Seguidores em Alta",
+  "mascotes": {
+    "mascote-seguidores-apontando": {
+      "nome": "Seguidores em Alta",
+      "resumo": "Influenciadora estilosa com cabeça de celular: a tela é o rosto, sempre expressivo e brincalhão.",
+      "corpo": "Mulher adulta, corpo esguio e elegante, pernas longas, de corpo inteiro.",
+      "rosto": "Celular rosa e preto no lugar da cabeça; na tela, rosto de desenho: piscando um olho, o outro olho grande com íris pink e coração, sobrancelha pink e sorriso aberto com língua pink.",
+      "pele_cabelo": "Mãos de pele clara, unhas pink; sem cabelo.",
+      "roupa": "Terninho preto (blazer e calça flare de cintura alta), blusa preta de gola alta, cinto preto e botas pretas de salto bico fino.",
+      "acessorios": "Relógio preto; tablet preto na mão.",
+      "cores": "Preto/roxo escuro #1a0a1f como base; pink/magenta #e81ed8 na tela, no contorno do celular, nas unhas e nos brilhos.",
+      "estilo": "Render 3D estilo animação, luz de contorno magenta, fundo recortado.",
+      "personalidade": "Divertida, confiante, carismática; fala de redes sociais com piscadinha.",
+      "poses_ok": "Apontando para cima ou para o texto; segurando o tablet; andando; mostrando a tela; expressões da tela podem mudar (piscando, surpresa, rindo).",
+      "nunca": "Nunca trocar o celular por um rosto humano; nunca mudar o pink/magenta para outra cor; nunca tirar o terninho preto.",
+      "uso": "Capa e CTA dos posts do Seguidores em Alta, ao lado do título, apontando para o texto.",
+      "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
+    }
+  },
+  "logos": {
+    "logo-seguidores-completa": {},
+    "logo-seguidores-pequena": {
+      "pequena": true
+    },
+    "logo-seguidores-escura": {}
+  },
+  "identidade": {
+    "cores": [
+      "Roxo #9B23B7 (primária)",
+      "Azul #009CFF (secundária)"
+    ],
+    "apoio": [
+      "Laranja Foguete #FB611D (detalhe: a chama do foguete)",
+      "Branco Gelo #FEF9FB"
+    ],
+    "destaque": "#9B23B7",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins"
+  }
+}

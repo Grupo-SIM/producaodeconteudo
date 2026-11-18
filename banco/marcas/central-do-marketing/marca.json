@@ -1,0 +1,59 @@
+{
+  "marca": "Central do Marketing",
+  "mascotes": {
+    "mascote-central-cafe": {
+      "nome": "Central",
+      "resumo": "Criativo de marketing com cabeça de lâmpada acesa: a ideia em pessoa, estilo streetwear.",
+      "corpo": "Adulto, corpo realista e encorpado, em pé, de corpo inteiro.",
+      "rosto": "Não tem rosto: a cabeça é uma lâmpada de vidro verde neon com o filamento aceso.",
+      "pele_cabelo": "Sem pele ou cabelo à mostra (luvas pretas).",
+      "roupa": "Boné preto com o \"C\" verde da marca; moletom preto com capuz forrado de verde e cordões verdes; jaqueta parka longa preta com recortes verdes e bolsos; calça cargo preta com fitas e recortes verdes; tênis de cano alto pretos com detalhes e sola verde neon e a coroa verde no cano.",
+      "acessorios": "Fone de ouvido preto no boné; relógio; alças de mochila nos ombros; copo de café preto na mão.",
+      "cores": "Preto #000000 como base; verde neon #0DE450 na lâmpada, nos recortes e nos brilhos.",
+      "estilo": "Render realista escuro, preto com luz verde neon, fundo recortado.",
+      "personalidade": "Criativo, descolado, confiante, sempre com uma ideia nova.",
+      "poses_ok": "Em pé segurando o café, mão no bolso; apontando para o texto; pensando; comemorando uma ideia.",
+      "nunca": "Nunca trocar a lâmpada por um rosto; nunca tirar o boné com o \"C\"; nunca usar outra cor de brilho que não seja o verde neon; nunca deixar cartoon fofo ou colorido.",
+      "uso": "Capa e CTA dos posts da Central do Marketing, em fundos escuros; grande, ao lado do título ou saindo pela borda de baixo.",
+      "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
+    }
+  },
+  "logos": {
+    "logo-central-completa": {},
+    "logo-central-pequena": {
+      "pequena": true
+    },
+    "logo-central-branca": {
+      "mono": true
+    },
+    "logo-central-escura": {},
+    "logo-central-preta": {
+      "mono": "preta"
+    },
+    "logo-central-faixa-preta-fundo-branco": {
+      "faixa": "preta em fundo branco"
+    },
+    "logo-central-faixa-branca-fundo-preto": {
+      "faixa": "branca em fundo preto"
+    },
+    "logo-central-faixa-verde-fundo-branco": {
+      "faixa": "verde em fundo branco"
+    },
+    "logo-central-faixa-verde-fundo-preto": {
+      "faixa": "verde em fundo preto"
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Verde Central #0DE450 (primária)"
+    ],
+    "apoio": [
+      "Preto #111111",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#0DE450",
+    "fundo": "escuro (preto)",
+    "ftit": "Poppins Bold",
+    "ftxt": "Poppins"
+  }
+}

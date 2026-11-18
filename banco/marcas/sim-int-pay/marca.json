@@ -1,0 +1,35 @@
+{
+  "marca": "SimIntPay",
+  "mascotes": {},
+  "logos": {
+    "logo-simintpay-completa": {},
+    "logo-simintpay-pequena": {
+      "pequena": true
+    },
+    "logo-simintpay-escura": {},
+    "logo-simintpay-faixa-fundo-branco": {
+      "faixa": "escura em fundo branco"
+    },
+    "logo-simintpay-faixa-fundo-preto": {
+      "faixa": "branca em fundo preto"
+    },
+    "logo-simintpay-fundo": {
+      "fundo": true
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Roxo #761FE3 (primária, a do site)",
+      "Azul Pay #5294FF (logo)",
+      "Azul Marinho #0A2F72 (logo)"
+    ],
+    "apoio": [
+      "Preto #141414",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#761FE3",
+    "ftit": "Poppins SemiBold",
+    "ftxt": "Poppins",
+    "fundo": "escuro (preto)"
+  }
+}

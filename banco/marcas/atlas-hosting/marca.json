@@ -1,0 +1,28 @@
+{
+  "marca": "Atlas Hosting",
+  "mascotes": {},
+  "logos": {
+    "logo-atlas-completa": {},
+    "logo-atlas-escura": {},
+    "logo-atlas-pequena": {
+      "pequena": true
+    }
+  },
+  "identidade": {
+    "cores": [
+      "Azul Noite #000F19 (base, o fundo do site)",
+      "Azul Atlas #1A97C3 (primária, logo)"
+    ],
+    "apoio": [
+      "Azul Claro #33B5FF (secundária, botões do site)",
+      "Azul Royal #3259D2",
+      "Violeta #4F26DD",
+      "Branco #FFFFFF"
+    ],
+    "destaque": "#1A97C3",
+    "ftit": "Quicksand Bold",
+    "ftxt": "Quicksand",
+    "fonte": "fonte-quicksand-bold",
+    "fundo": "escuro (azul noite)"
+  }
+}

@@ -26,16 +26,17 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Carrossel: quarto template aprovado, **10 · Xadrez (mostarda)** (réplica do kit de agência com xadrez; sem rodapé; conteúdo centralizado na altura, ajuste que vale também para o Fogo; foto da capa opcional). Ficha `15-carrossel-template-xadrez.md`. O dono vai mandar depois um treino de capas para todos os carrosséis.
 - 18/11/2026 · Carrossel: quinto template aprovado, **11 · Tipos de clientes (verde neon)** (no fim, o foguete vira a logo da marca e o contato vira o CTA). Ficha `16-carrossel-template-tipos-clientes.md`. Pendentes: kit 4 (espaço, ciano: falta o arquivo de fundo) e kit 7 (colagem: faltam os elementos). Depois vem o treino de capas.
 - 18/11/2026 · Carrossel: sexto template aprovado, **12 · Colagem (pink e roxo)**, versão limpa (texto reto, sem cortar palavras, elementos afastados, textos maiores, pílula de arraste curta, textos nos lugares do original). Ficha `17-carrossel-template-colagem.md`. Falta só o kit 4 (espaço, ciano: falta o arquivo de fundo).
+- 18/11/2026 · Carrossel: kit 4 montado como **13 · Espaço (azul neon)** (fundo, caneta, computador e barra de ferramentas do dono). Ficha `18-carrossel-template-espaco.md`. Aprovado pelo dono (sem a pílula "Segredos do MKT" no miolo).
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
-1. [ ] Carrossel: falta o kit 4 (espaço, ciano). O dono manda o arquivo de fundo sem textos em outra conversa.
-2. [ ] Identidade de cada marca: mascotes, pessoas que aparecem e 3 a 4 cores, cada uma com seu papel (1 destaque, 2 base escura, 3 apoio, 4 clara). Depois disso, a troca automática de cor nos templates aprovados, com prévia por marca para o dono aprovar (fotos e objetos com cor própria não trocam).
+1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
+2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
 3. [ ] Treino de capas para os carrosséis.
 4. [ ] Feed estático (refazer do zero a partir das referências do dono).
 5. [ ] Stories.
 6. [ ] Só depois disso: vídeo (Reels).
-Pendente técnico: os templates 7 a 12 e a Biblioteca de Artes estão no branch `claude/compassionate-darwin-b48wmn`; o PR para o `main` só é aberto quando o dono pedir.
+Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
 
 ## Onde paramos (14/11/2026, para a próxima conversa)
 - Sistema zerado: só trabalha o que o dono pede (Treino, + Novo conteúdo, Gerente) ou a grade de Produção diária (tudo em 0). Cérebro diário e relatório automático desligados.
