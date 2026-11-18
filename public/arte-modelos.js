@@ -510,8 +510,8 @@ const FG = { red: '#e3243b', preto: '#0b0b0b' }, fx = v => v * 1.0385 - 135, fy 
 const fgBase = (k) => ({ bg: { asset: 'tpl-fogo-fundo-' + k, color: '#050505' }, paper: '#050505', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 function fgEtiqueta(s, e, txt, x, y, h, fz) {
   const f = fT(500, -.02), w = largura(txt, f, fz) + 48;
-  s.shapes.push({ kind: 'rect', x: e.X(x + w / 2), y: e.Y(y + h / 2), w: e.X(w), h: e.Y(h), color: '#ffffff' });
-  s.texts.push({ role: 'title', value: txt, x: e.X(x + 22), y: e.Y(y + h / 2 - 4), align: 'left', size: e.P(fz), font: f.k, weight: f.w, ls: -.02, lh: 1, color: FG.preto, nowrap: true, shadow: false });
+  // a caixa branca é o fundo do próprio texto (abraça a palavra na fonte da marca): sem sobra branca e centrada (dono, 18/11/2026)
+  s.texts.push({ role: 'title', value: txt, x: e.X(x + w / 2), y: e.Y(y + h / 2), align: 'center', size: e.P(fz), font: f.k, weight: f.w, ls: -.02, lh: 1, color: FG.preto, nowrap: true, shadow: false, fundo: '#ffffff', fundo_pad: [Math.round(e.P((h - fz) / 2 + 2)), e.P(24)] });
   return w;
 }
 COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
@@ -523,7 +523,7 @@ COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
   let by, bh;
   if (d.__tagsAcima) {   // variação do Xadrez: as duas etiquetas em cima e a palavra-explosão embaixo, sem faixa preta
     const w1 = largura(l1, bfz, z1) + 48, w2 = largura(l2, bfz, z2) + 48, t2 = t1 + th + 8, wc2 = t2 + th + pz * .5 + 6;
-    fgEtiqueta(s, e, l1, cx - w1 / 2 + 20, t1, th, z1); fgEtiqueta(s, e, l2, cx - w2 / 2, t2, th, z2);
+    fgEtiqueta(s, e, l1, cx - w1 / 2, t1, th, z1); fgEtiqueta(s, e, l2, cx - w2 / 2, t2, th, z2);
     s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc2), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false });
     by = wc2 + pz * .5 - th + 10; bh = 0;
   } else {
@@ -554,7 +554,7 @@ COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
     B.push({ h: tl.length * z(82), gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + z(41) + i * z(82)), align: 'left', size: e.P(z(70)), font: tf.k, weight: tf.w, ls: -.015, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
     if (bl.length) B.push({ h: bl.length * z(46), gap: 40, make: y => { bl.forEach((l, i) => erLinha(s.texts, l, x, y + z(23) + i * z(46), z(34), bf, '#f2f2f2', e)); return []; } });
   }
-  pilha(B, 675, ctx).itens;
+  pilha(B, d.__centro || 675, ctx).itens;
   // nota queimando na divisa: na última página do miolo (entra no fim, como no original) e, em carrossel longo, a cada 3 páginas
   const ult = (ctx.i || 0) === (ctx.total || 1) - 2, meio = !ult && (ctx.i || 0) % 3 === 2;
   if (ult || meio) s.items.push({ asset: 'tpl-fogo-nota', x: F2((fx(1977 - 1300 + 540) + (meio ? 40 : 0)) / 1080), y: F2(fy(925 + (meio ? 60 : 0)) / 1350), size: Math.round(fy(1080) * (meio ? .82 : 1)), cruza: true, ...(meio ? { flip: true, rot: 8 } : {}) });
@@ -631,7 +631,7 @@ COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
 // VIS: parte visível do PNG (fração do quadrado) para medir a peça de verdade, não a caixa transparente.
 const VIS = { 'tpl-xadrez-rei': [.318, .289, .682, .821] };
 function desviaDoTexto(s, ctx) {
-  const W = ctx.W || 1080, H = ctx.H || 1350, folga = 24 / H;
+  const W = ctx.W || 1080, H = ctx.H || 1350, folga = 12 / H;
   const caixas = [];
   for (const t of s.texts || []) { if (!t.value) continue; const sz = (t.size || 40) / H, w = String(t.value).length * (t.size || 40) * .56 / W, x0 = t.align === 'left' ? t.x : t.align === 'right' ? t.x - w : t.x - w / 2; caixas.push([x0, t.y - sz * .6, x0 + w, t.y + sz * .6]); }
   for (const sh of s.shapes || []) if (sh.w && sh.h && sh.w < .95 && ['rect', 'pill'].includes(sh.kind)) caixas.push([sh.x - sh.w / 2, sh.y - sh.h / 2, sh.x + sh.w / 2, sh.y + sh.h / 2]);
@@ -659,12 +659,12 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto, quando a copy pede
   else s.items.unshift({ asset: 'tpl-xadrez-foto-capa', x: F2(fx(650) / 1080), y: F2(fy(215) / 1350), size: Math.round(fy(1300)) });   // padrão aprovado pelo dono: a foto da arte original (Coringa)
   { const dy = 70 / 1350; for (const o of [...s.texts, ...s.shapes]) o.y = F2(o.y + dy); const f0 = s.items[0]; if (f0?.asset === 'tpl-xadrez-foto-capa') { const h0 = fy(430), k = (h0 + 70) / h0; f0.size = Math.round(f0.size * k); f0.y = F2(((h0 + 70) / 2) / 1350); } else if (f0) f0.y = F2(f0.y + dy); }   // ajuste do dono: foto, título e botão um pouco mais para baixo
-  // rei pequeno da esquerda saiu (dono, 18/11/2026): só o rei grande, cruzando para a página 2
-  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true, desvia: 'baixo' });   // desce, nunca sobe: em cima compete com a foto
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(105 / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true, desvia: 'baixo' });   // peça pequena da referência: volta, mas sempre abaixo do texto
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 80) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true, desvia: 'baixo' });   // desce, nunca sobe: em cima compete com a foto
   return desviaDoTexto(s, ctx);
 };
 COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {   // __z 1.3: texto 30% maior que o do Fogo (decisão do dono, 18/11/2026)
-  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
+  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === 1 ? { __centro: 540 } : {}), ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
   s.items = s.items.filter(it => it.asset !== 'tpl-fogo-nota');
   xzCor(xzCor(xzCor(s, '#ffffff', XZ.escuro), '#f2f2f2', XZ.corpo), FG.red, '#b8901c');
   if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1115) - 115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
