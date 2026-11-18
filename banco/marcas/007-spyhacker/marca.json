@@ -17,5 +17,10 @@
       "uso": "Capa e CTA dos posts do 007 Spyhacker (segurança, hospedagem, Atlas Hosting), em fundos escuros; grande, saindo pela borda de baixo ou ao lado do título.",
       "obs": "Mascote oficial enviado pelo dono em 18/11/2026."
     }
+  },
+  "logos": {
+    "logo-spyhacker-pequena": {
+      "pequena": true
+    }
   }
 }

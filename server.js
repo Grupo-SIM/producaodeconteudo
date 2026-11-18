@@ -4678,7 +4678,7 @@ for (const [pasta, rotulo] of Object.entries(TPL_PASTAS)) try {
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   }
 } catch (e) { console.error('template', pasta, e.message); }
-// mascotes oficiais das marcas (banco/marcas/<pasta>/: marca.json + PNG sem fundo), enviados pelo dono no treino do Designer.
+// mascotes e logos oficiais das marcas (banco/marcas/<pasta>/: marca.json + PNG sem fundo), enviados pelo dono no treino do Designer.
 // Entram uma vez como arquivo "mascote" da marca, já com a ficha técnica; o dono pode editar depois na Biblioteca.
 try {
   const dirM = path.join(__dirname, 'banco', 'marcas');
@@ -4692,6 +4692,13 @@ try {
       fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.png'), buf);
       const pr = probeAsset(+r.lastInsertRowid, 'png'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
       salvaMascoteFicha({ id: +r.lastInsertRowid, ficha: null }, ficha);
+    }
+    for (const [nome, o] of Object.entries(cfg.logos || {})) {   // logos oficiais: a pequena (só o símbolo) leva a tag "logo pequena"
+      const arq = path.join(dir, nome + '.png'); if (!fs.existsSync(arq) || one('SELECT 1 x FROM assets WHERE name=? AND brand=?', nome, marca)) continue;
+      const buf = fs.readFileSync(arq);
+      const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', marca, nome, 'logo', o?.pequena ? 'logo, logo pequena, oficial' : 'logo, oficial', 'Logo oficial da marca, enviada pelo dono. Não apague.', '', nome + '.png', 'png', buf.length, 'Logo', T());
+      fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.png'), buf);
+      const pr = probeAsset(+r.lastInsertRowid, 'png'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
     }
   }
 } catch (e) { console.error('mascotes das marcas', e.message); }
