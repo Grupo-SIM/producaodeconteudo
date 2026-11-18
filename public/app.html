@@ -179,7 +179,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .kvr{display:flex;justify-content:space-between;gap:12px;background:#161618;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px}.sec{background:#161618;border-radius:10px;padding:10px 12px;margin-bottom:8px}.sec b{display:block;font-size:12px;letter-spacing:.04em;color:var(--gold2);margin-bottom:4px}.sec p{font-size:13px;color:var(--tx2);line-height:1.5}.sec em{font-style:normal;font-size:10.5px;border-radius:5px;padding:1px 6px;margin:0 2px}.sec em.prop{background:#10241a;color:#7fd1a0}.sec em.conf{background:#2a2014;color:#e9b87a}
 .hexes{display:flex;gap:10px;margin-top:6px;font-size:11.5px;color:var(--tx2);font-family:ui-monospace,monospace}
 .arqs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.arqs figure{margin:0}.arqs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#161618}.arqs figcaption{font-size:11px;color:var(--tx3);text-align:center;margin-top:3px}
-img.av{object-fit:cover;padding:0}
+img.av{object-fit:contain;padding:3px}
 .busca{width:260px;padding:7px 12px}
 .novo{display:grid;gap:8px}.novo .lb{font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-top:6px}.nvf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nvf button{text-align:left;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:#161618}.nvf button.on{border-color:#a8864a;background:#1a1710}.nvf b{display:block;font-size:13.5px}.nvf span{font-size:11.5px;color:var(--tx3)}
 .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 4px -1px 6px;border:1px solid #ffffff22}.kvr span:last-child{color:var(--tx3);text-align:right}
@@ -901,7 +901,9 @@ VIEWS.marcas = async () => {
   const ehId = x => /^#?\s*IDENTIDADE VISUAL/i.test(x.content.trim()) || /^identidade visual/i.test(x.title);
   const descr = b => docsDe(b).filter(x => x.category === 'marca' && !ehId(x));
   const ident = b => docsDe(b).find(ehId);
-  const logo = b => S._assets.find(x => (x.brand || '').toLowerCase() === b.name.toLowerCase() && /logo/i.test(x.kind + ' ' + x.name));
+  const nrm = t => (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const logo = b => { const da = S._assets.filter(x => nrm(x.brand) === nrm(b.name) && !/video|musica|fonte|audio/i.test(x.kind || '')), t = x => (x.kind || '') + ' ' + (x.name || '');   // ícone/símbolo primeiro (cabe no quadrado), depois a logo, depois mascote
+    return da.find(x => /[ií]cone|icon|s[ií]mbolo|simbolo|favicon|avatar|perfil|profile/i.test(t(x))) || da.find(x => /logo/i.test(t(x))) || da.find(x => /mascote/i.test(t(x))); };
   const nicho = b => { const p = achaSec(secoes(descr(b).map(x => x.content).join('\n')), 'PAPEL')[0]; return p ? juntar(p).split(/(?<=\.)\s/)[0].slice(0, 70) : ''; };
   const av = (b, big) => { const l = logo(b); return l ? `<img class="av ${big ? 'gold' : ''}" src="/api/assets/${l.id}/file" alt="">` : `<span class="av ${big ? 'gold' : ''}">${esc(sigla(b.name))}</span>`; };
   const linha = (k, v, cls = '') => `<div class="kvr ${cls}"><span>${esc(k)}</span><span>${v}</span></div>`;
