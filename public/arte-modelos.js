@@ -290,6 +290,9 @@ export const MODELOS = [
   { id: 'fogo-capa', nome: '8 · Fogo: capa', uso: 'capa de carrossel', desc: 'Template aprovado: fundo de fogo com dinheiro queimando, título em etiquetas brancas (kicker em cima, apoio embaixo) e a palavra-explosão em vermelho numa faixa preta inclinada; botão vermelho “Arrasta para o lado” com botão de contorno e seta.', campos: ['kicker', 'titulo', 'apoio', 'cta'] },
   { id: 'fogo-lista', nome: '8 · Fogo: miolo', uso: 'página interna', desc: 'Fundo preto; até 3 itens “1. Título” com explicação, ou uma frase grande com palavra em *vermelho* e apoio. A nota de R$ 100 queimando cruza a divisa na última página do miolo (e a cada 3 páginas em carrossel longo). Sem botão de arraste.', campos: ['itens', 'titulo', 'texto', 'n'] },
   { id: 'fogo-fim', nome: '8 · Fogo: fim', uso: 'última página', desc: 'Fundo preto com prédios e formas geométricas; pergunta ou fechamento grande centralizado, linha de apoio em caixa alta e botão vermelho opcional com o CTA.', campos: ['titulo', 'apoio', 'cta'] },
+  { id: 'idv-capa', nome: '9 · Identidade visual: capa', uso: 'capa de carrossel', desc: 'Template aprovado (roxo, meta-design): papel texturizado com ferramentas do Photoshop, chamada de 2 linhas, título em caixa alta espaçado e a palavra gigante em itálico, @ da marca com avatar e o robô roxo cruzando para a página 2.', campos: ['kicker', 'titulo', 'apoio', 'handle'] },
+  { id: 'idv-texto', nome: '9 · Identidade visual: miolo', uso: 'página interna', desc: 'Faixa roxa escura com estúdio e réguas; dois blocos em escada (ícone, título em 2 linhas e texto espaçado com **negrito**). O leão na poltrona cruza para a última página.', campos: ['itens'] },
+  { id: 'idv-fim', nome: '9 · Identidade visual: fim', uso: 'última página', desc: 'Papel claro com "ID. VISUAL" vertical; dois blocos lado a lado e a caixa tracejada com cantos de seleção que leva o CTA (frase + botão roxo).', campos: ['itens', 'titulo', 'cta'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -545,6 +548,59 @@ COMPOR_EXTRA['fogo-fim'] = (d, ctx) => {
   if (ap) { const af = fX(500, 0), al = erQuebra(ap, af, 42, 900); B.push({ h: al.length * 52, gap: 40, make: y => { al.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: .5, y: e.Y(y + 26 + i * 52), align: 'center', size: e.P(42), font: af.k, weight: af.w, ls: 0, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } }); }
   if (d.cta) { const cw = Math.max(360, largura(String(d.cta).toUpperCase(), fX(500, .05), 26) + 90); B.push({ h: 76, gap: 50, make: y => { s.shapes.push({ kind: 'pill', x: .5, y: e.Y(y + 38), w: e.X(cw), h: e.Y(76), color: FG.red }); s.texts.push({ role: 'title', value: String(d.cta).toUpperCase(), x: .5, y: e.Y(y + 38), align: 'center', size: e.P(26), font: FK.x, weight: pesoDe(FK.x, 500), ls: .05, lh: 1, color: '#ffffff', nowrap: true, shadow: false }); return []; } }); }
   pilha(B, fy(600), ctx).itens;
+  return s;
+};
+
+// ───────── Template "9 · Identidade visual (roxo)" (réplica aprovada do kit roxo, 18/11/2026) ─────────
+// Kit quadrado 1080×1080 levado a 1080×1350: fundo com 135 px a mais em cima e embaixo; medidas do kit + 135 no eixo y.
+const IV = { roxo: '#7b43e2', roxoClaro: '#d6b8ff', cinza: '#555555' }, iy = v => v + 135;
+const ivBase = k => ({ bg: { asset: 'tpl-idv-fundo-' + k, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
+// bloco: ícone, título em 2 linhas (fonte de máquina de escrever na arte; da marca quando houver) e texto espaçado com **negrito**
+function ivBloco(s, e, it, x, y, ic, corT, corB, maxW) {
+  const hf = fT(700, .06), bf = fX(400, .13), hz = 27, bz = 18;
+  if (ic) s.items.push({ asset: ic, x: e.X(x - 34), y: e.Y(y + 18), size: e.P(40) });
+  const hl = quebra(limpa(String(it.t || '')).toUpperCase(), hf, hz, maxW);
+  hl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 13 + i * 27), align: 'left', size: e.P(hz), font: hf.k, weight: hf.w, ls: .06, lh: 1, color: corT, nowrap: true, shadow: false }));
+  const bl = fgAst(erQuebra(String(it.d || ''), bf, bz, maxW)), y0 = y + hl.length * 27 + 14;
+  bl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(y0 + 13 + i * 27), align: 'left', size: e.P(bz), font: bf.k, weight: bf.w, ls: .13, lh: 1, color: corB, hl: corB, hw: 600, nowrap: true, shadow: false }));
+  return y0 + bl.length * 27;
+}
+COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
+  usaFontes(ctx, 'spacemono', 'poppins');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(1), cx = 480;
+  const kl = String(d.kicker || 'A importância|de ter uma').split('|').map(x => x.trim().toUpperCase()).filter(Boolean).slice(0, 2), kf = fT(700, .1);
+  const kz = Math.min(58, ...kl.map(l => 58 * 820 / Math.max(820, largura(l, kf, 58))));
+  kl.forEach((l, i) => s.texts.push({ role: 'label', value: l, x: e.X(cx), y: e.Y(iy(299) + i * 58), align: 'center', size: e.P(kz), font: kf.k, weight: kf.w, ls: .1, lh: 1, color: IV.roxo, nowrap: true, shadow: false }));
+  const tk = fMarca(ctx, 't') || 'anton', tf = { k: tk, w: pesoDe(tk, 800), ls: .2 }, t1 = String(d.titulo || 'Identidade').trim().toUpperCase(), t2 = String(d.apoio || 'Visual').trim().toUpperCase();
+  const z1 = Math.min(78, 78 * 560 / Math.max(1, largura(t1, tf, 78))), z2 = Math.min(196, 196 * 700 / Math.max(1, largura(t2, { ...tf, ls: .17 }, 196)));
+  s.texts.push({ role: 'title', value: t1, x: e.X(cx), y: e.Y(iy(430)), align: 'center', size: e.P(z1), font: tf.k, weight: tf.w, ls: .2, lh: 1, color: '#7740e6', nowrap: true, shadow: false });
+  s.texts.push({ role: 'title', value: t2, x: e.X(cx), y: e.Y(iy(587)), align: 'center', size: e.P(z2), font: tf.k, weight: tf.w, ls: .17, lh: 1, color: '#6a3cf0', italic: true, nowrap: true, shadow: false });
+  const handle = String(d.handle || ctx.contatos?.instagram || '').trim();
+  if (handle) { s.items.push({ asset: ctx.logo || ctx.avatar || 'avatar-padrao', x: e.X(368), y: e.Y(iy(830)), size: e.P(52), round: true }); s.texts.push({ role: 'label', value: handle.startsWith('@') ? handle : '@' + handle, x: e.X(410), y: e.Y(iy(830)), align: 'left', size: e.P(26), font: FK.x, weight: pesoDe(FK.x, 500), color: IV.roxo, nowrap: true, shadow: false }); }
+  s.items.push({ asset: 'tpl-idv-robo', x: F2((582 + 513) / 1080), y: F2(iy(150 + 513) / 1350), size: 1026, cruza: true });
+  return s;
+};
+COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
+  usaFontes(ctx, 'spacemono', 'poppins');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(2), it = erItens(d).slice(0, 2);
+  if (it[0]) ivBloco(s, e, it[0], 262, iy(255), 'tpl-idv-icone-pincel', IV.roxoClaro, '#ffffff', 340);
+  if (it[1]) ivBloco(s, e, it[1], 392, iy(585), 'tpl-idv-icone-foguete', '#ffffff', '#ffffff', 340);
+  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-idv-leao', x: F2((636 + 540) / 1080), y: F2(iy(432 + 540) / 1350), size: 1080, cruza: true });   // o leão entra no fim, como no original
+  return s;
+};
+COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
+  usaFontes(ctx, 'spacemono', 'poppins');
+  const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(3), it = erItens(d).slice(0, 2);
+  if (it[0]) ivBloco(s, e, it[0], 192, iy(255), null, '#8a3cf0', IV.cinza, 330);
+  if (it[1]) ivBloco(s, e, it[1], 652, iy(255), null, '#8a3cf0', IV.cinza, 290);
+  const bx = 400, by = iy(678), bw = 368, bh = 178;
+  s.shapes.push({ kind: 'rect', x: e.X(bx + bw / 2), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: 'transparent', stroke: IV.roxo, stroke_w: 2 / 1080, dash: true });
+  for (const [qx, qy] of [[bx, by], [bx + bw, by], [bx, by + bh], [bx + bw, by + bh]]) s.shapes.push({ kind: 'rect', x: e.X(qx), y: e.Y(qy), w: e.X(13), h: e.Y(13), color: '#444444' });
+  const tf = fT(600, 0), tl = erQuebra(d.titulo || 'Sua marca merece|ser lembrada.', tf, 27, bw - 40).slice(0, 2);
+  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(bx + bw / 2), y: e.Y(by + 34 + 17 + i * 34 - (tl.length - 2) * 17), align: 'center', size: e.P(27), font: tf.k, weight: tf.w, lh: 1, color: '#4a2a8a', nowrap: true, shadow: false }));
+  const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(600, .12), cz = Math.min(18, 18 * 230 / Math.max(1, largura(cta, cf, 18)));
+  s.shapes.push({ kind: 'pill', x: e.X(bx + bw / 2), y: e.Y(by + 137), w: e.X(280), h: e.Y(44), color: IV.roxo });
+  s.texts.push({ role: 'title', value: cta + ' →', x: e.X(bx + bw / 2), y: e.Y(by + 137), align: 'center', size: e.P(cz), font: cf.k, weight: cf.w, ls: .12, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
   return s;
 };
 

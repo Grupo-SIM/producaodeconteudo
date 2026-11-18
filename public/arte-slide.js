@@ -686,7 +686,7 @@ export function slideHtml(spec, s, i, total) {
       const ic = sh.icon && ICONES[sh.icon] ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:${sh.icon_color || '#e9e9ee'};filter:drop-shadow(0 ${Math.round(h * .02)}px ${Math.round(h * .02)}px rgba(0,0,0,.7)) drop-shadow(0 -1px 0 rgba(255,255,255,.4))">${iconSvg(sh.icon, Math.round(Math.min(w, h) * .62), 'currentColor', 2.6)}</span>` : '';
       return `<div class="sh" data-k="${k}" style="${st}">${ic}</div>`;
     }
-    if (sh.kind === 'ring' || sh.stroke) st += `border:${Math.max(1, Math.round((sh.stroke_w ?? .006) * W))}px solid ${sh.stroke || col};background:${sh.kind === 'ring' ? 'transparent' : (sh.glass ? 'rgba(255,255,255,.08)' : fill)};`;
+    if (sh.kind === 'ring' || sh.stroke) st += `border:${Math.max(1, Math.round((sh.stroke_w ?? .006) * W))}px ${sh.kind !== 'line' && sh.dash ? 'dashed' : 'solid'} ${sh.stroke || col};background:${sh.kind === 'ring' ? 'transparent' : (sh.glass ? 'rgba(255,255,255,.08)' : fill)};`;
     else st += `background:${sh.glass ? 'rgba(255,255,255,.10)' : fill};`;
     st += `border-radius:${sh.kind === 'circle' || sh.kind === 'ring' ? '50%' : sh.kind === 'pill' ? '999px' : Math.round((sh.radius || 0) * Math.min(w, h)) + 'px'};`;
     if (sh.kind === 'star') st += `clip-path:${starPoly(sh.points || 12, sh.inner || .78)};`;
