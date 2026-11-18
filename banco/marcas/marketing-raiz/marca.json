@@ -36,9 +36,9 @@
       "Magenta Suave #BD61AB (detalhe)",
       "Cinza #626161"
     ],
-    "destaque": "#FFFFFF",
+    "destaque": "#010101",
     "ftit": "Montserrat Bold",
     "ftxt": "Montserrat Regular",
-    "fundo": "escuro (preto)"
+    "fundo": "claro (branco)"
   }
 }

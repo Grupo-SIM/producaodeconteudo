@@ -1279,10 +1279,12 @@ export function comporSlide(slide, ctxBase) {
   if (ctx.fonteMarca && out?.texts) { const kM = ctx.fonteMarcaK || 'poppins'; for (const t of out.texts) if (t.font === kM) delete t.font; }
   return { ...out, modelo: slide.modelo, dados: slide.dados || {} };
 }
-const COR_TPL = { espaco: { cor: '#12c9de', pecas: 'tpl-espaco-' } };
+const COR_TPL = { espaco: { cor: '#12c9de', pecas: 'tpl-espaco-', escuro: true } };
 const hueDe = h => { const [r, g, b] = rgb(h).map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; const x = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (x * 60 + 360) % 360; };
 function trocaCor(out, modelo, alvo) {
   const t = COR_TPL[modelo.split('-')[0]]; if (!t || !/^#[0-9a-f]{6}$/i.test(alvo)) return;
+  const [r0, g0, b0] = rgb(alvo), semCor = Math.max(r0, g0, b0) - Math.min(r0, g0, b0) < 30;
+  if (semCor) alvo = t.escuro ? '#ffffff' : '#0a0a0a';   // marca preto e branco: em template escuro o destaque é o branco, em template claro o preto
   const de = t.cor.toLowerCase(), para = alvo.toLowerCase(), giro = Math.round(((hueDe(para) - hueDe(de)) + 540) % 360 - 180), escuro = sobre(para);
   const troca = o => { for (const k of ['color', 'hl', 'stroke', 'icon_color', 'bg']) if (typeof o[k] === 'string' && o[k].toLowerCase() === de) o[k] = para; };
   for (const o of [...(out.texts || []), ...(out.shapes || [])]) troca(o);

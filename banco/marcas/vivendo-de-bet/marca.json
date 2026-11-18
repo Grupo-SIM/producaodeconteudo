@@ -31,14 +31,13 @@
   "identidade": {
     "cores": [
       "Verde Neon #21DC0D (primária)",
-      "Verde Escuro #116106 (secundária)"
+      "Branco #FFFFFF (primária)"
     ],
     "apoio": [
-      "Preto #000000",
-      "Branco #FDFDFD"
+      "Verde Escuro #116106",
+      "Preto #000000"
     ],
     "destaque": "#21DC0D",
-    "fundo": "escuro (preto)",
     "ftit": "Anton",
     "ftxt": "Anton"
   }

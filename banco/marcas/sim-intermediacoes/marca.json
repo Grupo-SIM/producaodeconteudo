@@ -9,16 +9,18 @@
   },
   "identidade": {
     "cores": [
-      "Roxo #8C359B (primária)",
-      "Magenta #CC2F9C (secundária)"
+      "Violeta #8351F1 (primária, botões do site)",
+      "Roxo #8C359B (logo)",
+      "Magenta #CC2F9C (logo)"
     ],
     "apoio": [
-      "Rosa Violeta #B7349E (apoio)",
-      "Preto #0A0A0A",
+      "Rosa Violeta #B7349E",
+      "Preto #070410",
       "Branco #FFFFFF"
     ],
-    "destaque": "#CC2F9C",
+    "destaque": "#8351F1",
     "ftit": "Montserrat Bold Italic",
-    "ftxt": "Montserrat"
+    "ftxt": "Montserrat",
+    "fundo": "escuro (preto arroxeado)"
   }
 }

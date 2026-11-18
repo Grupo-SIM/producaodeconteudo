@@ -19,15 +19,17 @@
   },
   "identidade": {
     "cores": [
-      "Azul Pay #5294FF (primária)",
-      "Azul Marinho #0A2F72 (secundária)"
+      "Roxo #761FE3 (primária, a do site)",
+      "Azul Pay #5294FF (logo)",
+      "Azul Marinho #0A2F72 (logo)"
     ],
     "apoio": [
-      "Preto #020202",
+      "Preto #141414",
       "Branco #FFFFFF"
     ],
-    "destaque": "#5294FF",
+    "destaque": "#761FE3",
     "ftit": "Poppins SemiBold",
-    "ftxt": "Poppins"
+    "ftxt": "Poppins",
+    "fundo": "escuro (preto)"
   }
 }
