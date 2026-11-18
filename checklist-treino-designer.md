@@ -26,6 +26,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Carrossel: quarto template aprovado, **10 · Xadrez (mostarda)** (réplica do kit de agência com xadrez; sem rodapé; conteúdo centralizado na altura, ajuste que vale também para o Fogo; foto da capa opcional). Ficha `15-carrossel-template-xadrez.md`. O dono vai mandar depois um treino de capas para todos os carrosséis.
 - 18/11/2026 · Carrossel: quinto template aprovado, **11 · Tipos de clientes (verde neon)** (no fim, o foguete vira a logo da marca e o contato vira o CTA). Ficha `16-carrossel-template-tipos-clientes.md`. Pendentes: kit 4 (espaço, ciano: falta o arquivo de fundo) e kit 7 (colagem: faltam os elementos). Depois vem o treino de capas.
 - 18/11/2026 · Carrossel: sexto template aprovado, **12 · Colagem (pink e roxo)**, versão limpa (texto reto, sem cortar palavras, elementos afastados, textos maiores, pílula de arraste curta, textos nos lugares do original). Ficha `17-carrossel-template-colagem.md`. Falta só o kit 4 (espaço, ciano: falta o arquivo de fundo).
+- 18/11/2026 · Carrossel: kit 4 montado como **13 · Espaço (azul neon)** (fundo, caneta, computador e barra de ferramentas do dono). Ficha `18-carrossel-template-espaco.md`. Aguardando aprovação do dono.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
