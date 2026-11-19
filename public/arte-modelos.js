@@ -1279,9 +1279,9 @@ const COMPOR = {
     s.texts.push(...mol.texts); s.items.push(...mol.items); s.shapes.push(...mol.shapes); return s;
   }
 };
-// ───────── Template "15 · Venda ebook" (carrossel de venda aprovado pelo dono, 19/11/2026) ─────────
+// ───────── Template "15 · Carrossel de venda" (carrossel de venda aprovado pelo dono, 19/11/2026) ─────────
 // Fundo da seção História e venda pela cor da marca, logo pequena discreta no canto, uma frase grande por página na fonte da marca
-// com o trecho-chave (*assim*) em marca-texto, páginas com FOTO REAL de banco (estilo ebook, nunca gerada) e fim simples (pergunta + preço + "Clique no link da bio").
+// com o trecho-chave (*assim*) em marca-texto, páginas com FOTO REAL de banco (estilo editorial, nunca gerada) e fim simples (pergunta + preço + "Clique no link da bio").
 const VD_FUNDO_MARCA = { 'corte dos ricos': 'cinza-papel', 'marketing raiz': 'branco-granulado' };   // aprovados pelo dono
 // cor principal de cada marca (conhecimento/agentes/designer/20-cores-e-tipografia-das-marcas.md): decide o fundo e a cor do marca-texto
 const VD_COR = { '007 spyhacker': '#13ECE9', 'atlas hosting': '#1A97C3', 'central do marketing': '#0DE450', 'corte dos ricos': '#000000', 'marketing raiz': '#010101', 'pagatg': '#834DEB', 'seguidores em alta': '#9B23B7', 'simintpay': '#761FE3', 'sim intermediacoes': '#8351F1', 'teron': '#1A71FE', 'vivendo de bet': '#21DC0D' };
