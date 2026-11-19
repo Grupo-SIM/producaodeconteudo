@@ -783,14 +783,15 @@ const epLogo = (s, e, ctx, x, y) => { if (ctx.logo) s.items.push({ asset: ctx.lo
 COMPOR_EXTRA['espaco-capa'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = 552, maxW = 640;
+  if (/spyhacker/i.test(String(ctx.marca || ''))) s.bg = { ...s.bg, asset: 'tpl-espaco-fundo-1-spyhacker' };   // 007 Spyhacker: o mascote segura o tablet no lugar do astronauta (dono, 19/11/2026)
   // título na tela do tablet: as linhas de cima menores e a última (a palavra-chave) gigante, como “CONTA!”
   let tl = String(d.titulo || '4 segredos de marketing|que ninguém te|conta!').toUpperCase().split('|').map(x => x.replace(/\*/g, '').trim()).filter(Boolean);
   if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 62, maxW) : []), p[p.length - 1]]; }
   const cima = tl.slice(0, -1).slice(-3), ult = tl[tl.length - 1];
   const zc = Math.min(64, ...cima.map(l => 64 * maxW / Math.max(maxW, largura(l, tf, 64)))), zu = Math.min(230, 230 * maxW / Math.max(1, largura(ult, tf, 230)));
-  const hT = cima.length * zc * 1.02 + zu * .92, y0 = 570 - hT / 2;
-  cima.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + zc * .51 + i * zc * 1.02), align: 'center', size: e.P(zc), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false }));
-  s.texts.push({ role: 'title', value: ult, x: e.X(cx), y: e.Y(y0 + cima.length * zc * 1.02 + zu * .46), align: 'center', size: e.P(zu), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false });
+  const LH = 1.18, hT = cima.length * zc * LH + zu * .92, y0 = 570 - hT / 2;   // 1,18: linha com acento (NINGUÉM) não encosta na de cima
+  cima.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + zc * .59 + i * zc * LH), align: 'center', size: e.P(zc), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false }));
+  s.texts.push({ role: 'title', value: ult, x: e.X(cx), y: e.Y(y0 + cima.length * zc * LH + zu * .46), align: 'center', size: e.P(zu), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false });
   // botão: pílula ciano “Arraste para o lado” + quadrado com a seta
   const bt = String(d.cta_arraste || d.cta || 'Arraste para o lado').toUpperCase(), bf = fX(600, .04), bw = Math.max(330, largura(bt, bf, 24) + 90);
   s.shapes.push({ kind: 'pill', x: e.X(238 + bw / 2), y: e.Y(932), w: e.X(bw), h: e.Y(80), color: EP.ciano, radius: .2 });

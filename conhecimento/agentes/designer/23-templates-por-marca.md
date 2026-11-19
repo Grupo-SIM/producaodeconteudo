@@ -17,6 +17,6 @@ Marcas institucionais (Atlas Hosting, SimIntPay, Sim Intermediações, Teron, Pa
 | 10 · Xadrez (carrossel) | Marketing Raiz |
 | 11 · Tipos de clientes (carrossel) | Central do Marketing (o mascote no lugar da estátua da capa, mesmo tamanho e pose, com o fade embaixo) |
 | 12 · Colagem (carrossel) | Seguidores em Alta |
-| 13 · Espaço (carrossel) | 007 Spyhacker |
+| 13 · Espaço (carrossel) | 007 Spyhacker (o mascote segura o tablet da capa no lugar do astronauta, mesmo movimento e tamanho) |
 
 Excluído pelo dono (19/11/2026): 6 · Manchete sobre foto com logo (ficava igual ao 5). Formatos de notícia: Zyrion (foto inteira, duas fotos ou círculo), Nuvo, Manchete com perfil; contracapa (cartão do X) acompanha Zyrion e Nuvo.
