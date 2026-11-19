@@ -303,6 +303,7 @@ export function criarFluxoV2(ctx) {
       const motivo = str(b.motivo, 3500, 'Motivo');
       contentAct(id, 'changes', { feedback: motivo, target: b.alvo, motivos: b.motivos, campo: b.campo, refazer: !!b.refazer });
       setContent(id, { em_ajuste: 1, ajuste_motivo: motivo });
+      try { ctx.ajusteDono?.(c, motivo, b.alvo); } catch (e) { console.error('ajuste no chat do gerente:', e.message); }   // o que o dono escreve no ajuste vai para o chat do Gerente, que responde (canal direto)
       return { ok: true };
     }
     if (nome === 'descartar') {
