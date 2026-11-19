@@ -3,7 +3,25 @@
 
 Vale quando o formato da peça é estático / feed (post de imagem). A técnica geral (capa agressiva, tom falado, CTA da casa) continua valendo.
 
-## Estrutura
+## REGRA NOVA DO DONO (19/11/2026), vale mais que o resto deste arquivo
+- Estático é **UMA arte só** (duas artes = carrossel). Não existe mais "Arte 2".
+- A arte é uma **cena criativa que quebra o padrão** com o mascote da marca (ver Designer `22-feed-estatico-quebra-de-padrao.md`). O texto da arte é CURTO:
+  - **Título: 1 a 4 palavras** (ex.: "FORA", "SEGREDO", "ERROS de marketing", "Tipos de Funil", "SEJA VISTO").
+  - **Apoio (opcional): até 8 palavras** (ex.: "Você vai sair do mercado.", "no meio da multidão").
+  - O título conversa com a cena: escreva já pensando na imagem.
+- Todo o contexto vai na **LEGENDA**, que o "Leia a legenda ↓" da arte chama.
+- Há 19 artes de estático já aprovadas em `banco/tpl-estatico/` (14 a 25, 27 a 31, 33). Quando pedirem estático, primeiro veja se uma delas encaixa no tema: aí basta trocar o título/apoio (mesmo número de palavras) e escrever a legenda. Cada arte só é usada uma vez.
+
+### Novo formato de entrega
+📌 ARTE
+Cena: (o que o mascote faz e onde: uma ideia visual que se entende em 1 segundo)
+Título: (1 a 4 palavras)
+Apoio: (até 8 palavras, opcional)
+Arte aprovada reaproveitada: (número, se usar uma de banco/tpl-estatico)
+## LEGENDA
+...
+
+## Estrutura (antigo, só para referência)
 - **Arte 1 (obrigatória): headline forte.** É a capa: tem de parar o dedo sozinha. Mesmas regras da capa do carrossel (paradoxo, acusação ao hábito, perda direta; verdadeira).
 - **Arte 2 (opcional): apoio ou CTA.** Uma frase que complementa a headline e, se fizer sentido, a chamada. Não é obrigatória: o CTA pode ficar só na legenda.
 - **Legenda: explicativa.** Aqui mora o conteúdo que o carrossel colocaria nos slides: abre com uma frase forte, explica o porquê em 2 ou 3 parágrafos curtos, dá uma ação prática e fecha com o CTA da casa.

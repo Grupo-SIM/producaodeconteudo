@@ -127,3 +127,9 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 17 APROVADA. 16: título logo acima da cabeça do mascote (encostando), sem sobra grande no topo.
 - 16 APROVADA. 19 (pente fino): título numa fonte só, a da marca (Vivendo de Bet = Anton): linha de cima branca menor + palavra-chave gigante na cor da marca. Nada de misturar pílula, serifa e manuscrito no mesmo título.
 - 19 APROVADA. Treino inicial do feed estático CONCLUÍDO (19/11/2026). Itens de conferência copiados para o Revisor (gerente/03-conferencia-da-arte.md).
+
+## ESTÁTICO NÃO É TEMPLATE (decisão do dono, 19/11/2026)
+- Jornalístico e carrossel viram template porque se repetem (só muda o texto). Estático NÃO: cada post é uma arte/cena NOVA.
+- As 19 artes aprovadas (`banco/tpl-estatico/`) são um **estoque pronto**: quando pedirem estático, use uma delas trocando só o título/apoio pela copy nova (mesmo número de palavras, mesmo lugar). Cada arte do estoque só sai uma vez; registre qual foi usada.
+- Acabou o estoque (ou nenhuma encaixa no tema): **crie uma arte nova do zero** seguindo os princípios deste arquivo. O dono NÃO vai mandar referência toda vez: o Designer tem de inventar cenas novas no mesmo nível (ideia visual de 1 segundo, mascote fiel e grande, escala absurda / situação emocional / objeto impossível, fundo liso com contraste, título curto na fonte da marca, "Leia a legenda ↓").
+- Como gerar a cena nova: fal-ai/flux-pro/kontext com o PNG oficial do mascote + prompt da cena; recorte (birefnet) quando o mascote precisa passar na frente do título; texto montado por cima, nunca escrito pela IA.
