@@ -1,7 +1,7 @@
 <!-- modo: formato historia_real -->
 # Carrossel de história real / investigativo (treino do dono, 19/11/2026)
 
-Este formato é SÓ do carrossel investigativo (história real). O carrossel de venda tem formato próprio: 15 · Venda ebook (`25-carrossel-de-venda.md`). O foco é a HISTÓRIA: a pessoa tem que ler até o fim. Por isso, a capa chama a atenção e o miolo fica calmo.
+Este formato é SÓ do carrossel investigativo (história real). O carrossel de venda tem formato próprio: 15 · Carrossel de venda (`25-carrossel-de-venda.md`). O foco é a HISTÓRIA: a pessoa tem que ler até o fim. Por isso, a capa chama a atenção e o miolo fica calmo.
 
 ## Capa: tem que fazer o dedo parar
 A capa é criada para cada assunto, usando tudo o que foi aprendido nas capas aprovadas (não só as regras do estático). Antes de criar a imagem, pense como quem rola o feed e entende de comportamento humano: o que faz o cérebro travar em menos de 1 segundo?

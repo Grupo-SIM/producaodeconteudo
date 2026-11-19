@@ -20,7 +20,7 @@
 
 ## Carrossel de venda (só com produto cadastrado)
 Capa com a dor ou o desejo → o que custa continuar como está → o que o produto faz (mecanismo em uma frase) → prova real da ficha (resultado, depoimento verdadeiro, demonstração) → objeção mais comum respondida → oferta com o que inclui → chamada direta com o caminho exato (link na bio, palavra-chave na mensagem, botão).
-Visual: sempre o template 15 · Venda ebook (`25-carrossel-de-venda.md`), com fotos REAIS de banco, nunca geradas.
+Visual: sempre o template 15 · Carrossel de venda (`25-carrossel-de-venda.md`), com fotos REAIS de banco, nunca geradas.
 
 ## O que medir
 - Salvamentos e envios mostram utilidade; pedidos de orçamento, mensagens e vendas mostram resultado. As duas coisas são registradas, mas a venda é medida à parte.

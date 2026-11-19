@@ -16,7 +16,7 @@ Dois carrosséis aprovados pelo dono sem ajustes servem de régua: Controle Patr
 - Cashback sempre como crédito no Vale Bonus. Nunca "de volta".
 
 ## Carrossel de venda: formato aprovado (19/11/2026)
-O carrossel de venda sai no template 15 · Venda ebook (uma frase grande por página). Escreva assim:
+O carrossel de venda sai no template 15 · Carrossel de venda (uma frase grande por página). Escreva assim:
 - **Capa:** uma frase curta que para o dedo, com o trecho-chave entre asteriscos (`*ela já tem.*`), que vira o marca-texto.
 - **Miolo:** uma ideia por página, frase curta (até ~25 palavras) com o trecho-chave entre asteriscos; explicação, se houver, numa linha separada e menor.
 - **Fotos:** marque 2 ou 3 páginas com `[foto: o que a foto mostra]`, a cada 3 ou 4 páginas, só onde uma cena real reforça a frase (a dor, a virada, o produto em uso). A foto é sempre REAL, buscada em banco de imagens; descreva uma cena que existe em foto de banco (pessoa, objeto, lugar), nada fantasioso.

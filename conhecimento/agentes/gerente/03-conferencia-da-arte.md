@@ -49,7 +49,7 @@ Por template:
 - [ ] 12 Colagem: texto reto, alinhado à esquerda, sem cortar palavra no fim da linha, elementos afastados do texto, sem o "VOZ" gigante, textos no mesmo lugar do original, pílula de arraste curta.
 - [ ] 13 Espaço: sem a pílula "Segredos do MKT" no miolo e sem os ícones de curtir/comentar/enviar/salvar no fim.
 
-## Carrossel de venda (15 · Venda ebook, 19/11/2026)
+## Carrossel de venda (15 · Carrossel de venda, 19/11/2026)
 - A foto das páginas com foto é REAL, de banco de imagens. Foto gerada por IA neste formato: reprove.
 - A foto mostra exatamente o que a frase da página diz (não foto genérica).
 - Fundo, logo pequena, fonte e marca-texto são os da marca que publica; as faixas do marca-texto não encostam de uma linha para outra.

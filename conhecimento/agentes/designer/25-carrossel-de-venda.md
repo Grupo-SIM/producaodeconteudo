@@ -1,5 +1,5 @@
 <!-- modo: formato venda -->
-# Carrossel de venda: template 15 · Venda ebook (aprovado pelo dono, 19/11/2026)
+# Carrossel de venda: template 15 · Carrossel de venda (aprovado pelo dono, 19/11/2026)
 
 Formato próprio do carrossel de venda, diferente de todos os outros (educativos, investigativo, estáticos). Vale para TODAS as marcas, sempre nas cores e na fonte da marca que publica. No JSON use `"template":"venda-ebook"`.
 
@@ -11,7 +11,7 @@ Formato próprio do carrossel de venda, diferente de todos os outros (educativos
 
 ## Foto: SEMPRE real, de banco. NUNCA gerada
 - Neste formato a foto é sempre REAL, buscada nos bancos integrados (Pexels, Unsplash, Pixabay; se um falhar, o sistema segue nos outros e avisa o dono). Nunca gere imagem por IA aqui (outros formatos geram; este não).
-- No campo `foto`, escreva o termo de busca EM INGLÊS do que a frase mostra, concreto e visual (ex.: "old laptop forgotten in office desk drawer", "frustrated business owner looking at spreadsheet on laptop", "person scanning barcode label on office chair with smartphone"). A foto tem que mostrar exatamente o que a frase diz, estilo foto de ebook: real, limpa, sem texto nem número.
+- No campo `foto`, escreva o termo de busca EM INGLÊS do que a frase mostra, concreto e visual (ex.: "old laptop forgotten in office desk drawer", "frustrated business owner looking at spreadsheet on laptop", "person scanning barcode label on office chair with smartphone"). A foto tem que mostrar exatamente o que a frase diz, estilo foto editorial: real, limpa, sem texto nem número.
 - Não achou nada que combine: a página fica só com texto (não force foto genérica).
 
 ## Visual fixo (o sistema monta sozinho pela marca)

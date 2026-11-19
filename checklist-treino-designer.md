@@ -8,7 +8,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - [x] 2. Feed jornalístico: templates 1 a 5 aprovados (Zyrion, Nuvo, Manchete com perfil), 14 a 19/11/2026.
 - [x] 3. Carrossel educativo: templates 7 a 13 aprovados e atribuídos às marcas, 18 e 19/11/2026.
 - [x] 4. Carrossel de história real: investigativo (capa com foto real + miolo estilo Twitter), 19/11/2026.
-- [x] 5. Carrossel de venda: 15 · Venda ebook aprovado (19/11/2026), todas as marcas, fotos reais de banco.
+- [x] 5. Carrossel de venda: 15 · Carrossel de venda aprovado (19/11/2026), todas as marcas, fotos reais de banco.
 - [x] 6. Stories de venda: template 14 · Caixinha de pergunta, 19/11/2026.
 - [x] 7. Estático de venda: coberto pelo treino do estático (serve para todo estático, capa de carrossel e capa de vídeo). Carrossel de notícia: só capa do template + fotos/vídeos do fato + contracapa padrão (`09-feed-jornalistico.md`), 19/11/2026.
 
@@ -34,7 +34,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 19/11/2026 · Atribuição pelas CORES da arte (não pela copy): 7 Seguidores em Alta; 8 Marketing Raiz; 9 Sim Intermediações (original) e Seguidores em Alta (mascote no lugar do robô e do leão); 10 Marketing Raiz (fade na capa e no fim, miolo com a faixa contínua do dono); 11 Central do Marketing (mascote na capa, sem o busto quebrado); 12 Seguidores em Alta; 13 007 Spyhacker (mascote na capa, fundo da faixa original sem o círculo, divisas suaves). Vivendo de Bet e Corte dos Ricos ficam só com notícia. Testes do 9 com PagaTG/SimIntPay e do 13 com Atlas reprovados: institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
 - 19/11/2026 · Dono: estático = capa universal (estático de qualquer copy, capa de carrossel, capa de vídeo para o feed). Notícia não tem carrossel, exceto fato com várias fotos/vídeos: capa do template + mídias do fato + contracapa padrão. Falta só o carrossel de venda para fechar o treino do Designer.
 - 19/11/2026 · Template 13 · Espaço confirmado como formato SÓ da 007 Spyhacker; PR do template 13 resolvido; chaves dos bancos de imagem já no Komodo.
-- 19/11/2026 · Carrossel de venda APROVADO: 15 · Venda ebook (copy 21 de régua). Capa de texto própria (aprovada no feed simulado da Marketing Raiz), uma frase grande por página com marca-texto, 2 ou 3 páginas com foto estilo ebook, fim B (pergunta + preço + "Clique no link da bio"), logo pequena no canto. Fotos SEMPRE reais de banco, nunca geradas. Vale para todas as marcas nas cores de cada uma. Ficha `25-carrossel-de-venda.md`. TREINO DO DESIGNER FECHADO; próximo: vídeo (Reels).
+- 19/11/2026 · Carrossel de venda APROVADO: 15 · Carrossel de venda (copy 21 de régua). Capa de texto própria (aprovada no feed simulado da Marketing Raiz), uma frase grande por página com marca-texto, 2 ou 3 páginas com foto estilo editorial, fim B (pergunta + preço + "Clique no link da bio"), logo pequena no canto. Fotos SEMPRE reais de banco, nunca geradas. Vale para todas as marcas nas cores de cada uma. Ficha `25-carrossel-de-venda.md`. TREINO DO DESIGNER FECHADO; próximo: vídeo (Reels).
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
@@ -44,14 +44,14 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 4. [x] Feed estático: 19 artes aprovadas (estoque) + regras para criar novas do zero; estático NÃO é template (19/11/2026).
 5. [x] **Atribuir templates às marcas** (feito 19/11/2026, tabela em `conhecimento/agentes/designer/23-templates-por-marca.md`) (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
 6. [x] Stories de venda: template 14 · Caixinha de pergunta treinado (19/11/2026). Banco de fundos cresce com o tempo.
-7. [x] Carrossel de história real e carrossel de venda: investigativo FEITO; venda = 15 · Venda ebook (19/11/2026). Os 7 educativos ficam só para educativo.
+7. [x] Carrossel de história real e carrossel de venda: investigativo FEITO; venda = 15 · Carrossel de venda (19/11/2026). Os 7 educativos ficam só para educativo.
 8. [ ] Só depois disso: vídeo (Reels).
 Revisão fina dos carrosséis 7 a 13 (elemento fora do texto, menos páginas, letra maior): em produção, peça a peça, na aprovação.
 Template 13 já está no `main` e é só da 007 Spyhacker.
 
 ## Onde paramos (19/11/2026, para a próxima conversa)
 - Arte praticamente fechada: estático, jornalístico, carrosséis educativos 7 a 13, investigativo e stories de venda aprovados.
-- Carrossel de venda aprovado (15 · Venda ebook): treino do Designer FECHADO. Conferir o primeiro carrossel de venda real em produção (fotos reais de banco).
+- Carrossel de venda aprovado (15 · Carrossel de venda): treino do Designer FECHADO. Conferir o primeiro carrossel de venda real em produção (fotos reais de banco).
 - Depois: vídeo (Reels).
 - Pendências menores: revisão fina dos carrosséis 7 a 13 em produção; institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
 - Guardado para depois: escritório 3D (docs/pendente/escritorio3d.patch) e Cérebro; botão do Treino vai para dentro do "+ Novo conteúdo" no fim do treino.
