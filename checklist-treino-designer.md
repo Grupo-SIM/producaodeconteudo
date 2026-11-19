@@ -31,6 +31,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Feed estático: aprovados **14 · Palavra gigante + mascote** (Central do Marketing, "ERROS de marketing") e **15 · Escala absurda** (007 Spyhacker, "FORA"), cópia das referências do dono trocando a pessoa pelo mascote. Arquivos em `banco/tpl-estatico/`, ficha `22-feed-estatico-quebra-de-padrao.md`. Falta: virar template no sistema e mais referências do dono.
 - 18/11/2026 · Feed estático: aprovados 16 a 25, 27 e 28 (26 descartada). Total de 14 estáticos aprovados (14 a 25, 27, 28), arquivos em `banco/tpl-estatico/`. Falta: virar template no sistema.
 - 19/11/2026 · Feed estático FECHADO: 18 aprovados (14 a 25, 27 a 31, 33), descartados 26 e 32. Próximo: virar template no sistema, depois atribuir templates às marcas, depois stories.
+- 19/11/2026 · Atribuição pelas CORES da arte (não pela copy): 7 Seguidores em Alta; 8 Marketing Raiz; 9 Sim Intermediações (original) e Seguidores em Alta (mascote no lugar do robô e do leão); 10 Marketing Raiz (fade na capa e no fim, miolo com a faixa contínua do dono); 11 Central do Marketing (mascote na capa, sem o busto quebrado); 12 Seguidores em Alta; 13 007 Spyhacker (mascote na capa, fundo da faixa original sem o círculo, divisas suaves). Vivendo de Bet e Corte dos Ricos ficam só com notícia. Testes do 9 com PagaTG/SimIntPay e do 13 com Atlas reprovados: institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
@@ -38,7 +39,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
 3. [ ] Treino de capas para os carrosséis.
 4. [x] Feed estático: 19 artes aprovadas (estoque) + regras para criar novas do zero; estático NÃO é template (19/11/2026).
-5. [ ] **Atribuir templates às marcas** (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
+5. [x] **Atribuir templates às marcas** (feito 19/11/2026, tabela em `conhecimento/agentes/designer/23-templates-por-marca.md`) (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
 6. [ ] Stories de venda.
 7. [ ] Carrossel de história real e carrossel de venda: template próprio de cada (kit do dono). Os 7 educativos ficam só para educativo.
 8. [ ] Só depois disso: vídeo (Reels).
