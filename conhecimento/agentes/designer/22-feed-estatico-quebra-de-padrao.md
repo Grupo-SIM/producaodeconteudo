@@ -137,3 +137,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - Os 2 testes do zero NÃO foram aprovados (só para o dono ver). Falta o 'feeling' do dono: mais referências e volume em produção.
 - 30: marca da roupa BORDADA de verdade e pequena no peito (gerada na imagem), nunca texto solto por cima.
 - 30: bordado pequeno, alto no peito (perto do ombro), cinza tom sobre tom, com relevo leve: parece da própria blusa.
+- 30 (correção): o bordado é GERADO NA IMAGEM (nunca texto por cima, fica falso): 2 linhas, na altura do peito, linha cinza claro com textura de costura.
