@@ -146,3 +146,4 @@ O treino do estático é um só: a copy muda, mas o trabalho do Designer é o me
 - todo feed estático (educativo, venda, qualquer copy);
 - toda capa de carrossel (de qualquer template);
 - capa/foto de vídeo para o feed, quando pedirem ao Designer uma imagem para o feed ficar bonito.
+- Capa do Reels (19/11/2026): no "+ Novo conteúdo" → Reels → "Designer faz a capa". O Roteirista termina o roteiro com a seção "CAPA DO REELS" (frase até 8 palavras + Visual). O Designer faz UMA página 1080x1920 neste padrão, com texto, mascote e rosto no miolo 1080x1440 (a grade do perfil corta em 3:4). Na Mesa, o card do vídeo ganha o botão "Capa".

@@ -3,6 +3,6 @@
   { "id": "estatico", "nome": "Feed estático", "desc": "2 cards: o assunto e o CTA. Designer faz a arte.", "format": "feed", "tipos": [["educativo", "Educativo"], ["venda", "Venda"]] },
   { "id": "materia", "nome": "Feed jornalístico + matéria", "desc": "Matéria completa para o site e 2 cards de notícia (manchete e resumo).", "format": "feed", "tipos": [["noticia", "Notícia (fato com fonte)"]] },
   { "id": "stories", "nome": "Stories de venda", "desc": "18 a 20 telas com caixinha de perguntas.", "format": "stories", "tipos": [["venda", "Venda"]] },
-  { "id": "reels", "nome": "Reels", "desc": "Voz de IA, editado em motion pelo Editor de vídeo.", "format": "video_vertical", "tipos": [["educativo", "Educativo"], ["venda", "Venda"], ["institucional", "Institucional"]] },
+  { "id": "reels", "nome": "Reels", "desc": "Voz de IA, editado em motion pelo Editor de vídeo. Opcional: o Designer faz a capa.", "format": "video_vertical", "tipos": [["educativo", "Educativo"], ["venda", "Venda"], ["institucional", "Institucional"]] },
   { "id": "blog", "nome": "Post de blog", "desc": "Aula escrita para o site, sem arte.", "format": "feed", "tipos": [["texto", "Aula escrita"]] }
 ]
