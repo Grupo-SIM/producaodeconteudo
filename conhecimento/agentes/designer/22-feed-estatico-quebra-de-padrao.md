@@ -122,3 +122,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 32 DESCARTADA pelo dono. Estático fechado: 18 aprovados (14 a 25, 27 a 31, 33); descartados 26 e 32.
 - Pente fino (19/11/2026) · 16: título em fonte chamativa (Montserrat 900, branco + rosa), nada de letra pontilhada; fundo liso (degradê suave da cor da marca, sem raios de luz): mascote recortado sobre o fundo.
 - 16: título na FONTE DA MARCA (Seguidores em Alta = Poppins), primeira letra maiúscula, centralizado.
+- 16 APROVADA (Poppins). 17 (pente fino): texto na fonte da marca (Marketing Raiz = Montserrat), palavras grandes em preto e linhas pequenas em cinza da marca, blocos afastados (um no alto, outro embaixo) para usar o espaço vazio e nunca ficar atrás do mascote.
