@@ -19,4 +19,5 @@ Carrossel educativo em blocos: um conceito explicado em 2 a 6 tópicos curtos.
 
 ## Visual fixo
 - Roxo `#7b43e2`. O robô já vem tingido de rosa-roxo como na arte original.
-- Peças em `banco/tpl-idv/`: fundos 1 a 3 (kit 1080×1080 levado a 1080×1350), robô, leão e ícones.
+- Peças em `banco/tpl-idv/`: fundos 1 a 3 = o fundo panorâmico do dono (`referencia/fundo-panorama.jpg`) cortado em 3 e esticado na altura para 1080×1350, sem nada inventado em cima ou embaixo (dono, 19/11/2026: nada de faixa cinza ou borda que não existe na arte); robô, leão e ícones. Arte de referência em `referencia/arte-final.jpg`.
+- Seguidores em Alta: `tpl-idv-robo-seguidores` e `tpl-idv-leao-seguidores` (mascote no busto de perfil e sentado na poltrona, replicando os elementos).
