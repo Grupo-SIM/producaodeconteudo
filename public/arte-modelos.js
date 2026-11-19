@@ -774,67 +774,71 @@ COMPOR_EXTRA['colagem-fim'] = (d, ctx) => {
   return s;
 };
 
-// ───────── Template "13 · Espaço (azul neon)" (réplica do kit "segredos do marketing" com astronauta, 18/11/2026) ─────────
-// Arte original: faixa 2000×500 (4 páginas quadradas). Fundo ampliado ×2,7 em faixa contínua (página = 400 px da arte, a partir de x=40):
-// página 1080×1350 → x = (xArte − 40 − 400·k)·2,7 e y = yArte·2,7. Caneta e computador são peças soltas que cruzam a divisa.
-const EP = { ciano: '#12c9de', navy: '#04222b', claro: '#e4f7fa' };
+// ───────── Template "13 · Espaço (azul neon)" (réplica do kit "segredos do marketing" com astronauta; refeito igual à arte do dono, 19/11/2026) ─────────
+// Arte original: faixa 2000×500 com 4 páginas quadradas de 500. Cada página do fundo panorâmico (banco/tpl-espaco/referencia) vira 1080×1080
+// e é esticada na altura para 1080×1350, sem cortar nada. Medidas tiradas da arte em 1000×1000 por página: x·1,08 e y·1,35.
+const EP = { ciano: '#12c9de', navy: '#04222b', claro: '#e4f7fa' }, epX = v => v * 1.08, epY = v => v * 1.35;
 const epBase = n => ({ bg: { asset: 'tpl-espaco-fundo-' + n, color: '#020b14' }, paper: '#020b14', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
-const epLogo = (s, e, ctx, x, y) => { if (ctx.logo) s.items.push({ asset: ctx.logo, x: e.X(x), y: e.Y(y), size: 150 }); };
 COMPOR_EXTRA['espaco-capa'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
-  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = 552, maxW = 640;
-  if (/spyhacker/i.test(String(ctx.marca || ''))) s.bg = { ...s.bg, asset: 'tpl-espaco-fundo-1-spyhacker' };   // 007 Spyhacker: o mascote segura o tablet no lugar do astronauta (dono, 19/11/2026)
+  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = epX(485), maxW = 560;
+  if (/spyhacker/i.test(String(ctx.marca || ''))) s.bg = { ...s.bg, asset: 'tpl-espaco-fundo-1-spyhacker' };   // 007 Spyhacker: o mascote no lugar do astronauta, o resto do fundo intacto
   // título na tela do tablet: as linhas de cima menores e a última (a palavra-chave) gigante, como “CONTA!”
   let tl = String(d.titulo || '4 segredos de marketing|que ninguém te|conta!').toUpperCase().split('|').map(x => x.replace(/\*/g, '').trim()).filter(Boolean);
-  if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 62, maxW) : []), p[p.length - 1]]; }
+  if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 56, maxW) : []), p[p.length - 1]]; }
   const cima = tl.slice(0, -1).slice(-3), ult = tl[tl.length - 1];
-  const zc = Math.min(64, ...cima.map(l => 64 * maxW / Math.max(maxW, largura(l, tf, 64)))), zu = Math.min(230, 230 * maxW / Math.max(1, largura(ult, tf, 230)));
-  const LH = 1.18, hT = cima.length * zc * LH + zu * .92, y0 = 570 - hT / 2;   // 1,18: linha com acento (NINGUÉM) não encosta na de cima
+  const zc = Math.min(56, ...cima.map(l => 56 * maxW / Math.max(maxW, largura(l, tf, 56)))), zu = Math.min(200, 200 * (maxW - 60) / Math.max(1, largura(ult, tf, 200)));
+  const LH = 1.18, hT = cima.length * zc * LH + zu * .92, y0 = epY(418) - hT / 2;   // centro da tela do tablet
   cima.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + zc * .59 + i * zc * LH), align: 'center', size: e.P(zc), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false }));
   s.texts.push({ role: 'title', value: ult, x: e.X(cx), y: e.Y(y0 + cima.length * zc * LH + zu * .46), align: 'center', size: e.P(zu), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false });
-  // botão: pílula ciano “Arraste para o lado” + quadrado com a seta
-  const bt = String(d.cta_arraste || d.cta || 'Arraste para o lado').toUpperCase(), bf = fX(600, .04), bw = Math.max(330, largura(bt, bf, 24) + 90);
-  s.shapes.push({ kind: 'pill', x: e.X(238 + bw / 2), y: e.Y(932), w: e.X(bw), h: e.Y(80), color: EP.ciano, radius: .2 });
-  s.texts.push({ role: 'label', value: bt, x: e.X(238 + bw / 2), y: e.Y(932), align: 'center', size: e.P(24), font: bf.k, weight: bf.w, ls: .04, lh: 1, color: EP.navy, nowrap: true, shadow: false });
-  s.shapes.push({ kind: 'rect', x: e.X(238 + bw + 22 + 62), y: e.Y(932), w: e.X(124), h: e.Y(80), radius: .22, color: EP.ciano });
-  s.shapes.push({ kind: 'icon', icon: 'arrow-right', icon_color: EP.navy, x: e.X(238 + bw + 22 + 62), y: e.Y(932), w: e.X(44), h: e.Y(44) });
-  s.items.push({ asset: 'tpl-espaco-ferramentas', x: e.X(70), y: e.Y(1170), size: 1000, rot: 16 });
-  epLogo(s, e, ctx, 960, 1260);
+  // botão como na arte: pílula ciano “Arraste para o lado” + quadrado com a seta
+  const bt = String(d.cta_arraste || 'Arraste para o lado').toUpperCase(), bf = fX(600, .04), by = epY(690), bx0 = epX(258), bw = Math.max(epX(287), largura(bt, bf, 20) + 60);
+  s.shapes.push({ kind: 'pill', x: e.X(bx0 + bw / 2), y: e.Y(by), w: e.X(bw), h: e.Y(80), color: EP.ciano, radius: .2 });
+  s.texts.push({ role: 'label', value: bt, x: e.X(bx0 + bw / 2), y: e.Y(by), align: 'center', size: e.P(20), font: bf.k, weight: bf.w, ls: .04, lh: 1, color: EP.navy, nowrap: true, shadow: false });
+  s.shapes.push({ kind: 'rect', x: e.X(bx0 + bw + 22 + 50), y: e.Y(by), w: e.X(100), h: e.Y(80), radius: .22, color: EP.ciano });
+  s.shapes.push({ kind: 'icon', icon: 'arrow-right', icon_color: EP.navy, x: e.X(bx0 + bw + 22 + 50), y: e.Y(by), w: e.X(40), h: e.Y(40) });
+  // três barras de ferramentas em leque no canto de baixo, como na arte
+  for (const [x, y] of [[40, 845], [105, 815], [165, 800]]) s.items.push({ asset: 'tpl-espaco-ferramentas', x: e.X(epX(x)), y: e.Y(epY(y)), size: 600 });
   return s;
 };
-// miolo: 2 itens por página (seta, “01.” branco + título ciano e texto com *negrito*); a caneta cruza para a página seguinte,
-// o computador com a barra de ferramentas cruza da penúltima para o fim. Copy maior repete o miolo alternando os fundos 2 e 3.
+// miolo: etiqueta “SEGREDOS DO MKT” e 2 itens lado a lado (seta, “01.” branco + título ciano, texto com *negrito*);
+// a caneta cruza para a página seguinte e o computador com a barra de ferramentas cruza da última página do miolo para o fim.
 COMPOR_EXTRA['espaco-par'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
   const i = Math.max(1, ctx.i || 1), j = (i - 1) % 2, ult = i === (ctx.total || 3) - 2, e = erEsc(ctx, ctx.W, ctx.H), s = epBase(2 + j);
-  const dir = ult ? 'pc' : j === 0 ? 'caneta' : '', x0 = j === 1 ? 230 : 110, xr = dir === 'pc' ? 770 : dir === 'caneta' ? 880 : 970;
-  if (dir === 'caneta') s.items.push({ asset: 'tpl-espaco-caneta', x: 1, y: e.Y(640), size: 1250, cruza: true });
-  if (dir === 'pc') s.items.push({ asset: 'tpl-espaco-computador', x: e.X(1100), y: e.Y(1010), size: 1080, cruza: true });
-  const tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), bf = fX(400, 0), its = erItens(d).slice(0, 2), B = [];
+  if (ult) s.items.push({ asset: 'tpl-espaco-computador', x: e.X(epX(1040)), y: e.Y(epY(560)), size: 1190, cruza: true });
+  else if (j === 0) s.items.push({ asset: 'tpl-espaco-caneta', x: e.X(epX(970)), y: e.Y(epY(455)), size: 1210, cruza: true });
+  const tag = String(d.kicker || 'Segredos do MKT').toUpperCase(), gf = fX(500, .3), gw = Math.max(epX(290), largura(tag, gf, 17) * 1.3 + 90), gx = epX(128) + gw / 2, gy = epY(254);
+  s.shapes.push({ kind: 'pill', x: e.X(gx), y: e.Y(gy), w: e.X(gw), h: e.Y(46), color: 'transparent', stroke: '#ffffff', stroke_w: 2 / 1080 });
+  s.texts.push({ role: 'label', value: tag, x: e.X(gx - 18), y: e.Y(gy), align: 'center', size: e.P(17), font: gf.k, weight: gf.w, ls: .3, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
+  s.shapes.push({ kind: 'icon', icon: 'arrow-down', icon_color: '#04222b', x: e.X(epX(128) + gw - 30), y: e.Y(gy), w: e.X(18), h: e.Y(18) }); s.shapes.splice(s.shapes.length - 1, 0, { kind: 'circle', x: e.X(epX(128) + gw - 30), y: e.Y(gy), w: e.X(28), h: e.Y(28), color: '#ffffff' });
+  const tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), bf = fX(400, 0), its = erItens(d).slice(0, 2);
+  const COL = [{ a: 97, x: 120, w: 345 }, { a: 540, x: 565, w: ult ? 300 : 330 }];
   its.forEach((it, q) => {
-    const n = String(erNum(d, ctx, q)).padStart(2, '0') + '.', tx = x0 + 62, tw = xr - tx;
-    const tl = fgAst(erQuebra('*' + n + '* ' + String(it.t).toUpperCase().replace(/\*/g, ''), tf, 66, tw)).slice(0, 4);
-    const bl = it.d ? fgAst(erQuebra(it.d, bf, 28, tw)).slice(0, 6) : [];
-    B.push({ h: tl.length * 64 + (bl.length ? 18 + bl.length * 38 : 0), gap: q ? 64 : 0, make: y => {
-      s.shapes.push({ kind: 'ring', x: e.X(x0 + 20), y: e.Y(y + 32), w: e.X(38), h: e.Y(38), color: '#ffffff', stroke_w: 2.5 / 1080 }, { kind: 'icon', icon: 'arrow-right', icon_color: '#ffffff', x: e.X(x0 + 20), y: e.Y(y + 32), w: e.X(24), h: e.Y(24) });
-      tl.forEach((l, k) => s.texts.push({ role: 'title', value: l, x: e.X(tx), y: e.Y(y + 33 + k * 64), align: 'left', size: e.P(66), font: tf.k, weight: tf.w, lh: 1, color: EP.ciano, hl: '#ffffff', nowrap: true, shadow: false }));
-      bl.forEach((l, k) => s.texts.push({ role: 'body', value: l, x: e.X(tx), y: e.Y(y + tl.length * 64 + 18 + 19 + k * 38), align: 'left', size: e.P(28), font: bf.k, weight: bf.w, lh: 1, color: EP.claro, hl: '#ffffff', hw: 700, nowrap: true, shadow: false }));
-      return []; } });
+    const c = COL[q], tx = epX(c.x), tw = epX(c.w), y = epY(330);
+    const n = String(erNum(d, ctx, q)).padStart(2, '0') + '.';
+    const tl = fgAst(erQuebra('*' + n + '* ' + String(it.t).toUpperCase().replace(/\*/g, ''), tf, 64, tw)).slice(0, 5);
+    const bl = it.d ? fgAst(erQuebra(it.d, bf, 25, tw)).slice(0, 7) : [];
+    s.shapes.push({ kind: 'ring', x: e.X(epX(c.a)), y: e.Y(y + 36), w: e.X(36), h: e.Y(36), color: '#ffffff', stroke_w: 2.5 / 1080 }, { kind: 'icon', icon: 'arrow-right', icon_color: '#ffffff', x: e.X(epX(c.a)), y: e.Y(y + 36), w: e.X(22), h: e.Y(22) });
+    tl.forEach((l, k) => s.texts.push({ role: 'title', value: l, x: e.X(tx), y: e.Y(y + 36 + k * 66), align: 'left', size: e.P(64), font: tf.k, weight: tf.w, lh: 1, color: EP.ciano, hl: '#ffffff', nowrap: true, shadow: false }));
+    bl.forEach((l, k) => s.texts.push({ role: 'body', value: l, x: e.X(tx), y: e.Y(y + tl.length * 66 + 30 + k * 38), align: 'left', size: e.P(25), font: bf.k, weight: bf.w, lh: 1, color: EP.claro, hl: '#ffffff', hw: 700, nowrap: true, shadow: false }));
   });
-  pilha(B, 680, ctx);
-  epLogo(s, e, ctx, x0 + 75, 1265);
   return s;
 };
 COMPOR_EXTRA['espaco-fim'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
-  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(4), cx = 650, B = [];
-  const tf = fX(800, -.03), tl = erQuebra(d.titulo || 'Gostou do|conteúdo?', tf, 84, 680).slice(0, 4);
-  B.push({ h: tl.length * 86, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y + 43 + i * 86), align: 'center', size: e.P(84), font: tf.k, weight: tf.w, ls: -.03, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
-  const af = fX(400, -.01), al = erQuebra(d.texto || d.apoio || 'compartilhe|com os amigos!', af, 38, 640).slice(0, 5);
-  B.push({ h: al.length * 46, gap: 20, make: y => { al.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(cx), y: e.Y(y + 23 + i * 46), align: 'center', size: e.P(38), font: af.k, weight: af.w, ls: -.01, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); return []; } });
-  const ct = String(d.cta || 'Quero orçamento').toUpperCase(), cf = fX(700, .02), cw = Math.max(300, largura(ct, cf, 24) + 90);
-  B.push({ h: 68, gap: 48, make: y => { s.shapes.push({ kind: 'pill', x: e.X(cx), y: e.Y(y + 34), w: e.X(cw), h: e.Y(68), color: EP.ciano }); s.texts.push({ role: 'title', value: ct, x: e.X(cx), y: e.Y(y + 34), align: 'center', size: e.P(24), font: cf.k, weight: cf.w, ls: .02, lh: 1, color: EP.navy, nowrap: true, shadow: false }); return []; } });
-  pilha(B, 600, ctx);
+  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(4), cx = epX(497);
+  const tf = fX(800, -.03), tl = erQuebra(d.titulo || 'Gostou do|conteúdo?', tf, 80, 560).slice(0, 3);
+  const af = fX(400, -.01), al = erQuebra(d.texto || d.apoio || 'compartilhe|com os amigos!', af, 34, 560).slice(0, 3);
+  const yt = epY(340) - (tl.length - 2) * 40;
+  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(yt - 41 + i * 82), align: 'center', size: e.P(80), font: tf.k, weight: tf.w, ls: -.03, lh: 1, color: '#ffffff', nowrap: true, shadow: false }));
+  const ya = yt + (tl.length - 1) * 82 + 80;
+  al.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(cx), y: e.Y(ya + i * 46), align: 'center', size: e.P(34), font: af.k, weight: af.w, ls: -.01, lh: 1, color: '#ffffff', nowrap: true, shadow: false }));
+  const yi = ya + (al.length - 1) * 46 + 74;
+  ['heart', 'message-circle', 'send', 'bookmark'].forEach((ic, k) => s.shapes.push({ kind: 'icon', icon: ic, icon_color: EP.ciano, x: e.X(cx + (k - 1.5) * 40), y: e.Y(yi), w: e.X(28), h: e.Y(28) }));
+  const ct = String(d.cta || 'Quero orçamento').toUpperCase(), cf = fX(700, .02), cw = Math.max(epX(245), largura(ct, cf, 21) + 70), yb = yi + 104;
+  s.shapes.push({ kind: 'pill', x: e.X(cx), y: e.Y(yb), w: e.X(cw), h: e.Y(62), color: EP.ciano });
+  s.texts.push({ role: 'title', value: ct, x: e.X(cx), y: e.Y(yb), align: 'center', size: e.P(21), font: cf.k, weight: cf.w, ls: .02, lh: 1, color: EP.navy, nowrap: true, shadow: false });
   return s;
 };
 
