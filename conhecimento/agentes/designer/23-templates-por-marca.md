@@ -13,6 +13,7 @@ Marcas institucionais (Atlas Hosting, SimIntPay, Sim Intermediações, Teron, Pa
 | 5 · Manchete com perfil | Seguidores em Alta, Marketing Raiz |
 | 7 · Lista de erros (carrossel) | Seguidores em Alta |
 | 8 · Fogo (carrossel) | Marketing Raiz |
+| 10 · Xadrez (carrossel) | Marketing Raiz |
 | 9 · Identidade visual (carrossel) | Sim Intermediações (robô e leão originais), Seguidores em Alta (o mascote no lugar do robô e do leão, mesma pose e enquadramento) |
 
 Excluído pelo dono (19/11/2026): 6 · Manchete sobre foto com logo (ficava igual ao 5). Formatos de notícia: Zyrion (foto inteira, duas fotos ou círculo), Nuvo, Manchete com perfil; contracapa (cartão do X) acompanha Zyrion e Nuvo.
