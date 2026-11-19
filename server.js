@@ -2407,6 +2407,15 @@ function avatarMarca(brand) {
     fs.writeFileSync(path.join(ASSET_DIR, +r.lastInsertRowid + '.png'), png); log('designer', `Avatar quadrado da marca ${brand} criado a partir da logo (${nome})`); return nome;
   } catch (e) { console.error('avatar da marca:', e.message); return ''; }
 }
+// redes sociais de cada marca enviadas pelo dono (conhecimento/redes-marcas.json); nome comparado sem acento, espaço e caixa ("Cortes dos Ricos" = "Corte dos Ricos", "SIM INT PAY" = "SimIntPay")
+const normMarca = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/s(?=dos)/, '');
+let REDES_MARCAS = null;
+function redesDaMarca(brand) {
+  if (!REDES_MARCAS) { try { REDES_MARCAS = JSON.parse(fs.readFileSync(path.join(__dirname, 'conhecimento', 'redes-marcas.json'), 'utf8')); } catch { REDES_MARCAS = {}; } }
+  const n = normMarca(brand); if (!n) return {};
+  for (const [k, v] of Object.entries(REDES_MARCAS)) if (!k.startsWith('_') && normMarca(k) === n) return v;
+  return {};
+}
 function ctxMarca(brand, format, sp = {}) {
   const idv = identidadeDe(brand), [W, H] = ART_SIZE[format] || [1080, 1350];
   const ident = brand ? (one("SELECT content FROM knowledge WHERE brand=? COLLATE NOCASE AND category='marca' AND content LIKE '# IDENTIDADE VISUAL%' LIMIT 1", brand)?.content || '') : '';
@@ -2416,7 +2425,8 @@ function ctxMarca(brand, format, sp = {}) {
   const escura = logos.find(a => a !== clara && /pret|escur|black|dark/i.test(a.name) && fs.existsSync(path.join(ASSET_DIR, a.id + '.' + a.ext)));   // logo escura sem arquivo no disco não pode sumir da página clara: cai na logo clara com cápsula
   const ratio = clara ? imgRatio(path.join(ASSET_DIR, clara.id + '.' + clara.ext)) : null;
   const ct = {}; { const w = docs.match(/(?:whats\s*app|whatsapp|telefone|fone)\s*[:\-–]\s*([+()\d][\d ()+.-]{7,18}\d)/i); if (w) ct.whatsapp = w[1].trim(); const ig = docs.match(/(?:instagram|perfil|@)\s*[:\-–]?\s*(@[a-z0-9_.]{3,30})/i); if (ig) ct.instagram = ig[1]; const st = docs.match(/\bsite\s*[:\-–]\s*((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.[a-z.]{2,8}(?:\/[\w-]*)?)/i); if (st) ct.site = st[1].replace(/^https?:\/\//, ''); }
-  if (brand) { const ig = (jparse(one("SELECT value FROM settings WHERE key='marca_instagram'")?.value, {}) || {})[brand.toLowerCase()]; if (ig) ct.instagram = ig; }   // @ cadastrado em Marcas → Contas e postagem vale primeiro
+  if (brand) { const ig = (jparse(one("SELECT value FROM settings WHERE key='marca_instagram'")?.value, {}) || {})[brand.toLowerCase()] || redesDaMarca(brand).instagram; if (ig) ct.instagram = ig; }   // @ cadastrado em Marcas → Contas e postagem vale primeiro; senão o das redes enviadas pelo dono (conhecimento/redes-marcas.json)
+  if (brand) { const st = (jparse(one("SELECT value FROM settings WHERE key='marca_site'")?.value, {}) || {})[brand.toLowerCase()]; if (st) ct.site = st; }   // site cadastrado em Marcas → Contas e postagem vale primeiro
   if (!ct.site && brand) { try { const d = one("SELECT dominio FROM atlas_destinos WHERE brand=? COLLATE NOCASE AND COALESCE(dominio,'')<>'' ORDER BY ativo DESC, id LIMIT 1", brand); if (d) ct.site = String(d.dominio).replace(/^https?:\/\//, '').replace(/\/.*$/, ''); } catch { /* sem Atlas */ } }   // pedido do dono: o site da marca é o que está ligado a ela em Marcas → Contas e postagem → Sites no Atlas
   if (sp.contatos && typeof sp.contatos === 'object') for (const k of ['whatsapp', 'instagram', 'site', 'local']) if (sp.contatos[k]) ct[k] = String(sp.contatos[k]).replace(/[<>]/g, '').slice(0, 40);
   const molde = {};
@@ -3187,6 +3197,9 @@ function previaEstilo({ id, seq, format, brand, fresh }) {
   const pags = ex ? JSON.parse(JSON.stringify(ex)) : previaPaginas(tpl, fmt, brand);
   // página que leva foto mostra a foto padrão na prévia (sem foto o dono não entende o template); no post de verdade entra a foto do assunto
   for (const pg of pags) { const d = pg.dados || (pg.dados = {}); if (FOTO_PREVIA.has(pg.modelo) && !d.foto && !d.objeto) d.foto = 'foto-padrao-1'; }
+  // Nuvo na prévia sempre como o aprovado: logo, pílula com o site e "Siga @marca no Instagram" (sem site/@ cadastrado entra um exemplo, só na prévia)
+  { const ct = brand ? (ctxMarca(brand, fmt).contatos || {}) : {}, slug = String(brand || 'suamarca').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '') || 'suamarca';
+    for (const pg of pags) if (pg.modelo === 'noticia' && (pg.dados?.estilo === 'nuvo' || pg.opcoes?.estilo === 'nuvo' || (pg === pags[0] && tpl.seq?.[0]?.opcoes?.estilo === 'nuvo'))) { pg.dados.site ||= ct.site || slug + '.com.br'; pg.dados.handle ||= ct.instagram || '@' + slug; } }
   if (ex) for (const pg of pags) for (const k of ['foto', 'particulas', 'ambiente']) if (pg.dados && typeof pg.dados[k] === 'string' && !/^[a-z0-9-]{2,60}$/.test(pg.dados[k])) delete pg.dados[k];   // na prévia, sem imagem por IA
   const chave = crypto.createHash('sha1').update(JSON.stringify({ pags, fmt, brand, v: BUILD, vt: seq ? '' : (tplRow(id)?.visual_at || ''), m: mascotesDe(brand), tp: styleParams(brand).tipografia || null, f: fresh ? crypto.randomBytes(6).toString('hex') : '' })).digest('hex').slice(0, 20), titulo = '__previa__' + chave;
   const ja = one('SELECT id FROM contents WHERE teste=3 AND title=?', titulo);
@@ -7638,11 +7651,20 @@ async function api(req, res, url) {
   // @ do Instagram da marca (Marcas → Contas e postagem): a arte puxa daqui, como o site puxa dos Sites no Atlas
   if (p === '/api/marca-instagram') {
     const todos = jparse(one("SELECT value FROM settings WHERE key='marca_instagram'")?.value, {}) || {};
-    if (m === 'GET') return send(res, 200, { instagram: todos[String(url.searchParams.get('brand') || '').toLowerCase()] || '' });
+    if (m === 'GET') { const bq = String(url.searchParams.get('brand') || ''); return send(res, 200, { instagram: todos[bq.toLowerCase()] || redesDaMarca(bq).instagram || '', redes: redesDaMarca(bq) }); }
     if (m === 'POST') { const b = await readBody(req, 2e3), br = String(b.brand || '').trim().toLowerCase(); if (!br) throw fail(400, 'Falta a marca');
       const v = String(b.instagram || '').trim().replace(/^.*instagram\.com\//, '').replace(/[/?#].*$/, '').replace(/^@?/, ''); if (v && !/^[a-z0-9_.]{2,30}$/i.test(v)) throw fail(400, '@ inválido');
       if (v) todos[br] = '@' + v; else delete todos[br];
       run("INSERT INTO settings(key,value) VALUES('marca_instagram',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(todos)); return send(res, 200, { ok: true, instagram: todos[br] || '' }); }
+  }
+  // site da marca (Marcas → Contas e postagem): a pílula do Nuvo e os rodapés puxam daqui; sem ele, o domínio ligado em Sites no Atlas
+  if (p === '/api/marca-site') {
+    const todos = jparse(one("SELECT value FROM settings WHERE key='marca_site'")?.value, {}) || {};
+    if (m === 'GET') return send(res, 200, { site: todos[String(url.searchParams.get('brand') || '').toLowerCase()] || '' });
+    if (m === 'POST') { const b = await readBody(req, 2e3), br = String(b.brand || '').trim().toLowerCase(); if (!br) throw fail(400, 'Falta a marca');
+      const v = String(b.site || '').trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '').toLowerCase(); if (v && !/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/[\w-]*)?$/.test(v)) throw fail(400, 'Site inválido');
+      if (v) todos[br] = v; else delete todos[br];
+      run("INSERT INTO settings(key,value) VALUES('marca_site',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(todos)); return send(res, 200, { ok: true, site: todos[br] || '' }); }
   }
   if (p === '/api/arte-modelos' && m === 'GET') return send(res, 200, { modelos: MODELOS_ARTE });
   // Templates de página do editor: os seus (página salva do jeito que você deixou) e quais dos prontos você escondeu
