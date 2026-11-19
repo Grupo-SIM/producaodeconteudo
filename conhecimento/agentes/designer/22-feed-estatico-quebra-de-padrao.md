@@ -139,3 +139,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 30: bordado pequeno, alto no peito (perto do ombro), cinza tom sobre tom, com relevo leve: parece da própria blusa.
 - 30 (correção): o bordado é GERADO NA IMAGEM (nunca texto por cima, fica falso): 2 linhas, na altura do peito, linha cinza claro com textura de costura.
 - 30: bordado pequeno (tamanho de logo de peito, ~9% da largura da arte).
+- 30 APROVADA. Lição: cada edição por IA em cima de outra edição perde qualidade; editar sempre a partir da imagem boa mais antiga e colar só o pedaço novo.
