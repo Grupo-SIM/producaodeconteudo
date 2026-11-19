@@ -119,3 +119,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 3ª rodada: 29 coroa encaixada na cabeça; 30 sem resto da referência atrás do botão, marca escrita na roupa ("Central do Marketing") no lugar do rabisco; 31 aprovada; 32 borboletas viraram dinheiro voando, pernas do mascote mais grossas; 33 última tentativa: cena da referência editada (nano-banana) trocando só a pessoa, mascote pequeno no meio da multidão.
 - 4ª rodada: 29 coroa pequena encaixada; 30 APROVADA; 32 dinheiro em 3D (maços e moedas) no lugar das notas planas, listras douradas; 33 sem a pessoa original atrás do mascote (nunca deixar resto da pessoa da referência).
 - 5ª rodada: 29 e 33 APROVADAS; 32 um elemento 3D grande e centralizado (moeda) vale mais que vários pequenos; dinheiro em dólar 3D, nada de barra de ouro.
+- 32 DESCARTADA pelo dono. Estático fechado: 18 aprovados (14 a 25, 27 a 31, 33); descartados 26 e 32.

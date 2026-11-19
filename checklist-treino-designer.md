@@ -30,6 +30,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Teste Xadrez com história real (Toy Story 2) e venda (Controle Patrimonial): elemento nunca em cima do texto (desce, não sobe, para não competir com a foto); juntar slides curtos e aumentar a letra; leitura igual à referência; etiquetas da capa abraçam o texto e ficam centradas. Ficha `21-elemento-nunca-sobre-texto-e-paginas.md`. Decisão: história real e venda terão templates próprios; templates são atribuídos às marcas em vez de trocar de cor.
 - 18/11/2026 · Feed estático: aprovados **14 · Palavra gigante + mascote** (Central do Marketing, "ERROS de marketing") e **15 · Escala absurda** (007 Spyhacker, "FORA"), cópia das referências do dono trocando a pessoa pelo mascote. Arquivos em `banco/tpl-estatico/`, ficha `22-feed-estatico-quebra-de-padrao.md`. Falta: virar template no sistema e mais referências do dono.
 - 18/11/2026 · Feed estático: aprovados 16 a 25, 27 e 28 (26 descartada). Total de 14 estáticos aprovados (14 a 25, 27, 28), arquivos em `banco/tpl-estatico/`. Falta: virar template no sistema.
+- 19/11/2026 · Feed estático FECHADO: 18 aprovados (14 a 25, 27 a 31, 33), descartados 26 e 32. Próximo: virar template no sistema, depois atribuir templates às marcas, depois stories.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
