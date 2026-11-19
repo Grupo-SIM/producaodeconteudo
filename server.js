@@ -2415,6 +2415,7 @@ function ctxMarca(brand, format, sp = {}) {
   const escura = logos.find(a => a !== clara && /pret|escur|black|dark/i.test(a.name) && fs.existsSync(path.join(ASSET_DIR, a.id + '.' + a.ext)));   // logo escura sem arquivo no disco não pode sumir da página clara: cai na logo clara com cápsula
   const ratio = clara ? imgRatio(path.join(ASSET_DIR, clara.id + '.' + clara.ext)) : null;
   const ct = {}; { const w = docs.match(/(?:whats\s*app|whatsapp|telefone|fone)\s*[:\-–]\s*([+()\d][\d ()+.-]{7,18}\d)/i); if (w) ct.whatsapp = w[1].trim(); const ig = docs.match(/(?:instagram|perfil|@)\s*[:\-–]?\s*(@[a-z0-9_.]{3,30})/i); if (ig) ct.instagram = ig[1]; const st = docs.match(/\bsite\s*[:\-–]\s*((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.[a-z.]{2,8}(?:\/[\w-]*)?)/i); if (st) ct.site = st[1].replace(/^https?:\/\//, ''); }
+  if (brand) { const ig = (jparse(one("SELECT value FROM settings WHERE key='marca_instagram'")?.value, {}) || {})[brand.toLowerCase()]; if (ig) ct.instagram = ig; }   // @ cadastrado em Marcas → Contas e postagem vale primeiro
   if (!ct.site && brand) { try { const d = one("SELECT dominio FROM atlas_destinos WHERE brand=? COLLATE NOCASE AND COALESCE(dominio,'')<>'' ORDER BY ativo DESC, id LIMIT 1", brand); if (d) ct.site = String(d.dominio).replace(/^https?:\/\//, '').replace(/\/.*$/, ''); } catch { /* sem Atlas */ } }   // pedido do dono: o site da marca é o que está ligado a ela em Marcas → Contas e postagem → Sites no Atlas
   if (sp.contatos && typeof sp.contatos === 'object') for (const k of ['whatsapp', 'instagram', 'site', 'local']) if (sp.contatos[k]) ct[k] = String(sp.contatos[k]).replace(/[<>]/g, '').slice(0, 40);
   const molde = {};
@@ -7620,6 +7621,15 @@ async function api(req, res, url) {
   }
 
   // ── Entrega: imagens da arte
+  // @ do Instagram da marca (Marcas → Contas e postagem): a arte puxa daqui, como o site puxa dos Sites no Atlas
+  if (p === '/api/marca-instagram') {
+    const todos = jparse(one("SELECT value FROM settings WHERE key='marca_instagram'")?.value, {}) || {};
+    if (m === 'GET') return send(res, 200, { instagram: todos[String(url.searchParams.get('brand') || '').toLowerCase()] || '' });
+    if (m === 'POST') { const b = await readBody(req, 2e3), br = String(b.brand || '').trim().toLowerCase(); if (!br) throw fail(400, 'Falta a marca');
+      const v = String(b.instagram || '').trim().replace(/^.*instagram\.com\//, '').replace(/[/?#].*$/, '').replace(/^@?/, ''); if (v && !/^[a-z0-9_.]{2,30}$/i.test(v)) throw fail(400, '@ inválido');
+      if (v) todos[br] = '@' + v; else delete todos[br];
+      run("INSERT INTO settings(key,value) VALUES('marca_instagram',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify(todos)); return send(res, 200, { ok: true, instagram: todos[br] || '' }); }
+  }
   if (p === '/api/arte-modelos' && m === 'GET') return send(res, 200, { modelos: MODELOS_ARTE });
   // Templates de página do editor: os seus (página salva do jeito que você deixou) e quais dos prontos você escondeu
   if (p === '/api/tpl-paginas' && m === 'GET') return send(res, 200, { itens: all('SELECT id,nome,brand,format,slide,base,categoria,updated_at FROM tpl_paginas ORDER BY id DESC').map(x => ({ ...x, slide: jparse(x.slide, {}) })), ocultos: jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, []) });

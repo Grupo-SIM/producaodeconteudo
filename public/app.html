@@ -942,7 +942,7 @@ VIEWS.marcas = async () => {
       esq = `<h5>Templates que o Designer usa nesta marca</h5><p class="small muted" style="margin:0 0 8px">Marque só o que esta marca pode usar. O Designer faz a arte apenas com os marcados. A quantidade de posts por dia fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p><div id="mtpl" class="small muted">Carregando…</div>`;
       dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
-      esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
+      esq = `<h5>Contas</h5><div class="kvr"><span>Instagram</span><span style="display:flex;gap:6px;align-items:center"><input id="migig" placeholder="@perfil" style="width:150px" onchange="salvaIgMarca('${esc(sel.name)}', this.value)"></span></div>${['Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
       dir = `<h5>Sites no Atlas</h5><div id="atlasd" class="small muted">Carregando…</div>`;
     }
     det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
@@ -956,7 +956,9 @@ VIEWS.marcas = async () => {
   if (tab === 'contas' && sel) carregaAtlasMarca(sel.name);
 };
 // ───────── sites no Atlas: os agentes postam nos sites do Atlas Hosting ligados a esta marca
+async function salvaIgMarca(marca, v) { const r = await tryDo(() => api('/api/marca-instagram', { body: { brand: marca, instagram: v } }), 'Instagram salvo: as artes passam a usar este @'); if (r && $('#migig')) $('#migig').value = r.instagram; }
 async function carregaAtlasMarca(marca) {
+  api('/api/marca-instagram?brand=' + encodeURIComponent(marca)).then(r => { if ($('#migig')) $('#migig').value = r.instagram || ''; }).catch(() => {});
   const el = $('#atlasd'); if (!el) return;
   try {
     const [est, { destinos }] = await Promise.all([api('/api/v2/atlas/estado'), api('/api/v2/atlas/destinos?marca=' + encodeURIComponent(marca))]);
