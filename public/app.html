@@ -425,6 +425,7 @@ document.addEventListener('click', () => { $('#bpop')?.classList.add('hidden'); 
 // ───────── problemas em linguagem simples: o que aconteceu e o que depende de você
 function explica(motivo) {
   const m = String(motivo || '');
+  if (/^Arte descartada/.test(m)) return { titulo: 'Você descartou a arte', faca: 'A copy aprovada continua aqui. Clique em Resolvido para o Designer fazer uma arte nova, ou em Descartar para jogar tudo fora.' };
   if (/^Edição do vídeo descartada/.test(m)) return { titulo: 'Você descartou a edição do vídeo (foi para a lixeira)', faca: 'O roteiro aprovado continua aqui. Clique em Editar novamente para o Editor fazer uma edição nova.' };
   if (/limite de uso/i.test(m)) return { auto: true, causa: 'limite', titulo: 'A assinatura do Claude atingiu o limite de uso', faca: 'Espere o limite renovar (algumas horas) e clique em Resolvido. Se quiser evitar, diminua as metas por dia.' };
   if (/dangerously-skip-permissions|root\/sudo/i.test(m)) return { auto: true, causa: 'config', titulo: 'Erro de configuração do servidor (já corrigido)', faca: 'Nada a fazer além de clicar em Resolvido: o item volta para a fila e roda de novo.' };
@@ -773,7 +774,7 @@ function confirmaDescarte(id) {
     document.body.appendChild(box);
   });
 }
-async function descartarArte(id, tipo) { const v = tipo === 'video'; if (!(await confirmaSim(v ? 'Descartar esta edição?' : 'Descartar esta arte?', v ? 'Só a edição vai para a lixeira. O roteiro e a copy já foram aprovados e continuam. O Editor só edita de novo quando você clicar em Editar novamente.' : 'Só a arte vai fora. A copy já foi aprovada: ela continua e volta para a fila do Designer, que faz uma arte nova.', v ? 'Descartar edição' : 'Descartar arte'))) return; await tryDo(() => api(`/api/v2/itens/${id}/descartar_arte`, { body: {} }), v ? 'Edição descartada: o roteiro espera você clicar em Editar novamente' : 'Arte descartada: a copy voltou para a fila'); fechaEstudio(); fecha(); }
+async function descartarArte(id, tipo) { const v = tipo === 'video'; if (!(await confirmaSim(v ? 'Descartar esta edição?' : 'Descartar esta arte?', v ? 'Só a edição vai para a lixeira. O roteiro e a copy já foram aprovados e continuam. O Editor só edita de novo quando você clicar em Editar novamente.' : 'Só a arte vai fora. A copy já foi aprovada e continua parada no Fluxo: o Designer só faz outra arte quando você pedir.', v ? 'Descartar edição' : 'Descartar arte'))) return; await tryDo(() => api(`/api/v2/itens/${id}/descartar_arte`, { body: {} }), v ? 'Edição descartada: o roteiro espera você clicar em Editar novamente' : 'Arte descartada. O Designer só faz outra quando você pedir'); fechaEstudio(); fecha(); }
 async function acao(id, a) { if (a === 'descartar' && !(await confirmaDescarte(id))) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
 
 // ───────── Publicação (manual)

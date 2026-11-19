@@ -34,6 +34,7 @@ export function raiaDe(c, ctx) {
 }
 
 // Estado novo a partir do status antigo e dos jobs ativos do item
+const ARTE_DESCARTADA = 'Arte descartada: a copy aprovada espera você clicar em Resolvido para ganhar arte nova';
 const EDICAO_DESCARTADA = 'Edição do vídeo descartada: o roteiro aprovado espera você clicar em Editar novamente';
 export function estadoDe(c, jobs = []) {
   const ativos = jobs.filter(j => j.status === 'queued' || j.status === 'running');
@@ -312,9 +313,8 @@ export function criarFluxoV2(ctx) {
         log(null, `Você descartou a edição do vídeo de "${c.title}" (foi para a lixeira). O roteiro aprovado continua; o Editor edita de novo quando você clicar em Editar novamente`, id);
         return { ok: true };
       }
-      setContent(id, { art_spec: '', art_status: '', art: '', status: 'producing', error: '', em_ajuste: 0, ajuste_motivo: '' });
-      ctx.enqueue(id, 'designer', 'arte', {}, 'manual');
-      log(null, `Você descartou a arte de "${c.title}": a copy aprovada continua e voltou para o Designer`, id);
+      setContent(id, { art_spec: '', art_status: '', art: '', status: 'producing', error: ARTE_DESCARTADA, em_ajuste: 0, ajuste_motivo: '' });   // pedido do dono: descartar NÃO refaz sozinho
+      log(null, `Você descartou a arte de "${c.title}". A copy aprovada continua; o Designer só faz outra quando você clicar em Resolvido`, id);
       return { ok: true };
     }
     if (nome === 'restaurar') {
@@ -340,9 +340,10 @@ export function criarFluxoV2(ctx) {
     if (nome === 'resolver') {   // o dono resolveu a causa (login, limite, ajuste): limpa o erro e a etapa recomeça de onde parou
       if (['posted', 'discarded'].includes(c.status)) throw fail(400, 'Este item não está parado');
       run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id);
-      const editarDeNovo = c.error === EDICAO_DESCARTADA;
+      const editarDeNovo = c.error === EDICAO_DESCARTADA, arteDeNovo = c.error === ARTE_DESCARTADA;
       setContent(id, { error: '' });
       if (editarDeNovo) { ctx.enqueue(id, 'editor', 'video', {}, 'manual'); log(null, `Você pediu para editar de novo o vídeo de "${c.title}"`, id); return { ok: true }; }
+      if (arteDeNovo) { ctx.enqueue(id, 'designer', 'arte', {}, 'manual'); log(null, `Você pediu uma arte nova para "${c.title}"`, id); return { ok: true }; }
       contentAct(id, 'reprocess');
       log(null, `Você marcou "${c.title}" como resolvido: a produção recomeçou`, id);
       return { ok: true };
