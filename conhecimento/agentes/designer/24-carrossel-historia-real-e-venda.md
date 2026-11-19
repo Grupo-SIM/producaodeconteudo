@@ -12,7 +12,8 @@ A capa é criada para cada assunto, usando tudo o que foi aprendido nas capas ap
 5. **Pergunta aberta.** A cena deixa a dúvida "como isso aconteceu?", que só se resolve arrastando.
 6. **Cara de foto real:** foto de jornal da época do caso (granulado, flash, documental). Nada de imagem com defeito: objeto deformado, letras inventadas pela IA (desfoque ou gere de novo), emenda no fundo, montagem que se vê. Imagem "bugada" foi reprovada.
 7. **Texto no topo, sem cobrir o rosto.** Selo pequeno ("CASO REAL · ano"), manchete enorme em caixa alta com a palavra-chave na cor da marca e o subtítulo logo abaixo, com a palavra mais forte em destaque. O rosto em primeiro plano fica livre.
-8. **Cor diferente do resto do carrossel.** Se o miolo é claro, a capa é escura e carregada (e vice-versa).
+8. **"Arraste →" pequeno no canto de baixo à direita**, numa pílula escura meio transparente com a seta na cor da marca. Só na capa. Nunca grande nem no meio, para não cobrir a cena nem deixar cara de anúncio.
+9. **Cor diferente do resto do carrossel.** Se o miolo é claro, a capa é escura e carregada (e vice-versa).
 
 ## Miolo: calmo, para ler
 - Fundo SÓ da seção **História e venda** da Biblioteca (fundos padrão), escolhido pela cor da marca. O fundo pode ter a cor trocada para a da marca, mantendo a textura, sempre priorizando a leitura: claro = tom bem suave da cor da marca com texto escuro; escuro = quase preto puxado na cor da marca com texto claro. Cor forte e saturada só no destaque, nunca no fundo inteiro.
