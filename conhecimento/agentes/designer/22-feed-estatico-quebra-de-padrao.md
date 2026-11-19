@@ -140,3 +140,10 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 30 (correção): o bordado é GERADO NA IMAGEM (nunca texto por cima, fica falso): 2 linhas, na altura do peito, linha cinza claro com textura de costura.
 - 30: bordado pequeno (tamanho de logo de peito, ~9% da largura da arte).
 - 30 APROVADA. Lição: cada edição por IA em cima de outra edição perde qualidade; editar sempre a partir da imagem boa mais antiga e colar só o pedaço novo.
+
+## 34 · "SIM, fui eu que FIZ" (Central do Marketing) APROVADA, 19/11/2026: serve de ESTÁTICO e de CAPA DE CARROSSEL
+- Réplica da referência do dono (`ref-34.webp`): mascote sentado no sofá com notebook, parede clara, duas palavras gigantes condensadas (SIM | FIZ) com a cabeça entre elas e na frente das letras (recorte `c34-cut.png`, opaco), palavra manuscrita em arco centralizada no vão entre as duas palavras, pílula do perfil no topo esquerdo, "Versão post estático" sob a 1ª palavra e o botão sob a 2ª. Sem hashtag no canto.
+- Cores da Central (aprovadas pelo dono no lugar do marrom da referência): letras gigantes pretas #111, manuscrito e destaque do apoio em verde escuro #0A9A3A, contornos pretos, botão com bolinha PRETA e seta VERDE neon.
+- Uso como ESTÁTICO: botão "LEIA A LEGENDA". Uso como CAPA DE CARROSSEL: botão "ARRASTE PARA O LADO".
+- Trocar texto: só pelo que o Copy escreveu do assunto, mesma estrutura (palavra curta | manuscrito curto | palavra curta + apoio de 1 linha), mesmo tamanho e mesmo lugar; nunca aumentar fonte, nunca acrescentar linhas; a cabeça continua entre as duas palavras e o manuscrito centralizado no vão.
+- Arquivos: `layout-34.html` (montagem), `c34.png` (cena), `c34-cut.png` (recorte), `aprovado-34-sim-fui-eu-que-fiz-central.png`.
