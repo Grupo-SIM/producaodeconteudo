@@ -125,3 +125,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 16 APROVADA (Poppins). 17 (pente fino): texto na fonte da marca (Marketing Raiz = Montserrat), palavras grandes em preto e linhas pequenas em cinza da marca, blocos afastados (um no alto, outro embaixo) para usar o espaço vazio e nunca ficar atrás do mascote.
 - 16 sem o "2026", título mais baixo. 17: os blocos de texto ficam PERTO do mascote (encostando nele), não longe nas bordas; palavras grandes em preto.
 - 17 APROVADA. 16: título logo acima da cabeça do mascote (encostando), sem sobra grande no topo.
+- 16 APROVADA. 19 (pente fino): título numa fonte só, a da marca (Vivendo de Bet = Anton): linha de cima branca menor + palavra-chave gigante na cor da marca. Nada de misturar pílula, serifa e manuscrito no mesmo título.
