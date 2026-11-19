@@ -1747,6 +1747,7 @@ if (!one("SELECT 1 x FROM settings WHERE key='rev_v1'")) {
 }
 
 db.exec(`CREATE TABLE IF NOT EXISTS tpl_paginas(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, brand TEXT DEFAULT '', format TEXT DEFAULT '', slide TEXT NOT NULL, base TEXT DEFAULT '', created_at TEXT, updated_at TEXT)`);
+try { db.exec("ALTER TABLE tpl_paginas ADD COLUMN categoria TEXT DEFAULT ''"); } catch { /* já existe */ }
 // ───────────────────────── Fila e pipeline ─────────────────────────
 function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter = null) {
   // copy já aprovada pelo dono (Treino do Designer, Produção diária com copy aprovada): nunca volta para o Roteirista nem para a revisão da copy; segue para a arte
@@ -7620,13 +7621,14 @@ async function api(req, res, url) {
   // ── Entrega: imagens da arte
   if (p === '/api/arte-modelos' && m === 'GET') return send(res, 200, { modelos: MODELOS_ARTE });
   // Templates de página do editor: os seus (página salva do jeito que você deixou) e quais dos prontos você escondeu
-  if (p === '/api/tpl-paginas' && m === 'GET') return send(res, 200, { itens: all('SELECT id,nome,brand,format,slide,base,updated_at FROM tpl_paginas ORDER BY id DESC').map(x => ({ ...x, slide: jparse(x.slide, {}) })), ocultos: jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, []) });
+  if (p === '/api/tpl-paginas' && m === 'GET') return send(res, 200, { itens: all('SELECT id,nome,brand,format,slide,base,categoria,updated_at FROM tpl_paginas ORDER BY id DESC').map(x => ({ ...x, slide: jparse(x.slide, {}) })), ocultos: jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, []) });
   if (p === '/api/tpl-paginas' && m === 'POST') {
     const b = await readBody(req, 4e5), sl = sanitizeArteSpec({ slides: [b.slide] }, 'carrossel').slides[0]; if (!sl) throw fail(400, 'Página vazia');
     const nome = String(b.nome || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'Meu template', fmt = String(b.format || '').slice(0, 30), base = String(b.base || '').slice(0, 120);
     let id = +b.id || 0;
-    if (id && one('SELECT 1 x FROM tpl_paginas WHERE id=?', id)) run('UPDATE tpl_paginas SET nome=?, slide=?, format=?, updated_at=? WHERE id=?', nome, JSON.stringify(sl), fmt, T(), id);
-    else id = +run('INSERT INTO tpl_paginas(nome,brand,format,slide,base,created_at,updated_at) VALUES(?,?,?,?,?,?,?)', nome, String(b.brand || '').slice(0, 80), fmt, JSON.stringify(sl), base, T(), T()).lastInsertRowid;
+    const cat = ['noticia', 'feed', 'carrossel', 'stories'].includes(b.categoria) ? b.categoria : '';
+    if (id && one('SELECT 1 x FROM tpl_paginas WHERE id=?', id)) run("UPDATE tpl_paginas SET nome=?, slide=?, format=?, categoria=COALESCE(NULLIF(?,''),categoria), updated_at=? WHERE id=?", nome, JSON.stringify(sl), fmt, cat, T(), id);
+    else id = +run('INSERT INTO tpl_paginas(nome,brand,format,slide,base,categoria,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)', nome, String(b.brand || '').slice(0, 80), fmt, JSON.stringify(sl), base, cat, T(), T()).lastInsertRowid;
     if (base) { const oc = new Set(jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, [])); oc.add(base); run("INSERT INTO settings(key,value) VALUES('tpl_ocultos',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify([...oc])); }   // editou um pronto: a sua versão toma o lugar dele
     log('designer', `Template de página salvo: ${nome}`); return send(res, 200, { id });
   }
@@ -7875,7 +7877,7 @@ async function api(req, res, url) {
         id, title: c.title, brand: c.brand, format: c.format, teste: c.teste, status: c.status, w, h, spec, resolved, font, pano_url: panoUrl, base_ajustes: base ? arteDiff(base, sp).length : 0,
         defaults: { accent: idv.accent || brandColors()[c.brand] || '#f59e0b', ink: idv.ink || '#ffffff', paper: idv.paper || '#0b0b0d', fonte: idv.fontAsset || '' },
         palette: [...new Set([idv.accent, brandColors()[c.brand], idv.ink, idv.paper, ...(idv.apoio || []), ...(idv.cores || [])].filter(x => /^#[0-9a-f]{6}$/i.test(x || '')).map(x => x.toLowerCase()))].slice(0, 12),
-        assets: lib.filter(a => IMG.includes(a.ext) && (a.colecao === 'arte' || a.kind === 'logo')).map(a => ({ id: a.id, name: a.name, kind: a.kind, brand: a.brand, url: `/api/assets/${a.id}/file`, thumb: `/api/assets/${a.id}/thumb` })),
+        assets: (usados => lib.filter(a => IMG.includes(a.ext) && (a.colecao === 'arte' || a.kind === 'logo' || usados.has(a.name))))(new Set([...JSON.stringify(spec).matchAll(/"asset":"([^"]+)"/g)].map(x => x[1]))).map(a => ({ id: a.id, name: a.name, kind: a.kind, brand: a.brand, url: `/api/assets/${a.id}/file`, thumb: `/api/assets/${a.id}/thumb` })),
         layout_origem: (() => { const m0 = /^l:(\d+)$/.exec(c.estilo_arte || ''), lo = m0 ? one('SELECT id,name,brand FROM art_layouts WHERE id=?', +m0[1]) : null; return lo ? { id: lo.id, name: lo.name, brand: lo.brand } : null; })(),
         checks: checksLer(c.art_checks), arte: arteInfo(id), layouts: all("SELECT * FROM art_layouts ORDER BY (brand=? COLLATE NOCASE) DESC, (brand='') DESC, brand COLLATE NOCASE, id DESC LIMIT 400", c.brand || '').filter(l => sameDims(l.format, c.format)).map(layoutPub), fal: !!falKey() && settings().art_gen === '1'
       });
