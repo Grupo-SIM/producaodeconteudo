@@ -1279,6 +1279,88 @@ const COMPOR = {
     s.texts.push(...mol.texts); s.items.push(...mol.items); s.shapes.push(...mol.shapes); return s;
   }
 };
+// ───────── Template "15 · Venda ebook" (carrossel de venda aprovado pelo dono, 19/11/2026) ─────────
+// Fundo da seção História e venda pela cor da marca, logo pequena discreta no canto, uma frase grande por página na fonte da marca
+// com o trecho-chave (*assim*) em marca-texto, páginas com FOTO REAL de banco (estilo ebook, nunca gerada) e fim simples (pergunta + preço + "Clique no link da bio").
+const VD_FUNDO_MARCA = { 'corte dos ricos': 'cinza-papel', 'marketing raiz': 'branco-granulado' };   // aprovados pelo dono
+// cor principal de cada marca (conhecimento/agentes/designer/20-cores-e-tipografia-das-marcas.md): decide o fundo e a cor do marca-texto
+const VD_COR = { '007 spyhacker': '#13ECE9', 'atlas hosting': '#1A97C3', 'central do marketing': '#0DE450', 'corte dos ricos': '#000000', 'marketing raiz': '#010101', 'pagatg': '#834DEB', 'seguidores em alta': '#9B23B7', 'simintpay': '#761FE3', 'sim intermediacoes': '#8351F1', 'teron': '#1A71FE', 'vivendo de bet': '#21DC0D' };
+const vdCor = ctx => VD_COR[String(ctx.marca || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()] || ctx.accent || '#000000';
+const VD_FUNDOS = { 'cinza-papel': 0, 'branco-granulado': 0, 'branco-ondas': 0, 'bege-ornamento': 0, 'laranja-madeira': 1, 'preto-circulos': 1, 'preto-fumaca': 1, 'roxo-pincelada': 1, 'verde-neon-escuro': 1 };   // 1 = fundo escuro (texto claro)
+function vdFundo(ctx) {
+  const m = String(ctx.marca || '').toLowerCase(); if (VD_FUNDO_MARCA[m]) return VD_FUNDO_MARCA[m];
+  const [r, g, b] = rgb(vdCor(ctx)).map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), sat = mx - mn;
+  if (sat < .18) return mx < .5 ? 'cinza-papel' : 'branco-granulado';   // marca preto e branco: fundo claro, como os aprovados
+  let h = 0; if (mx === r) h = ((g - b) / sat) % 6; else if (mx === g) h = (b - r) / sat + 2; else h = (r - g) / sat + 4; h = (h * 60 + 360) % 360;
+  if (h < 45) return 'laranja-madeira'; if (h < 70) return 'bege-ornamento'; if (h < 170) return 'verde-neon-escuro'; if (h < 255) return 'preto-circulos'; return 'roxo-pincelada';
+}
+function vdBase(ctx) {
+  const f = vdFundo(ctx), esc = !!VD_FUNDOS[f], acc = vdCor(ctx);
+  const C = esc ? { tinta: '#f6f6f6', apoio: '#d0d0d0', pag: '#9a9a9a', hl: ['roxo-pincelada', 'laranja-madeira'].includes(f) || lum(acc) <= .04 ? '#f6f6f6' : acc, borda: '#f6f6f6' } : { tinta: '#111111', apoio: '#333333', pag: '#666666', hl: '#000000', borda: '#111111' };
+  C.hlTxt = sobre(C.hl);
+  const s = { bg: { asset: 'tpl-historia-fundo-' + f, color: esc ? '#111111' : '#ededed' }, paper: esc ? '#111111' : '#ededed', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] };
+  return { s, C };
+}
+const vdFT = ctx => { const k = fMarca(ctx, 't') || 'lora'; return { k, w: pesoDe(k, 700), ls: 0 }; };
+const vdFX = ctx => { const k = fMarca(ctx, 'x') && fMarca(ctx, 'x') !== fMarca(ctx, 't') ? fMarca(ctx, 'x') : 'inter'; return { k, w: pesoDe(k, 400), ls: 0 }; };
+// logo pequena no canto de cima e número da página embaixo, iguais em todas as páginas
+function vdMoldura(s, ctx, e, C) {
+  const lg = ctx.avatar || ctx.logo; if (lg) s.items.push({ asset: lg, x: e.X(100 + 36), y: e.Y(52 + 36), size: e.P(72), moldura: true });
+  if ((ctx.total || 0) > 1) s.texts.push({ role: 'body', value: `${(ctx.i || 0) + 1}/${ctx.total}`, x: e.X(980), y: e.Y(1294), align: 'right', size: e.P(26), font: 'inter', weight: 600, ls: 0, color: C.pag, nowrap: true, shadow: false });
+}
+// frase com marca-texto: *trecho* sai em faixa (cor de destaque) com a letra clara (o navegador desenha a faixa na largura real da fonte);
+// entrelinha folgada (1,6) para as faixas não encostarem de uma linha para outra
+function vdFrase(s, e, txt, f, size, x, yTop, maxW, C) {
+  const ls = fgAst(erQuebra(String(txt || ''), f, size, maxW)), h = ls.length * size * 1.6;
+  s.texts.push({ role: 'title', value: ls.join('|'), x: e.X(x), y: e.Y(yTop + h / 2), align: 'left', size: e.P(size), font: f.k, weight: f.w, ls: 0, lh: 1.6, color: C.tinta, hl: C.hl, mk: true, nowrap: true, shadow: false });
+  return h;
+}
+const vdApoio = (s, e, txt, f, size, x, yTop, maxW, C) => { const ls = quebra(limpa(txt), f, size, maxW), L = size * 1.45; ls.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(yTop + L * i + L / 2), align: 'left', size: e.P(size), font: f.k, weight: f.w, lh: 1, color: C.apoio, nowrap: true, shadow: false })); return ls.length * L; };
+const vdCabe = (txt, f, max, min, maxW, maxL) => { let z = max; while (z > min && fgAst(erQuebra(String(txt || ''), f, z, maxW)).length > maxL) z -= 2; return z; };
+COMPOR_EXTRA['venda-capa'] = (d, ctx) => {
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), x = 100, mw = 880, tz = vdCabe(d.titulo, tf, 100, 64, mw, 6);
+  const th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, ph = 64, cta = String(d.cta || 'Arraste para o lado →'), cf = { k: 'inter', w: 600, ls: 0 }, cw = largura(cta, cf, 30) + 60;
+  const y0 = 675 - (th + 70 + ph) / 2;
+  vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C);
+  const py = y0 + th + 70;
+  s.shapes.push({ kind: 'pill', x: e.X(x + cw / 2), y: e.Y(py + ph / 2), w: e.X(cw), h: e.Y(ph), color: 'transparent', stroke: C.borda, stroke_w: 2 / 1080 });
+  s.texts.push({ role: 'body', value: cta, x: e.X(x + cw / 2), y: e.Y(py + ph / 2), align: 'center', size: e.P(30), font: 'inter', weight: 600, ls: 0, caixa: 'normal', color: C.tinta, nowrap: true, shadow: false });
+  vdMoldura(s, ctx, e, C); return s;
+};
+// miolo: frase grande (+ apoio menor). Com "foto": foto REAL de banco (cantos arredondados, ~60% da página) em cima e a frase embaixo
+COMPOR_EXTRA['venda-pagina'] = (d, ctx) => {
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880;
+  const foto = d.foto ? String(typeof d.foto === 'object' ? (d.foto.banco || d.foto.gen || '') : d.foto).replace(/^\s*banco\s*:\s*/i, '').trim() : '';
+  const ap = String(d.texto || '').trim();
+  if (foto) {
+    const tz = vdCabe(d.titulo, tf, 54, 40, mw, 5), fh = 620, th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, y0 = 675 - (fh + 56 + th) / 2;
+    const ehAsset = /^[a-z0-9-]{2,80}$/.test(foto) && foto.includes('-');   // arquivo da Biblioteca (ex.: prévia); o resto é termo de busca no banco de imagens
+    s.items.push({ ...(ehAsset ? { asset: foto } : { banco: foto }), x: .5, y: e.Y(y0 + fh / 2), size: e.P(880), h: e.Y(fh), radius: 28 / 1080, fotoCard: true });
+    vdFrase(s, e, d.titulo, tf, tz, x, y0 + fh + 56, mw, C);
+  } else {
+    const tz = vdCabe(d.titulo, tf, 64, 44, mw, 7), lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.45 : 0, y0 = 675 - (lt + (ap ? 60 + la : 0)) / 2;
+    vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C);
+    if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 60, mw, C);
+  }
+  vdMoldura(s, ctx, e, C); return s;
+};
+// fim (versão B aprovada): pergunta grande com marca-texto, uma linha com preço/condição e "Clique no link da bio" com círculo e seta
+COMPOR_EXTRA['venda-fim'] = (d, ctx) => {
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880, tz = vdCabe(d.titulo, tf, 60, 44, mw, 5);
+  const lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, ap = String(d.texto || '').trim(), la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.5 : 0, cta = String(d.cta || 'Clique no link da bio'), y0 = 675 - (lt + (ap ? 50 + la : 0) + 56 + 84) / 2;
+  vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C);
+  if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 50, mw, C);
+  const cy = y0 + lt + (ap ? 50 + la : 0) + 56 + 42, cor = VD_FUNDOS[vdFundo(ctx)] ? C.hl : '#111111';
+  s.shapes.push({ kind: 'circle', x: e.X(x + 42), y: e.Y(cy), w: e.X(84), h: e.Y(84), color: cor });
+  s.shapes.push({ kind: 'icon', icon: 'arrow-up-right', x: e.X(x + 42), y: e.Y(cy), w: e.X(40), h: e.Y(40), icon_color: sobre(cor) });
+  s.texts.push({ role: 'title', value: cta, x: e.X(x + 84 + 24), y: e.Y(cy), align: 'left', size: e.P(40), font: 'inter', weight: 600, color: C.tinta, nowrap: true, shadow: false });
+  vdMoldura(s, ctx, e, C); return s;
+};
+MODELOS.push(
+  { id: 'venda-capa', nome: '15 · Venda: capa', uso: 'capa de carrossel', desc: 'Template aprovado do carrossel de venda: fundo de História e venda pela cor da marca, logo pequena no canto, frase grande na fonte da marca com o trecho-chave (*assim*) em marca-texto e a pílula "Arraste para o lado →".', campos: ['titulo', 'cta'] },
+  { id: 'venda-pagina', nome: '15 · Venda: página', uso: 'página interna', desc: 'Uma frase grande por página com o trecho-chave (*assim*) em marca-texto e, opcional, um apoio menor (texto). Com "foto": foto REAL de banco de imagens (Pexels, Unsplash, Pixabay; nunca gerada) com cantos arredondados em cima e a frase embaixo. Use foto em 2 ou 3 páginas, a cada 3 ou 4, mostrando exatamente o que a frase diz.', campos: ['titulo', 'texto', 'foto'] },
+  { id: 'venda-fim', nome: '15 · Venda: fim', uso: 'última página', desc: 'Pergunta grande com marca-texto, uma linha com o preço/condição (texto) e "Clique no link da bio" com círculo e seta.', campos: ['titulo', 'texto', 'cta'] });
+MODELO_IDS.push('venda-capa', 'venda-pagina', 'venda-fim');
 Object.assign(COMPOR, COMPOR_EXTRA);
 
 // contexto padrão a partir das cores da peça; o servidor completa com a Identidade da marca (fontes, logo, contatos, moldura)
@@ -1313,7 +1395,8 @@ export function comporSlide(slide, ctxBase) {
     if (!altoMarca) for (const k of ['titulo', 'texto', 'apoio']) if (gritado(d[k])) d[k] = aplicaCaixa(d[k], 'frase'); }
   for (const k of ['kicker', 'titulo', 'apoio', 'cta', 'texto', 'numero', 'fantasma', 'selo', 'legenda', 'nome', 'frase', 'handle']) if (d[k] != null) d[k] = String(d[k]).replace(/[<>]/g, '').replace(/[ \t]+([?!:;,.…])/g, '$1').replace(/[ \t]{2,}/g, ' ').trim().slice(0, 400);   // "pronto ?" vira "pronto?"; espaço duplo some
   // hierarquia: só UMA coisa em destaque. Título inteiro marcado vira branco (o destaque passa para a chamada pequena)
-  if (d.titulo) { const t = String(d.titulo).trim(), m = t.match(/^\*([^*]+)\*$/); if (m) d.titulo = m[1]; else { const n = (t.match(/\*[^*]+\*/g) || []); if (n.length > 1) { let k = 0; d.titulo = t.replace(/\*([^*]+)\*/g, (x, y) => k++ ? y : x); } } }
+  if (d.titulo && !String(slide.modelo || '').startsWith('venda-')) { const t = String(d.titulo).trim(), m = t.match(/^\*([^*]+)\*$/); if (m) d.titulo = m[1]; else { const n = (t.match(/\*[^*]+\*/g) || []); if (n.length > 1) { let k = 0; d.titulo = t.replace(/\*([^*]+)\*/g, (x, y) => k++ ? y : x); } } }
+  // venda (acima): o marca-texto pode pegar a frase inteira ou mais de um trecho (aprovado pelo dono)
   let ctx = ctxBase.T ? ctxBase : contexto(ctxBase);
   // capas (herói, faixas, revista) foram desenhadas sobre fundo escuro: numa marca de papel claro, a capa usa um fundo escuro da cor da marca (com tinta branca) em vez de ficar cinza e borrada
   if (['heroi', 'capa-faixa', 'revista'].includes(id) && lum(ctx.paper) > .55) ctx = { ...ctx, paper: mistura(ctx.accent, '#000000', .9), ink: '#ffffff' };
