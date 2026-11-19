@@ -305,6 +305,7 @@ export const MODELOS = [
   { id: 'espaco-capa', nome: '13 · Espaço: capa', uso: 'capa de carrossel', desc: 'Template aprovado (espaço azul neon): astronauta segurando o tablet; título preto na tela com a última linha gigante (ex.: “4 segredos de marketing|que ninguém te|conta!”), botão ciano “Arraste para o lado” com a seta e a barra de ferramentas no canto.', campos: ['titulo', 'cta'] },
   { id: 'espaco-par', nome: '13 · Espaço: miolo', uso: 'página interna', desc: '2 itens por página: seta, “01.” branco + título ciano em caixa alta e texto curto com *negrito*. A caneta digital cruza para a página seguinte e o computador com a barra de ferramentas cruza da penúltima para o fim.', campos: ['itens', 'n'] },
   { id: 'espaco-fim', nome: '13 · Espaço: fim', uso: 'última página', desc: '“Gostou do conteúdo?” branco, “compartilhe com os amigos!”, pílula ciano do CTA (sem ícones de curtir/compartilhar, decisão do dono) (ex.: “Quero orçamento”).', campos: ['titulo', 'texto', 'cta'] },
+  { id: 'caixinha', nome: '14 · Caixinha de pergunta (stories de venda)', uso: 'tela de stories de venda', desc: 'Template aprovado (dono, 19/11/2026): caixinha "Faça uma pergunta" igual à do Instagram com a pergunta dentro e, embaixo, a resposta em letra serifada branca, como uma pessoa responderia. Fundo SÓ da seção Stories da Biblioteca, o que mais combina com o assunto da tela, com um fade preto leve. Tela sem pergunta = só a resposta no centro. Fundo preto liso (fundo "preto") também vale, numa tela ou outra.', campos: ['pergunta', 'resposta', 'fundo'] },
   { id: 'cta', nome: 'Chamada final', uso: 'última página', desc: 'Frase de fechamento no centro com destaque e um botão grande na cor da marca; o mascote ou objeto da capa pode voltar acima da frase; contatos no rodapé.', campos: ['titulo', 'cta', 'objeto', 'icone'] }
 ];
 export const MODELO_IDS = MODELOS.map(m => m.id);
@@ -838,6 +839,29 @@ COMPOR_EXTRA['espaco-fim'] = (d, ctx) => {
   return s;
 };
 
+// ───────── Template "14 · Caixinha de pergunta" (stories de venda; teste aprovado pelo dono em 19/11/2026) ─────────
+// Igual ao Instagram: caixinha com faixa cinza-escura "Faça uma pergunta" e corpo branco com a pergunta (sem serifa); embaixo, a resposta
+// em serifada branca, centralizada. O fundo vem da seção Stories da Biblioteca (d.fundo); por cima, um fade preto leve só para dar leitura.
+COMPOR_EXTRA['caixinha'] = (d, ctx) => {
+  FK = { t: 'cormorant', x: 'inter' };   // letra do Instagram, não a da marca: a caixinha precisa parecer a original
+  const e = erEsc(ctx, 1080, 1920), preto = !d.fundo || d.fundo === 'preto', s = { bg: preto ? { color: '#000000' } : { asset: String(d.fundo), color: '#000000' }, paper: '#000000', shade: preto ? 0 : .5, shade_dir: 'full', pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] };
+  const Y = e.Y, q = String(d.pergunta || '').replace(/[*_|]/g, ' ').replace(/\s+/g, ' ').trim();
+  const rf = { k: 'cormorant', w: 600, ls: 0 }, resp = String(d.resposta || d.texto || d.titulo || '').replace(/[*_]/g, '').replace(/\s+/g, ' ').trim();
+  let rz = 70, rl = erQuebra(resp, rf, rz, 860); if (rl.length > 6) { rz = 60; rl = erQuebra(resp, rf, rz, 880); } if (rl.length > 8) { rz = 52; rl = erQuebra(resp, rf, rz, 900); }
+  const rlh = Math.round(rz * 1.2);
+  let yR;
+  if (q) {
+    const qf = { k: 'inter', w: 500, ls: 0 }, ql = erQuebra(q, qf, 45, 740).slice(0, 4), BW = 848, HH = 104, BH = HH + 100 + ql.length * 56, Y0 = 300;
+    s.shapes.push({ kind: 'rect', x: e.X(540), y: Y(Y0 + BH / 2), w: e.X(BW), h: Y(BH), radius: 30 / BH, color: '#ffffff' });
+    s.shapes.push({ kind: 'rect', x: e.X(540), y: Y(Y0 + HH / 2), w: e.X(BW), h: Y(HH), radius: 30 / HH, color: '#262626' });
+    s.shapes.push({ kind: 'rect', x: e.X(540), y: Y(Y0 + HH - 22), w: e.X(BW), h: Y(44), radius: 0, color: '#262626' });
+    s.texts.push({ role: 'body', value: 'Faça uma pergunta', ls: 0, x: e.X(540), y: Y(Y0 + HH / 2 + 2), align: 'center', size: e.P(31), font: 'inter', weight: 500, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
+    ql.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(540), y: Y(Y0 + HH + 50 + 28 + i * 56), align: 'center', size: e.P(45), font: 'inter', weight: 500, lh: 1, color: '#262626', nowrap: true, shadow: false }));
+    yR = Y0 + BH + 140;
+  } else yR = 860 - rl.length * rlh / 2;   // tela sem caixinha: a resposta fica sozinha, no meio
+  rl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(540), y: Y(yR + rlh / 2 + i * rlh), align: 'center', size: e.P(rz), font: 'cormorant', weight: 600, lh: 1, color: '#ffffff', nowrap: true }));
+  return s;
+};
 
 const COMPOR = {
   'erros-capa'(d, ctx) {

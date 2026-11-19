@@ -15,6 +15,9 @@ Atualizado em outubro de 2026. Vale para feed, carrossel e stories.
 4. **Curiosidade com promessa verdadeira:** a capa nomeia a situação de quem vai ler ("Você está pagando caro no aluguel do cartão?") ou promete um resultado que os slides entregam.
 5. **A marca reconhecível de longe:** cor de destaque, fonte e posição da logo iguais em todas as peças. Consistência faz a pessoa reconhecer a marca antes de ler o nome.
 
+## Capa de carrossel = estático (regra do dono, 19/11/2026)
+A capa de qualquer carrossel joga o mesmo jogo de atenção do post estático. Tudo o que o dono treina no estático (quebra de padrão, gancho, imagem, contraste, emoção) vale também para as capas dos carrosséis, respeitando a identidade de cada template. Nos templates aprovados, repetir a imagem do kit na capa está ok; com o tempo, a capa pode ganhar imagem ligada ao assunto, como no carrossel investigativo.
+
 ## Hierarquia em toda tela
 - Três níveis no máximo: **título** (o que prende), **apoio** (o que explica) e **destaque** (a palavra que importa, na cor de destaque da marca).
 - No máximo duas famílias de fonte e três cores de destaque por peça.
