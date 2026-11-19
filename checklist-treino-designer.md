@@ -37,11 +37,11 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
 1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
 2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
-3. [ ] Treino de capas para os carrosséis.
+3. [x] Capas dos carrosséis: todo estático aprovado serve de capa (confirmado pelo dono 19/11/2026).
 4. [x] Feed estático: 19 artes aprovadas (estoque) + regras para criar novas do zero; estático NÃO é template (19/11/2026).
 5. [x] **Atribuir templates às marcas** (feito 19/11/2026, tabela em `conhecimento/agentes/designer/23-templates-por-marca.md`) (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
-6. [ ] Stories de venda.
-7. [ ] Carrossel de história real e carrossel de venda: template próprio de cada (kit do dono). Os 7 educativos ficam só para educativo.
+6. [x] Stories de venda: template 14 · Caixinha de pergunta treinado (19/11/2026). Banco de fundos cresce com o tempo.
+7. [ ] Carrossel de história real e carrossel de venda: investigativo (história real) FEITO (capa com foto real + miolo estilo Twitter); FALTA o formato do carrossel de venda (kit do dono). Os 7 educativos ficam só para educativo.
 8. [ ] Só depois disso: vídeo (Reels).
 Revisão fina dos carrosséis 7 a 13 (elemento fora do texto, menos páginas, letra maior): em produção, peça a peça, na aprovação.
 Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
