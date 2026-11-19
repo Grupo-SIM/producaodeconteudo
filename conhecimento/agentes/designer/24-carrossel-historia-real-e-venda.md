@@ -24,7 +24,7 @@ A capa é criada para cada assunto, usando tudo o que foi aprendido nas capas ap
 - Foto achada também passa pela checklist da capa (rosto e emoção, elementos do título, pergunta aberta). Foto real fraca pode ser tratada (recorte, contraste, ampliação), mas não pode virar outra cena.
 - Foto com licença que pede crédito: o crédito vai na legenda ("Foto: autor, licença, fonte").
 
-**Venda: o mascote.** O mascote da marca entra na cena da capa, reagindo com o corpo à situação do título (o mascote pode não ter rosto: a emoção vem da postura). Marca sem mascote: cena com objeto ou pessoa ligada ao título.
+**Venda: o mascote do PERFIL QUE PUBLICA** (ex.: post no Marketing Raiz vendendo a SimIntPay, que não tem mascote = o rei do Marketing Raiz; o produto aparece na cena). O mascote entra na cena da capa, reagindo com o corpo à situação do título (o mascote pode não ter rosto: a emoção vem da postura). Marca sem mascote: cena com objeto ou pessoa ligada ao título.
 
 ## Miolo: calmo, para ler
 - Fundo SÓ da seção **História e venda** da Biblioteca (fundos padrão), escolhido pela cor da marca. O fundo pode ter a cor trocada para a da marca, mantendo a textura, sempre priorizando a leitura: claro = tom bem suave da cor da marca com texto escuro; escuro = quase preto puxado na cor da marca com texto claro. Cor forte e saturada só no destaque, nunca no fundo inteiro.
