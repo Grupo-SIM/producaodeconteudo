@@ -667,7 +667,7 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   return desviaDoTexto(s, ctx);
 };
 COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {   // __z 1.3: texto 30% maior que o do Fogo (decisão do dono, 18/11/2026)
-  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === 1 ? { __centro: 540 } : {}), ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
+  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === 1 ? { __centro: 540 } : {}), ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: ((ctx.i || 1) - 1) % 2 ? 'tpl-xadrez-fundo-2b' : 'tpl-xadrez-fundo-2', color: '#e8e4da' };   // faixa contínua do dono (referencia/miolo-faixa.png): cada página é meia volta do desenho, alternando 2 e 2b, sem emenda s.paper = '#e8e4da';
   s.items = s.items.filter(it => it.asset !== 'tpl-fogo-nota');
   xzCor(xzCor(xzCor(s, '#ffffff', XZ.escuro), '#f2f2f2', XZ.corpo), FG.red, '#b8901c');
   if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1115) - 115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
