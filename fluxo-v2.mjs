@@ -202,7 +202,7 @@ export function criarFluxoV2(ctx) {
     const itens = rows.map(c => item(c, porC.get(c.id) || []));
     // notícia tem 2 entregas: o post do Instagram (cards) aparece na raia Carrossel e a matéria do site na raia Matéria de jornal
     // regra do treino: toda notícia tem as duas entregas; sem a matéria a peça está incompleta (fica marcada, não vira outro formato)
-    for (const i of [...itens]) if (i.raia === 'materia' && (i.tem_arte || i.tem_art_spec)) {   // arte sendo refeita (ajuste) continua em dois cartões
+    for (const i of [...itens]) if (i.raia === 'materia' && (i.tem_arte || i.tem_art_spec || rows.find(r => r.id === i.id)?.error === ARTE_DESCARTADA)) {   // arte sendo refeita (ajuste) ou descartada continua em dois cartões: descartar a arte não tira a matéria da Mesa
       const c0 = rows.find(r => r.id === i.id); i.parte = 'materia'; if (!c0?.materia) i.sem_materia = true; itens.push({ ...i, raia: 'carrossel', parte: 'post', sem_materia: false }); }
     // hora de cada parte: a da matéria só muda quando a matéria muda; a do post, quando o texto ou a arte mudam
     for (const i of itens) if (i.parte) { const c0 = rows.find(r => r.id === i.id), t = i.parte === 'materia' ? c0?.materia_em : c0?.post_em; if (t) i.atualizado = t; else if (i.parte === 'materia') i.atualizado = c0?.created_at || i.atualizado; }

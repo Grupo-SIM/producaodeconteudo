@@ -4,12 +4,12 @@ Regra do treino (decisão do dono, 14/11/2026): dar vida, formato a formato, à 
 Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → Mandar. A peça entra direto na etapa de arte; o dono corrige na Mesa de revisão. Cada correção do dono vira regra em `conhecimento/agentes/designer/`.
 
 ## Ordem (o dono quis começar pelas peças menores)
-- [ ] 1. Feed estático: 17 (Vivendo de Bet, 2 cards)
-- [ ] 2. Feed jornalístico (cards da matéria): 37 (Seguidores em Alta) e 36 (Vivendo de Bet)
-- [ ] 3. Carrossel educativo (1 a 10, 14, 15, 23 a 26)
-- [ ] 4. Carrossel de história real (11, 12, 13, 16)
-- [ ] 5. Carrossel de venda (21, 22)
-- [ ] 6. Stories de venda (18, 19, 20, 43, 44)
+- [x] 1. Feed estático: fechado (18 artes aprovadas + regras para criar do zero), 19/11/2026.
+- [x] 2. Feed jornalístico: templates 1 a 5 aprovados (Zyrion, Nuvo, Manchete com perfil), 14 a 19/11/2026.
+- [x] 3. Carrossel educativo: templates 7 a 13 aprovados e atribuídos às marcas, 18 e 19/11/2026.
+- [x] 4. Carrossel de história real: investigativo (capa com foto real + miolo estilo Twitter), 19/11/2026.
+- [ ] 5. Carrossel de venda: FALTA o kit do dono (arte final + fundo + elementos).
+- [x] 6. Stories de venda: template 14 · Caixinha de pergunta, 19/11/2026.
 - [x] 7. Estático de venda: coberto pelo treino do estático (serve para todo estático, capa de carrossel e capa de vídeo). Carrossel de notícia: só capa do template + fotos/vídeos do fato + contracapa padrão (`09-feed-jornalistico.md`), 19/11/2026.
 
 ## Como cada correção entra
@@ -33,6 +33,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 19/11/2026 · Feed estático FECHADO: 18 aprovados (14 a 25, 27 a 31, 33), descartados 26 e 32. Próximo: virar template no sistema, depois atribuir templates às marcas, depois stories.
 - 19/11/2026 · Atribuição pelas CORES da arte (não pela copy): 7 Seguidores em Alta; 8 Marketing Raiz; 9 Sim Intermediações (original) e Seguidores em Alta (mascote no lugar do robô e do leão); 10 Marketing Raiz (fade na capa e no fim, miolo com a faixa contínua do dono); 11 Central do Marketing (mascote na capa, sem o busto quebrado); 12 Seguidores em Alta; 13 007 Spyhacker (mascote na capa, fundo da faixa original sem o círculo, divisas suaves). Vivendo de Bet e Corte dos Ricos ficam só com notícia. Testes do 9 com PagaTG/SimIntPay e do 13 com Atlas reprovados: institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
 - 19/11/2026 · Dono: estático = capa universal (estático de qualquer copy, capa de carrossel, capa de vídeo para o feed). Notícia não tem carrossel, exceto fato com várias fotos/vídeos: capa do template + mídias do fato + contracapa padrão. Falta só o carrossel de venda para fechar o treino do Designer.
+- 19/11/2026 · Template 13 · Espaço confirmado como formato SÓ da 007 Spyhacker; PR do template 13 resolvido; chaves dos bancos de imagem já no Komodo.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
@@ -45,11 +46,11 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 7. [ ] Carrossel de história real e carrossel de venda: investigativo (história real) FEITO (capa com foto real + miolo estilo Twitter); FALTA o formato do carrossel de venda (kit do dono). Os 7 educativos ficam só para educativo.
 8. [ ] Só depois disso: vídeo (Reels).
 Revisão fina dos carrosséis 7 a 13 (elemento fora do texto, menos páginas, letra maior): em produção, peça a peça, na aprovação.
-Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
+Template 13 já está no `main` e é só da 007 Spyhacker.
 
-## Onde paramos (14/11/2026, para a próxima conversa)
-- Sistema zerado: só trabalha o que o dono pede (Treino, + Novo conteúdo, Gerente) ou a grade de Produção diária (tudo em 0). Cérebro diário e relatório automático desligados.
-- Treino do Designer começa pelo feed jornalístico: 37 (Seguidores em Alta, estilo Zyrion), depois 36 (Vivendo de Bet, estilo Nuvo). No treino a peça vai direto para a Mesa do dono (sem Revisor).
-- Primeiro teste da 37 (antes das correções): foto de cartaz com letras, capa cortada (157 caracteres) e cartão da contracapa cortado. Corrigido: limites capa 100 / contracapa 130 (Revisor de Copy barra e o Designer devolve ao Copy), contracapa usa o texto do Copy, regras de foto (sem letras, chocante).
-- Próximo passo: descartar a 37 antiga, mandar de novo pelo Treino e conferir capa e contracapa. Pendente do dono: chaves dos bancos de imagem (PEXELS_API_KEY, UNSPLASH_ACCESS_KEY, PIXABAY_API_KEY) no Komodo.
+## Onde paramos (19/11/2026, para a próxima conversa)
+- Arte praticamente fechada: estático, jornalístico, carrosséis educativos 7 a 13, investigativo e stories de venda aprovados.
+- Próximo passo: o dono manda o kit do **carrossel de venda**; replicar igual, ajustar e aprovar (fundos do miolo da seção História e venda).
+- Depois: vídeo (Reels).
+- Pendências menores: revisão fina dos carrosséis 7 a 13 em produção; institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
 - Guardado para depois: escritório 3D (docs/pendente/escritorio3d.patch) e Cérebro; botão do Treino vai para dentro do "+ Novo conteúdo" no fim do treino.
