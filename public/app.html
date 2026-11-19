@@ -425,6 +425,7 @@ document.addEventListener('click', () => { $('#bpop')?.classList.add('hidden'); 
 // ───────── problemas em linguagem simples: o que aconteceu e o que depende de você
 function explica(motivo) {
   const m = String(motivo || '');
+  if (/^Arte descartada/.test(m)) return { titulo: 'Você descartou a arte', faca: 'A copy aprovada continua aqui. Clique em Resolvido para o Designer fazer uma arte nova, ou em Descartar para jogar tudo fora.' };
   if (/^Edição do vídeo descartada/.test(m)) return { titulo: 'Você descartou a edição do vídeo (foi para a lixeira)', faca: 'O roteiro aprovado continua aqui. Clique em Editar novamente para o Editor fazer uma edição nova.' };
   if (/limite de uso/i.test(m)) return { auto: true, causa: 'limite', titulo: 'A assinatura do Claude atingiu o limite de uso', faca: 'Espere o limite renovar (algumas horas) e clique em Resolvido. Se quiser evitar, diminua as metas por dia.' };
   if (/dangerously-skip-permissions|root\/sudo/i.test(m)) return { auto: true, causa: 'config', titulo: 'Erro de configuração do servidor (já corrigido)', faca: 'Nada a fazer além de clicar em Resolvido: o item volta para a fila e roda de novo.' };
@@ -687,7 +688,7 @@ async function abrirItem(id, parte) {
     <div class="mb"><div id="atlasi"></div><dl class="kv"><dt>Marca</dt><dd>${esc(d.marca || '—')}</dd><dt>Formato</dt><dd>${esc(RAIA_NOME(d))}</dd>${d.estado === 'parado' ? `<dt>O que houve</dt><dd>${esc(explica(d.motivo).titulo)}</dd><dt>O que fazer</dt><dd>${esc(explica(d.motivo).faca)}</dd><dt>Detalhe técnico</dt><dd class="small muted">${esc(d.motivo || '')}</dd>` : d.motivo ? `<dt>Motivo</dt><dd>${esc(d.motivo)}</dd>` : ''}${d.em_ajuste ? `<dt>Ajuste pedido</dt><dd>${esc(d.ajuste_motivo)}</dd>` : ''}${d.post_url ? `<dt>Link</dt><dd><a href="${esc(d.post_url)}" target="_blank" rel="noopener">${esc(d.post_url)}</a></dd>` : ''}<dt>Criado</dt><dd>${fmtD(d.criado)}</dd></dl>
     ${d.roteiro ? `<h3 style="margin:16px 0 6px;font-size:13px" class="muted">Roteiro</h3><div class="doc" style="min-height:0">${esc(d.roteiro)}</div>` : ''}
     ${versoesHtml(d)}</div>
-    <div class="ft">${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}${d.status !== 'discarded' && ['etapa', 'ajuste', 'fila'].includes(d.estado) ? (d.pausado ? `<button class="btn ok" onclick="pausaItemModal(${id},false)">Continuar</button><span class="muted small" style="align-self:center">parada por você</span>` : `<button class="btn" style="border-color:#6b2a2e;color:#ff9b9b" onclick="pausaItemModal(${id},true)" title="Para o agente agora; a peça fica onde está até você mandar continuar">Parar agente</button>`) : ''}${d.estado === 'parado' ? `<button class="btn ok" style="margin-left:auto" onclick="resolver([${id}])">${/^Edição do vídeo descartada/.test(d.motivo || '') ? 'Editar novamente' : 'Resolvido'}</button>` : ''}</div>`);
+    <div class="ft">${/^Arte descartada/.test(d.motivo || '') ? `<button class="btn ok" onclick="tryDo(()=>api('/api/v2/itens/${id}/resolver',{body:{}}),'O Designer vai refazer a arte').then(fecha)">Refazer arte</button>` : ''}${d.status === 'discarded' ? `<button class="btn" onclick="acao(${id},'restaurar')">Restaurar</button>` : `<button class="btn dg" onclick="acao(${id},'descartar')">Descartar</button>`}${d.status !== 'discarded' && ['etapa', 'ajuste', 'fila'].includes(d.estado) ? (d.pausado ? `<button class="btn ok" onclick="pausaItemModal(${id},false)">Continuar</button><span class="muted small" style="align-self:center">parada por você</span>` : `<button class="btn" style="border-color:#6b2a2e;color:#ff9b9b" onclick="pausaItemModal(${id},true)" title="Para o agente agora; a peça fica onde está até você mandar continuar">Parar agente</button>`) : ''}${d.estado === 'parado' ? `<button class="btn ok" style="margin-left:auto" onclick="resolver([${id}])">${/^Edição do vídeo descartada/.test(d.motivo || '') ? 'Editar novamente' : 'Resolvido'}</button>` : ''}</div>`);
   atlasNoItem(id);
 }
 function versoesHtml(d) {
@@ -774,7 +775,7 @@ function confirmaDescarte(id) {
     document.body.appendChild(box);
   });
 }
-async function descartarArte(id, tipo) { const v = tipo === 'video'; if (!(await confirmaSim(v ? 'Descartar esta edição?' : 'Descartar esta arte?', v ? 'Só a edição vai para a lixeira. O roteiro e a copy já foram aprovados e continuam. O Editor só edita de novo quando você clicar em Editar novamente.' : 'Só a arte vai fora. A copy já foi aprovada: ela continua e volta para a fila do Designer, que faz uma arte nova.', v ? 'Descartar edição' : 'Descartar arte'))) return; await tryDo(() => api(`/api/v2/itens/${id}/descartar_arte`, { body: {} }), v ? 'Edição descartada: o roteiro espera você clicar em Editar novamente' : 'Arte descartada: a copy voltou para a fila'); fechaEstudio(); fecha(); }
+async function descartarArte(id, tipo) { const v = tipo === 'video'; if (!(await confirmaSim(v ? 'Descartar esta edição?' : 'Descartar esta arte?', v ? 'Só a edição vai para a lixeira. O roteiro e a copy já foram aprovados e continuam. O Editor só edita de novo quando você clicar em Editar novamente.' : 'Só a arte vai para a lixeira (fica 30 dias). A copy volta para a fila de arte: o Designer só faz outra quando você clicar em Refazer arte ou quando a meta do dia da Produção diária ainda não foi atingida.', v ? 'Descartar edição' : 'Descartar arte'))) return; await tryDo(() => api(`/api/v2/itens/${id}/descartar_arte`, { body: {} }), v ? 'Edição descartada: o roteiro espera você clicar em Editar novamente' : 'Arte na lixeira. A copy voltou para a fila de arte'); fechaEstudio(); fecha(); }
 async function acao(id, a) { if (a === 'descartar' && !(await confirmaDescarte(id))) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
 
 // ───────── Publicação (manual)
@@ -942,7 +943,7 @@ VIEWS.marcas = async () => {
       esq = `<h5>Templates que o Designer usa nesta marca</h5><p class="small muted" style="margin:0 0 8px">Marque só o que esta marca pode usar. O Designer faz a arte apenas com os marcados. A quantidade de posts por dia fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p><div id="mtpl" class="small muted">Carregando…</div>`;
       dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
-      esq = `<h5>Contas</h5>${['Instagram', 'Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
+      esq = `<h5>Contas</h5><div class="kvr"><span>Instagram</span><span style="display:flex;gap:6px;align-items:center"><input id="migig" placeholder="@perfil" style="width:150px" onchange="salvaIgMarca('${esc(sel.name)}', this.value)"></span></div>${['Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
       dir = `<h5>Sites no Atlas</h5><div id="atlasd" class="small muted">Carregando…</div>`;
     }
     det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
@@ -956,7 +957,9 @@ VIEWS.marcas = async () => {
   if (tab === 'contas' && sel) carregaAtlasMarca(sel.name);
 };
 // ───────── sites no Atlas: os agentes postam nos sites do Atlas Hosting ligados a esta marca
+async function salvaIgMarca(marca, v) { const r = await tryDo(() => api('/api/marca-instagram', { body: { brand: marca, instagram: v } }), 'Instagram salvo: as artes passam a usar este @'); if (r && $('#migig')) $('#migig').value = r.instagram; }
 async function carregaAtlasMarca(marca) {
+  api('/api/marca-instagram?brand=' + encodeURIComponent(marca)).then(r => { if ($('#migig')) $('#migig').value = r.instagram || ''; }).catch(() => {});
   const el = $('#atlasd'); if (!el) return;
   try {
     const [est, { destinos }] = await Promise.all([api('/api/v2/atlas/estado'), api('/api/v2/atlas/destinos?marca=' + encodeURIComponent(marca))]);
@@ -1231,7 +1234,7 @@ async function cerAcende(q) {
 
 // ───────── Configurações
 VIEWS.config = async () => {
-  const [st, us, lx, gs, sy] = await Promise.all([api('/api/state'), S.me.admin ? api('/api/users').catch(() => ({ users: [] })) : { users: [] }, api('/api/v2/fluxo?lixeira=1'), api('/api/v2/gastos'), api('/api/v2/sync').catch(() => null)]);
+  const [st, us, lx, gs, la, sy] = await Promise.all([api('/api/state'), S.me.admin ? api('/api/users').catch(() => ({ users: [] })) : { users: [] }, api('/api/v2/fluxo?lixeira=1'), api('/api/v2/gastos'), api('/api/lixeira').catch(() => ({ itens: [] })), api('/api/v2/sync').catch(() => null)]);
   const lixo = lx.itens.filter(i => i.estado === 'descartado'), kv = (k, v) => `<div class="kvr"><span>${esc(k)}</span><span>${v}</span></div>`;
   const prov = { assinatura: 'Assinatura do Claude', api: 'Chave de API', manual: 'Modo chat (sem conexão)' }[st.api?.provider] || st.api?.provider;
   const perfil = u => u.role === 'admin' ? 'Dono' : 'Revisor';
@@ -1244,7 +1247,9 @@ VIEWS.config = async () => {
     <div class="box"><div class="bh"><b>Logins</b>${S.me.admin ? '<button class="btn sm ok" onclick="novoLogin()">+ Adicionar conta</button>' : ''}</div>
       <p class="small muted" style="margin-bottom:8px">Dono: acesso a tudo. Revisor: Fluxo, Revisão, Publicação e conversa com o gerente.</p>
       ${kv(S.me.owner ? 'Você (dono)' : esc(S.me.name), 'Dono')}${us.users.map(u => `<div class="kvr"><span>${esc(u.name)} <small class="muted">${esc(u.username)}${u.active ? '' : ' · desativado'}</small></span><span>${perfil(u)} ${S.me.admin && u.id !== S.me.id ? `<button class="btn sm dg" onclick="apagaLogin(${u.id},'${esc(u.name)}')">Remover</button>` : ''}</span></div>`).join('')}</div>
-    <div class="box"><div class="bh"><b>Lixeira</b><span>itens descartados</span></div>${lixo.map(i => `<div class="kvr"><span>${esc(i.titulo)} <small class="muted">${esc(i.marca)}</small></span><span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></span></div>`).join('') || '<p class="muted small">Vazia.</p>'}</div>
+    <div class="box"><div class="bh"><b>Lixeira</b><span>itens descartados</span></div>${lixo.map(i => `<div class="kvr"><span>${esc(i.titulo)} <small class="muted">${esc(i.marca)}</small></span><span><button class="btn sm" onclick="tryDo(()=>api('/api/v2/itens/${i.id}/restaurar',{body:{}}),'Restaurado').then(render)">Restaurar</button></span></div>`).join('') || '<p class="muted small">Vazia.</p>'}
+      ${(la.itens || []).filter(x => x.tipo === 'arte').length ? `<div class="small muted" style="margin:10px 0 4px">Artes descartadas (a copy segue na fila de arte)</div>${la.itens.filter(x => x.tipo === 'arte').map(x => `<div class="kvr"><span>${esc(x.nome)} <small class="muted">${esc(x.brand)} · some em ${x.dias} d</small></span><span><button class="btn sm" onclick="tryDo(()=>api('/api/lixeira/${x.id}/recuperar',{body:{}}),'Arte restaurada').then(render)">Restaurar</button></span></div>`).join('')}` : ''}
+      <p class="muted small" style="margin-top:8px">Tudo o que está na lixeira é apagado de vez depois de 30 dias.</p></div>
     ${sy ? `<div class="box"><div class="bh"><b>Treino ↔ pasta conhecimento/</b></div>${kv('Bases dos agentes na pasta', `${sy.entrada.arquivos} arquivos · ${sy.entrada.carregados} carregados`)}${kv('Regras aprendidas ativas', sy.saida.regras)}${kv('Última gravação na pasta', fmtD(sy.saida.ultima) || 'nunca')}
       <p class="small muted" style="margin:8px 0">As regras são gravadas em conhecimento/aprendido/. Para chegarem ao GitHub, faça commit dessa pasta.</p>
       <div style="display:flex;gap:6px"><button class="btn sm" onclick="tryDo(()=>api('/api/v2/sync/importar',{body:{}}),'Bases recarregadas').then(render)">Importar da pasta</button><button class="btn sm ok" onclick="tryDo(()=>api('/api/v2/sync/exportar',{body:{}}),'Regras gravadas').then(render)">Gravar regras na pasta</button></div></div>` : ''}
