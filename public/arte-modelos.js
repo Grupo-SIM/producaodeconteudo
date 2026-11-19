@@ -615,8 +615,8 @@ COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
 COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(3), it = erItens(d).slice(0, 2);
-  if (it[0]) ivBloco(s, e, it[0], 80, iy(150), null, '#8a3cf0', IV.cinza, 380, 1.45);
-  if (it[1]) ivBloco(s, e, it[1], 500, iy(150), null, '#8a3cf0', IV.cinza, 340, 1.45);
+  if (it[0]) ivBloco(s, e, it[0], 80, iy(310), null, '#8a3cf0', IV.cinza, 380, 1.45);
+  if (it[1]) ivBloco(s, e, it[1], 500, iy(310), null, '#8a3cf0', IV.cinza, 340, 1.45);
   const bx = 430, by = iy(620), bw = 470, bh = 250;   // à direita do leão que entra pela esquerda
   s.shapes.push({ kind: 'rect', x: e.X(bx + bw / 2), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: 'transparent', stroke: IV.roxo, stroke_w: 2 / 1080, dash: true });
   for (const [qx, qy] of [[bx, by], [bx + bw, by], [bx, by + bh], [bx + bw, by + bh]]) s.shapes.push({ kind: 'rect', x: e.X(qx), y: e.Y(qy), w: e.X(13), h: e.Y(13), color: '#444444' });
