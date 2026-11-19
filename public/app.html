@@ -916,7 +916,7 @@ VIEWS.marcas = async () => {
   const bloco = s => `<div class="sec"><b>${esc(s.t.charAt(0) + s.t.slice(1).toLowerCase())}</b><p>${esc(juntar(s)).replace(/\[(PROPOSTA|CONFIRMAR)[^\]]*\]/g, m => `<em class="${m.includes('CONFIRMAR') ? 'conf' : 'prop'}">${m.slice(1, -1)}</em>`).replace(/\n/g, '<br>')}</p></div>`;
   // lista compacta: cada assunto em uma linha; clique abre o texto completo
   const blocoL = s => { const t = s.t.charAt(0) + s.t.slice(1).toLowerCase(), v = juntar(s), tags = (v.match(/\[(PROPOSTA|CONFIRMAR)/g) || []).map(x => x.slice(1)); return `<div class="kvr li" onclick='editaSecao(${JSON.stringify(sel.name)}, ${JSON.stringify(s.t)})'><span>${esc(t)}${tags.includes('CONFIRMAR') ? ' <em class="tconf">confirmar</em>' : tags.includes('PROPOSTA') ? ' <em class="tprop">proposta</em>' : ''}</span><span class="cut">${esc(v.replace(/\[[^\]]*\]/g, '').slice(0, 70))}</span></div>`; };
-  const tab = S.marcaTab || 'id';
+  const tab = S.marcaTab || 'id', ed = sel && S.marcaEd === sel.id;
   let det = '';
   if (sel) {
     const ss = secoes(descr(sel).map(x => x.content).join('\n')), idv = ident(sel), sid = secoes(idv?.content || '');
@@ -943,10 +943,16 @@ VIEWS.marcas = async () => {
       esq = `<h5>Templates que o Designer usa nesta marca</h5><p class="small muted" style="margin:0 0 8px">Marque só o que esta marca pode usar. O Designer faz a arte apenas com os marcados. A quantidade de posts por dia fica em <a href="#" onclick="go('producao');return false">Produção diária</a>.</p><div id="mtpl" class="small muted">Carregando…</div>`;
       dir = achaSec(ss, 'TIPOS', 'GANCHO').map(blocoL).join('') || '';
     } else {
-      esq = `<h5>Contas</h5><div class="kvr"><span>Instagram</span><span style="display:flex;gap:6px;align-items:center"><input id="migig" placeholder="@perfil" style="width:150px" onchange="salvaIgMarca('${esc(sel.name)}', this.value)"></span></div>${['Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
+      esq = `<h5>Contas</h5><div class="kvr"><span>Instagram</span><span style="display:flex;gap:6px;align-items:center"><input id="migig" placeholder="@perfil" style="width:150px" onchange="salvaIgMarca('${esc(sel.name)}', this.value)"></span></div><div class="kvr"><span>Site</span><span style="display:flex;gap:6px;align-items:center"><input id="migsite" placeholder="seusite.com.br" style="width:150px" onchange="salvaSiteMarca('${esc(sel.name)}', this.value)"></span></div>${['Facebook', 'TikTok', 'YouTube', 'Pinterest'].map(r => linha(r, 'conectar · em breve')).join('')}${linha('Site e blog', 'pelo Atlas, ao lado')}<p class="small muted" style="margin-top:8px">Nas redes, a postagem é manual, pela tela Publicação. Nos sites do Atlas, os agentes publicam depois da sua aprovação.</p>${achaSec(ss, 'CANAIS', 'CTA').map(blocoL).join('')}`;
       dir = `<h5>Sites no Atlas</h5><div id="atlasd" class="small muted">Carregando…</div>`;
     }
-    det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span><button class="btn sm" onclick="detMarca(${sel.id})">Editar</button></div>
+    if (ed && (tab === 'id' || tab === 'voz')) {   // Editar: os documentos da marca ficam editáveis aqui mesmo, no lugar da leitura
+      const cats = tab === 'id' ? ['marca', 'diretrizes'] : [...new Set(['tom_de_voz', 'publico', 'nicho', 'produto', ...docsDe(sel).map(x => x.category).filter(c => !['marca', 'diretrizes'].includes(c))])];
+      const ds = docsDe(sel).filter(x => cats.includes(x.category));
+      esq = ds.map(x => `<h5>${esc(x.title)}</h5><textarea class="f" id="kd${x.id}" rows="14" style="width:100%">${esc(x.content)}</textarea><div style="display:flex;gap:6px;margin:6px 0 16px"><button class="btn sm ok" onclick="salvaDoc(${x.id})">Salvar</button><button class="btn sm" onclick="apagaDoc(${x.id})">Apagar</button></div>`).join('') || '<p class="muted small">Nenhum documento ainda.</p>';
+      esq += `<button class="btn sm" onclick="novoDoc(${sel.id}, '${tab === 'id' ? 'marca' : 'tom_de_voz'}')">+ Novo documento</button>`; dir = '';
+    }
+    det = `<div class="box mdet"><div class="mh">${av(sel, true)}<div><h2>${esc(sel.name)} ${etq(sel)}</h2><span class="muted small">${esc(nicho(sel))}</span>${hexes.length ? `<div class="hexes">${hexes.map(h => `<span><i class="sw" style="background:${h}"></i>${h.toUpperCase()}</span>`).join('')}</div>` : ''}</div><span style="flex:1"></span>${ed ? `<button class="btn sm" onclick="renMarca(${sel.id})">Renomear</button><button class="btn sm ok" onclick="S.marcaEd=0;render()">Concluir</button>` : `<button class="btn sm" onclick="S.marcaEd=${sel.id};if(!['id','voz'].includes(S.marcaTab||'id'))S.marcaTab='id';render()">Editar</button>`}</div>
       <div class="tabs">${[['id', 'Identidade visual'], ['voz', 'Voz e público'], ['formatos', 'Formatos'], ['contas', 'Contas e postagem']].map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" onclick="S.marcaTab='${k}';render()">${n}</button>`).join('')}</div>
       <div class="two"${tab === 'formatos' ? ' style="grid-template-columns:1fr"' : ''}><div>${esq}</div>${dir ? `<div>${dir}</div>` : ''}</div>
       <div class="learnbox">O que você mudar aqui, o gerente avisa os agentes e salva no cérebro da marca. Também dá para mudar só pela conversa.</div></div>`;
@@ -958,7 +964,9 @@ VIEWS.marcas = async () => {
 };
 // ───────── sites no Atlas: os agentes postam nos sites do Atlas Hosting ligados a esta marca
 async function salvaIgMarca(marca, v) { const r = await tryDo(() => api('/api/marca-instagram', { body: { brand: marca, instagram: v } }), 'Instagram salvo: as artes passam a usar este @'); if (r && $('#migig')) $('#migig').value = r.instagram; }
+async function salvaSiteMarca(marca, v) { const r = await tryDo(() => api('/api/marca-site', { body: { brand: marca, site: v } }), 'Site salvo: as artes passam a usar este site'); if (r && $('#migsite')) $('#migsite').value = r.site; }
 async function carregaAtlasMarca(marca) {
+  api('/api/marca-site?brand=' + encodeURIComponent(marca)).then(r => { if ($('#migsite')) $('#migsite').value = r.site || ''; }).catch(() => {});
   api('/api/marca-instagram?brand=' + encodeURIComponent(marca)).then(r => { if ($('#migig')) $('#migig').value = r.instagram || ''; }).catch(() => {});
   const el = $('#atlasd'); if (!el) return;
   try {
@@ -1111,8 +1119,8 @@ async function detMarca(id) {
 }
 function mTab(b, k) { if (k === 'f') { const m = document.querySelector('[data-m="f"] .mtplm'); if (m && !m.dataset.ok) { m.dataset.ok = 1; carregaTplMarca(m.dataset.marca, m); } } b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); document.querySelectorAll('[data-m]').forEach(e => e.classList.toggle('hidden', e.dataset.m !== k)); }
 async function salvaDoc(kid) { const x = S._docs.find(d => d.id === kid); await tryDo(() => api('/api/knowledge/' + kid, { method: 'PUT', body: { ...x, content: $('#kd' + kid).value } }), 'Salvo'); x.content = $('#kd' + kid).value; }
-async function apagaDoc(kid, bid) { if (!confirm('Apagar este documento?')) return; await tryDo(() => api('/api/knowledge/' + kid, { method: 'DELETE' }), 'Apagado'); detMarca(bid); }
-async function novoDoc(bid, cat) { const b = S.brands.find(x => x.id === bid), t = prompt('Título do documento'); if (!t) return; await tryDo(() => api('/api/knowledge', { body: { title: t, category: cat, content: 'Escreva aqui.', brand: b.name } }), 'Criado'); detMarca(bid); }
+async function apagaDoc(kid, bid) { if (!confirm('Apagar este documento?')) return; await tryDo(() => api('/api/knowledge/' + kid, { method: 'DELETE' }), 'Apagado'); if (bid) detMarca(bid); else render(); }
+async function novoDoc(bid, cat) { const b = S.brands.find(x => x.id === bid), t = prompt('Título do documento'); if (!t) return; await tryDo(() => api('/api/knowledge', { body: { title: t, category: cat, content: 'Escreva aqui.', brand: b.name } }), 'Criado'); if (S.marcaEd === bid) render(); else detMarca(bid); }
 async function renMarca(id) { const n = prompt('Novo nome'); if (n) { await tryDo(() => api('/api/brands/' + id, { method: 'PUT', body: { name: n } }), 'Renomeada'); fecha(); render(); } }
 
 // ───────── Produtos
