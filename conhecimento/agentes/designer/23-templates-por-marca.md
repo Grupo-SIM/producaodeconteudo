@@ -1,6 +1,8 @@
 <!-- modo: sempre -->
 # Templates atribuídos às marcas (decisão do dono, 19/11/2026)
 
+**O que é template (arte), dono, 19/11/2026:** template é SÓ o formato de arte que se repete várias vezes trocando o texto (ex.: jornalísticos, carrossel investigativo, carrosséis 7 a 13, caixinha). Arte única de estoque (os estáticos e capas treinados, como a 34) NÃO é template: sai uma vez só e não entra em `TEMPLATES_CASA`.
+
 Cada template sai nas cores da referência e só é usado pelas marcas listadas (campo `marcas` em `TEMPLATES_CASA`, `server.js`).
 A atribuição é pela ARTE (cores predominantes do template combinando com as cores da marca), não pelo assunto da copy: a copy de qualquer carrossel muda conforme o conteúdo (dono, 19/11/2026).
 Cada marca de nicho tem UM só formato de notícia (decisão do dono, 19/11/2026).
