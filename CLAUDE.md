@@ -18,7 +18,8 @@ Os agentes publicam nos sites da conta master do Atlas Hosting (Criador de Sites
 
 ## Contatos da marca nas artes (Nuvo e outros)
 - Site: linha "Site:" no documento da marca; senão o domínio ligado à marca em Sites no Atlas (`atlas_destinos`).
-- @ do Instagram: o campo Instagram em Marcas → Contas e postagem (setting `marca_instagram`) vale primeiro; senão a linha "Instagram: @perfil" do documento da marca.
+- @ do Instagram: o campo Instagram em Marcas → Contas e postagem (setting `marca_instagram`) vale primeiro; senão as redes enviadas pelo dono em `conhecimento/redes-marcas.json` (todas as redes de cada marca; nome comparado sem acento/espaço); senão a linha "Instagram: @perfil" do documento da marca.
+- Prévia do template 4 · Nuvo sempre mostra pílula do site e "Siga @marca" (sem cadastro entra exemplo, só na prévia).
 
 ## Deploy
 Push no `main` gera a imagem `ghcr.io/grupo-sim/producaodeconteudo:latest`; o dono faz o Deploy no Komodo.
