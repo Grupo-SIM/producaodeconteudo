@@ -3444,6 +3444,14 @@ function composeFundo(prompt, brand) {
   return { prompt: [f.prompt_base, prompt, f.estilo, f.iluminacao, f.lente, f.textura, f.paleta_prompt].filter(Boolean).join(', ') + (f.negativo ? `, without ${f.negativo}` : ''), seed: f.seed };
 }
 // O que a arte tinha quando foi aprovada ou devolvida: matéria-prima do aprendizado de estilo
+// Grade do perfil: as últimas peças aprovadas/postadas da marca (capa = 1ª imagem), da mais nova para a mais antiga, para a capa nova combinar com a sequência do Instagram
+function gradeDoPerfil(c, n = 9) {
+  if (!c.brand) return null;
+  const rows = all("SELECT * FROM contents WHERE teste=0 AND id<>? AND brand=? COLLATE NOCASE AND status IN ('approved','posted') AND art_spec<>'' ORDER BY COALESCE(posted_at, updated_at) DESC LIMIT ?", c.id, c.brand, n);
+  if (!rows.length) return { texto: `\n\n# GRADE DO PERFIL\n${c.brand} ainda não tem posts aprovados com arte: esta capa abre a sequência. Siga a identidade da marca para ser a base das próximas.`, imgs: [] };
+  const imgs = [], L = rows.map((x, i) => { const f = arteFiles(x.id)[0], v = f && imgs.length < 6 ? visionImg(path.join(ARTE_DIR(x.id), f)) : null; if (v) imgs.push(v); return `${i + 1}. "${clip(x.title, 70)}" (${x.format}${x.capa_reels ? ', capa de Reels' : ''})${v ? ' [imagem ' + imgs.length + ']' : ''}: ${artSnapshot(x)}`; });
+  return { imgs, texto: `\n\n# GRADE DO PERFIL (últimos posts aprovados de ${c.brand}, do mais novo ao mais antigo)\nA capa do Reels é uma tarefa de GRADE: ela entra no topo do perfil ao lado destas. Olhe a sequência (cores, fundo claro/escuro, peso do texto, mascote) e faça a capa para o perfil ficar HARMÔNICO na lateral e na grade 3 colunas: mantenha a paleta e a família visual, alterne claro/escuro e o enquadramento com os vizinhos, sem repetir a mesma capa nem destoar.\n${L.join('\n')}` };
+}
 function artSnapshot(c) {
   try {
     const sp = JSON.parse(c.art_spec || '{}'), sl = sp.slides || []; if (!sl.length) return '';
@@ -5802,7 +5810,9 @@ const HANDLERS = {
     if (lidas && !MANUAL && !als.getStore()?.dry && settings().arte_do_roteiro === 'sempre' && !/^l:/.test(String(c.estilo_arte || '')) && await arteDoRoteiro(c.id, 'modo rápido')) return { text: getContent(c.id).art, tin: 0, tout: 0 };
     if (c.kind === 'noticia' && !input.feedback && !als.getStore()?.dry && await arteDoRoteiro(c.id, 'notícia: arte montada pelo painel'))   // com pedido seu, o Designer mexe na arte que já existe em vez de remontar do roteiro
       return { text: getContent(c.id).art, tin: 0, tout: 0 };   // notícia: a arte sai do roteiro, no template da marca, sem depender de o Designer entregar JSON
-    const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000 });
+    const grade = isVideo(c.format) && c.capa_reels ? gradeDoPerfil(c) : null;   // capa do Reels: o Designer vê as últimas capas aprovadas da marca para o perfil ficar harmônico
+    if (grade) user += grade.texto;
+    const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000, images: grade?.imgs || [] });
     const sp = extractArteSpec(r.text, c.format, c);
     // você pediu para mexer só numa página (capa, contracapa, página N): as outras páginas e o formato ficam exatamente como estavam
     if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const so = input.ped?.paginas?.length ? new Set(input.ped.paginas) : paginasPedidas(input.feedback), ant = jparse(c.art_spec, null);
