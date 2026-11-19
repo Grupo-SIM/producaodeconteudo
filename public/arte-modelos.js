@@ -782,24 +782,24 @@ const epLogo = (s, e, ctx, x, y) => { if (ctx.logo) s.items.push({ asset: ctx.lo
 const epBase = n => ({ bg: { asset: 'tpl-espaco-fundo-' + n, color: '#020b14' }, paper: '#020b14', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 COMPOR_EXTRA['espaco-capa'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
-  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = epX(485), maxW = 560;
-  if (/spyhacker/i.test(String(ctx.marca || ''))) s.bg = { ...s.bg, asset: 'tpl-espaco-fundo-1-spyhacker' };   // 007 Spyhacker: o mascote no lugar do astronauta, o resto do fundo intacto
+  const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = 552, maxW = 640;
+  if (/spyhacker/i.test(String(ctx.marca || ''))) s.bg = { ...s.bg, asset: 'tpl-espaco-fundo-1-spyhacker' };   // 007 Spyhacker: o mascote segura o tablet no lugar do astronauta (dono, 19/11/2026)
   // título na tela do tablet: as linhas de cima menores e a última (a palavra-chave) gigante, como “CONTA!”
   let tl = String(d.titulo || '4 segredos de marketing|que ninguém te|conta!').toUpperCase().split('|').map(x => x.replace(/\*/g, '').trim()).filter(Boolean);
-  if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 56, maxW) : []), p[p.length - 1]]; }
+  if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 62, maxW) : []), p[p.length - 1]]; }
   const cima = tl.slice(0, -1).slice(-3), ult = tl[tl.length - 1];
-  const zc = Math.min(56, ...cima.map(l => 56 * maxW / Math.max(maxW, largura(l, tf, 56)))), zu = Math.min(200, 200 * (maxW - 60) / Math.max(1, largura(ult, tf, 200)));
-  const LH = 1.18, hT = cima.length * zc * LH + zu * .92, y0 = epY(418) - hT / 2;   // centro da tela do tablet
+  const zc = Math.min(64, ...cima.map(l => 64 * maxW / Math.max(maxW, largura(l, tf, 64)))), zu = Math.min(230, 230 * maxW / Math.max(1, largura(ult, tf, 230)));
+  const LH = 1.18, hT = cima.length * zc * LH + zu * .92, y0 = 570 - hT / 2;   // 1,18: linha com acento (NINGUÉM) não encosta na de cima
   cima.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + zc * .59 + i * zc * LH), align: 'center', size: e.P(zc), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false }));
   s.texts.push({ role: 'title', value: ult, x: e.X(cx), y: e.Y(y0 + cima.length * zc * LH + zu * .46), align: 'center', size: e.P(zu), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false });
-  // botão como na arte: pílula ciano “Arraste para o lado” + quadrado com a seta
-  const bt = String(d.cta_arraste || 'Arraste para o lado').toUpperCase(), bf = fX(600, .04), by = epY(690), bx0 = epX(258), bw = Math.max(epX(287), largura(bt, bf, 20) + 60);
-  s.shapes.push({ kind: 'pill', x: e.X(bx0 + bw / 2), y: e.Y(by), w: e.X(bw), h: e.Y(80), color: EP.ciano, radius: .2 });
-  s.texts.push({ role: 'label', value: bt, x: e.X(bx0 + bw / 2), y: e.Y(by), align: 'center', size: e.P(20), font: bf.k, weight: bf.w, ls: .04, lh: 1, color: EP.navy, nowrap: true, shadow: false });
-  s.shapes.push({ kind: 'rect', x: e.X(bx0 + bw + 22 + 50), y: e.Y(by), w: e.X(100), h: e.Y(80), radius: .22, color: EP.ciano });
-  s.shapes.push({ kind: 'icon', icon: 'arrow-right', icon_color: EP.navy, x: e.X(bx0 + bw + 22 + 50), y: e.Y(by), w: e.X(40), h: e.Y(40) });
-  // três barras de ferramentas em leque no canto de baixo, como na arte
-  for (const [x, y] of [[40, 845], [105, 815], [165, 800]]) s.items.push({ asset: 'tpl-espaco-ferramentas', x: e.X(epX(x)), y: e.Y(epY(y)), size: 600 });
+  // botão: pílula ciano “Arraste para o lado” + quadrado com a seta
+  const bt = String(d.cta_arraste || d.cta || 'Arraste para o lado').toUpperCase(), bf = fX(600, .04), bw = Math.max(330, largura(bt, bf, 24) + 90);
+  s.shapes.push({ kind: 'pill', x: e.X(238 + bw / 2), y: e.Y(932), w: e.X(bw), h: e.Y(80), color: EP.ciano, radius: .2 });
+  s.texts.push({ role: 'label', value: bt, x: e.X(238 + bw / 2), y: e.Y(932), align: 'center', size: e.P(24), font: bf.k, weight: bf.w, ls: .04, lh: 1, color: EP.navy, nowrap: true, shadow: false });
+  s.shapes.push({ kind: 'rect', x: e.X(238 + bw + 22 + 62), y: e.Y(932), w: e.X(124), h: e.Y(80), radius: .22, color: EP.ciano });
+  s.shapes.push({ kind: 'icon', icon: 'arrow-right', icon_color: EP.navy, x: e.X(238 + bw + 22 + 62), y: e.Y(932), w: e.X(44), h: e.Y(44) });
+  s.items.push({ asset: 'tpl-espaco-ferramentas', x: e.X(70), y: e.Y(1170), size: 1000, rot: 16 });
+  epLogo(s, e, ctx, 960, 1260);
   return s;
 };
 // miolo: etiqueta “SEGREDOS DO MKT” e 2 itens lado a lado (seta, “01.” branco + título ciano, texto com *negrito*);
