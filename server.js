@@ -1747,6 +1747,7 @@ if (!one("SELECT 1 x FROM settings WHERE key='rev_v1'")) {
 }
 
 db.exec(`CREATE TABLE IF NOT EXISTS tpl_paginas(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, brand TEXT DEFAULT '', format TEXT DEFAULT '', slide TEXT NOT NULL, base TEXT DEFAULT '', created_at TEXT, updated_at TEXT)`);
+try { db.exec("ALTER TABLE tpl_paginas ADD COLUMN categoria TEXT DEFAULT ''"); } catch { /* já existe */ }
 // ───────────────────────── Fila e pipeline ─────────────────────────
 function enqueue(contentId, agent, kind, input = {}, origin = 'auto', runAfter = null) {
   // copy já aprovada pelo dono (Treino do Designer, Produção diária com copy aprovada): nunca volta para o Roteirista nem para a revisão da copy; segue para a arte
@@ -3854,7 +3855,7 @@ const ROLE_PT = { title: 'título', body: 'texto de apoio', number: 'número gra
 const jparse = (s, d = null) => { try { return s ? JSON.parse(s) : d; } catch { return d; } };
 // Lixeira de artes: layout ou estilo apagado (e a versão anterior de um layout atualizado) fica 7 dias para recuperar e depois some de vez. Enquanto está na lixeira NADA usa: nem Designer, nem Cérebro, nem notícias.
 db.exec("CREATE TABLE IF NOT EXISTS lixeira_arte(id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, orig_id INTEGER, brand TEXT DEFAULT '', nome TEXT DEFAULT '', dados TEXT NOT NULL, thumb TEXT DEFAULT '', motivo TEXT DEFAULT '', apagado_em TEXT NOT NULL)");
-const LIXEIRA_DIAS = 7;
+const LIXEIRA_DIAS = 30;   // pedido do dono: toda lixeira some sozinha depois de 30 dias
 function lixeiraGuarda(tipo, row, motivo = '') {
   try {
     let thumb = ''; if (tipo.startsWith('layout')) { try { const b = fs.readFileSync(path.join(LAYOUT_DIR, row.id + '.jpg')); if (b.length < 400000) thumb = b.toString('base64'); } catch { /* sem miniatura */ } }
@@ -3862,7 +3863,15 @@ function lixeiraGuarda(tipo, row, motivo = '') {
     if (tipo === 'layout_versao') for (const x of all("SELECT id FROM lixeira_arte WHERE tipo='layout_versao' AND orig_id=? ORDER BY id DESC LIMIT -1 OFFSET 5", row.id)) run('DELETE FROM lixeira_arte WHERE id=?', x.id);
   } catch (e) { console.error('lixeira:', e.message); }
 }
-function lixeiraLimpa() { try { const n = run('DELETE FROM lixeira_arte WHERE apagado_em < ?', new Date(Date.now() - LIXEIRA_DIAS * 864e5).toISOString()).changes; if (n) log('designer', `Lixeira de artes: ${n} item(ns) com mais de ${LIXEIRA_DIAS} dias foram apagados de vez`); return n; } catch (e) { console.error('lixeira (limpeza):', e.message); return 0; } }
+function lixeiraLimpa() { try {
+  const lim = new Date(Date.now() - LIXEIRA_DIAS * 864e5).toISOString();
+  try {   // conteúdos descartados (lixeira do Fluxo) e edições de vídeo descartadas: também somem depois de 30 dias
+    const velhos = all("SELECT id FROM contents WHERE status='discarded' AND COALESCE(updated_at,created_at) < ?", lim);
+    for (const { id } of velhos) { run('DELETE FROM jobs WHERE content_id=?', id); run('DELETE FROM contents WHERE id=?', id); }
+    if (velhos.length) log(null, `Lixeira: ${velhos.length} conteúdo(s) descartados há mais de ${LIXEIRA_DIAS} dias foram apagados de vez`);
+    try { run('DELETE FROM edicoes_lixeira WHERE ts < ?', lim); } catch { /* tabela ainda não existe */ }
+  } catch (e) { console.error('lixeira (conteúdos):', e.message); }
+  const n = run('DELETE FROM lixeira_arte WHERE apagado_em < ?', lim).changes; if (n) log('designer', `Lixeira de artes: ${n} item(ns) com mais de ${LIXEIRA_DIAS} dias foram apagados de vez`); return n; } catch (e) { console.error('lixeira (limpeza):', e.message); return 0; } }
 const lixeiraPub = r => ({ id: r.id, tipo: r.tipo, nome: r.nome, brand: r.brand, motivo: r.motivo, apagado_em: r.apagado_em, dias: Math.max(0, Math.ceil(LIXEIRA_DIAS - (Date.now() - new Date(r.apagado_em)) / 864e5)), thumb: r.thumb ? `/api/lixeira/${r.id}/thumb` : '' });
 // Depois que um layout/estilo some: o que apontava para ele (notícias da marca, estilo padrão, molde fixo do Cérebro) passa para o mais recente que sobrou, em vez de continuar usando o apagado
 function limpaReferenciasArte(tipo, id, brand) {
@@ -7612,13 +7621,14 @@ async function api(req, res, url) {
   // ── Entrega: imagens da arte
   if (p === '/api/arte-modelos' && m === 'GET') return send(res, 200, { modelos: MODELOS_ARTE });
   // Templates de página do editor: os seus (página salva do jeito que você deixou) e quais dos prontos você escondeu
-  if (p === '/api/tpl-paginas' && m === 'GET') return send(res, 200, { itens: all('SELECT id,nome,brand,format,slide,base,updated_at FROM tpl_paginas ORDER BY id DESC').map(x => ({ ...x, slide: jparse(x.slide, {}) })), ocultos: jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, []) });
+  if (p === '/api/tpl-paginas' && m === 'GET') return send(res, 200, { itens: all('SELECT id,nome,brand,format,slide,base,categoria,updated_at FROM tpl_paginas ORDER BY id DESC').map(x => ({ ...x, slide: jparse(x.slide, {}) })), ocultos: jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, []) });
   if (p === '/api/tpl-paginas' && m === 'POST') {
     const b = await readBody(req, 4e5), sl = sanitizeArteSpec({ slides: [b.slide] }, 'carrossel').slides[0]; if (!sl) throw fail(400, 'Página vazia');
     const nome = String(b.nome || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'Meu template', fmt = String(b.format || '').slice(0, 30), base = String(b.base || '').slice(0, 120);
     let id = +b.id || 0;
-    if (id && one('SELECT 1 x FROM tpl_paginas WHERE id=?', id)) run('UPDATE tpl_paginas SET nome=?, slide=?, format=?, updated_at=? WHERE id=?', nome, JSON.stringify(sl), fmt, T(), id);
-    else id = +run('INSERT INTO tpl_paginas(nome,brand,format,slide,base,created_at,updated_at) VALUES(?,?,?,?,?,?,?)', nome, String(b.brand || '').slice(0, 80), fmt, JSON.stringify(sl), base, T(), T()).lastInsertRowid;
+    const cat = ['noticia', 'feed', 'carrossel', 'stories'].includes(b.categoria) ? b.categoria : '';
+    if (id && one('SELECT 1 x FROM tpl_paginas WHERE id=?', id)) run("UPDATE tpl_paginas SET nome=?, slide=?, format=?, categoria=COALESCE(NULLIF(?,''),categoria), updated_at=? WHERE id=?", nome, JSON.stringify(sl), fmt, cat, T(), id);
+    else id = +run('INSERT INTO tpl_paginas(nome,brand,format,slide,base,categoria,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)', nome, String(b.brand || '').slice(0, 80), fmt, JSON.stringify(sl), base, cat, T(), T()).lastInsertRowid;
     if (base) { const oc = new Set(jparse(one("SELECT value FROM settings WHERE key='tpl_ocultos'")?.value, [])); oc.add(base); run("INSERT INTO settings(key,value) VALUES('tpl_ocultos',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", JSON.stringify([...oc])); }   // editou um pronto: a sua versão toma o lugar dele
     log('designer', `Template de página salvo: ${nome}`); return send(res, 200, { id });
   }
@@ -7867,7 +7877,7 @@ async function api(req, res, url) {
         id, title: c.title, brand: c.brand, format: c.format, teste: c.teste, status: c.status, w, h, spec, resolved, font, pano_url: panoUrl, base_ajustes: base ? arteDiff(base, sp).length : 0,
         defaults: { accent: idv.accent || brandColors()[c.brand] || '#f59e0b', ink: idv.ink || '#ffffff', paper: idv.paper || '#0b0b0d', fonte: idv.fontAsset || '' },
         palette: [...new Set([idv.accent, brandColors()[c.brand], idv.ink, idv.paper, ...(idv.apoio || []), ...(idv.cores || [])].filter(x => /^#[0-9a-f]{6}$/i.test(x || '')).map(x => x.toLowerCase()))].slice(0, 12),
-        assets: lib.filter(a => IMG.includes(a.ext) && (a.colecao === 'arte' || a.kind === 'logo')).map(a => ({ id: a.id, name: a.name, kind: a.kind, brand: a.brand, url: `/api/assets/${a.id}/file`, thumb: `/api/assets/${a.id}/thumb` })),
+        assets: (usados => lib.filter(a => IMG.includes(a.ext) && (a.colecao === 'arte' || a.kind === 'logo' || usados.has(a.name))))(new Set([...JSON.stringify(spec).matchAll(/"asset":"([^"]+)"/g)].map(x => x[1]))).map(a => ({ id: a.id, name: a.name, kind: a.kind, brand: a.brand, url: `/api/assets/${a.id}/file`, thumb: `/api/assets/${a.id}/thumb` })),
         layout_origem: (() => { const m0 = /^l:(\d+)$/.exec(c.estilo_arte || ''), lo = m0 ? one('SELECT id,name,brand FROM art_layouts WHERE id=?', +m0[1]) : null; return lo ? { id: lo.id, name: lo.name, brand: lo.brand } : null; })(),
         checks: checksLer(c.art_checks), arte: arteInfo(id), layouts: all("SELECT * FROM art_layouts ORDER BY (brand=? COLLATE NOCASE) DESC, (brand='') DESC, brand COLLATE NOCASE, id DESC LIMIT 400", c.brand || '').filter(l => sameDims(l.format, c.format)).map(layoutPub), fal: !!falKey() && settings().art_gen === '1'
       });
@@ -7958,6 +7968,11 @@ async function api(req, res, url) {
         const livre = !one('SELECT 1 x FROM art_templates WHERE id=?', d.id), cols = ['nome', 'uso', 'nivel', 'formatos', 'seq', 'exemplo', 'brand', 'usos', 'created_at', 'central', 'visual', 'visual_brand', 'base', 'visual_at', 'tema', 'deriva'];
         run(`INSERT INTO art_templates(${livre ? 'id,' : ''}${cols.join(',')}) VALUES(${livre ? '?,' : ''}${cols.map(() => '?').join(',')})`, ...(livre ? [d.id] : []), ...cols.map(k => d[k] ?? ''));
         msg = `Estilo “${d.nome}” recuperado`;
+      } else if (r.tipo === 'arte') {   // arte descartada na Mesa: volta para a peça se a copy ainda está esperando na fila de arte
+        const c = one('SELECT * FROM contents WHERE id=?', r.orig_id); if (!c || c.status === 'discarded') throw fail(400, 'O conteúdo desta arte não existe mais (ou está na lixeira)');
+        if (c.art_spec || one("SELECT 1 x FROM jobs WHERE content_id=? AND status IN ('queued','running')", c.id)) throw fail(400, 'Este conteúdo já tem outra arte (ou o Designer está fazendo uma)');
+        setContent(c.id, { art: d.art || '', art_spec: d.art_spec || '', art_status: d.art_status || '', status: 'awaiting_approval', error: '' });
+        msg = `Arte de “${r.nome}” restaurada: voltou para a Mesa de revisão`;
       } else throw fail(400, 'Tipo desconhecido');
       run('DELETE FROM lixeira_arte WHERE id=?', r.id); try { brainSincronizaSalvos(); } catch { /* ok */ }
       log('designer', msg); changed(); return send(res, 200, { ok: true, msg });
