@@ -9,7 +9,7 @@ Estratégia, segredos, jogo de mercado, decisões (ex.: "3 segredos que ninguém
 ## Estrutura (template `xadrez`)
 É a mesma estrutura do 8 · Fogo, que vem do mesmo modelo de agência.
 1. **Capa (`xadrez-capa`):** fundo preto geométrico e foto do assunto opcional no alto (`foto`). As duas etiquetas brancas ficam em cima (`kicker`, `apoio`) e a palavra-explosão mostarda embaixo (`titulo`). Leva o rei pequeno à esquerda, o rei grande inclinado cruzando para a página 2 e o botão mostarda "Arrasta para o lado".
-2. **Miolo (`xadrez-lista`, repete):** fundo bege com forma orgânica. Até 3 itens numerados, ou uma frase forte com a palavra em *destaque*. O rei em pé cruza da última página do miolo para o fim.
+2. **Miolo (`xadrez-lista`, repete):** fundo bege com forma orgânica, da faixa contínua do dono (`banco/tpl-xadrez/referencia/miolo-faixa.png`): cada página é meia volta do desenho (`tpl-xadrez-fundo-2` e `-2b` alternando), então o miolo pode ganhar quantas páginas a copy pedir e o desenho continua sem emenda. Nunca repetir a mesma página duplicada (dono, 19/11/2026). Até 3 itens numerados, ou uma frase forte com a palavra em *destaque*. O rei em pé cruza da última página do miolo para o fim.
 3. **Fim (`xadrez-fim`):** fundo preto com prédios em P&B, a pergunta grande, a linha de apoio e o botão mostarda opcional.
 
 ## Ajustes do dono
