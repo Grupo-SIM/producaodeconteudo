@@ -599,7 +599,8 @@ COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
   s.texts.push({ role: 'title', value: t2, x: e.X(cx), y: e.Y(iy(587)), align: 'center', size: e.P(z2), font: tf.k, weight: tf.w, ls: .17, lh: 1, color: '#6a3cf0', italic: true, nowrap: true, shadow: false });
   const handle = String(d.handle || ctx.contatos?.instagram || '').trim();
   if (handle) { s.items.push({ asset: ctx.logo || ctx.avatar || 'avatar-padrao', x: e.X(368), y: e.Y(iy(830)), size: e.P(52), round: true }); s.texts.push({ role: 'label', value: handle.startsWith('@') ? handle : '@' + handle, x: e.X(410), y: e.Y(iy(830)), align: 'left', size: e.P(26), font: FK.x, weight: pesoDe(FK.x, 500), color: IV.roxo, nowrap: true, shadow: false }); }
-  s.items.push({ asset: ivPeca(ctx, 'tpl-idv-robo'), x: F2((582 + 513) / 1080), y: F2(iy(150 + 513) / 1350), size: 1026, cruza: true });
+  { const pc = ivPeca(ctx, 'tpl-idv-robo'), [l, b] = /seguidores/.test(pc) ? [302, 936] : [187, 932], sz = 1250, k = sz / 1080;   // maior e encostado no pé da página (dono, 19/11/2026); l/b = borda esquerda e pé visíveis do PNG
+    s.items.push({ asset: pc, x: F2((790 - (l - 540) * k) / 1080), y: F2((1362 - (b - 540) * k) / 1350), size: sz, cruza: true }); }
   return s;
 };
 COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
