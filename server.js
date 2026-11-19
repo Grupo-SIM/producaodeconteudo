@@ -211,7 +211,7 @@ if (!db.prepare("SELECT 1 x FROM settings WHERE key='lib_arte_v1'").get()) { db.
 const ASSET_DIR = path.join(DATA_DIR, 'assets'); fs.mkdirSync(ASSET_DIR, { recursive: true });
 // Coleções da biblioteca: para que serve cada arquivo no vídeo
 // Biblioteca em duas seções de estilo de vídeo (motion e VSL); '' = arquivos gerais (logos, fontes, músicas, narrações) usados pelos dois
-const COLECOES = { motion: 'Motion', hardcopy: 'VSL', arte: 'Artes', stories: 'Stories' };   // stories = fundos dos stories de venda (só deles; o dono abastece)   // arte = Biblioteca de Artes do Designer (só o que o dono aprovou); motion e VSL = Biblioteca de Vídeo
+const COLECOES = { motion: 'Motion', hardcopy: 'VSL', arte: 'Artes', stories: 'Stories', historia: 'História e venda' };   // historia = fundos do miolo dos carrosséis de história real e de venda (o dono abastece)   // stories = fundos dos stories de venda (só deles; o dono abastece)   // arte = Biblioteca de Artes do Designer (só o que o dono aprovou); motion e VSL = Biblioteca de Vídeo
 const SEM_SECAO = ['logo', 'fonte', 'musica', 'efeito', 'narracao', 'audio'];
 const colecaoDe = (v, kind) => SEM_SECAO.includes(kind) ? '' : COLECOES[v] ? v : v === 'none' ? '' : (['fundo', 'textura', 'foto', 'mascote', 'video'].includes(kind) ? 'motion' : '');
 const POSE_DIR = path.join(DATA_DIR, 'poses'); fs.mkdirSync(POSE_DIR, { recursive: true });
@@ -1139,7 +1139,7 @@ function catalogoArte(rows) {
 function assetCatalog(brand = '', scoped = false, ag = '') {
   const rows = (scoped && !brand) ? all("SELECT * FROM assets WHERE brand='' ORDER BY kind, name") : brand ? all("SELECT * FROM assets WHERE brand='' OR brand=? COLLATE NOCASE ORDER BY brand COLLATE NOCASE, kind, name", brand) : all('SELECT * FROM assets ORDER BY brand COLLATE NOCASE, kind, name');
   if (ag === 'designer') return catalogoArte(rows.filter(a => a.colecao === 'arte' || ['logo', 'fonte'].includes(a.kind)));
-  if (ag === 'editor') { const vid = rows.filter(a => !['arte', 'stories'].includes(a.colecao)); rows.length = 0; rows.push(...vid); }   // Artes e Stories são só do Designer
+  if (ag === 'editor') { const vid = rows.filter(a => !['arte', 'stories', 'historia'].includes(a.colecao)); rows.length = 0; rows.push(...vid); }   // Artes e Stories são só do Designer
   const out = ['### [ARQUIVOS DA MARCA — catálogo]', 'A biblioteca tem duas seções: “Motion” = imagens, fotos, elementos, fundos e vídeos para o estilo motion 2D (imagem solta entra como item {"type":"img","asset":…}; fundo de cena vai em bg); “VSL” = imagens, vídeos e animações para o estilo VSL, em que cada cena é uma imagem ou vídeo inteiro com o texto por cima (bg, shade 0.25 a 0.4). Arquivos sem seção (logos, fontes, músicas, narrações) servem aos dois estilos.', 'Cite SEMPRE os arquivos pelo nome exato desta lista (ex.: “logo-clara”, “fundo-floresta-01”) ao indicar logo, fundo, mascote, foto, textura, fonte ou trilha. Não invente arquivos. Se a peça precisar de um arquivo que não está na lista, escreva “ARQUIVO FALTANDO: <o que falta>”.'];
   if (!rows.length) { out.push('(Nenhum arquivo cadastrado ainda.)'); return out.join('\n'); }
   const mascs = rows.filter(a => a.kind === 'mascote' && IMG_EXT.includes(a.ext));
@@ -4738,18 +4738,19 @@ for (const [pasta, rotulo] of Object.entries(TPL_PASTAS)) try {
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   }
 } catch (e) { console.error('template', pasta, e.message); }
-// fundos dos stories de venda (banco/tpl-stories, enviados pelo dono em 19/11/2026): biblioteca própria, seção Stories.
-// O Designer só usa fundo de stories desta seção e escolhe o que mais combina com o assunto de cada tela (descrição e "usar quando" no fundos.json).
-try {
-  const dir = path.join(__dirname, 'banco', 'tpl-stories'), fichas = jparse(fs.existsSync(path.join(dir, 'fundos.json')) ? fs.readFileSync(path.join(dir, 'fundos.json'), 'utf8') : '{}', {}) || {};
+// bibliotecas próprias de fundos do Designer, enviadas pelo dono e abastecidas com o tempo (cada fundo tem ficha no fundos.json da pasta):
+// Stories (banco/tpl-stories, 19/11/2026): o fundo que mais combina com o assunto de cada tela dos stories de venda.
+// História e venda (banco/tpl-historia, 19/11/2026): fundos padrão do miolo dos carrosséis de história real e de venda, escolhidos pela COR DA MARCA.
+for (const [pasta, col, rotulo, uso] of [['tpl-stories', 'stories', 'Stories de venda/Fundos', 'stories de venda'], ['tpl-historia', 'historia', 'História e venda/Fundos', 'carrossel de história real e de venda']]) try {
+  const dir = path.join(__dirname, 'banco', pasta), fichas = jparse(fs.existsSync(path.join(dir, 'fundos.json')) ? fs.readFileSync(path.join(dir, 'fundos.json'), 'utf8') : '{}', {}) || {};
   for (const arqN of fs.existsSync(dir) ? fs.readdirSync(dir).sort() : []) {
-    const m = arqN.match(/^(tpl-stories-fundo-[a-z0-9-]+)\.(png|jpg)$/); if (!m || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", m[1])) continue;
+    const m = arqN.match(/^(tpl-[a-z]+-fundo-[a-z0-9-]+)\.(png|jpg)$/); if (!m || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", m[1])) continue;
     const [, nome, ext] = m, f = fichas[nome] || {}, buf = fs.readFileSync(path.join(dir, arqN));
-    const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'fundo', ['stories de venda', f.usar_quando].filter(Boolean).join(', '), f.descricao || 'Fundo dos stories de venda', 'stories', arqN, ext, buf.length, 'Stories de venda/Fundos', T());
+    const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'fundo', [uso, f.cores ? 'cores: ' + f.cores : '', f.tom ? 'fundo ' + f.tom : '', f.usar_quando].filter(Boolean).join(', '), f.descricao || 'Fundo de ' + uso, col, arqN, ext, buf.length, rotulo, T());
     fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   }
-} catch (e) { console.error('fundos dos stories', e.message); }
+} catch (e) { console.error('fundos de', pasta, e.message); }
 // mascotes e logos oficiais das marcas (banco/marcas/<pasta>/: marca.json + PNG sem fundo), enviados pelo dono no treino do Designer.
 // Entram uma vez como arquivo "mascote" da marca, já com a ficha técnica; o dono pode editar depois na Biblioteca.
 try {
