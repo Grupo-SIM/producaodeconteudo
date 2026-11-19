@@ -34,6 +34,7 @@ export function raiaDe(c, ctx) {
 }
 
 // Estado novo a partir do status antigo e dos jobs ativos do item
+const EDICAO_DESCARTADA = 'Edição do vídeo descartada: o roteiro aprovado espera você clicar em Editar novamente';
 export function estadoDe(c, jobs = []) {
   const ativos = jobs.filter(j => j.status === 'queued' || j.status === 'running');
   const rodando = ativos.find(j => j.status === 'running');
@@ -301,13 +302,19 @@ export function criarFluxoV2(ctx) {
       log(null, `Você descartou "${c.title}" (fica na lixeira)`, id);
       return { ok: true };
     }
-    if (nome === 'descartar_arte') {   // na aprovação da arte/vídeo a copy já foi aprovada: some só a arte (ou o vídeo) e a peça volta para a fila do Designer (ou do Editor); a copy só vai para a lixeira quando descartada na aprovação de copy
+    if (nome === 'descartar_arte') {   // na aprovação da arte/vídeo a copy já foi aprovada: some só a arte (ou a edição do vídeo); a copy e o roteiro só vão para a lixeira quando descartados na aprovação de copy
       if (c.status === 'discarded') throw fail(400, 'Este item está na lixeira');
-      const ag = c.format === 'video_vertical' ? 'editor' : 'designer';
       run("DELETE FROM jobs WHERE content_id=? AND status='queued'", id);
-      setContent(id, { ...(ag === 'designer' ? { art_spec: '', art_status: '', art: '' } : { video: '', spec: '' }), status: 'producing', error: '', em_ajuste: 0, ajuste_motivo: '' });
-      ctx.enqueue(id, ag, ag === 'designer' ? 'arte' : 'video', {}, 'manual');
-      log(null, `Você descartou ${ag === 'designer' ? 'a arte' : 'o vídeo'} de "${c.title}": a copy aprovada continua e voltou para ${ag === 'designer' ? 'o Designer' : 'o Editor'}`, id);
+      if (c.format === 'video_vertical') {   // vídeo: a edição vai para a lixeira e o Editor só edita de novo quando o dono clicar em "Editar novamente"
+        run('CREATE TABLE IF NOT EXISTS edicoes_lixeira(id INTEGER PRIMARY KEY, content_id INTEGER, ts TEXT, video TEXT, spec TEXT)');
+        if (c.video || c.spec) run('INSERT INTO edicoes_lixeira(content_id,ts,video,spec) VALUES(?,?,?,?)', id, T(), c.video || '', c.spec || '');
+        setContent(id, { video: '', spec: '', status: 'producing', error: EDICAO_DESCARTADA, em_ajuste: 0, ajuste_motivo: '' });
+        log(null, `Você descartou a edição do vídeo de "${c.title}" (foi para a lixeira). O roteiro aprovado continua; o Editor edita de novo quando você clicar em Editar novamente`, id);
+        return { ok: true };
+      }
+      setContent(id, { art_spec: '', art_status: '', art: '', status: 'producing', error: '', em_ajuste: 0, ajuste_motivo: '' });
+      ctx.enqueue(id, 'designer', 'arte', {}, 'manual');
+      log(null, `Você descartou a arte de "${c.title}": a copy aprovada continua e voltou para o Designer`, id);
       return { ok: true };
     }
     if (nome === 'restaurar') {
@@ -333,7 +340,9 @@ export function criarFluxoV2(ctx) {
     if (nome === 'resolver') {   // o dono resolveu a causa (login, limite, ajuste): limpa o erro e a etapa recomeça de onde parou
       if (['posted', 'discarded'].includes(c.status)) throw fail(400, 'Este item não está parado');
       run("UPDATE jobs SET status='done', error='' WHERE content_id=? AND status='error'", id);
+      const editarDeNovo = c.error === EDICAO_DESCARTADA;
       setContent(id, { error: '' });
+      if (editarDeNovo) { ctx.enqueue(id, 'editor', 'video', {}, 'manual'); log(null, `Você pediu para editar de novo o vídeo de "${c.title}"`, id); return { ok: true }; }
       contentAct(id, 'reprocess');
       log(null, `Você marcou "${c.title}" como resolvido: a produção recomeçou`, id);
       return { ok: true };
