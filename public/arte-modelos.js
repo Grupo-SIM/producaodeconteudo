@@ -682,7 +682,8 @@ const tcBase = k => ({ bg: { asset: 'tpl-clientes-fundo-' + k, color: '#1a1a1a' 
 COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
   usaFontes(ctx, 'poppins', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = tcBase(1), cx = 525;
-  s.items.push({ asset: 'tpl-clientes-busto-oculos', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037, fil: { gray: .4, sepia: .2, hue: 60 } });
+  if (/central/i.test(String(ctx.marca || ''))) s.items.push({ asset: 'tpl-clientes-busto-central', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037 });   // Central do Marketing: o mascote no lugar da estátua, mesmo tamanho e olhando para o mesmo lado (dono, 19/11/2026)
+  else s.items.push({ asset: 'tpl-clientes-busto-oculos', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037, fil: { gray: .4, sepia: .2, hue: 60 } });
   const tf = fT(800, 0), tl = erQuebra(String(d.titulo || 'Tipos de|clientes').toUpperCase(), tf, 74, 560).slice(0, 3), tz = Math.min(74, ...tl.map(l => 74 * 560 / Math.max(560, largura(l, tf, 74))));
   const y0 = 710 - (tl.length - 2) * 74;
   tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + 37 + i * 74), align: 'center', size: e.P(tz), font: tf.k, weight: tf.w, lh: 1, color: '#ffffff', nowrap: true, shadow: true }));
@@ -708,8 +709,7 @@ COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
   pilha(B, 0, ctx, { topo: 290 });
   const fim = (ctx.i || 0) === (ctx.total || 1) - 2;
   if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(960 / 1080), y: F2(1285 / 1350), size: 870, cruza: true });
-  else if (j === 0) s.items.push({ asset: 'tpl-clientes-busto-quebrado', x: F2(1120 / 1080), y: F2(634 / 1350), size: 1058, cruza: true });
-  else s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(1038 / 1350), size: 1037, cruza: true });
+  else if (j !== 0) s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(1038 / 1350), size: 1037, cruza: true });
   return s;
 };
 COMPOR_EXTRA['clientes-fim'] = (d, ctx) => {
