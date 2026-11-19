@@ -16,5 +16,9 @@ Os agentes publicam nos sites da conta master do Atlas Hosting (Criador de Sites
 - Variáveis: `ATLAS_URL` e `ATLAS_API_TOKEN` (o mesmo valor de `PDC_API_TOKEN` no Atlas). Sem elas a seção avisa que a ligação está desligada.
 - Formato novo de copy que deva ir para site: inclua em `FORMATOS_DESTINO` (`atlas-sites.mjs`) e confira se `extrairArtigo` lê a ficha dele.
 
+## Contatos da marca nas artes (Nuvo e outros)
+- Site: linha "Site:" no documento da marca; senão o domínio ligado à marca em Sites no Atlas (`atlas_destinos`).
+- @ do Instagram: o campo Instagram em Marcas → Contas e postagem (setting `marca_instagram`) vale primeiro; senão a linha "Instagram: @perfil" do documento da marca.
+
 ## Deploy
 Push no `main` gera a imagem `ghcr.io/grupo-sim/producaodeconteudo:latest`; o dono faz o Deploy no Komodo.
