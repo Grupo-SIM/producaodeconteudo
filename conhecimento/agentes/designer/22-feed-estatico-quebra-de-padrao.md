@@ -135,3 +135,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - Como gerar a cena nova: fal-ai/flux-pro/kontext com o PNG oficial do mascote + prompt da cena; recorte (birefnet) quando o mascote precisa passar na frente do título; texto montado por cima, nunca escrito pela IA.
 - Testes do zero (A ISCA, Só curtida): o dono viu que o Designer entendeu a ideia, mas ainda não está 100%. Os ajustes vêm com o uso em produção (cada correção vira regra aqui e no Revisor).
 - Os 2 testes do zero NÃO foram aprovados (só para o dono ver). Falta o 'feeling' do dono: mais referências e volume em produção.
+- 30: marca da roupa BORDADA de verdade e pequena no peito (gerada na imagem), nunca texto solto por cima.
