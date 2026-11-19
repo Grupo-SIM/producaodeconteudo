@@ -34,7 +34,7 @@ export function raiaDe(c, ctx) {
 }
 
 // Estado novo a partir do status antigo e dos jobs ativos do item
-const ARTE_DESCARTADA = 'Arte descartada: a copy aprovada espera você clicar em Resolvido para ganhar arte nova';
+const ARTE_DESCARTADA = 'Arte descartada: a copy aprovada está na fila de arte';
 const EDICAO_DESCARTADA = 'Edição do vídeo descartada: o roteiro aprovado espera você clicar em Editar novamente';
 export function estadoDe(c, jobs = []) {
   const ativos = jobs.filter(j => j.status === 'queued' || j.status === 'running');
@@ -42,6 +42,7 @@ export function estadoDe(c, jobs = []) {
   const futuro = t => t && new Date(t).getTime() > Date.now();
   const comErro = jobs.some(j => j.status === 'error') && !ativos.length;
   const ajuste = !!c.em_ajuste;
+  if (c.error === ARTE_DESCARTADA && c.status !== 'discarded') return { estado: 'fila', etapa: 'designer', motivo: 'Arte descartada: espera Refazer arte ou a meta do dia na Produção diária' };   // copy na fila de arte
   switch (c.status) {
     case 'posted': return { estado: 'finalizado', etapa: 'publicacao' };
     case 'discarded': return { estado: 'descartado', etapa: '' };
@@ -70,6 +71,7 @@ export function criarFluxoV2(ctx) {
   const path = ctx.path, fsx = ctx.fs;
   db.exec(`CREATE TABLE IF NOT EXISTS descobertas(id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, semana TEXT NOT NULL, raia TEXT DEFAULT '', agente TEXT DEFAULT 'roteirista', marca TEXT DEFAULT '', texto TEXT NOT NULL, evidencia TEXT DEFAULT '', status TEXT NOT NULL DEFAULT 'nova', regra_id INTEGER, UNIQUE(semana, texto))`);
 
+  try { db.exec('ALTER TABLE contents ADD COLUMN arte_refeita_em TEXT'); } catch { /* já existe */ }
   db.exec(`CREATE TABLE IF NOT EXISTS formatos(
     id TEXT PRIMARY KEY, nome TEXT NOT NULL, etapas TEXT NOT NULL, meta_dia INTEGER NOT NULL DEFAULT 1,
     modo TEXT NOT NULL DEFAULT 'manual', ordem INTEGER DEFAULT 0, ativo INTEGER DEFAULT 1, updated_at TEXT)`);
@@ -119,12 +121,19 @@ export function criarFluxoV2(ctx) {
     const s = ctx.settings();   // a grade de Produção diária é o único gatilho: tudo zerado = nada é criado sozinho
     const hora = +new Date().toLocaleString('en-US', { timeZone: s.tz || 'America/Sao_Paulo', hour: 'numeric', hour12: false }); if (hora < +(s.start_hour || 0)) return;
     const hoje = diaLocal(Date.now()), F = novoFormatos();
-    const feitos = all("SELECT * FROM contents WHERE teste=0 AND created_by IN ('autopilot','grade_aprovada') AND created_at>=?", new Date(Date.now() - 40 * 3600e3).toISOString()).filter(c => diaLocal(c.created_at) === hoje);
+    // conta para a meta: o que foi criado hoje ou teve a arte refeita hoje pela grade; a copy esperando na fila de arte (arte descartada) não conta
+    const desde = new Date(Date.now() - 40 * 3600e3).toISOString();
+    const feitos = all("SELECT * FROM contents WHERE teste=0 AND COALESCE(error,'')<>? AND ((created_by IN ('autopilot','grade_aprovada') AND created_at>=?) OR arte_refeita_em>=?)", ARTE_DESCARTADA, desde, desde).filter(c => diaLocal(c.arte_refeita_em && c.arte_refeita_em > c.created_at ? c.arte_refeita_em : c.created_at) === hoje);
     for (const m of all('SELECT * FROM brand_metas WHERE qtd>0')) {
       const f = F.find(x => x.id === m.raia); if (!f) continue;
       const falta = m.qtd - feitos.filter(c => (c.brand || '').toLowerCase() === m.brand.toLowerCase() && raiaDe(c, ctx) === m.raia).length; if (falta <= 0) continue;
       // primeiro a copy já aprovada (nada de copy nova enquanto houver aprovada para o formato); só sem nenhuma o Gerente pede pauta nova
-      let usadas = 0; for (let k = 0; k < falta; k++) { const pc = aprovadaPara(m.brand, m.raia); if (!pc) break; criarDeAprovada(pc, m.brand, 'grade_aprovada'); usadas++; }
+      let usadas = 0;
+      for (const w of all('SELECT * FROM contents WHERE teste=0 AND error=? AND status<>\'discarded\' AND brand=? COLLATE NOCASE ORDER BY id', ARTE_DESCARTADA, m.brand)) {   // copy cuja arte foi descartada: volta antes de qualquer copy nova
+        if (usadas >= falta) break; if (raiaDe(w, ctx) !== m.raia) continue;
+        setContent(w.id, { error: '', arte_refeita_em: T() }); ctx.enqueue(w.id, 'designer', 'arte', {}, 'auto'); log(null, `Produção diária: a meta de ${m.brand} ainda não foi atingida, o Designer refaz a arte de "${w.title}"`, w.id); usadas++;
+      }
+      for (let k = usadas; k < falta; k++) { const pc = aprovadaPara(m.brand, m.raia); if (!pc) break; criarDeAprovada(pc, m.brand, 'grade_aprovada'); usadas++; }
       if (usadas >= falta) continue;
       const tag = `"meta":"${m.brand}|${m.raia}"`;
       if (one("SELECT 1 x FROM jobs WHERE kind='pautas' AND status IN ('queued','running') AND input LIKE ?", '%' + tag + '%')) continue;
@@ -315,8 +324,9 @@ export function criarFluxoV2(ctx) {
       }
       run('CREATE TABLE IF NOT EXISTS artes_lixeira(id INTEGER PRIMARY KEY, content_id INTEGER, ts TEXT, art TEXT, art_spec TEXT)');
       if (c.art || c.art_spec) run('INSERT INTO artes_lixeira(content_id,ts,art,art_spec) VALUES(?,?,?,?)', id, T(), c.art || '', c.art_spec || '');   // só a arte vai para a lixeira; a copy fica
+      if (c.art || c.art_spec) run('INSERT INTO lixeira_arte(tipo,orig_id,brand,nome,dados,thumb,motivo,apagado_em) VALUES(?,?,?,?,?,?,?,?)', 'arte', id, c.brand || '', c.title || '', JSON.stringify({ art: c.art || '', art_spec: c.art_spec || '', art_status: c.art_status || '' }), '', 'Arte descartada na Mesa de revisão', T());   // só a arte vai para a lixeira (30 dias); a copy fica na fila de arte
       setContent(id, { art_spec: '', art_status: '', art: '', status: 'producing', error: ARTE_DESCARTADA, em_ajuste: 0, ajuste_motivo: '' });   // pedido do dono: descartar NÃO refaz sozinho
-      log(null, `Você descartou a arte de "${c.title}". A copy aprovada continua; o Designer só faz outra quando você clicar em Resolvido`, id);
+      log(null, `Você descartou a arte de "${c.title}" (foi para a lixeira). A copy voltou para a fila de arte: o Designer só faz outra quando você clicar em Refazer arte ou quando a meta do dia da Produção diária pedir`, id);
       return { ok: true };
     }
     if (nome === 'restaurar') {
