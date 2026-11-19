@@ -578,14 +578,14 @@ const IV = { roxo: '#7b43e2', roxoClaro: '#d6b8ff', cinza: '#555555' }, iy = v =
   ivPeca = (ctx, nome) => /seguidores/i.test(String(ctx.marca || '')) ? nome + '-seguidores' : nome;   // Seguidores em Alta: o mascote faz o papel do robô e do leão (dono, 19/11/2026)
 const ivBase = k => ({ bg: { asset: 'tpl-idv-fundo-' + k, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 // bloco: ícone, título em 2 linhas (fonte de máquina de escrever na arte; da marca quando houver) e texto espaçado com **negrito**
-function ivBloco(s, e, it, x, y, ic, corT, corB, maxW) {
-  const hf = fT(700, .06), bf = fX(400, .13), hz = 27, bz = 18;
-  if (ic) s.items.push({ asset: ic, x: e.X(x - 34), y: e.Y(y + 18), size: e.P(40) });
+function ivBloco(s, e, it, x, y, ic, corT, corB, maxW, z = 1) {   // z: escala do texto (dono, 19/11/2026: texto do miolo e do fim maior, para ler no celular)
+  const hf = fT(700, .06), bf = fX(400, .13), hz = 27 * z, bz = 18 * z, L = 27 * z;
+  if (ic) s.items.push({ asset: ic, x: e.X(x - 34 * z), y: e.Y(y + 18 * z), size: e.P(40 * z) });
   const hl = quebra(limpa(String(it.t || '')).toUpperCase(), hf, hz, maxW);
-  hl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 13 + i * 27), align: 'left', size: e.P(hz), font: hf.k, weight: hf.w, ls: .06, lh: 1, color: corT, nowrap: true, shadow: false }));
-  const bl = fgAst(erQuebra(String(it.d || ''), bf, bz, maxW)), y0 = y + hl.length * 27 + 14;
-  bl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(y0 + 13 + i * 27), align: 'left', size: e.P(bz), font: bf.k, weight: bf.w, ls: .13, lh: 1, color: corB, hl: corB, hw: 600, nowrap: true, shadow: false }));
-  return y0 + bl.length * 27;
+  hl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 13 * z + i * L), align: 'left', size: e.P(hz), font: hf.k, weight: hf.w, ls: .06, lh: 1, color: corT, nowrap: true, shadow: false }));
+  const bl = fgAst(erQuebra(String(it.d || ''), bf, bz, maxW)), y0 = y + hl.length * L + 14 * z;
+  bl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(y0 + 13 * z + i * L), align: 'left', size: e.P(bz), font: bf.k, weight: bf.w, ls: .13, lh: 1, color: corB, hl: corB, hw: 600, nowrap: true, shadow: false }));
+  return y0 + bl.length * L;
 }
 COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
@@ -606,24 +606,25 @@ COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
 COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(2), it = erItens(d).slice(0, 2);
-  if (it[0]) ivBloco(s, e, it[0], 262, iy(255), 'tpl-idv-icone-pincel', IV.roxoClaro, '#ffffff', 340);
-  if (it[1]) ivBloco(s, e, it[1], 392, iy(585), 'tpl-idv-icone-foguete', '#ffffff', '#ffffff', 340);
+  const dx = (ctx.i || 0) === 1 ? 210 : 0;   // página 2: o robô da capa entra pela esquerda; o texto anda para a direita e nunca fica por baixo dele
+  if (it[0]) ivBloco(s, e, it[0], 150 + dx, iy(215), 'tpl-idv-icone-pincel', IV.roxoClaro, '#ffffff', 640 - dx, 1.6);
+  if (it[1]) ivBloco(s, e, it[1], 230 + dx, iy(560), 'tpl-idv-icone-foguete', '#ffffff', '#ffffff', 600 - dx, 1.6);
   if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: ivPeca(ctx, 'tpl-idv-leao'), x: F2((636 + 540) / 1080), y: F2(iy(432 + 540) / 1350), size: 1080, cruza: true });   // o leão entra no fim, como no original
   return s;
 };
 COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(3), it = erItens(d).slice(0, 2);
-  if (it[0]) ivBloco(s, e, it[0], 192, iy(255), null, '#8a3cf0', IV.cinza, 330);
-  if (it[1]) ivBloco(s, e, it[1], 652, iy(255), null, '#8a3cf0', IV.cinza, 290);
-  const bx = 400, by = iy(678), bw = 368, bh = 178;
+  if (it[0]) ivBloco(s, e, it[0], 80, iy(150), null, '#8a3cf0', IV.cinza, 380, 1.45);
+  if (it[1]) ivBloco(s, e, it[1], 500, iy(150), null, '#8a3cf0', IV.cinza, 340, 1.45);
+  const bx = 430, by = iy(620), bw = 470, bh = 250;   // à direita do leão que entra pela esquerda
   s.shapes.push({ kind: 'rect', x: e.X(bx + bw / 2), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: 'transparent', stroke: IV.roxo, stroke_w: 2 / 1080, dash: true });
   for (const [qx, qy] of [[bx, by], [bx + bw, by], [bx, by + bh], [bx + bw, by + bh]]) s.shapes.push({ kind: 'rect', x: e.X(qx), y: e.Y(qy), w: e.X(13), h: e.Y(13), color: '#444444' });
-  const tf = fT(600, 0), tl = erQuebra(d.titulo || 'Sua marca merece|ser lembrada.', tf, 27, bw - 40).slice(0, 2);
-  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(bx + bw / 2), y: e.Y(by + 34 + 17 + i * 34 - (tl.length - 2) * 17), align: 'center', size: e.P(27), font: tf.k, weight: tf.w, lh: 1, color: '#4a2a8a', nowrap: true, shadow: false }));
-  const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(600, .12), cz = Math.min(18, 18 * 230 / Math.max(1, largura(cta, cf, 18)));
-  s.shapes.push({ kind: 'pill', x: e.X(bx + bw / 2), y: e.Y(by + 137), w: e.X(280), h: e.Y(44), color: IV.roxo });
-  s.texts.push({ role: 'title', value: cta + ' →', x: e.X(bx + bw / 2), y: e.Y(by + 137), align: 'center', size: e.P(cz), font: cf.k, weight: cf.w, ls: .12, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
+  const tf = fT(600, 0), tl = erQuebra(d.titulo || 'Sua marca merece|ser lembrada.', tf, 40, bw - 60).slice(0, 2);
+  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(bx + bw / 2), y: e.Y(by + 48 + 24 + i * 48 - (tl.length - 2) * 24), align: 'center', size: e.P(40), font: tf.k, weight: tf.w, lh: 1, color: '#4a2a8a', nowrap: true, shadow: false }));
+  const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(600, .12), cz = Math.min(26, 26 * 340 / Math.max(1, largura(cta, cf, 26)));
+  s.shapes.push({ kind: 'pill', x: e.X(bx + bw / 2), y: e.Y(by + 190), w: e.X(400), h: e.Y(64), color: IV.roxo });
+  s.texts.push({ role: 'title', value: cta + ' →', x: e.X(bx + bw / 2), y: e.Y(by + 190), align: 'center', size: e.P(cz), font: cf.k, weight: cf.w, ls: .12, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
   return s;
 };
 
