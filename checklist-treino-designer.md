@@ -37,7 +37,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
 2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
 3. [ ] Treino de capas para os carrosséis.
-4. [ ] Feed estático (refazer do zero a partir das referências do dono: educativo e venda, card do assunto + card do CTA).
+4. [x] Feed estático: 19 artes aprovadas (estoque) + regras para criar novas do zero; estático NÃO é template (19/11/2026).
 5. [ ] **Atribuir templates às marcas** (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
 6. [ ] Stories de venda.
 7. [ ] Carrossel de história real e carrossel de venda: template próprio de cada (kit do dono). Os 7 educativos ficam só para educativo.
