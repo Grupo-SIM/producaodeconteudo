@@ -51,5 +51,5 @@ Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`;
 - Sistema zerado: só trabalha o que o dono pede (Treino, + Novo conteúdo, Gerente) ou a grade de Produção diária (tudo em 0). Cérebro diário e relatório automático desligados.
 - Treino do Designer começa pelo feed jornalístico: 37 (Seguidores em Alta, estilo Zyrion), depois 36 (Vivendo de Bet, estilo Nuvo). No treino a peça vai direto para a Mesa do dono (sem Revisor).
 - Primeiro teste da 37 (antes das correções): foto de cartaz com letras, capa cortada (157 caracteres) e cartão da contracapa cortado. Corrigido: limites capa 100 / contracapa 130 (Revisor de Copy barra e o Designer devolve ao Copy), contracapa usa o texto do Copy, regras de foto (sem letras, chocante).
-- Próximo passo: descartar a 37 antiga, mandar de novo pelo Treino e conferir capa e contracapa. Pendente do dono: chaves dos bancos de imagem (PEXELS_API_KEY, UNSPLASH_ACCESS_KEY, PIXABAY_API_KEY) no Komodo.
+- Próximo passo: descartar a 37 antiga, mandar de novo pelo Treino e conferir capa e contracapa. Chaves dos bancos de imagem (PEXELS_API_KEY, UNSPLASH_ACCESS_KEY, PIXABAY_API_KEY) já estão no Komodo (feito, confirmado pelo dono 19/11/2026).
 - Guardado para depois: escritório 3D (docs/pendente/escritorio3d.patch) e Cérebro; botão do Treino vai para dentro do "+ Novo conteúdo" no fim do treino.
