@@ -6631,6 +6631,17 @@ const BANCOS = [
 const thumbCache = new Map();
 const bancosAtivos = () => BANCOS.filter(b => !b.chave || process.env[b.chave]);
 const buscaCache = new Map();
+// banco de imagens que falhou (chave inválida, limite, fora do ar): avisa o dono no máximo 1x a cada 6 h por banco; a busca já seguiu nos outros bancos
+const avisoBanco = new Map();
+function avisoBancoFalhou(b, e) {
+  if (Date.now() - (avisoBanco.get(b.id) || 0) < 6 * 3600e3) return; avisoBanco.set(b.id, Date.now());
+  const st = +(String(e?.message || '').match(/\b(\d{3})\b/) || [])[1], outros = bancosAtivos().filter(x => x.id !== b.id).map(x => x.nome).join(', ') || 'nenhum outro banco';
+  const motivo = st === 401 || st === 403 ? `chave recusada (${st}): confira a ${b.chave} no Komodo` : st === 429 ? 'limite de buscas atingido (429)' : `erro: ${String(e?.message || e).slice(0, 120)}`;
+  const msg = `⚠ Banco de imagens ${b.nome} falhou (${motivo}). As fotos continuam saindo pelos outros bancos (${outros}).`;
+  try { log(null, msg); } catch { /* sem log */ }
+  try { addChat('gerente', msg); } catch { /* sem chat */ }
+  console.error(msg);
+}
 async function buscaImagens(q, pag = 1, banco = '') {
   q = String(q || '').trim().slice(0, 120); if (q.length < 2) throw fail(400, 'Escreva o que procurar');
   const lista = bancosAtivos().filter(b => !banco || b.id === banco), k = q.toLowerCase() + '|' + pag + '|' + banco, ck = buscaCache.get(k);
@@ -6638,7 +6649,7 @@ async function buscaImagens(q, pag = 1, banco = '') {
   const out = [], erros = [];
   for (const b of lista) {
     if (b.id === 'openverse' && !banco && out.length >= 18) continue;   // com banco pago respondendo, o Openverse só completa
-    try { const r = await b.busca(q, pag, b.chave ? process.env[b.chave] : ''); out.push(...r.map(x => ({ ...x, fonte: b.nome }))); } catch (e) { erros.push(`${b.nome}: ${e.message}`); }
+    try { const r = await b.busca(q, pag, b.chave ? process.env[b.chave] : ''); out.push(...r.map(x => ({ ...x, fonte: b.nome }))); } catch (e) { erros.push(`${b.nome}: ${e.message}`); avisoBancoFalhou(b, e); }   // um banco falhar NÃO para o trabalho: os outros bancos seguem na mesma busca
   }
   const v = { itens: out.slice(0, 60), bancos: lista.map(b => b.nome), erros };
   buscaCache.set(k, { t: Date.now(), v }); if (buscaCache.size > 200) buscaCache.delete(buscaCache.keys().next().value);
