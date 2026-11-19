@@ -546,7 +546,7 @@ COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
   const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = fT(500, -.012), bf = fX(400, -.006), maxW = d.__maxW || 1080 - x - 110, B = [], Z = d.__z || 1, z = v => Math.round(v * Z);   // __z: escala do texto (o Xadrez usa maior: miolo só de texto, mais fácil de ler)
   const it = erItens(d).slice(0, 3), n0 = +d.n > 0 ? +d.n : null;
   if (it.length) it.forEach((o, j) => {
-    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, z(44), maxW), bl = erQuebra(o.d, bf, z(32), maxW);
+    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, z(44), maxW), bl = fgAst(erQuebra(o.d, bf, z(32), maxW));
     B.push({ h: tl.length * z(55) + 12 + bl.length * z(41), gap: j ? 74 : 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + z(27) + i * z(55)), align: 'left', size: e.P(z(44)), font: hf.k, weight: hf.w, ls: -.012, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); bl.forEach((l, i) => erLinha(s.texts, l, x, y + tl.length * z(55) + 12 + z(20) + i * z(41), z(32), bf, '#f2f2f2', e)); return []; } });
   });
   else {   // página de frase: título grande com palavra em vermelho (*assim*) e apoio
@@ -573,18 +573,19 @@ COMPOR_EXTRA['fogo-fim'] = (d, ctx) => {
 };
 
 // ───────── Template "9 · Identidade visual (roxo)" (réplica aprovada do kit roxo, 18/11/2026) ─────────
-// Kit quadrado 1080×1080 levado a 1080×1350: fundo com 135 px a mais em cima e embaixo; medidas do kit + 135 no eixo y.
-const IV = { roxo: '#7b43e2', roxoClaro: '#d6b8ff', cinza: '#555555' }, iy = v => v + 135;
+// Kit quadrado 1080×1080 levado a 1080×1350: o fundo panorâmico do dono, sem nada inventado, esticado na altura (×1,25); medidas do kit ×1,25 no eixo y.
+const IV = { roxo: '#7b43e2', roxoClaro: '#d6b8ff', cinza: '#555555' }, iy = v => v * 1.25,
+  ivPeca = (ctx, nome) => /seguidores/i.test(String(ctx.marca || '')) ? nome + '-seguidores' : nome;   // Seguidores em Alta: o mascote faz o papel do robô e do leão (dono, 19/11/2026)
 const ivBase = k => ({ bg: { asset: 'tpl-idv-fundo-' + k, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 // bloco: ícone, título em 2 linhas (fonte de máquina de escrever na arte; da marca quando houver) e texto espaçado com **negrito**
-function ivBloco(s, e, it, x, y, ic, corT, corB, maxW) {
-  const hf = fT(700, .06), bf = fX(400, .13), hz = 27, bz = 18;
-  if (ic) s.items.push({ asset: ic, x: e.X(x - 34), y: e.Y(y + 18), size: e.P(40) });
+function ivBloco(s, e, it, x, y, ic, corT, corB, maxW, z = 1) {   // z: escala do texto (dono, 19/11/2026: texto do miolo e do fim maior, para ler no celular)
+  const hf = fT(700, .06), bf = fX(400, .13), hz = 27 * z, bz = 18 * z, L = 27 * z;
+  if (ic) s.items.push({ asset: ic, x: e.X(x - 34 * z), y: e.Y(y + 18 * z), size: e.P(40 * z) });
   const hl = quebra(limpa(String(it.t || '')).toUpperCase(), hf, hz, maxW);
-  hl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 13 + i * 27), align: 'left', size: e.P(hz), font: hf.k, weight: hf.w, ls: .06, lh: 1, color: corT, nowrap: true, shadow: false }));
-  const bl = fgAst(erQuebra(String(it.d || ''), bf, bz, maxW)), y0 = y + hl.length * 27 + 14;
-  bl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(y0 + 13 + i * 27), align: 'left', size: e.P(bz), font: bf.k, weight: bf.w, ls: .13, lh: 1, color: corB, hl: corB, hw: 600, nowrap: true, shadow: false }));
-  return y0 + bl.length * 27;
+  hl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 13 * z + i * L), align: 'left', size: e.P(hz), font: hf.k, weight: hf.w, ls: .06, lh: 1, color: corT, nowrap: true, shadow: false }));
+  const bl = fgAst(erQuebra(String(it.d || ''), bf, bz, maxW)), y0 = y + hl.length * L + 14 * z;
+  bl.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(y0 + 13 * z + i * L), align: 'left', size: e.P(bz), font: bf.k, weight: bf.w, ls: .13, lh: 1, color: corB, hl: corB, hw: 600, nowrap: true, shadow: false }));
+  return y0 + bl.length * L;
 }
 COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
@@ -598,30 +599,32 @@ COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
   s.texts.push({ role: 'title', value: t2, x: e.X(cx), y: e.Y(iy(587)), align: 'center', size: e.P(z2), font: tf.k, weight: tf.w, ls: .17, lh: 1, color: '#6a3cf0', italic: true, nowrap: true, shadow: false });
   const handle = String(d.handle || ctx.contatos?.instagram || '').trim();
   if (handle) { s.items.push({ asset: ctx.logo || ctx.avatar || 'avatar-padrao', x: e.X(368), y: e.Y(iy(830)), size: e.P(52), round: true }); s.texts.push({ role: 'label', value: handle.startsWith('@') ? handle : '@' + handle, x: e.X(410), y: e.Y(iy(830)), align: 'left', size: e.P(26), font: FK.x, weight: pesoDe(FK.x, 500), color: IV.roxo, nowrap: true, shadow: false }); }
-  s.items.push({ asset: 'tpl-idv-robo', x: F2((582 + 513) / 1080), y: F2(iy(150 + 513) / 1350), size: 1026, cruza: true });
+  { const pc = ivPeca(ctx, 'tpl-idv-robo'), [l, b] = /seguidores/.test(pc) ? [302, 936] : [187, 932], sz = 1250, k = sz / 1080;   // maior e encostado no pé da página (dono, 19/11/2026); l/b = borda esquerda e pé visíveis do PNG
+    s.items.push({ asset: pc, x: F2((790 - (l - 540) * k) / 1080), y: F2((1362 - (b - 540) * k) / 1350), size: sz, cruza: true }); }
   return s;
 };
 COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(2), it = erItens(d).slice(0, 2);
-  if (it[0]) ivBloco(s, e, it[0], 262, iy(255), 'tpl-idv-icone-pincel', IV.roxoClaro, '#ffffff', 340);
-  if (it[1]) ivBloco(s, e, it[1], 392, iy(585), 'tpl-idv-icone-foguete', '#ffffff', '#ffffff', 340);
-  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-idv-leao', x: F2((636 + 540) / 1080), y: F2(iy(432 + 540) / 1350), size: 1080, cruza: true });   // o leão entra no fim, como no original
+  const dx = (ctx.i || 0) === 1 ? 210 : 0;   // página 2: o robô da capa entra pela esquerda; o texto anda para a direita e nunca fica por baixo dele
+  if (it[0]) ivBloco(s, e, it[0], 150 + dx, iy(215), 'tpl-idv-icone-pincel', IV.roxoClaro, '#ffffff', 640 - dx, 1.6);
+  if (it[1]) ivBloco(s, e, it[1], 230 + dx, iy(560), 'tpl-idv-icone-foguete', '#ffffff', '#ffffff', 600 - dx, 1.6);
+  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: ivPeca(ctx, 'tpl-idv-leao'), x: F2((636 + 540) / 1080), y: F2(iy(432 + 540) / 1350), size: 1080, cruza: true });   // o leão entra no fim, como no original
   return s;
 };
 COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
   usaFontes(ctx, 'spacemono', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(3), it = erItens(d).slice(0, 2);
-  if (it[0]) ivBloco(s, e, it[0], 192, iy(255), null, '#8a3cf0', IV.cinza, 330);
-  if (it[1]) ivBloco(s, e, it[1], 652, iy(255), null, '#8a3cf0', IV.cinza, 290);
-  const bx = 400, by = iy(678), bw = 368, bh = 178;
+  if (it[0]) ivBloco(s, e, it[0], 80, iy(150), null, '#8a3cf0', IV.cinza, 380, 1.45);
+  if (it[1]) ivBloco(s, e, it[1], 500, iy(310), null, '#8a3cf0', IV.cinza, 340, 1.45);
+  const bx = 430, by = iy(620), bw = 470, bh = 250;   // à direita do leão que entra pela esquerda
   s.shapes.push({ kind: 'rect', x: e.X(bx + bw / 2), y: e.Y(by + bh / 2), w: e.X(bw), h: e.Y(bh), color: 'transparent', stroke: IV.roxo, stroke_w: 2 / 1080, dash: true });
   for (const [qx, qy] of [[bx, by], [bx + bw, by], [bx, by + bh], [bx + bw, by + bh]]) s.shapes.push({ kind: 'rect', x: e.X(qx), y: e.Y(qy), w: e.X(13), h: e.Y(13), color: '#444444' });
-  const tf = fT(600, 0), tl = erQuebra(d.titulo || 'Sua marca merece|ser lembrada.', tf, 27, bw - 40).slice(0, 2);
-  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(bx + bw / 2), y: e.Y(by + 34 + 17 + i * 34 - (tl.length - 2) * 17), align: 'center', size: e.P(27), font: tf.k, weight: tf.w, lh: 1, color: '#4a2a8a', nowrap: true, shadow: false }));
-  const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(600, .12), cz = Math.min(18, 18 * 230 / Math.max(1, largura(cta, cf, 18)));
-  s.shapes.push({ kind: 'pill', x: e.X(bx + bw / 2), y: e.Y(by + 137), w: e.X(280), h: e.Y(44), color: IV.roxo });
-  s.texts.push({ role: 'title', value: cta + ' →', x: e.X(bx + bw / 2), y: e.Y(by + 137), align: 'center', size: e.P(cz), font: cf.k, weight: cf.w, ls: .12, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
+  const tf = fT(600, 0), tl = erQuebra(d.titulo || 'Sua marca merece|ser lembrada.', tf, 40, bw - 60).slice(0, 2);
+  tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(bx + bw / 2), y: e.Y(by + 48 + 24 + i * 48 - (tl.length - 2) * 24), align: 'center', size: e.P(40), font: tf.k, weight: tf.w, lh: 1, color: '#4a2a8a', nowrap: true, shadow: false }));
+  const cta = String(d.cta || 'Link na bio').toUpperCase(), cf = fX(600, .12), cz = Math.min(26, 26 * 340 / Math.max(1, largura(cta, cf, 26)));
+  s.shapes.push({ kind: 'pill', x: e.X(bx + bw / 2), y: e.Y(by + 190), w: e.X(400), h: e.Y(64), color: IV.roxo });
+  s.texts.push({ role: 'title', value: cta + ' →', x: e.X(bx + bw / 2), y: e.Y(by + 190), align: 'center', size: e.P(cz), font: cf.k, weight: cf.w, ls: .12, lh: 1, color: '#ffffff', nowrap: true, shadow: false });
   return s;
 };
 
@@ -664,7 +667,7 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   return desviaDoTexto(s, ctx);
 };
 COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {   // __z 1.3: texto 30% maior que o do Fogo (decisão do dono, 18/11/2026)
-  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === 1 ? { __centro: 540 } : {}), ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
+  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === 1 ? { __centro: 540 } : {}), ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: ((ctx.i || 1) - 1) % 2 ? 'tpl-xadrez-fundo-2b' : 'tpl-xadrez-fundo-2', color: '#e8e4da' };   // faixa contínua do dono (referencia/miolo-faixa.png): cada página é meia volta do desenho, alternando 2 e 2b, sem emenda s.paper = '#e8e4da';
   s.items = s.items.filter(it => it.asset !== 'tpl-fogo-nota');
   xzCor(xzCor(xzCor(s, '#ffffff', XZ.escuro), '#f2f2f2', XZ.corpo), FG.red, '#b8901c');
   if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1115) - 115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
@@ -679,7 +682,8 @@ const tcBase = k => ({ bg: { asset: 'tpl-clientes-fundo-' + k, color: '#1a1a1a' 
 COMPOR_EXTRA['clientes-capa'] = (d, ctx) => {
   usaFontes(ctx, 'poppins', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = tcBase(1), cx = 525;
-  s.items.push({ asset: 'tpl-clientes-busto-oculos', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037, fil: { gray: .4, sepia: .2, hue: 60 } });
+  if (/central/i.test(String(ctx.marca || ''))) s.items.push({ asset: 'tpl-clientes-busto-central', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037 });   // Central do Marketing: o mascote no lugar da estátua, mesmo tamanho e olhando para o mesmo lado (dono, 19/11/2026)
+  else s.items.push({ asset: 'tpl-clientes-busto-oculos', x: F2(518 / 1080), y: F2(613 / 1350), size: 1037, fil: { gray: .4, sepia: .2, hue: 60 } });
   const tf = fT(800, 0), tl = erQuebra(String(d.titulo || 'Tipos de|clientes').toUpperCase(), tf, 74, 560).slice(0, 3), tz = Math.min(74, ...tl.map(l => 74 * 560 / Math.max(560, largura(l, tf, 74))));
   const y0 = 710 - (tl.length - 2) * 74;
   tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + 37 + i * 74), align: 'center', size: e.P(tz), font: tf.k, weight: tf.w, lh: 1, color: '#ffffff', nowrap: true, shadow: true }));
@@ -705,8 +709,7 @@ COMPOR_EXTRA['clientes-bloco'] = (d, ctx) => {
   pilha(B, 0, ctx, { topo: 290 });
   const fim = (ctx.i || 0) === (ctx.total || 1) - 2;
   if (fim) s.items.push({ asset: 'tpl-clientes-maleta', x: F2(960 / 1080), y: F2(1285 / 1350), size: 870, cruza: true });
-  else if (j === 0) s.items.push({ asset: 'tpl-clientes-busto-quebrado', x: F2(1120 / 1080), y: F2(634 / 1350), size: 1058, cruza: true });
-  else s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(1038 / 1350), size: 1037, cruza: true });
+  else if (j !== 0) s.items.push({ asset: 'tpl-clientes-cavalo', x: F2(1190 / 1080), y: F2(1038 / 1350), size: 1037, cruza: true });
   return s;
 };
 COMPOR_EXTRA['clientes-fim'] = (d, ctx) => {
@@ -771,23 +774,24 @@ COMPOR_EXTRA['colagem-fim'] = (d, ctx) => {
   return s;
 };
 
-// ───────── Template "13 · Espaço (azul neon)" (réplica do kit "segredos do marketing" com astronauta, 18/11/2026) ─────────
-// Arte original: faixa 2000×500 (4 páginas quadradas). Fundo ampliado ×2,7 em faixa contínua (página = 400 px da arte, a partir de x=40):
-// página 1080×1350 → x = (xArte − 40 − 400·k)·2,7 e y = yArte·2,7. Caneta e computador são peças soltas que cruzam a divisa.
-const EP = { ciano: '#12c9de', navy: '#04222b', claro: '#e4f7fa' };
-const epBase = n => ({ bg: { asset: 'tpl-espaco-fundo-' + n, color: '#020b14' }, paper: '#020b14', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
+// ───────── Template "13 · Espaço (azul neon)" (réplica do kit "segredos do marketing" com astronauta; refeito igual à arte do dono, 19/11/2026) ─────────
+// Arte original: faixa 2000×500 com 4 páginas quadradas de 500. Cada página do fundo panorâmico (banco/tpl-espaco/referencia) vira 1080×1080
+// e é esticada na altura para 1080×1350, sem cortar nada. Medidas tiradas da arte em 1000×1000 por página: x·1,08 e y·1,35.
+const EP = { ciano: '#12c9de', navy: '#04222b', claro: '#e4f7fa' }, epX = v => v * 1.08, epY = v => v * 1.35;
 const epLogo = (s, e, ctx, x, y) => { if (ctx.logo) s.items.push({ asset: ctx.logo, x: e.X(x), y: e.Y(y), size: 150 }); };
+const epBase = n => ({ bg: { asset: 'tpl-espaco-fundo-' + n, color: '#020b14' }, paper: '#020b14', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 COMPOR_EXTRA['espaco-capa'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
   const e = erEsc(ctx, ctx.W, ctx.H), s = epBase(1), tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), cx = 552, maxW = 640;
+  if (/spyhacker/i.test(String(ctx.marca || ''))) s.bg = { ...s.bg, asset: 'tpl-espaco-fundo-1-spyhacker' };   // 007 Spyhacker: o mascote segura o tablet no lugar do astronauta (dono, 19/11/2026)
   // título na tela do tablet: as linhas de cima menores e a última (a palavra-chave) gigante, como “CONTA!”
   let tl = String(d.titulo || '4 segredos de marketing|que ninguém te|conta!').toUpperCase().split('|').map(x => x.replace(/\*/g, '').trim()).filter(Boolean);
   if (tl.length === 1) { const p = tl[0].split(/\s+/); tl = [...(p.length > 1 ? erQuebra(p.slice(0, -1).join(' '), tf, 62, maxW) : []), p[p.length - 1]]; }
   const cima = tl.slice(0, -1).slice(-3), ult = tl[tl.length - 1];
   const zc = Math.min(64, ...cima.map(l => 64 * maxW / Math.max(maxW, largura(l, tf, 64)))), zu = Math.min(230, 230 * maxW / Math.max(1, largura(ult, tf, 230)));
-  const hT = cima.length * zc * 1.02 + zu * .92, y0 = 570 - hT / 2;
-  cima.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + zc * .51 + i * zc * 1.02), align: 'center', size: e.P(zc), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false }));
-  s.texts.push({ role: 'title', value: ult, x: e.X(cx), y: e.Y(y0 + cima.length * zc * 1.02 + zu * .46), align: 'center', size: e.P(zu), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false });
+  const LH = 1.18, hT = cima.length * zc * LH + zu * .92, y0 = 570 - hT / 2;   // 1,18: linha com acento (NINGUÉM) não encosta na de cima
+  cima.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(cx), y: e.Y(y0 + zc * .59 + i * zc * LH), align: 'center', size: e.P(zc), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false }));
+  s.texts.push({ role: 'title', value: ult, x: e.X(cx), y: e.Y(y0 + cima.length * zc * LH + zu * .46), align: 'center', size: e.P(zu), font: tf.k, weight: tf.w, lh: 1, color: '#111111', nowrap: true, shadow: false });
   // botão: pílula ciano “Arraste para o lado” + quadrado com a seta
   const bt = String(d.cta_arraste || d.cta || 'Arraste para o lado').toUpperCase(), bf = fX(600, .04), bw = Math.max(330, largura(bt, bf, 24) + 90);
   s.shapes.push({ kind: 'pill', x: e.X(238 + bw / 2), y: e.Y(932), w: e.X(bw), h: e.Y(80), color: EP.ciano, radius: .2 });
@@ -798,14 +802,14 @@ COMPOR_EXTRA['espaco-capa'] = (d, ctx) => {
   epLogo(s, e, ctx, 960, 1260);
   return s;
 };
-// miolo: 2 itens por página (seta, “01.” branco + título ciano e texto com *negrito*); a caneta cruza para a página seguinte,
-// o computador com a barra de ferramentas cruza da penúltima para o fim. Copy maior repete o miolo alternando os fundos 2 e 3.
+// miolo: etiqueta “SEGREDOS DO MKT” e 2 itens lado a lado (seta, “01.” branco + título ciano, texto com *negrito*);
+// a caneta cruza para a página seguinte e o computador com a barra de ferramentas cruza da última página do miolo para o fim.
 COMPOR_EXTRA['espaco-par'] = (d, ctx) => {
   usaFontes(ctx, 'bebas', 'poppins');
   const i = Math.max(1, ctx.i || 1), j = (i - 1) % 2, ult = i === (ctx.total || 3) - 2, e = erEsc(ctx, ctx.W, ctx.H), s = epBase(2 + j);
   const dir = ult ? 'pc' : j === 0 ? 'caneta' : '', x0 = j === 1 ? 230 : 110, xr = dir === 'pc' ? 770 : dir === 'caneta' ? 880 : 970;
-  if (dir === 'caneta') s.items.push({ asset: 'tpl-espaco-caneta', x: 1, y: e.Y(640), size: 1250, cruza: true });
-  if (dir === 'pc') s.items.push({ asset: 'tpl-espaco-computador', x: e.X(1100), y: e.Y(1010), size: 1080, cruza: true });
+  if (dir === 'caneta') s.items.push({ asset: 'tpl-espaco-caneta', x: e.X(epX(970)), y: e.Y(epY(455)), size: 1210, cruza: true });   // tamanho e lugar da arte do dono
+  if (dir === 'pc') s.items.push({ asset: 'tpl-espaco-computador', x: e.X(epX(1040)), y: e.Y(epY(560)), size: 1190, cruza: true });
   const tf = fT(CONDENSADA[FK.t] ? 400 : 700, 0), bf = fX(400, 0), its = erItens(d).slice(0, 2), B = [];
   its.forEach((it, q) => {
     const n = String(erNum(d, ctx, q)).padStart(2, '0') + '.', tx = x0 + 62, tw = xr - tx;
@@ -833,6 +837,7 @@ COMPOR_EXTRA['espaco-fim'] = (d, ctx) => {
   pilha(B, 600, ctx);
   return s;
 };
+
 
 const COMPOR = {
   'erros-capa'(d, ctx) {
