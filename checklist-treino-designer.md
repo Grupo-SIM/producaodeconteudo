@@ -27,15 +27,22 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Carrossel: quinto template aprovado, **11 · Tipos de clientes (verde neon)** (no fim, o foguete vira a logo da marca e o contato vira o CTA). Ficha `16-carrossel-template-tipos-clientes.md`. Pendentes: kit 4 (espaço, ciano: falta o arquivo de fundo) e kit 7 (colagem: faltam os elementos). Depois vem o treino de capas.
 - 18/11/2026 · Carrossel: sexto template aprovado, **12 · Colagem (pink e roxo)**, versão limpa (texto reto, sem cortar palavras, elementos afastados, textos maiores, pílula de arraste curta, textos nos lugares do original). Ficha `17-carrossel-template-colagem.md`. Falta só o kit 4 (espaço, ciano: falta o arquivo de fundo).
 - 18/11/2026 · Carrossel: kit 4 montado como **13 · Espaço (azul neon)** (fundo, caneta, computador e barra de ferramentas do dono). Ficha `18-carrossel-template-espaco.md`. Aprovado pelo dono (sem a pílula "Segredos do MKT" no miolo).
+- 18/11/2026 · Teste Xadrez com história real (Toy Story 2) e venda (Controle Patrimonial): elemento nunca em cima do texto (desce, não sobe, para não competir com a foto); juntar slides curtos e aumentar a letra; leitura igual à referência; etiquetas da capa abraçam o texto e ficam centradas. Ficha `21-elemento-nunca-sobre-texto-e-paginas.md`. Decisão: história real e venda terão templates próprios; templates são atribuídos às marcas em vez de trocar de cor.
+- 18/11/2026 · Feed estático: aprovados **14 · Palavra gigante + mascote** (Central do Marketing, "ERROS de marketing") e **15 · Escala absurda** (007 Spyhacker, "FORA"), cópia das referências do dono trocando a pessoa pelo mascote. Arquivos em `banco/tpl-estatico/`, ficha `22-feed-estatico-quebra-de-padrao.md`. Falta: virar template no sistema e mais referências do dono.
+- 18/11/2026 · Feed estático: aprovados 16 a 25, 27 e 28 (26 descartada). Total de 14 estáticos aprovados (14 a 25, 27, 28), arquivos em `banco/tpl-estatico/`. Falta: virar template no sistema.
+- 19/11/2026 · Feed estático FECHADO: 18 aprovados (14 a 25, 27 a 31, 33), descartados 26 e 32. Próximo: virar template no sistema, depois atribuir templates às marcas, depois stories.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
 1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
 2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
 3. [ ] Treino de capas para os carrosséis.
-4. [ ] Feed estático (refazer do zero a partir das referências do dono).
-5. [ ] Stories.
-6. [ ] Só depois disso: vídeo (Reels).
+4. [x] Feed estático: 19 artes aprovadas (estoque) + regras para criar novas do zero; estático NÃO é template (19/11/2026).
+5. [ ] **Atribuir templates às marcas** (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
+6. [ ] Stories de venda.
+7. [ ] Carrossel de história real e carrossel de venda: template próprio de cada (kit do dono). Os 7 educativos ficam só para educativo.
+8. [ ] Só depois disso: vídeo (Reels).
+Revisão fina dos carrosséis 7 a 13 (elemento fora do texto, menos páginas, letra maior): em produção, peça a peça, na aprovação.
 Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
 
 ## Onde paramos (14/11/2026, para a próxima conversa)

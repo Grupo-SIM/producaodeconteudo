@@ -610,6 +610,7 @@ export function slideHtml(spec, s, i, total) {
     if (t.deco) extra += `text-decoration:${t.deco === 'riscado' ? 'line-through' : 'underline'};text-decoration-thickness:.07em;text-underline-offset:.14em;`;
     if (t.hl) extra += `--hl:${t.hl};--hlc:${lumOf(t.hl) > .36 ? '#0a0a0a' : '#ffffff'};`; if (t.hw) extra += `--hw:${+t.hw || 700};`;
     if (t.nowrap && !t.reflow) extra += 'white-space:nowrap;width:auto;';
+    if (t.fundo) { const [pv, ph] = Array.isArray(t.fundo_pad) ? t.fundo_pad : [Math.round(size * .06), Math.round(size * .28)]; extra += `background:${t.fundo};padding:${pv}px ${ph}px;white-space:nowrap;width:auto;`; }   // etiqueta: a caixa abraça o texto na fonte que for (sem sobra nem corte)
     if (F) extra += `font-family:'${F.family}','${family}',sans-serif;`;
     const roleCta = t.role === 'cta', roleBadge = t.role === 'badge';
     if (roleCta) {

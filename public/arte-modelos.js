@@ -510,8 +510,8 @@ const FG = { red: '#e3243b', preto: '#0b0b0b' }, fx = v => v * 1.0385 - 135, fy 
 const fgBase = (k) => ({ bg: { asset: 'tpl-fogo-fundo-' + k, color: '#050505' }, paper: '#050505', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 function fgEtiqueta(s, e, txt, x, y, h, fz) {
   const f = fT(500, -.02), w = largura(txt, f, fz) + 48;
-  s.shapes.push({ kind: 'rect', x: e.X(x + w / 2), y: e.Y(y + h / 2), w: e.X(w), h: e.Y(h), color: '#ffffff' });
-  s.texts.push({ role: 'title', value: txt, x: e.X(x + 22), y: e.Y(y + h / 2 - 4), align: 'left', size: e.P(fz), font: f.k, weight: f.w, ls: -.02, lh: 1, color: FG.preto, nowrap: true, shadow: false });
+  // a caixa branca é o fundo do próprio texto (abraça a palavra na fonte da marca): sem sobra branca e centrada (dono, 18/11/2026)
+  s.texts.push({ role: 'title', value: txt, x: e.X(x + w / 2), y: e.Y(y + h / 2), align: 'center', size: e.P(fz), font: f.k, weight: f.w, ls: -.02, lh: 1, color: FG.preto, nowrap: true, shadow: false, fundo: '#ffffff', fundo_pad: [Math.round(e.P((h - fz) / 2 + 2)), e.P(24)] });
   return w;
 }
 COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
@@ -523,7 +523,7 @@ COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
   let by, bh;
   if (d.__tagsAcima) {   // variação do Xadrez: as duas etiquetas em cima e a palavra-explosão embaixo, sem faixa preta
     const w1 = largura(l1, bfz, z1) + 48, w2 = largura(l2, bfz, z2) + 48, t2 = t1 + th + 8, wc2 = t2 + th + pz * .5 + 6;
-    fgEtiqueta(s, e, l1, cx - w1 / 2 + 20, t1, th, z1); fgEtiqueta(s, e, l2, cx - w2 / 2, t2, th, z2);
+    fgEtiqueta(s, e, l1, cx - w1 / 2, t1, th, z1); fgEtiqueta(s, e, l2, cx - w2 / 2, t2, th, z2);
     s.texts.push({ role: 'title', value: pal, x: e.X(cx), y: e.Y(wc2), align: 'center', size: e.P(pz), font: af.k, weight: af.w, ls: .01, lh: 1, color: FG.red, nowrap: true, shadow: false });
     by = wc2 + pz * .5 - th + 10; bh = 0;
   } else {
@@ -543,18 +543,18 @@ COMPOR_EXTRA['fogo-capa'] = (d, ctx) => {
 };
 COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
   usaFontes(ctx, 'rubik', 'rubik');
-  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = fT(500, -.012), bf = fX(400, -.006), maxW = d.__maxW || 1080 - x - 110, B = [];
+  const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = fT(500, -.012), bf = fX(400, -.006), maxW = d.__maxW || 1080 - x - 110, B = [], Z = d.__z || 1, z = v => Math.round(v * Z);   // __z: escala do texto (o Xadrez usa maior: miolo só de texto, mais fácil de ler)
   const it = erItens(d).slice(0, 3), n0 = +d.n > 0 ? +d.n : null;
   if (it.length) it.forEach((o, j) => {
-    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, 44, maxW), bl = erQuebra(o.d, bf, 32, maxW);
-    B.push({ h: tl.length * 55 + 12 + bl.length * 41, gap: j ? 74 : 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 27 + i * 55), align: 'left', size: e.P(44), font: hf.k, weight: hf.w, ls: -.012, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); bl.forEach((l, i) => erLinha(s.texts, l, x, y + tl.length * 55 + 12 + 20 + i * 41, 32, bf, '#f2f2f2', e)); return []; } });
+    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, z(44), maxW), bl = erQuebra(o.d, bf, z(32), maxW);
+    B.push({ h: tl.length * z(55) + 12 + bl.length * z(41), gap: j ? 74 : 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + z(27) + i * z(55)), align: 'left', size: e.P(z(44)), font: hf.k, weight: hf.w, ls: -.012, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); bl.forEach((l, i) => erLinha(s.texts, l, x, y + tl.length * z(55) + 12 + z(20) + i * z(41), z(32), bf, '#f2f2f2', e)); return []; } });
   });
   else {   // página de frase: título grande com palavra em vermelho (*assim*) e apoio
-    const tf = fT(500, -.015), tl = fgAst(erQuebra(String(d.titulo || ''), tf, 70, maxW)), bl = erQuebra(d.texto, bf, 34, maxW);
-    B.push({ h: tl.length * 82, gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + 41 + i * 82), align: 'left', size: e.P(70), font: tf.k, weight: tf.w, ls: -.015, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
-    if (bl.length) B.push({ h: bl.length * 46, gap: 40, make: y => { bl.forEach((l, i) => erLinha(s.texts, l, x, y + 23 + i * 46, 34, bf, '#f2f2f2', e)); return []; } });
+    const tf = fT(500, -.015), tl = fgAst(erQuebra(String(d.titulo || ''), tf, z(70), maxW)), bl = erQuebra(d.texto, bf, z(34), maxW);
+    B.push({ h: tl.length * z(82), gap: 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + z(41) + i * z(82)), align: 'left', size: e.P(z(70)), font: tf.k, weight: tf.w, ls: -.015, lh: 1, color: '#ffffff', hl: FG.red, nowrap: true, shadow: false })); return []; } });
+    if (bl.length) B.push({ h: bl.length * z(46), gap: 40, make: y => { bl.forEach((l, i) => erLinha(s.texts, l, x, y + z(23) + i * z(46), z(34), bf, '#f2f2f2', e)); return []; } });
   }
-  pilha(B, 675, ctx).itens;
+  pilha(B, d.__centro || 675, ctx).itens;
   // nota queimando na divisa: na última página do miolo (entra no fim, como no original) e, em carrossel longo, a cada 3 páginas
   const ult = (ctx.i || 0) === (ctx.total || 1) - 2, meio = !ult && (ctx.i || 0) % 3 === 2;
   if (ult || meio) s.items.push({ asset: 'tpl-fogo-nota', x: F2((fx(1977 - 1300 + 540) + (meio ? 40 : 0)) / 1080), y: F2(fy(925 + (meio ? 60 : 0)) / 1350), size: Math.round(fy(1080) * (meio ? .82 : 1)), cruza: true, ...(meio ? { flip: true, rot: 8 } : {}) });
@@ -625,6 +625,29 @@ COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
   return s;
 };
 
+
+// ───────── REGRA DO DONO (18/11/2026): elemento decorativo nunca fica em cima do texto nem compete com o título.
+// Item marcado com `desvia` (peças, objetos soltos) é empurrado para cima ou para baixo até sair da área dos textos e das etiquetas/botões.
+// VIS: parte visível do PNG (fração do quadrado) para medir a peça de verdade, não a caixa transparente.
+const VIS = { 'tpl-xadrez-rei': [.318, .289, .682, .821] };
+function desviaDoTexto(s, ctx) {
+  const W = ctx.W || 1080, H = ctx.H || 1350, folga = 12 / H;
+  const caixas = [];
+  for (const t of s.texts || []) { if (!t.value) continue; const sz = (t.size || 40) / H, w = String(t.value).length * (t.size || 40) * .56 / W, x0 = t.align === 'left' ? t.x : t.align === 'right' ? t.x - w : t.x - w / 2; caixas.push([x0, t.y - sz * .6, x0 + w, t.y + sz * .6]); }
+  for (const sh of s.shapes || []) if (sh.w && sh.h && sh.w < .95 && ['rect', 'pill'].includes(sh.kind)) caixas.push([sh.x - sh.w / 2, sh.y - sh.h / 2, sh.x + sh.w / 2, sh.y + sh.h / 2]);
+  for (const it of s.items || []) {
+    if (!it.desvia) continue; const v = VIS[it.asset] || [.2, .2, .8, .8], q = (it.size || 420), qw = q / W, qh = q / H;
+    const bx = () => [it.x - qw / 2 + v[0] * qw, it.y - qh / 2 + v[1] * qh, it.x - qw / 2 + v[2] * qw, it.y - qh / 2 + v[3] * qh];
+    const [x0, , x1] = bx(), alvo = caixas.filter(c => c[2] > x0 && c[0] < x1); if (!alvo.length) continue;
+    const bate = () => { const b = bx(); return alvo.some(c => c[2] > b[0] && c[0] < b[2] && c[3] + folga > b[1] && c[1] - folga < b[3]); };
+    if (!bate()) continue;
+    const topo = Math.min(...alvo.map(c => c[1])), base = Math.max(...alvo.map(c => c[3])), b = bx();
+    const desce = base + folga - b[1], sobe = b[3] - (topo - folga);   // quanto andar para ficar todo abaixo ou todo acima do bloco de texto
+    const y0 = it.y; if (it.desvia === 'baixo') { it.y = +(y0 + desce).toFixed(4); continue; } it.y = +(y0 + (desce <= sobe ? desce : -sobe)).toFixed(4);
+    if (bate()) it.y = +(y0 + (desce <= sobe ? -sobe : desce)).toFixed(4);
+  }
+  return s;
+}
 // ───────── Template "10 · Xadrez (mostarda)" (réplica aprovada do kit de agência com peças de xadrez, 18/11/2026) ─────────
 // Mesma estrutura do "8 · Fogo" (o mesmo modelo de agência): reaproveita as páginas do Fogo e troca fundo, cor de destaque e elementos.
 const XZ = { mostarda: '#e5b93a', escuro: '#141414', corpo: '#262626' };
@@ -636,12 +659,12 @@ COMPOR_EXTRA['xadrez-capa'] = (d, ctx) => {
   if (ft) s.items.unshift({ ...srcDe(ft, x => `${x}, cinematic dark moody photo, warm light, no text`), x: .5, y: .2, box: { w: 1, h: .52, fade: .4, pos: 'center 30%' } });   // foto do assunto no alto, quando a copy pede
   else s.items.unshift({ asset: 'tpl-xadrez-foto-capa', x: F2(fx(650) / 1080), y: F2(fy(215) / 1350), size: Math.round(fy(1300)) });   // padrão aprovado pelo dono: a foto da arte original (Coringa)
   { const dy = 70 / 1350; for (const o of [...s.texts, ...s.shapes]) o.y = F2(o.y + dy); const f0 = s.items[0]; if (f0?.asset === 'tpl-xadrez-foto-capa') { const h0 = fy(430), k = (h0 + 70) / h0; f0.size = Math.round(f0.size * k); f0.y = F2(((h0 + 70) / 2) / 1350); } else if (f0) f0.y = F2(f0.y + dy); }   // ajuste do dono: foto, título e botão um pouco mais para baixo
-  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(105 / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true });   // peça pequena inteira dentro da página
-  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 110) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true });
-  return s;
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2(105 / 1080), y: F2(fy(435.5) / 1350), size: Math.round(fy(475)), flip: true, desvia: 'baixo' });   // peça pequena da referência: volta, mas sempre abaixo do texto
+  s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1176) - 80) / 1080), y: F2(fy(568) / 1350), size: Math.round(fy(1080)), cruza: true, desvia: 'baixo' });   // desce, nunca sobe: em cima compete com a foto
+  return desviaDoTexto(s, ctx);
 };
-COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {
-  const s = COMPOR_EXTRA['fogo-lista']({ ...d, ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
+COMPOR_EXTRA['xadrez-lista'] = (d, ctx) => {   // __z 1.3: texto 30% maior que o do Fogo (decisão do dono, 18/11/2026)
+  const s = COMPOR_EXTRA['fogo-lista']({ ...d, __z: 1.3, ...((ctx.i || 0) === 1 ? { __centro: 540 } : {}), ...((ctx.i || 0) === (ctx.total || 1) - 2 ? { __maxW: 640 } : {}) }, ctx); s.bg = { asset: 'tpl-xadrez-fundo-2', color: '#e8e4da' }; s.paper = '#e8e4da';
   s.items = s.items.filter(it => it.asset !== 'tpl-fogo-nota');
   xzCor(xzCor(xzCor(s, '#ffffff', XZ.escuro), '#f2f2f2', XZ.corpo), FG.red, '#b8901c');
   if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-xadrez-rei', x: F2((fx(1115) - 115) / 1080), y: F2(fy(923) / 1350), size: Math.round(fy(1836)), rot: -30, cruza: true });   // rei em pé entrando no fim, como no original
@@ -1286,7 +1309,7 @@ const COR_TPL = {
   erros: { cor: '#f41ae2', apoio: ['#2ed1b4'], pref: 'tpl-erros-', fundo: true, pecas: true },
   fogo: { cor: '#e3243b', pref: 'tpl-fogo-', fundo: false, pecas: false },
   idv: { cor: '#7b43e2', apoio: ['#d6b8ff', '#4a2a8a'], pref: 'tpl-idv-', fundo: true, pecas: true },
-  xadrez: { cor: '#e5b93a', pref: 'tpl-xadrez-', fundo: true, pecas: false },
+  xadrez: { cor: '#e5b93a', pref: 'tpl-xadrez-', fundo: false, pecas: false, leitura: true },   // leitura igual à referência (dono, 18/11/2026): fundo e texto do miolo não mudam por marca
   clientes: { cor: '#2ee84a', pref: 'tpl-clientes-', fundo: true, pecas: true },
   colagem: { cor: '#ff1493', apoio: ['#45125c', '#3cff3c', '#ffe14d'], pref: 'tpl-colagem-', fundo: true, pecas: true }
 };
@@ -1301,6 +1324,7 @@ function giraHex(h, graus, cinza) {
 }
 function trocaCor(out, modelo, alvo) {
   const t = COR_TPL[modelo.split('-')[0]]; if (!t || !/^#[0-9a-f]{6}$/i.test(alvo)) return;
+  if (t.leitura && !/-(capa|fim)$/.test(modelo)) return;   // páginas de leitura ficam como a referência
   const [r0, g0, b0] = rgb(alvo), semCor = Math.max(r0, g0, b0) - Math.min(r0, g0, b0) < 30;
   if (semCor) alvo = lum(out.paper || '#000000') < .4 ? '#ffffff' : '#0a0a0a';   // marca preto e branco: em página escura o destaque é o branco, em página clara o preto
   const de = t.cor.toLowerCase(), para = alvo.toLowerCase(), giro = Math.round(((hueDe(para) - hueDe(de)) + 540) % 360 - 180), escuro = sobre(para);
