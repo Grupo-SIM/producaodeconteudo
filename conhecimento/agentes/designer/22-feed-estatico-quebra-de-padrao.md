@@ -123,3 +123,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - Pente fino (19/11/2026) · 16: título em fonte chamativa (Montserrat 900, branco + rosa), nada de letra pontilhada; fundo liso (degradê suave da cor da marca, sem raios de luz): mascote recortado sobre o fundo.
 - 16: título na FONTE DA MARCA (Seguidores em Alta = Poppins), primeira letra maiúscula, centralizado.
 - 16 APROVADA (Poppins). 17 (pente fino): texto na fonte da marca (Marketing Raiz = Montserrat), palavras grandes em preto e linhas pequenas em cinza da marca, blocos afastados (um no alto, outro embaixo) para usar o espaço vazio e nunca ficar atrás do mascote.
+- 16 sem o "2026", título mais baixo. 17: os blocos de texto ficam PERTO do mascote (encostando nele), não longe nas bordas; palavras grandes em preto.
