@@ -272,7 +272,7 @@ const agenteLigado = id => !!one('SELECT 1 x FROM agents WHERE id=? AND enabled=
 let atlasV = null;   // sites no Atlas (atlas-sites.mjs): criado junto com o fluxo v2
 // Item de um site do Atlas usa só os agentes escolhidos para aquele site (o agente desligado no painel continua de fora)
 const agenteDoItem = (c, id) => { const a = atlasV?.agentesDo(c); return agenteLigado(id) && (!a || a.includes(id)); };
-const producaoDe = c => textoPuro(c) ? [] : (PRODUCTION[c.format] || []).filter(id => agenteDoItem(c, id));   // agente desativado não recebe tarefa (ficaria parada na fila)
+const producaoDe = c => textoPuro(c) ? [] : [...(PRODUCTION[c.format] || []), ...(isVideo(c.format) && c.capa_reels ? ['designer'] : [])].filter(id => agenteDoItem(c, id));   // Reels com "Designer faz a capa": Editor (vídeo) e Designer (capa) trabalham juntos   // agente desativado não recebe tarefa (ficaria parada na fila)
 let MANUAL = !API_KEY;   // sem chave de API e sem assinatura conectada: modo chat (pedido colado à mão)
 
 // ── Assinatura do Claude (Claude Code com login claude.ai, igual ao claude-worker do Atlas): roda os agentes sem chave de API
@@ -355,7 +355,7 @@ const ARTE_GUIA = {
   feed: 'Esta é uma peça ESTÁTICA (uma imagem). Crie a arte final do post de feed: texto exato da arte (headline, apoio, selo), hierarquia e layout, paleta, tipografia, elementos gráficos e um prompt de imagem pronto para gerar/montar a arte no Canva, Figma ou gerador de imagens. Não crie roteiro de vídeo.',
   carrossel: 'Esta é uma peça ESTÁTICA em vários slides. Crie a arte final do carrossel: para CADA slide, o texto exato, o layout e os elementos visuais; capa forte, consistência entre slides, paleta e tipografia. Não crie roteiro de vídeo.',
   stories: 'Esta é uma sequência de STORIES estáticos 1080x1920. Para CADA tela: texto exato, layout respeitando as zonas seguras (topo e base livres), elementos visuais, e o adesivo de interação (enquete, caixinha, link) quando houver; mantenha consistência entre as telas. Não crie roteiro de vídeo.',
-  video_vertical: 'Esta peça é um VÍDEO vertical. Crie somente a CAPA e os elementos gráficos de apoio (textos de tela, selos): texto exato, layout, paleta e tipografia. A edição do vídeo é feita pelo Editor.',
+  video_vertical: 'Esta peça é um VÍDEO vertical (Reels). Crie SOMENTE a CAPA do Reels: UMA página 1080x1920 (slides com 1 item), no MESMO padrão do feed estático aprovado (base 22-feed-estatico-quebra-de-padrao.md: o treino do estático vale para toda capa). Texto = a frase da seção "CAPA DO REELS" do roteiro (se não houver, o gancho do roteiro, curto). Tudo o que importa (texto, mascote, rosto) fica no miolo central 1080x1440, porque a grade do perfil corta a capa em 3:4; topo e base são só fundo. A edição do vídeo é feita pelo Editor.',
   video_horizontal: 'Esta peça é um VÍDEO horizontal. Crie somente a THUMBNAIL (1280x720) e os elementos gráficos de apoio (textos de tela, lower thirds): texto exato, layout, paleta e tipografia. A edição é feita pelo Editor.'
 };
 const KIND_GUIDE = {
@@ -1788,6 +1788,7 @@ function brief(c, full = false) {
   let t = `Título/tema: ${c.title}\nFormato: ${c.format}\nTipo de conteúdo: ${c.kind}\nPlataforma: ${c.platform || 'não definida'}`;
   if (c.brand) t += `\nMarca: ${c.brand} (use SOMENTE o conhecimento desta marca e o geral; ignore o das outras marcas)`;
   if (c.goal) t += `\nOBJETIVO: ${GOAL_LABEL[c.goal]}`;
+  if (c.capa_reels && isVideo(c.format)) t += '\nCAPA DO REELS: o Designer faz a capa deste vídeo. Roteirista: termine o roteiro com a seção "CAPA DO REELS" trazendo a frase da capa (até 8 palavras, para parar o dedo, no padrão do feed estático) e uma linha "Visual:" com a ideia da imagem.';
   t += `\nBriefing: ${c.brief || '(sem briefing adicional)'}`;
   const p = c.product_id ? one('SELECT * FROM products WHERE id=?', c.product_id) : null;
   if (p) t += `\n\n# PRODUTO A VENDER\n${productBlock({ ...p, brand: c.brand || brandsOfProduct(p.id).join(', ') }, full)}`;
@@ -2638,6 +2639,7 @@ const TEMAS = { educativo: 'Educativo', lista: 'Lista', tutorial: 'Tutorial', of
 db.exec(`CREATE TABLE IF NOT EXISTS art_templates(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, uso TEXT DEFAULT '', nivel TEXT DEFAULT 'simples', formatos TEXT DEFAULT '["carrossel"]', seq TEXT NOT NULL, exemplo TEXT DEFAULT '', brand TEXT DEFAULT '', usos INTEGER DEFAULT 0, created_at TEXT NOT NULL)`);
 for (const col of ["visual TEXT DEFAULT ''", "visual_brand TEXT DEFAULT ''", "base TEXT DEFAULT ''", "visual_at TEXT DEFAULT ''", "tema TEXT DEFAULT ''", "deriva TEXT DEFAULT ''"]) { try { db.exec('ALTER TABLE art_templates ADD COLUMN ' + col); } catch { /* já existe */ } }
 try { db.exec("ALTER TABLE contents ADD COLUMN estilo_ref TEXT DEFAULT ''"); } catch { /* já existe */ }
+try { db.exec('ALTER TABLE contents ADD COLUMN capa_reels INTEGER DEFAULT 0'); } catch { /* já existe */ }
 // estilo do dono: o "id" é o do estilo da casa quando ele é a versão do dono de um estilo da casa (base) ou veio da Biblioteca Central
 // visual do estilo guardado POR MARCA: { "<marca em minúsculas>": { brand, at, pages:[...] } } (a versão antiga era uma lista só, de uma marca)
 const visMapa = r => { const v = jparse(r?.visual, null); if (!v) return {}; if (Array.isArray(v)) return { [String(r.visual_brand || '').toLowerCase()]: { brand: r.visual_brand || '', at: r.visual_at || '', pages: v } }; return typeof v === 'object' ? v : {}; };
@@ -3445,6 +3447,14 @@ function composeFundo(prompt, brand) {
   return { prompt: [f.prompt_base, prompt, f.estilo, f.iluminacao, f.lente, f.textura, f.paleta_prompt].filter(Boolean).join(', ') + (f.negativo ? `, without ${f.negativo}` : ''), seed: f.seed };
 }
 // O que a arte tinha quando foi aprovada ou devolvida: matéria-prima do aprendizado de estilo
+// Grade do perfil: as últimas peças aprovadas/postadas da marca (capa = 1ª imagem), da mais nova para a mais antiga, para a capa nova combinar com a sequência do Instagram
+function gradeDoPerfil(c, n = 9) {
+  if (!c.brand) return null;
+  const rows = all("SELECT * FROM contents WHERE teste=0 AND id<>? AND brand=? COLLATE NOCASE AND status IN ('approved','posted') AND art_spec<>'' ORDER BY COALESCE(posted_at, updated_at) DESC LIMIT ?", c.id, c.brand, n);
+  if (!rows.length) return { texto: `\n\n# GRADE DO PERFIL\n${c.brand} ainda não tem posts aprovados com arte: esta capa abre a sequência. Siga a identidade da marca para ser a base das próximas.`, imgs: [] };
+  const imgs = [], L = rows.map((x, i) => { const f = arteFiles(x.id)[0], v = f && imgs.length < 6 ? visionImg(path.join(ARTE_DIR(x.id), f)) : null; if (v) imgs.push(v); return `${i + 1}. "${clip(x.title, 70)}" (${x.format}${x.capa_reels ? ', capa de Reels' : ''})${v ? ' [imagem ' + imgs.length + ']' : ''}: ${artSnapshot(x)}`; });
+  return { imgs, texto: `\n\n# GRADE DO PERFIL (últimos posts aprovados de ${c.brand}, do mais novo ao mais antigo)\nA capa do Reels é uma tarefa de GRADE: ela entra no topo do perfil ao lado destas. Olhe a sequência (cores, fundo claro/escuro, peso do texto, mascote) e faça a capa para o perfil ficar HARMÔNICO na lateral e na grade 3 colunas: mantenha a paleta e a família visual, alterne claro/escuro e o enquadramento com os vizinhos, sem repetir a mesma capa nem destoar.\n${L.join('\n')}` };
+}
 function artSnapshot(c) {
   try {
     const sp = JSON.parse(c.art_spec || '{}'), sl = sp.slides || []; if (!sl.length) return '';
@@ -5811,7 +5821,9 @@ const HANDLERS = {
     if (lidas && !MANUAL && !als.getStore()?.dry && settings().arte_do_roteiro === 'sempre' && !/^l:/.test(String(c.estilo_arte || '')) && await arteDoRoteiro(c.id, 'modo rápido')) return { text: getContent(c.id).art, tin: 0, tout: 0 };
     if (c.kind === 'noticia' && !input.feedback && !als.getStore()?.dry && await arteDoRoteiro(c.id, 'notícia: arte montada pelo painel'))   // com pedido seu, o Designer mexe na arte que já existe em vez de remontar do roteiro
       return { text: getContent(c.id).art, tin: 0, tout: 0 };   // notícia: a arte sai do roteiro, no template da marca, sem depender de o Designer entregar JSON
-    const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000 });
+    const grade = isVideo(c.format) && c.capa_reels ? gradeDoPerfil(c) : null;   // capa do Reels: o Designer vê as últimas capas aprovadas da marca para o perfil ficar harmônico
+    if (grade) user += grade.texto;
+    const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 7000, images: grade?.imgs || [] });
     const sp = extractArteSpec(r.text, c.format, c);
     // você pediu para mexer só numa página (capa, contracapa, página N): as outras páginas e o formato ficam exatamente como estavam
     if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const so = input.ped?.paginas?.length ? new Set(input.ped.paginas) : paginasPedidas(input.feedback), ant = jparse(c.art_spec, null);
@@ -5874,7 +5886,7 @@ const HANDLERS = {
     }
     const rv = (() => { try { return JSON.parse(c.review || '{}'); } catch { return {}; } })();
     const regrasEnt = [c.art && 'designer', c.video && 'editor'].filter(Boolean).map(id => { const b = brainBlock(id, c.brand || '', { base: false, count: false, fmt: fmtGrupo(c.format) }); return b ? `## ${agentRow(id).name}\n${b}` : ''; }).filter(Boolean).join('\n\n');
-    const tipoEnt = `# TIPO DE ENTREGA\nEsta peça é ${isVideo(c.format) ? 'de VÍDEO: só o Editor produz. Avalie apenas o vídeo e não cobre arte separada.' : 'ESTÁTICA: só o Designer produz. Avalie apenas a arte e não cobre vídeo.'}\n\n`;
+    const tipoEnt = `# TIPO DE ENTREGA\nEsta peça é ${isVideo(c.format) ? (c.capa_reels ? 'de VÍDEO com CAPA: o Editor faz o vídeo e o Designer faz só a capa do Reels (uma imagem). Avalie o vídeo e a capa.' : 'de VÍDEO: só o Editor produz. Avalie apenas o vídeo e não cobre arte separada.') : 'ESTÁTICA: só o Designer produz. Avalie apenas a arte e não cobre vídeo.'}\n\n`;
     const estiloEnt = c.art && estiloTexto(c.brand) ? estiloTexto(c.brand) + 'Confira se a arte cumpre este estilo (composição, cores, fundos e o que evitar). Descumprir é motivo para devolver ao Designer, citando o item.\n\n' : '';
     const user = tipoEnt + estiloEnt + resumoArteReal(c) + (regrasEnt ? `# REGRAS DO CÉREBRO QUE ESTA ENTREGA DEVE CUMPRIR\nSe a arte ou o vídeo descumprir alguma, devolva (ajustar), cite a regra em "problemas" e peça a correção ao agente certo.\n${regrasEnt}\n\n` : '') + `# TAREFA\nFaça a REVISÃO DA ENTREGA desta peça: o roteiro já foi aprovado por você e agora a arte e/ou o vídeo ficaram prontos. Confira se a entrega está de acordo com o roteiro, a marca, a identidade visual e se é executável. Aprovada, ela segue para o Social Media e depois para o dono. Nota mínima do sistema: ${s.score_min}.\n\n# PEÇA\n${brief(c, true)}\n\n# ROTEIRO APROVADO\n${cut(c.script, 7000)}${c.art ? '\n\n# DIREÇÃO DE ARTE\n' + cut(c.art, 5000) : ''}${c.video ? '\n\n# DECUPAGEM DO VÍDEO\n' + cut(c.video, 5000) : ''}${(() => { const t = [checksTexto(checksLer(c.art_checks)) && 'ARTE:\n' + checksTexto(checksLer(c.art_checks)), checksTexto(checksLer(c.vid_checks)) && 'VÍDEO:\n' + checksTexto(checksLer(c.vid_checks))].filter(Boolean).join('\n'); return t ? '\n\n# CHECAGEM AUTOMÁTICA (medida pelo painel; o que está “NÃO corrigido” deve ser devolvido ao agente)\n' + t : ''; })()}\n\n# REVISÃO DO ROTEIRO (feita por você) (nota ${c.score != null ? Number(c.score).toFixed(1) : '-'})\n${cut(JSON.stringify(rv), 1800)}\n\n# SAÍDA\nResponda SOMENTE com JSON válido (sem texto antes ou depois, sem cercas de código). Dentro dos textos NÃO use aspas duplas retas e não quebre linha. Formato:\n{"veredito":"aprovar|ajustar","nota":0,"resumo":"2 a 3 frases com o seu parecer","pontos_fortes":["..."],"problemas":["..."],"ajustes_para_esta_tarefa":"o que corrigir agora (vazio se nada)","devolver":[{"agente":"designer|editor|roteirista","ajustes":"ajustes numerados e objetivos para quem fez (só se veredito=ajustar)"}],"feedback_proxima_tarefa":"orientação prática para as próximas tarefas, de acordo com o padrão de qualidade observado"}`;
     const ctx0 = als.getStore(); let imgs = [...quadrosRev];
@@ -6334,6 +6346,7 @@ function createContent(f, createdBy = 'manual', runAt = null) {
   const r = run('INSERT INTO contents(title,format,kind,platform,brief,goal,product_id,brand,status,estilo_video,estilo_arte,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     f.title, f.format, f.kind, f.platform || '', f.brief || '', f.goal || '', f.product_id || null, f.brand || '', 'producing', f.format === 'video_vertical' ? (f.estilo_video === 'auto' || estiloVideo(String(f.estilo_video || ''))?.id || 'auto') : '', ['carrossel', 'feed', 'stories'].includes(f.format) ? (f.estilo_arte || '') : '', createdBy, T(), T());
   const id = +r.lastInsertRowid;
+  if (f.capa_reels) run('UPDATE contents SET capa_reels=1 WHERE id=?', id);   // Reels com capa do Designer
   if (f.destino_id) atlasV?.vincular(id, f.destino_id);   // antes do Roteirista: os agentes do site valem desde a 1ª etapa
   enqueue(id, 'roteirista', 'roteiro', {}, 'auto', runAt);
   if (runAt) log(null, `"${f.title}" agendado para ${fmtQuando(runAt)}`, id);
@@ -6883,7 +6896,7 @@ function contentAct(id, act, b = {}) {
   } else if (act === 'changes') {
     if (!c.script) throw fail(400, 'Ainda não há roteiro para ajustar');
     let target = ['designer', 'editor'].includes(b.target) ? b.target : 'roteirista';
-    if (target !== 'roteirista') target = isVideo(c.format) ? 'editor' : 'designer';   // vídeo é do Editor, arte é do Designer
+    if (target !== 'roteirista') target = isVideo(c.format) && !(c.capa_reels && target === 'designer') ? 'editor' : 'designer';   // vídeo é do Editor, arte é do Designer (Reels com capa: ajuste da capa vai ao Designer)   // vídeo é do Editor, arte é do Designer
     const fbRaw = String(b.feedback || '').trim().slice(0, 3500), marcados = target === 'roteirista' ? [] : motivosValidos(target, b.motivos);
     if (!fbRaw && !marcados.length) throw fail(400, 'Descreva o ajuste ou marque ao menos um motivo');
     const inferidos = target === 'roteirista' ? [] : inferMotivos(target, fbRaw).filter(x => !marcados.includes(x)), tagsAj = [...marcados, ...inferidos];
@@ -7021,6 +7034,7 @@ async function api(req, res, url) {
       title: str(f.title, 200, 'Título'), format: FORMATS.includes(f.format) ? f.format : (() => { throw fail(400, 'Formato inválido'); })(),
       kind: KINDS.includes(f.kind) ? f.kind : 'educativo', platform: str(f.platform, 40, 'Plataforma', false), brief: str(f.brief, 6000, 'Briefing', false),
       goal: GOALS.includes(f.goal) ? f.goal : '', brand: str(f.brand, 80, 'Marca', false), estilo_video: String(f.estilo_video || '').slice(0, 40), estilo_arte: (() => { const v = String(f.estilo_arte || ''); if (/^t:/.test(v) && templateDe(v.slice(2))) return v; if (/^l:\d+$/.test(v) && one('SELECT id FROM art_layouts WHERE id=?', +v.slice(2))) return v; return ''; })(),
+      capa_reels: f.capa_reels && ['video_vertical', 'video_horizontal'].includes(f.format) ? 1 : 0,
       product_id: f.goal === 'produto' && +f.product_id ? (one('SELECT id FROM products WHERE id=?', +f.product_id)?.id || (() => { throw fail(400, 'Produto não encontrado'); })()) : null
     });
     let runAt = null;

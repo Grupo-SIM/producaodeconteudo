@@ -10,7 +10,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - [ ] 4. Carrossel de história real (11, 12, 13, 16)
 - [ ] 5. Carrossel de venda (21, 22)
 - [ ] 6. Stories de venda (18, 19, 20, 43, 44)
-- [ ] 7. Estático de venda e carrossel de notícia (sem copy aprovada: Copy escreve antes)
+- [x] 7. Estático de venda: coberto pelo treino do estático (serve para todo estático, capa de carrossel e capa de vídeo). Carrossel de notícia: só capa do template + fotos/vídeos do fato + contracapa padrão (`09-feed-jornalistico.md`), 19/11/2026.
 
 ## Como cada correção entra
 - Vira regra na base do Designer (`conhecimento/agentes/designer/`) e, ao mesmo tempo, item de conferência na base do Revisor (`conhecimento/agentes/gerente/`), igual ao treino do Copy: o Revisor passa a cobrar do Designer o que o dono corrigiu.
@@ -32,16 +32,17 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Feed estático: aprovados 16 a 25, 27 e 28 (26 descartada). Total de 14 estáticos aprovados (14 a 25, 27, 28), arquivos em `banco/tpl-estatico/`. Falta: virar template no sistema.
 - 19/11/2026 · Feed estático FECHADO: 18 aprovados (14 a 25, 27 a 31, 33), descartados 26 e 32. Próximo: virar template no sistema, depois atribuir templates às marcas, depois stories.
 - 19/11/2026 · Atribuição pelas CORES da arte (não pela copy): 7 Seguidores em Alta; 8 Marketing Raiz; 9 Sim Intermediações (original) e Seguidores em Alta (mascote no lugar do robô e do leão); 10 Marketing Raiz (fade na capa e no fim, miolo com a faixa contínua do dono); 11 Central do Marketing (mascote na capa, sem o busto quebrado); 12 Seguidores em Alta; 13 007 Spyhacker (mascote na capa, fundo da faixa original sem o círculo, divisas suaves). Vivendo de Bet e Corte dos Ricos ficam só com notícia. Testes do 9 com PagaTG/SimIntPay e do 13 com Atlas reprovados: institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
+- 19/11/2026 · Dono: estático = capa universal (estático de qualquer copy, capa de carrossel, capa de vídeo para o feed). Notícia não tem carrossel, exceto fato com várias fotos/vídeos: capa do template + mídias do fato + contracapa padrão. Falta só o carrossel de venda para fechar o treino do Designer.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
 1. [x] Carrossel: kits fechados (templates 7 a 13 aprovados).
 2. [x] Identidade de cada marca: mascotes, logos, cores e fontes feitos em 18/11 (fichas `19-mascotes-das-marcas.md` e `20-cores-e-tipografia-das-marcas.md`; único rosto de cada marca = o mascote). Troca automática de cor nos templates 7 a 13 ligada em 18/11 (aprovada pelo dono com prévia em SimIntPay, Seguidores, Raiz e Vivendo de Bet).
-3. [ ] Treino de capas para os carrosséis.
+3. [x] Capas dos carrosséis: todo estático aprovado serve de capa (confirmado pelo dono 19/11/2026).
 4. [x] Feed estático: 19 artes aprovadas (estoque) + regras para criar novas do zero; estático NÃO é template (19/11/2026).
 5. [x] **Atribuir templates às marcas** (feito 19/11/2026, tabela em `conhecimento/agentes/designer/23-templates-por-marca.md`) (logo depois do estático, antes dos stories): o Claude manda cada template aprovado (jornalísticos 1 a 6, Manchetes de marca, carrosséis 7 a 13, estáticos) e pergunta para quais marcas ele serve; marca na checklist de Marcas → Formatos. Template sai nas cores da referência (troca de cor por marca desligada em 18/11/2026).
-6. [ ] Stories de venda.
-7. [ ] Carrossel de história real e carrossel de venda: template próprio de cada (kit do dono). Os 7 educativos ficam só para educativo.
+6. [x] Stories de venda: template 14 · Caixinha de pergunta treinado (19/11/2026). Banco de fundos cresce com o tempo.
+7. [ ] Carrossel de história real e carrossel de venda: investigativo (história real) FEITO (capa com foto real + miolo estilo Twitter); FALTA o formato do carrossel de venda (kit do dono). Os 7 educativos ficam só para educativo.
 8. [ ] Só depois disso: vídeo (Reels).
 Revisão fina dos carrosséis 7 a 13 (elemento fora do texto, menos páginas, letra maior): em produção, peça a peça, na aprovação.
 Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
