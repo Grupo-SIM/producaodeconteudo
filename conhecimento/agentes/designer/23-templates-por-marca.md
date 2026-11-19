@@ -10,3 +10,5 @@ Marcas institucionais (Atlas Hosting, SimIntPay, Sim Intermediações, Teron, Pa
 | 1 · Notícia Zyrion | 007 Spyhacker |
 | 4 · Notícia Nuvo | Vivendo de Bet |
 | 5 · Manchete com perfil | Seguidores em Alta |
+
+Excluído pelo dono (19/11/2026): 6 · Manchete sobre foto com logo (ficava igual ao 5). Formatos de notícia: Zyrion (foto inteira, duas fotos ou círculo), Nuvo, Manchete com perfil; contracapa (cartão do X) acompanha Zyrion e Nuvo.
