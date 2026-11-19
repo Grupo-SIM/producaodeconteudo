@@ -301,6 +301,15 @@ export function criarFluxoV2(ctx) {
       log(null, `Você descartou "${c.title}" (fica na lixeira)`, id);
       return { ok: true };
     }
+    if (nome === 'descartar_arte') {   // na aprovação da arte/vídeo a copy já foi aprovada: some só a arte (ou o vídeo) e a peça volta para a fila do Designer (ou do Editor); a copy só vai para a lixeira quando descartada na aprovação de copy
+      if (c.status === 'discarded') throw fail(400, 'Este item está na lixeira');
+      const ag = c.format === 'video_vertical' ? 'editor' : 'designer';
+      run("DELETE FROM jobs WHERE content_id=? AND status='queued'", id);
+      setContent(id, { ...(ag === 'designer' ? { art_spec: '', art_status: '', art: '' } : { video: '', spec: '' }), status: 'producing', error: '', em_ajuste: 0, ajuste_motivo: '' });
+      ctx.enqueue(id, ag, ag === 'designer' ? 'arte' : 'video', {}, 'manual');
+      log(null, `Você descartou ${ag === 'designer' ? 'a arte' : 'o vídeo'} de "${c.title}": a copy aprovada continua e voltou para ${ag === 'designer' ? 'o Designer' : 'o Editor'}`, id);
+      return { ok: true };
+    }
     if (nome === 'restaurar') {
       if (c.status !== 'discarded') throw fail(400, 'Este item não está na lixeira');
       const volta = c.status_antes || 'awaiting_approval';
@@ -561,7 +570,7 @@ export function criarFluxoV2(ctx) {
       return send(res, 200, { ...item(c), roteiro: c.script, legenda: c.caption, materia: c.materia, brief: c.brief, art_spec: c.art_spec, spec: c.spec, video: c.video, versoes: all('SELECT n,ts,autor,motivo,campos,resumo FROM content_versions WHERE content_id=? ORDER BY n DESC', c.id).map(v => ({ ...v, campos: JSON.parse(v.campos) })) });
     }
     if ((mt = p.match(/^\/api\/v2\/itens\/(\d+)\/versoes$/)) && m === 'GET') return send(res, 200, { versoes: all('SELECT * FROM content_versions WHERE content_id=? ORDER BY n DESC', +mt[1]).map(v => ({ ...v, campos: JSON.parse(v.campos), antes: JSON.parse(v.antes), depois: JSON.parse(v.depois) })) });
-    if ((mt = p.match(/^\/api\/v2\/itens\/(\d+)\/(aprovar|ajuste|descartar|restaurar|postado|editar|voltar_versao|resolver)$/)) && m === 'POST') {
+    if ((mt = p.match(/^\/api\/v2\/itens\/(\d+)\/(aprovar|ajuste|descartar|descartar_arte|restaurar|postado|editar|voltar_versao|resolver)$/)) && m === 'POST') {
       const b = await readBody(req, 4e5);
       const r = acao(+mt[1], mt[2], b, user); changed();
       return send(res, 200, r);
