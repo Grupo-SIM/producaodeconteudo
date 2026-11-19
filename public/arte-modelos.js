@@ -546,7 +546,7 @@ COMPOR_EXTRA['fogo-lista'] = (d, ctx) => {
   const e = erEsc(ctx, ctx.W, ctx.H), s = fgBase(2), x = fx(247), hf = fT(500, -.012), bf = fX(400, -.006), maxW = d.__maxW || 1080 - x - 110, B = [], Z = d.__z || 1, z = v => Math.round(v * Z);   // __z: escala do texto (o Xadrez usa maior: miolo só de texto, mais fácil de ler)
   const it = erItens(d).slice(0, 3), n0 = +d.n > 0 ? +d.n : null;
   if (it.length) it.forEach((o, j) => {
-    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, z(44), maxW), bl = erQuebra(o.d, bf, z(32), maxW);
+    const num = n0 ? n0 + j : j + 1, tl = quebra(`${num}. ${limpa(o.t)}`, hf, z(44), maxW), bl = fgAst(erQuebra(o.d, bf, z(32), maxW));
     B.push({ h: tl.length * z(55) + 12 + bl.length * z(41), gap: j ? 74 : 0, make: y => { tl.forEach((l, i) => s.texts.push({ role: 'title', value: l, x: e.X(x), y: e.Y(y + z(27) + i * z(55)), align: 'left', size: e.P(z(44)), font: hf.k, weight: hf.w, ls: -.012, lh: 1, color: '#ffffff', nowrap: true, shadow: false })); bl.forEach((l, i) => erLinha(s.texts, l, x, y + tl.length * z(55) + 12 + z(20) + i * z(41), z(32), bf, '#f2f2f2', e)); return []; } });
   });
   else {   // página de frase: título grande com palavra em vermelho (*assim*) e apoio
