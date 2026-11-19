@@ -120,3 +120,4 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 4ª rodada: 29 coroa pequena encaixada; 30 APROVADA; 32 dinheiro em 3D (maços e moedas) no lugar das notas planas, listras douradas; 33 sem a pessoa original atrás do mascote (nunca deixar resto da pessoa da referência).
 - 5ª rodada: 29 e 33 APROVADAS; 32 um elemento 3D grande e centralizado (moeda) vale mais que vários pequenos; dinheiro em dólar 3D, nada de barra de ouro.
 - 32 DESCARTADA pelo dono. Estático fechado: 18 aprovados (14 a 25, 27 a 31, 33); descartados 26 e 32.
+- Pente fino (19/11/2026) · 16: título em fonte chamativa (Montserrat 900, branco + rosa), nada de letra pontilhada; fundo liso (degradê suave da cor da marca, sem raios de luz): mascote recortado sobre o fundo.
