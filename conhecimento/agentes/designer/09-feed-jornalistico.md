@@ -43,3 +43,11 @@ Contracapa (cartão do X) é uma página à parte e opcional: só entra quando o
 - Nuvo (dono, 19/11/2026): sempre com a pílula do site da marca e "Leia a legenda" embaixo (abaixo do "Siga @marca no Instagram"). A pílula só aparece quando a marca tem o site cadastrado em Contatos: confira.
 - Nuvo (dono, 19/11/2026): NÃO tem "Leia a legenda". Leva sempre a logo no topo, a pílula com o site e o "Siga @marca no Instagram": sem site/@ cadastrado em Contatos da marca, a pílula e o Siga somem e a arte fica errada (avisar o dono para cadastrar).
 - Prévia do sistema corrigida (19/11/2026): o estilo da capa do template (Nuvo, logo no topo, perfil, fio) não se perde mais na prévia nem na notícia de verdade. Visíveis só os jornalísticos aprovados: 1 Zyrion (com as variações 2 tela dividida e 3 círculo, escolhidas pelas fotos), 4 Nuvo, 5 Manchete com perfil, 6 Manchete sobre foto com logo; Manchete do Raiz e Frase de personalidade voltaram a ficar ocultas.
+
+## Carrossel jornalístico: o ÚNICO formato (dono, 19/11/2026)
+Notícia normal NÃO vira carrossel: é só capa + contracapa.
+Só vira carrossel quando o fato tem várias fotos/vídeos públicos para mostrar (ex.: tecnologia nova com fotos e vídeos do equipamento):
+1. Capa = a capa do template jornalístico da marca (1 a 5).
+2. Meio = as fotos (e vídeos, se houver) reais do fato, uma por página.
+3. Última página = a contracapa padrão (cartão do X), que é o fechamento.
+Não existe outro formato de carrossel de notícia.

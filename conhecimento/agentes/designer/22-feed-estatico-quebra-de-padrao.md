@@ -140,3 +140,9 @@ Arquivos em `banco/tpl-estatico/` (`ref-N`, `layout-N.html`, `teste-N.png`).
 - 30 (correção): o bordado é GERADO NA IMAGEM (nunca texto por cima, fica falso): 2 linhas, na altura do peito, linha cinza claro com textura de costura.
 - 30: bordado pequeno (tamanho de logo de peito, ~9% da largura da arte).
 - 30 APROVADA. Lição: cada edição por IA em cima de outra edição perde qualidade; editar sempre a partir da imagem boa mais antiga e colar só o pedaço novo.
+
+## Vale para TODA capa (dono, 19/11/2026)
+O treino do estático é um só: a copy muda, mas o trabalho do Designer é o mesmo. Este padrão serve para:
+- todo feed estático (educativo, venda, qualquer copy);
+- toda capa de carrossel (de qualquer template);
+- capa/foto de vídeo para o feed, quando pedirem ao Designer uma imagem para o feed ficar bonito.

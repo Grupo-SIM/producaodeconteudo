@@ -10,7 +10,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - [ ] 4. Carrossel de história real (11, 12, 13, 16)
 - [ ] 5. Carrossel de venda (21, 22)
 - [ ] 6. Stories de venda (18, 19, 20, 43, 44)
-- [ ] 7. Estático de venda e carrossel de notícia (sem copy aprovada: Copy escreve antes)
+- [x] 7. Estático de venda: coberto pelo treino do estático (serve para todo estático, capa de carrossel e capa de vídeo). Carrossel de notícia: só capa do template + fotos/vídeos do fato + contracapa padrão (`09-feed-jornalistico.md`), 19/11/2026.
 
 ## Como cada correção entra
 - Vira regra na base do Designer (`conhecimento/agentes/designer/`) e, ao mesmo tempo, item de conferência na base do Revisor (`conhecimento/agentes/gerente/`), igual ao treino do Copy: o Revisor passa a cobrar do Designer o que o dono corrigiu.
@@ -32,6 +32,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 - 18/11/2026 · Feed estático: aprovados 16 a 25, 27 e 28 (26 descartada). Total de 14 estáticos aprovados (14 a 25, 27, 28), arquivos em `banco/tpl-estatico/`. Falta: virar template no sistema.
 - 19/11/2026 · Feed estático FECHADO: 18 aprovados (14 a 25, 27 a 31, 33), descartados 26 e 32. Próximo: virar template no sistema, depois atribuir templates às marcas, depois stories.
 - 19/11/2026 · Atribuição pelas CORES da arte (não pela copy): 7 Seguidores em Alta; 8 Marketing Raiz; 9 Sim Intermediações (original) e Seguidores em Alta (mascote no lugar do robô e do leão); 10 Marketing Raiz (fade na capa e no fim, miolo com a faixa contínua do dono); 11 Central do Marketing (mascote na capa, sem o busto quebrado); 12 Seguidores em Alta; 13 007 Spyhacker (mascote na capa, fundo da faixa original sem o círculo, divisas suaves). Vivendo de Bet e Corte dos Ricos ficam só com notícia. Testes do 9 com PagaTG/SimIntPay e do 13 com Atlas reprovados: institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
+- 19/11/2026 · Dono: estático = capa universal (estático de qualquer copy, capa de carrossel, capa de vídeo para o feed). Notícia não tem carrossel, exceto fato com várias fotos/vídeos: capa do template + mídias do fato + contracapa padrão. Falta só o carrossel de venda para fechar o treino do Designer.
 (registrar aqui e na base do Designer a cada rodada)
 
 ## Plano do dono (18/11/2026): fechar toda a parte de ARTE antes de vídeo
