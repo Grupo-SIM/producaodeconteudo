@@ -7,3 +7,4 @@ Marcas institucionais (Atlas Hosting, SimIntPay, Sim Intermediações, Teron, Pa
 | Template | Marcas |
 |---|---|
 | 1 · Notícia Zyrion | 007 Spyhacker |
+| 4 · Notícia Nuvo | Vivendo de Bet |
