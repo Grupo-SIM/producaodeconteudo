@@ -2503,7 +2503,7 @@ function compoeModelos(found, format, brand, c = null) {
       const sl = found.slides[0] || {}, limpa = v => String(v || '').replace(/\[i:[a-z-]+\]/g, '').replace(/[*|]+/g, ' ').replace(/\s+/g, ' ').trim();
       let tit = limpa(sl.dados?.titulo || sl.dados?.frase || '');
       if (!tit) { const ts = (sl.texts || []).filter(t => ['title', 'body'].includes(t.role || 'body') && String(t.value || '').trim() && !/^(fonte|cr[ée]dito)\b/i.test(limpa(t.value)) && !/^[\p{L} ]{2,30},\s*\d{1,2}\/\d{1,2}\/\d{2,4}$/u.test(limpa(t.value))).sort((x, y) => (y.size || 0) - (x.size || 0) || limpa(y.value).length - limpa(x.value).length); tit = limpa(ts[0]?.value); }
-      const semPerfil = m0 === 'manchete-foto' ? { topo: 'nenhum' } : {};   // notícia nunca leva o avatar/perfil no topo (nem com foto, nem sem)
+      const semPerfil = m0 === 'manchete-foto' && !tv?.seq?.[0]?.opcoes?.topo ? { topo: 'nenhum' } : {};   // notícia nunca leva o avatar/perfil no topo (nem com foto, nem sem)
       if (tit) found.slides = [{ modelo: m0, dados: { titulo: tit, ...semPerfil } }]; else if (!MODELO_IDS.includes(sl.modelo)) found.slides = [{ modelo: m0, dados: { ...semPerfil } }];
       else found.slides = [{ ...sl, modelo: m0, dados: { ...(sl.dados || {}), ...semPerfil } }];
     }
@@ -2513,7 +2513,8 @@ function compoeModelos(found, format, brand, c = null) {
   if (Array.isArray(found?.slides) && found.template && templateDe(found.template)) {   // o Designer escolheu um template: a estrutura (modelo, mascote, fundo) vem dele
     const est = estruturaTemplate(templateDe(found.template), format, found.slides.length, {}, brand);
     found.slides = found.slides.map((s, i) => { const e = est[i]; if (!e || !s || typeof s !== 'object') return s; if (!MODELO_IDS.includes(s.modelo) && ((Array.isArray(s.texts) && s.texts.length) || (Array.isArray(s.items) && s.items.some(x => !x?.moldura)))) return s;   // página livre do Designer (textos e imagens próprios): o template não pode apagar e trocar por um modelo vazio
-      const d = { ...(e.dados.objeto && !s.dados?.foto && !s.dados?.objeto ? { objeto: e.dados.objeto } : {}), ...(e.dados.fundo ? { fundo: e.dados.fundo } : {}), ...(s.dados || {}) }; return { ...s, modelo: MODELO_IDS.includes(s.modelo) ? s.modelo : e.modelo, dados: d }; });
+      const op = i === 0 ? (templateDe(found.template)?.seq?.[0]?.opcoes || {}) : {};   // estilo próprio da capa do template (Nuvo, logo no topo, fio...): nunca se perde
+      const d = { ...(e.dados.objeto && !s.dados?.foto && !s.dados?.objeto ? { objeto: e.dados.objeto } : {}), ...(e.dados.fundo ? { fundo: e.dados.fundo } : {}), ...(s.dados || {}), ...op }; return { ...s, modelo: MODELO_IDS.includes(s.modelo) ? s.modelo : e.modelo, dados: d }; });
     if (!found.previa) { try { run('UPDATE art_templates SET usos=usos+1 WHERE id=?', tplRow(found.template)?.id || 0); } catch { /* template da casa */ } }
   }
   { const vidC = found.estilo || found.template || estiloPadrao(brand, format);   // a capa segue o modelo da capa do estilo/layout da marca (o dono montou o layout: a capa não pode virar outro modelo)
@@ -2542,7 +2543,7 @@ function compoeModelos(found, format, brand, c = null) {
         const corpoRaw = sl.length > 2 ? sl.slice(1, -1).map(x => [x.dados?.titulo, x.dados?.texto || x.dados?.apoio].filter(Boolean).join('. ')).filter(Boolean).map(t => /[.!?…]\**\s*$/.test(t) ? t : t.replace(/\s*(\**)\s*$/, '.$1')).join(' ').replace(/\s+/g, ' ').trim() : '';
         const corpoNoticia = corpoRaw.length <= 340 ? corpoRaw : (corpoRaw.slice(0, 340).match(/^[\s\S]*[.!?](?=\s|$)/)?.[0] || corpoRaw.slice(0, 340).replace(/\s+\S*$/, '') + '…');
         const temContra = sl.length >= 2 || !!partesNoticia(c?.script).contra;   // contracapa opcional: só quando o roteirista/Designer mandou uma 2ª página
-        found.slides = [{ ...p0, modelo: 'noticia', dados: { titulo: d0.titulo, selo: d0.selo || (kk && kk.length <= 28 ? kk : undefined), legenda: d0.legenda, foto } },
+        found.slides = [{ ...p0, modelo: 'noticia', dados: { titulo: d0.titulo, selo: d0.selo || (kk && kk.length <= 28 ? kk : undefined), legenda: d0.legenda, foto, foto2: d0.foto2, circulo: d0.circulo, pb: d0.pb, site: d0.site, handle: d0.handle, ...(tv?.seq?.[0]?.opcoes || {}) } },   // o estilo da capa do template (ex.: Nuvo) e as variações (tela dividida, círculo, P&B) não se perdem
           ...(temContra ? [{ ...p1, modelo: 'post-card', dados: { x: c?.kind === 'noticia' ? true : undefined, titulo: corpoNoticia || (p1.modelo === 'post-card' ? d1.titulo : [d1.titulo, d1.texto || d1.apoio].filter(Boolean).join('. ').replace(/\*\.\s/g, '* ')), nome: d1.nome, foto } }] : [])];
         for (const x of found.slides) for (const k of Object.keys(x.dados)) if (x.dados[k] == null || x.dados[k] === '') delete x.dados[k];
       }
@@ -2590,13 +2591,13 @@ const TEMPLATES_CASA = [
     seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }] },
   { id: 'post-objeto', oculto: true, nome: 'Post único com objeto-símbolo', nivel: 'robusto', formatos: ['feed'], uso: 'Post de 2 a 4 palavras com um objeto que simboliza a ideia (tempo é ouro, dinheiro, estratégia). Título partido pelo objeto.',
     seq: [{ modelo: 'dividido', papel: 'capa' }] },
-  { id: 'frase-personalidade', marcas: ['CENTRAL DO MARKETING'], nome: 'Frase de personalidade (retrato + citação)', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Frase marcante de uma pessoa (histórica ou atual) em post único: retrato em página inteira que escurece até o preto, fio com a logo da marca e o @ no meio, nome de quem disse e a frase em caixa alta centralizada. Foto = o retrato da pessoa; texto = a citação fiel.',
+  { id: 'frase-personalidade', oculto: true, marcas: ['CENTRAL DO MARKETING'], nome: 'Frase de personalidade (retrato + citação)', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Frase marcante de uma pessoa (histórica ou atual) em post único: retrato em página inteira que escurece até o preto, fio com a logo da marca e o @ no meio, nome de quem disse e a frase em caixa alta centralizada. Foto = o retrato da pessoa; texto = a citação fiel.',
     seq: [{ modelo: 'citacao', papel: 'capa' }] },
   { id: 'manchete-perfil', marcas: ['Seguidores em Alta'], nome: '5 · Manchete com perfil', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto em página inteira, perfil da marca no topo, manchete em caixa alta centralizada, “Leia a legenda” e barra na cor da marca. Foto = a imagem real do assunto.',
-    seq: [{ modelo: 'manchete-foto', papel: 'capa' }] },
+    seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'perfil' } }] },
   { id: 'manchete-bet', marcas: ['Vivendo de Bet'], nome: '6 · Manchete sobre foto com logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do esporte/aposta em post único: foto em página inteira, logo da marca no canto, manchete em caixa alta centralizada, “Leia a legenda” e fio colorido no rodapé. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'logo', rodape: 'fio' } }] },
-  { id: 'manchete-raiz', marcas: ['Marketing Raiz'], nome: 'Manchete sobre foto com fio e logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto (ou colagem de fotos) no alto que escurece até o preto, fio branco, manchete em itálico com sombra na cor da marca, logo e “Leia a legenda” embaixo. Foto = a imagem real do assunto.',
+  { id: 'manchete-raiz', oculto: true, marcas: ['Marketing Raiz'], nome: 'Manchete sobre foto com fio e logo', nivel: 'robusto', formatos: ['feed', 'carrossel'], uso: 'Notícia ou fato do momento em post único: foto (ou colagem de fotos) no alto que escurece até o preto, fio branco, manchete em itálico com sombra na cor da marca, logo e “Leia a legenda” embaixo. Foto = a imagem real do assunto.',
     seq: [{ modelo: 'manchete-foto', papel: 'capa', opcoes: { topo: 'nenhum', linha: true, rodape: 'logo', italico: true, sombra: true } }] },
   { id: 'noticia-jornal', marcas: ['007 Spyhacker'], nome: '1 · Notícia Zyrion', nivel: 'robusto', formatos: ['carrossel'], paginas: 2, uso: 'Notícia no estilo de jornal em 2 páginas: capa com a foto da notícia, degradê, selo “Notícia urgente!” e manchete em caixa alta; contra-capa com um cartão branco (avatar, nome verificado e o texto da notícia). Estrutura fixa, sem miolo.',
     seq: [{ modelo: 'noticia', papel: 'capa' }, { modelo: 'post-card', papel: 'fim' }] },
@@ -2947,7 +2948,7 @@ function previaPaginas(tpl, format, brand, nFixo) {
   }
   if (fixo2(tpl) && pags[0]) {   // estilo de notícia: a capa mostra "Leia a legenda" (frase de personalidade: modo impacto, sem nome) e a contracapa é o cartão do X
     if (pags[0].modelo === 'citacao') { pags[0].dados.impact = true; delete pags[0].dados.nome; }
-    if (pags[0].modelo === 'manchete-foto') pags[0].dados.topo = 'nenhum';
+    if (pags[0].modelo === 'manchete-foto' && !tpl.seq?.[0]?.opcoes?.topo) pags[0].dados.topo = 'nenhum';
     const cc = pags[pags.length - 1]; if (pags.length > 1 && cc.modelo === 'post-card') cc.dados.x = true;
   }
   if (pags[0]?.modelo === 'agencia-capa') Object.assign(pags[0].dados, { apoio: 'Você não está investindo em anúncios.', titulo: 'Você está jogando dinheiro fora.', objeto: 'glass trash can full of dollar bills, translucent crystal' });
