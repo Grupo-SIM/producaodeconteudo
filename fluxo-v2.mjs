@@ -313,8 +313,8 @@ export function criarFluxoV2(ctx) {
         log(null, `Você descartou a edição do vídeo de "${c.title}" (foi para a lixeira). O roteiro aprovado continua; o Editor edita de novo quando você clicar em Editar novamente`, id);
         return { ok: true };
       }
-      setContent(id, { status: 'discarded', status_antes: c.status, em_ajuste: 0 });   // pedido do dono: descartar arte = direto para a lixeira (dá para restaurar de lá)
-      log(null, `Você descartou a arte de "${c.title}" (foi para a lixeira)`, id);
+      setContent(id, { art_spec: '', art_status: '', art: '', status: 'producing', error: ARTE_DESCARTADA, em_ajuste: 0, ajuste_motivo: '' });   // pedido do dono: descartar NÃO refaz sozinho
+      log(null, `Você descartou a arte de "${c.title}". A copy aprovada continua; o Designer só faz outra quando você clicar em Resolvido`, id);
       return { ok: true };
     }
     if (nome === 'restaurar') {

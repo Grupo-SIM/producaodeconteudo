@@ -774,7 +774,7 @@ function confirmaDescarte(id) {
     document.body.appendChild(box);
   });
 }
-async function descartarArte(id, tipo) { const v = tipo === 'video'; if (!(await confirmaSim(v ? 'Descartar esta edição?' : 'Descartar esta arte?', v ? 'Só a edição vai para a lixeira. O roteiro e a copy já foram aprovados e continuam. O Editor só edita de novo quando você clicar em Editar novamente.' : 'Vai direto para a lixeira (dá para restaurar de lá). O Designer não refaz.', v ? 'Descartar edição' : 'Descartar arte'))) return; await tryDo(() => api(`/api/v2/itens/${id}/descartar_arte`, { body: {} }), v ? 'Edição descartada: o roteiro espera você clicar em Editar novamente' : 'Arte descartada: foi para a lixeira'); fechaEstudio(); fecha(); }
+async function descartarArte(id, tipo) { const v = tipo === 'video'; if (!(await confirmaSim(v ? 'Descartar esta edição?' : 'Descartar esta arte?', v ? 'Só a edição vai para a lixeira. O roteiro e a copy já foram aprovados e continuam. O Editor só edita de novo quando você clicar em Editar novamente.' : 'Só a arte vai fora. A copy já foi aprovada e continua parada no Fluxo: o Designer só faz outra arte quando você pedir.', v ? 'Descartar edição' : 'Descartar arte'))) return; await tryDo(() => api(`/api/v2/itens/${id}/descartar_arte`, { body: {} }), v ? 'Edição descartada: o roteiro espera você clicar em Editar novamente' : 'Arte descartada. O Designer só faz outra quando você pedir'); fechaEstudio(); fecha(); }
 async function acao(id, a) { if (a === 'descartar' && !(await confirmaDescarte(id))) return; await tryDo(() => api(`/api/v2/itens/${id}/${a}`, { body: {} }), a === 'descartar' ? 'Descartado (está na lixeira)' : 'Feito'); fecha(); }
 
 // ───────── Publicação (manual)
