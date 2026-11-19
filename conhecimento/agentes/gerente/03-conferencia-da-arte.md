@@ -28,3 +28,23 @@ Cada correção do dono no treino do Designer vira item desta lista. Ao revisar 
 - [ ] Textinhos de canto finos e discretos; destaque com marca-texto quando a cor não lê no fundo.
 - [ ] "Leia a legenda ↓" centralizado embaixo (salvo quando a referência pede outro lugar), sem nada atrás dele.
 - [ ] Elementos 3D grandes e poucos (um elemento grande vale mais que vários pequenos).
+
+## Carrosséis educativos 7 a 13 (treino de 18/11/2026) · bases do Designer 11 a 18 e 21
+Valem para todos:
+- [ ] É um dos templates aprovados (7 Lista de erros, 8 Fogo, 9 Identidade roxo, 10 Xadrez, 11 Tipos de clientes, 12 Colagem, 13 Espaço) e o template está atribuído à marca (Marcas → Formatos).
+- [ ] Cores da referência do template (sem trocar pela cor da marca). Leitura do miolo igual à referência: fundo, texto e destaque legíveis.
+- [ ] Fundo NUNCA misturado entre templates; elementos de outro template só quando combinam com a copy.
+- [ ] Texto = copy aprovada do Roteirista, na fonte da marca (sem fonte cadastrada, a da arte). Nenhuma frase cortada.
+- [ ] Copy maior: o miolo ganha páginas repetindo o cenário do MESMO template, sem perder as transições (fundo contínuo, elementos cruzando as divisas).
+- [ ] Slides curtos seguidos juntados numa página (virada no título com palavra em *destaque*, resto no apoio); carrossel de 6 a 7 páginas, não 9 a 10.
+- [ ] Sobrou espaço: o texto cresce para ler fácil.
+- [ ] Elemento decorativo NUNCA em cima do texto nem competindo com o título, principalmente na capa: a peça desce (ou sobe) até liberar; o texto não diminui para caber a peça.
+- [ ] "Arraste para o lado" SÓ na capa. Miolo sem botão.
+- [ ] Sem rodapé de agência, telefone, endereço, redes, ícones de curtir/comentar/salvar, pílula de @ ou barra de busca.
+- [ ] Foto da capa só quando ligada à copy; nunca foto de exemplo nem aleatória.
+- [ ] Último slide: logo da marca e CTA no lugar dos contatos/selos do kit original.
+Por template:
+- [ ] 10 Xadrez: etiquetas brancas da capa abraçam o texto (sem sobra) e centradas; rei pequeno e rei grande abaixo do texto, nunca em cima; miolo com texto 30% maior; texto da última página do miolo não passa por baixo do rei.
+- [ ] 8 Fogo e 10 Xadrez: conteúdo centralizado na altura (sem rodapé).
+- [ ] 12 Colagem: texto reto, alinhado à esquerda, sem cortar palavra no fim da linha, elementos afastados do texto, sem o "VOZ" gigante, textos no mesmo lugar do original, pílula de arraste curta.
+- [ ] 13 Espaço: sem a pílula "Segredos do MKT" no miolo e sem os ícones de curtir/comentar/enviar/salvar no fim.
