@@ -2575,6 +2575,16 @@ function compoeModelos(found, format, brand, c = null) {
       if (i === 0 && sl.modelo === 'heroi') { const d = { ...(sl.dados || {}) }; return { ...sl, modelo: 'noticia', dados: { titulo: d.titulo, legenda: d.legenda, foto: nf } }; }
       return sl; }); }
   if (c?.kind === 'noticia') found.slides = found.slides.map(sl => MODELO_IDS.includes(sl?.modelo) ? semMascoteNoticia(sl, brand, nfoto) : sl);
+  // carrossel de venda (15): 2 ou 3 páginas com foto REAL de banco são obrigatórias; se o Designer não pediu, o sistema escolhe as páginas e busca pela frase, e o Gerente avisa o dono
+  if (!found.previa && Array.isArray(found.slides) && (found.template === 'venda-ebook' || found.estilo === 'venda-ebook' || found.slides.some(s => s?.modelo === 'venda-pagina'))) {
+    const pg = found.slides.map((s, i) => s?.modelo === 'venda-pagina' || (i > 0 && i < found.slides.length - 1 && !s?.modelo) ? i : -1).filter(i => i >= 0), com = pg.filter(i => found.slides[i]?.dados?.foto), quer = pg.length >= 6 ? 3 : pg.length >= 3 ? 2 : 0;
+    if (com.length < quer) {
+      const livres = pg.filter(i => !found.slides[i]?.dados?.foto), alvo = [], passo = livres.length / (quer - com.length + 1);
+      for (let k = 1; alvo.length < quer - com.length && k <= quer; k++) { const i = livres[Math.min(livres.length - 1, Math.round(k * passo) - 1)]; if (i != null && !alvo.includes(i)) alvo.push(i); }
+      for (const i of alvo) { const sl = found.slides[i]; sl.modelo ||= 'venda-pagina'; sl.dados = { ...(sl.dados || {}), foto: String(sl.dados?.titulo || '').replace(/[*|_]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90) }; }
+      if (alvo.length && c?.id) { try { addChat('gerente', `Aviso no carrossel de venda “${clip(c.title || '', 60)}”: o Designer não marcou as fotos (o formato pede 2 ou 3). Escolhi as páginas ${alvo.map(i => i + 1).join(', ')} e busquei fotos reais pela frase de cada uma. Confira na Mesa se combinam.`); } catch { /* sem chat */ } }
+    }
+  }
   const base = ctxMarca(brand, format, found), n = Math.min(found.slides.length, ART_MAX[format] || 10);
   found.slides = found.slides.map((s, i) => { if (!MODELO_IDS.includes(s?.modelo)) return s; try { const r = comporSlide({ modelo: s.modelo, dados: s.dados && typeof s.dados === 'object' ? s.dados : {} }, { ...base, i, total: n }); if (r && s.bgLivre?.asset) r.bg = { ...s.bgLivre }; return r || s; } catch (e) { console.error('modelo', s.modelo, e.message); return s; } });
   const fotoNoticiaIdx = nfoto ? found.slides.map((sl, i) => FOTO_MODELOS.includes(sl?.modelo) ? i : -1).filter(i => i >= 0) : [];
@@ -3866,6 +3876,7 @@ async function renderArte(id, { regen = false } = {}) {
     try { checksSalva('designer', id, checksLer(fs.readFileSync(path.join(dir, 'checks.json'), 'utf8')), 'art_checks'); } catch (e) { console.error('checagem da arte:', e.message); }
     if (credBanco.size) warn.push('Fotos de banco: ' + [...credBanco].join(' · '));
     setContent(id, { art_status: 'ok', art_note: warn.join('\n') });
+    { const fw = c.teste === 3 ? [] : warn.filter(w => /foto do banco|no banco|imagem|fundo/i.test(w)); if (fw.length) try { addChat('gerente', `Aviso na arte de “${clip(c.title || '', 60)}” (${c.brand || 'sem marca'}): ${fw.slice(0, 4).join(' ')} Confira na Mesa de revisão.`); } catch { /* sem chat */ } }   // o dono sabe na hora quando faltou foto ou fundo
     log('designer', `Arte renderizada em PNG (${arteFiles(id).length} ${arteFiles(id).length === 1 ? 'imagem' : 'imagens'}): "${c.title}"`, id);
   } catch (e) {
     status = status === 'ok' ? 'erro' : status;
@@ -5961,7 +5972,9 @@ const HANDLERS = {
   async chat(job) {
     const input = JSON.parse(job.input || '{}'), msg = one('SELECT * FROM chat_msgs WHERE id=?', input.msg);
     if (!msg) return { text: '' };
-    const user = `# ESTADO ATUAL DO SISTEMA (dados reais; não invente nada além disto)\n${gerenteSnapshot(msg.text)}\n\n# CONVERSA ATÉ AGORA\n${gerenteHistorico(msg.id) || '(início da conversa)'}\n\n# MENSAGEM DO DONO\n${msg.text}\n\n${GERENTE_ACOES}\n\nResponda agora ao dono, em português do Brasil, de forma direta e curta.`;
+    const pc = input.content ? getContent(input.content) : null;   // mensagem que veio do "Mandar ajustar" da Mesa: o Gerente vê a peça
+    const pecaCtx = pc ? `\n\n# PEÇA DO AJUSTE (o dono escreveu pelo botão "Mandar ajustar" na Mesa de revisão; o pedido de ajuste JÁ FOI ENVIADO ao agente da etapa, não repita como ação)\nTítulo: ${pc.title} · Marca: ${pc.brand || '-'} · Formato: ${pc.format} · Tipo: ${pc.kind || '-'} · Etapa: ${pc.status}${(() => { try { const sp = JSON.parse(pc.art_spec || '{}'), sl = sp.slides || [], fotos = sl.filter(x => (x.items || []).some(it => it.banco || it.fotoCard) || x.dados?.foto).length; return '\nArte: template ' + (sp.template || sp.estilo || '-') + ', ' + sl.length + ' páginas, ' + fotos + ' com foto.'; } catch { return ''; } })()}\nAvisos da arte: ${pc.art_note || '(nenhum)'}\nResponda às PERGUNTAS do dono sobre esta peça com base nesses dados (diga o que aconteceu e por quê, sem inventar), confirme em uma linha o que vai ser ajustado e, se for regra para as próximas, diga onde vai valer.` : '';
+    const user = `# ESTADO ATUAL DO SISTEMA (dados reais; não invente nada além disto)\n${gerenteSnapshot(msg.text)}\n\n# CONVERSA ATÉ AGORA\n${gerenteHistorico(msg.id) || '(início da conversa)'}${pecaCtx}\n\n# MENSAGEM DO DONO\n${msg.text}\n\n${GERENTE_ACOES}\n\nResponda agora ao dono, em português do Brasil, de forma direta e curta.`;
     const r = await callClaude({ agent: agentRow('chefe'), user, maxTokens: 4000 });
     const { fala, acoes } = gerenteResposta(r.text);
     const res = [];
@@ -6969,6 +6982,12 @@ var ctxFluxo; const fluxoV2 = criarFluxoV2(ctxFluxo = { paraAgora: id => paraAgo
 atlasV = criarAtlas({ db, all, one, run, T, getContent, setContent, contentAct, changed, log, readBody, send, fail, str, addChat, clip, settings: () => settings(), enqueue: (...a) => enqueue(...a), pump: () => setImmediate(pump),
   fluxoAcao: (id, nome, b) => fluxoV2.acao(id, nome, b, null), extrair: (c, formato) => extrairArtigo(formato === 'materia' ? c.materia : c.script), capaDe: c => capaDoItem(c) });
 ctxFluxo.depoisDeAprovar = id => atlasV?.depoisDeAprovar(id);
+// "Mandar ajustar" na Mesa: a mensagem do dono entra no chat do Gerente (com a peça) e o Gerente responde ali, como numa conversa
+ctxFluxo.ajusteDono = (c, motivo, alvo) => {
+  const mid = addChat('user', `✏️ Ajuste em “${clip(c.title || '', 70)}” (${[c.brand, c.format].filter(Boolean).join(' · ')}${alvo ? ' · ' + alvo : ''}): ${motivo}`);
+  if (agenteLigado('chefe')) enqueue(null, 'chefe', 'chat', { msg: mid, content: c.id }, 'chat');
+  changed();
+};
 // Capa do post no site: a 1ª arte do Designer ou, na notícia, a foto da própria notícia
 function capaDoItem(c) {
   try {
