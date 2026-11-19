@@ -40,3 +40,4 @@ Vale para toda notícia (capa + contracapa). Só arte: a copy não muda. Modelos
 Zyrion: editoria pequena em branco acima da manchete (sem pílula), manchete toda branca em caixa alta, logo da marca entre as duas linhas, "Leia a legenda".
 Nuvo: logo no topo, pílula do site em ~65% da altura, manchete logo abaixo (até 4 linhas), nome vazado atrás, "Siga @marca no Instagram" com o ícone.
 Contracapa (cartão do X) é uma página à parte e opcional: só entra quando o roteirista escreveu a Contracapa. Padrão: foto viva até ~3/4 com fade para o preto, cartão branco de 83% da largura terminando em ~90% da altura, avatar redondo, nome em negrito com selo azul, texto normal com o @ em azul.
+- Nuvo (dono, 19/11/2026): sempre com a pílula do site da marca e "Leia a legenda" embaixo (abaixo do "Siga @marca no Instagram"). A pílula só aparece quando a marca tem o site cadastrado em Contatos: confira.

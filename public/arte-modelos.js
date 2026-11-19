@@ -254,7 +254,8 @@ function noticiaNuvo(d, ctx) {
   if (marca) { const g = marca.split(/\s+/)[0].toUpperCase().slice(0, 8), gs = Math.round(Math.min(H * .2, W * 1.05 / Math.max(1, largura(g, { k: 'montserrat', w: 800 }, 1)))); s.texts.push({ role: 'title', value: g, x: .5, y: F2((yT + hT * .55) / H), align: 'center', size: gs, font: 'montserrat', weight: 800, decor: true, outline: true, stroke: '#ffffff', stroke_w: Math.max(2, Math.round(W * .0022)), opacity: .35, nowrap: true, shadow: false }); }
   if (site) { const ps = Math.round(W * .026); s.texts.push({ role: 'badge', value: site, x: .5, y: .65, align: 'center', size: ps, font: 'montserrat', weight: 600, ls: 0, upper: false, caixa: 'normal', bg: ctx.accent, color: sobre(ctx.accent), shape: 'pill', nowrap: true, shadow: false, front: true }); }
   s.texts.push(...[].concat(texto(ctx, tf, ti.linhas, ti.size, { x: W / 2, yTop: yT, align: 'center', color: '#ffffff', extra: { front: true } }).t));
-  if (arroba.length > 1) s.texts.push({ role: 'body', value: `[i:instagram] Siga ${arroba} no Instagram`, x: .5, y: .94, align: 'center', size: Math.round(W * .019), font: 'montserrat', weight: 400, italic: true, color: '#ffffff', opacity: .7, nowrap: true, shadow: false, front: true });
+  s.texts.push({ role: 'body', value: 'Leia a legenda', x: .5, y: .955, align: 'center', size: Math.round(W * .02), font: 'montserrat', weight: 500, color: '#ffffff', opacity: .85, nowrap: true, shadow: false, front: true });   // dono (19/11/2026): Nuvo também leva "Leia a legenda"
+  if (arroba.length > 1) s.texts.push({ role: 'body', value: `[i:instagram] Siga ${arroba} no Instagram`, x: .5, y: .915, align: 'center', size: Math.round(W * .019), font: 'montserrat', weight: 400, italic: true, color: '#ffffff', opacity: .7, nowrap: true, shadow: false, front: true });
   return s;
 }
 export const MODELOS = [
