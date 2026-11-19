@@ -45,7 +45,7 @@ Como mandar: Fluxo → **Treino do Designer** → escolhe a peça e a marca → 
 7. [ ] Carrossel de história real e carrossel de venda: investigativo (história real) FEITO (capa com foto real + miolo estilo Twitter); FALTA o formato do carrossel de venda (kit do dono). Os 7 educativos ficam só para educativo.
 8. [ ] Só depois disso: vídeo (Reels).
 Revisão fina dos carrosséis 7 a 13 (elemento fora do texto, menos páginas, letra maior): em produção, peça a peça, na aprovação.
-Pendente técnico: o template 13 está no branch `claude/eager-hamilton-pg32g4`; o PR para o `main` só é aberto quando o dono pedir.
+Template 13 já está no `main` e é só da 007 Spyhacker.
 
 ## Onde paramos (14/11/2026, para a próxima conversa)
 - Sistema zerado: só trabalha o que o dono pede (Treino, + Novo conteúdo, Gerente) ou a grade de Produção diária (tudo em 0). Cérebro diário e relatório automático desligados.

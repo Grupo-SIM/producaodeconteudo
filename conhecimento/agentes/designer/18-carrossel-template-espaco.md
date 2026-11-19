@@ -3,6 +3,9 @@
 
 Aprovado pelo dono em 18/11/2026. Montado a partir do kit 4 do dono (faixa "4 segredos de marketing que ninguém te conta"), com o fundo e os elementos que ele enviou.
 
+## Marca
+Formato aprovado SÓ para a **007 Spyhacker** (decisão do dono, 19/11/2026). Nenhuma outra marca usa este template.
+
 ## Quando usar
 Segredos, dicas, verdades ou erros de marketing, tráfego e tecnologia, em lista numerada.
 
