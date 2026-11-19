@@ -573,8 +573,9 @@ COMPOR_EXTRA['fogo-fim'] = (d, ctx) => {
 };
 
 // ───────── Template "9 · Identidade visual (roxo)" (réplica aprovada do kit roxo, 18/11/2026) ─────────
-// Kit quadrado 1080×1080 levado a 1080×1350: fundo com 135 px a mais em cima e embaixo; medidas do kit + 135 no eixo y.
-const IV = { roxo: '#7b43e2', roxoClaro: '#d6b8ff', cinza: '#555555' }, iy = v => v + 135;
+// Kit quadrado 1080×1080 levado a 1080×1350: o fundo panorâmico do dono, sem nada inventado, esticado na altura (×1,25); medidas do kit ×1,25 no eixo y.
+const IV = { roxo: '#7b43e2', roxoClaro: '#d6b8ff', cinza: '#555555' }, iy = v => v * 1.25,
+  ivPeca = (ctx, nome) => /seguidores/i.test(String(ctx.marca || '')) ? nome + '-seguidores' : nome;   // Seguidores em Alta: o mascote faz o papel do robô e do leão (dono, 19/11/2026)
 const ivBase = k => ({ bg: { asset: 'tpl-idv-fundo-' + k, color: '#ffffff' }, paper: '#ffffff', shade: 0, pager: false, fx: { grain: 0, vignette: 0 }, texts: [], items: [], shapes: [] });
 // bloco: ícone, título em 2 linhas (fonte de máquina de escrever na arte; da marca quando houver) e texto espaçado com **negrito**
 function ivBloco(s, e, it, x, y, ic, corT, corB, maxW) {
@@ -598,7 +599,7 @@ COMPOR_EXTRA['idv-capa'] = (d, ctx) => {
   s.texts.push({ role: 'title', value: t2, x: e.X(cx), y: e.Y(iy(587)), align: 'center', size: e.P(z2), font: tf.k, weight: tf.w, ls: .17, lh: 1, color: '#6a3cf0', italic: true, nowrap: true, shadow: false });
   const handle = String(d.handle || ctx.contatos?.instagram || '').trim();
   if (handle) { s.items.push({ asset: ctx.logo || ctx.avatar || 'avatar-padrao', x: e.X(368), y: e.Y(iy(830)), size: e.P(52), round: true }); s.texts.push({ role: 'label', value: handle.startsWith('@') ? handle : '@' + handle, x: e.X(410), y: e.Y(iy(830)), align: 'left', size: e.P(26), font: FK.x, weight: pesoDe(FK.x, 500), color: IV.roxo, nowrap: true, shadow: false }); }
-  s.items.push({ asset: 'tpl-idv-robo', x: F2((582 + 513) / 1080), y: F2(iy(150 + 513) / 1350), size: 1026, cruza: true });
+  s.items.push({ asset: ivPeca(ctx, 'tpl-idv-robo'), x: F2((582 + 513) / 1080), y: F2(iy(150 + 513) / 1350), size: 1026, cruza: true });
   return s;
 };
 COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
@@ -606,7 +607,7 @@ COMPOR_EXTRA['idv-texto'] = (d, ctx) => {
   const e = erEsc(ctx, ctx.W, ctx.H), s = ivBase(2), it = erItens(d).slice(0, 2);
   if (it[0]) ivBloco(s, e, it[0], 262, iy(255), 'tpl-idv-icone-pincel', IV.roxoClaro, '#ffffff', 340);
   if (it[1]) ivBloco(s, e, it[1], 392, iy(585), 'tpl-idv-icone-foguete', '#ffffff', '#ffffff', 340);
-  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: 'tpl-idv-leao', x: F2((636 + 540) / 1080), y: F2(iy(432 + 540) / 1350), size: 1080, cruza: true });   // o leão entra no fim, como no original
+  if ((ctx.i || 0) === (ctx.total || 1) - 2) s.items.push({ asset: ivPeca(ctx, 'tpl-idv-leao'), x: F2((636 + 540) / 1080), y: F2(iy(432 + 540) / 1350), size: 1080, cruza: true });   // o leão entra no fim, como no original
   return s;
 };
 COMPOR_EXTRA['idv-fim'] = (d, ctx) => {
