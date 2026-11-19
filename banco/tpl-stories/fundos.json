@@ -1,0 +1,106 @@
+{
+ "tpl-stories-fundo-papel-rasgado-jornal": {
+  "descricao": "Papel preto rasgado sobre jornal antigo",
+  "usar_quando": "verdade revelada, bastidores, o que ninguém conta, notícia, desmascarar mito"
+ },
+ "tpl-stories-fundo-xadrez-rainha-caida": {
+  "descricao": "Rei de xadrez de pé e a rainha caída no tabuleiro, preto e branco",
+  "usar_quando": "estratégia, vencer a concorrência, jogada certa, xeque-mate, decisão"
+ },
+ "tpl-stories-fundo-vela-acesa": {
+  "descricao": "Vela acesa com fumaça no escuro",
+  "usar_quando": "esperança, recomeço, última chance, foco, calma, reflexão"
+ },
+ "tpl-stories-fundo-silhueta-cortina": {
+  "descricao": "Silhueta de homem atrás de uma cortina no escuro",
+  "usar_quando": "mistério, segredo, anonimato, bastidores, quem está por trás"
+ },
+ "tpl-stories-fundo-escada-espiral": {
+  "descricao": "Homem subindo uma escada em espiral rumo à luz",
+  "usar_quando": "jornada, crescimento, passo a passo, evolução, chegar lá, começar"
+ },
+ "tpl-stories-fundo-olho-no-escuro": {
+  "descricao": "Olho espiando no escuro",
+  "usar_quando": "observar, desconfiança, golpe, ficar de olho, atenção, cuidado"
+ },
+ "tpl-stories-fundo-jornais": {
+  "descricao": "Jornais amassados, preto e branco",
+  "usar_quando": "notícia, informação, mídia, o que estão falando, mercado"
+ },
+ "tpl-stories-fundo-relogio-espera": {
+  "descricao": "Homem sentado de costas olhando um relógio na parede, névoa",
+  "usar_quando": "tempo, espera, paciência, procrastinação, momento certo, demora"
+ },
+ "tpl-stories-fundo-feixe-de-luz": {
+  "descricao": "Feixe de luz no escuro tocando uma mão",
+  "usar_quando": "descoberta, ideia, achar a saída, clareza, virada de chave"
+ },
+ "tpl-stories-fundo-corda-arrebentando": {
+  "descricao": "Corda arrebentando no meio, fundo preto",
+  "usar_quando": "limite, pressão, ruptura, quase desistir, ponto de virada, risco"
+ },
+ "tpl-stories-fundo-degraus-de-luz": {
+  "descricao": "Degraus de luz subindo no escuro",
+  "usar_quando": "subir de nível, passo a passo, caminho, progresso, método"
+ },
+ "tpl-stories-fundo-piso-xadrez": {
+  "descricao": "Sala escura com piso quadriculado vazio",
+  "usar_quando": "estratégia, regras do jogo, recomeço do zero, cenário, ambiente"
+ },
+ "tpl-stories-fundo-rei-derrubando": {
+  "descricao": "Rei branco de xadrez derrubando peças pretas",
+  "usar_quando": "vitória, dominar o mercado, vencer, resultado, superar concorrente"
+ },
+ "tpl-stories-fundo-caminho-para-luz": {
+  "descricao": "Homem andando para a luz entre peças de xadrez caídas",
+  "usar_quando": "decisão, liderança, saída, sair na frente, seguir em frente"
+ },
+ "tpl-stories-fundo-rosto-encapuzado": {
+  "descricao": "Rosto encapuzado com olhar intenso no escuro",
+  "usar_quando": "determinação, foco, segredo, sério, hacker, coragem"
+ },
+ "tpl-stories-fundo-homem-sem-rosto": {
+  "descricao": "Homem de terno com o rosto coberto por papel, rua em preto e branco",
+  "usar_quando": "identidade, anonimato, ser visto, marca sem rosto, vergonha, se esconder"
+ },
+ "tpl-stories-fundo-luminaria-azul": {
+  "descricao": "Luminária acesa sobre fundo azul com papéis espalhados",
+  "usar_quando": "ideia, planejamento, organização, explicação, estudo"
+ },
+ "tpl-stories-fundo-luminaria-escuro": {
+  "descricao": "Luminária acesa no escuro, luz caindo",
+  "usar_quando": "destaque, holofote, ideia, atenção, foco em uma coisa"
+ },
+ "tpl-stories-fundo-cadeira-diretor": {
+  "descricao": "Cadeira de diretor num palco com holofotes",
+  "usar_quando": "protagonismo, assumir o controle, comandar, palco, dono do próprio negócio"
+ },
+ "tpl-stories-fundo-parede-degraus": {
+  "descricao": "Parede escura com degraus de luz e pessoa pequena subindo",
+  "usar_quando": "superação, desafio, escalar, esforço, longo caminho"
+ },
+ "tpl-stories-fundo-holofotes-palco": {
+  "descricao": "Holofotes de palco acesos",
+  "usar_quando": "show, lançamento, atenção, destaque, aparecer"
+ },
+ "tpl-stories-fundo-chapeu-vermelho": {
+  "descricao": "Multidão de chapéus pretos e um único chapéu vermelho",
+  "usar_quando": "se destacar, ser diferente, posicionamento, sair da multidão, exclusivo"
+ },
+ "tpl-stories-fundo-estatua-rosa": {
+  "descricao": "Estátua grega segurando uma rosa vermelha",
+  "usar_quando": "sabedoria, valor, elegância, amor pelo que faz, cuidado, presente"
+ },
+ "tpl-stories-fundo-peao-espelho": {
+  "descricao": "Peão de xadrez diante de um espelho",
+  "usar_quando": "potencial, autoimagem, transformação, se enxergar maior, confiança"
+ },
+ "tpl-stories-fundo-grade-preta": {
+  "descricao": "Grade branca fina sobre fundo preto, neutro",
+  "usar_quando": "neutro, estrutura, organização, plano, tela de explicação"
+ },
+ "tpl-stories-fundo-vozes-ansiedade": {
+  "descricao": "Pessoa encolhida cercada de mãos sombrias",
+  "usar_quando": "ansiedade, medo, pressão, dúvidas, sobrecarga, cobrança"
+ }
+}

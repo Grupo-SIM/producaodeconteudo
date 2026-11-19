@@ -2519,7 +2519,7 @@ const assetThumb = (a, h2 = 120) => {
   return h('div', { style: { ...box, color: 'var(--mut)' } }, svg(GROUP_ICON[g], 34));
 };
 const KIND_LABEL = { logo: 'Logo', fundo: 'Fundo / layout de fundo', mascote: 'MASCOTE da marca (personagem oficial)', foto: 'Foto / imagem', textura: 'Textura / padrão', fonte: 'Fonte (arquivo)', musica: 'Música (trilha)', efeito: 'Efeito sonoro', narracao: 'Narração gravada', audio: 'Áudio (outro)', video: 'Vídeo / footage', outro: 'Outro' };
-const COLECAO = { arte: 'Artes', motion: 'Motion', hardcopy: 'VSL' };
+const COLECAO = { arte: 'Artes', stories: 'Stories', motion: 'Motion', hardcopy: 'VSL' };
 const COL_HELP = { arte: 'Biblioteca de Artes do Designer: só fundos, elementos e texturas aprovados pelo dono. Separada dos vídeos: o Editor não usa e o Designer só usa estes.', motion: 'Imagens, fotos, elementos, fundos e vídeos para o estilo motion 2D: texto animado com objetos e fundos em cena.', hardcopy: 'Imagens, vídeos e animações para o estilo VSL: cada cena é uma imagem ou vídeo inteiro, com o texto por cima.', none: 'Logos, mascotes, fontes, músicas e narrações. Servem aos dois estilos.' };
 const COL_ICON = { arte: MI.img, motion: MI.font, hardcopy: MI.video, none: MI.file };
 const KIND_BY_EXT = ext => IMG_EXT.includes(ext) ? 'foto' : AUD_EXT.includes(ext) ? 'musica' : VID_EXT.includes(ext) ? 'video' : FONT_EXT.includes(ext) ? 'fonte' : 'outro';
@@ -2550,7 +2550,7 @@ async function arquivosDoDrop(dt) {
 function uploadAssets(brandPref, preFiles, preKind) {   // coleção pré-selecionada = a que está aberta na Biblioteca
   const brands = (S.kb?.brands || []).map(x => x.name);
   const bsel = h('select', null, h('option', { value: '' }, 'Geral (todas as marcas)'), brands.map(n => h('option', { value: n, selected: n === brandPref }, n)));
-  const csel = h('select', null, Object.entries(COLECAO).map(([k, v]) => h('option', { value: k, selected: k === (['hardcopy', 'arte'].includes(S.mb?.col) ? S.mb.col : 'motion') }, 'Seção ' + v)), h('option', { value: 'none', selected: S.mb?.col === 'none' }, 'Geral (logos, fontes, músicas, narrações)'));
+  const csel = h('select', null, Object.entries(COLECAO).map(([k, v]) => h('option', { value: k, selected: k === (['hardcopy', 'arte', 'stories'].includes(S.mb?.col) ? S.mb.col : 'motion') }, 'Seção ' + v)), h('option', { value: 'none', selected: S.mb?.col === 'none' }, 'Geral (logos, fontes, músicas, narrações)'));
   const ksel = h('select', null, h('option', { value: '' }, 'Detectar pelo nome, pasta e tipo do arquivo'), Object.entries(KIND_LABEL).map(([k, v]) => h('option', { value: k, selected: k === preKind }, v)));
   const tags = h('input', { type: 'text', placeholder: 'Ex.: calma, tecnologia, vertical, fundo escuro' });
   const note = h('input', { type: 'text', placeholder: 'Ex.: cidade à noite com luzes em movimento (ajuda o Editor a escolher)' });
@@ -2821,10 +2821,10 @@ async function viewMedia(embedded) {
   const [al, bd] = await Promise.all([api('/assets'), api('/knowledge')]);
   S.kb = bd; S.assetsList = al.assets;
   const M = S.mb = Object.assign({ tipo: 'all', brand: 'all', q: '', sort: 'recent', col: 'motion' }, S.mb || {});
-  if (!['arte', 'motion', 'hardcopy', 'none', 'all'].includes(M.col)) M.col = 'motion';
+  if (!['arte', 'stories', 'motion', 'hardcopy', 'none', 'all'].includes(M.col)) M.col = 'motion';
   const inCol = (a, c) => c === 'all' || (c === 'none' ? !a.colecao : a.colecao === c);
   const GR_ALL = [['img', 'Imagens'], ['video', 'Vídeos e animações'], ['musica', 'Músicas'], ['audio', 'Narrações e efeitos'], ['fonte', 'Fontes'], ['outro', 'Outros']];
-  const GR_COL = M.col === 'arte' ? ['img'] : M.col === 'motion' || M.col === 'hardcopy' ? ['img', 'video'] : M.col === 'none' ? ['img', 'musica', 'audio', 'fonte', 'outro'] : GR_ALL.map(g => g[0]);
+  const GR_COL = M.col === 'arte' || M.col === 'stories' ? ['img'] : M.col === 'motion' || M.col === 'hardcopy' ? ['img', 'video'] : M.col === 'none' ? ['img', 'musica', 'audio', 'fonte', 'outro'] : GR_ALL.map(g => g[0]);
   const GR = [['all', 'Tudo'], ...GR_ALL.filter(g => GR_COL.includes(g[0]))];
   if (!GR.some(g => g[0] === M.tipo)) M.tipo = 'all';
   const cnt = (k, c = M.col) => al.assets.filter(a => inCol(a, c) && (k === 'all' || mediaGroup(a) === k)).length;
@@ -2838,9 +2838,9 @@ async function viewMedia(embedded) {
     h('span', { class: 'lib-ci' }, svg(COL_ICON[k], 22)), h('div', { class: 'sp' }, h('b', null, label), h('div', { class: 'small mut', style: { lineHeight: 1.45 } }, COL_HELP[k]),
       h('div', { class: 'lib-cnts' }, k === 'none' ? [h('span', null, h('b', null, cnt('musica', k) + cnt('audio', k)), ' áudios'), h('span', null, h('b', null, cnt('img', k)), ' imagens'), h('span', null, h('b', null, cnt('fonte', k)), ' fontes')] : [h('span', null, h('b', null, cnt('img', k)), ' imagens'), h('span', null, h('b', null, cnt('video', k)), ' vídeos e animações')])));
   root.append(painelFichas(al.assets));
-  root.append(h('div', { class: 'lib-secs' }, secCard('arte', 'Artes (Designer)'), secCard('motion', 'Motion'), secCard('hardcopy', 'VSL'), secCard('none', 'Geral')));
+  root.append(h('div', { class: 'lib-secs' }, secCard('arte', 'Artes (Designer)'), secCard('stories', 'Stories (fundos de venda)'), secCard('motion', 'Motion'), secCard('hardcopy', 'VSL'), secCard('none', 'Geral')));
   const secName = M.col === 'all' ? 'a biblioteca' : M.col === 'none' ? 'Geral' : 'a seção ' + COLECAO[M.col];
-  const drop = h('div', { class: 'lib-drop' }, svg(MI.up, 22), h('div', null, h('b', null, M.col === 'all' ? 'Arraste arquivos aqui' : 'Arraste para ' + secName), h('div', { class: 'small mut' }, M.col === 'motion' ? 'Imagens, fotos, fundos e vídeos para o estilo Motion. Ou clique para escolher.' : M.col === 'hardcopy' ? 'Imagens, vídeos e animações para o estilo VSL. Ou clique para escolher.' : M.col === 'none' ? 'Logos, mascotes, fontes, músicas e narrações. Ou clique para escolher.' : 'Ou clique para escolher. Vários de uma vez.')));
+  const drop = h('div', { class: 'lib-drop' }, svg(MI.up, 22), h('div', null, h('b', null, M.col === 'all' ? 'Arraste arquivos aqui' : 'Arraste para ' + secName), h('div', { class: 'small mut' }, M.col === 'stories' ? 'Fundos dos stories de venda (o Designer só usa estes). Na descrição, diga o que a imagem mostra e quando usar. Ou clique para escolher.' : M.col === 'motion' ? 'Imagens, fotos, fundos e vídeos para o estilo Motion. Ou clique para escolher.' : M.col === 'hardcopy' ? 'Imagens, vídeos e animações para o estilo VSL. Ou clique para escolher.' : M.col === 'none' ? 'Logos, mascotes, fontes, músicas e narrações. Ou clique para escolher.' : 'Ou clique para escolher. Vários de uma vez.')));
   const pick = h('input', { type: 'file', multiple: true, style: { display: 'none' } }); pick.addEventListener('change', () => { if (pick.files.length) uploadAssets(secBrand, pick.files); });
   drop.addEventListener('click', () => pick.click());
   ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('on'); }));

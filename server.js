@@ -211,7 +211,7 @@ if (!db.prepare("SELECT 1 x FROM settings WHERE key='lib_arte_v1'").get()) { db.
 const ASSET_DIR = path.join(DATA_DIR, 'assets'); fs.mkdirSync(ASSET_DIR, { recursive: true });
 // Coleções da biblioteca: para que serve cada arquivo no vídeo
 // Biblioteca em duas seções de estilo de vídeo (motion e VSL); '' = arquivos gerais (logos, fontes, músicas, narrações) usados pelos dois
-const COLECOES = { motion: 'Motion', hardcopy: 'VSL', arte: 'Artes' };   // arte = Biblioteca de Artes do Designer (só o que o dono aprovou); motion e VSL = Biblioteca de Vídeo
+const COLECOES = { motion: 'Motion', hardcopy: 'VSL', arte: 'Artes', stories: 'Stories' };   // stories = fundos dos stories de venda (só deles; o dono abastece)   // arte = Biblioteca de Artes do Designer (só o que o dono aprovou); motion e VSL = Biblioteca de Vídeo
 const SEM_SECAO = ['logo', 'fonte', 'musica', 'efeito', 'narracao', 'audio'];
 const colecaoDe = (v, kind) => SEM_SECAO.includes(kind) ? '' : COLECOES[v] ? v : v === 'none' ? '' : (['fundo', 'textura', 'foto', 'mascote', 'video'].includes(kind) ? 'motion' : '');
 const POSE_DIR = path.join(DATA_DIR, 'poses'); fs.mkdirSync(POSE_DIR, { recursive: true });
@@ -1139,7 +1139,7 @@ function catalogoArte(rows) {
 function assetCatalog(brand = '', scoped = false, ag = '') {
   const rows = (scoped && !brand) ? all("SELECT * FROM assets WHERE brand='' ORDER BY kind, name") : brand ? all("SELECT * FROM assets WHERE brand='' OR brand=? COLLATE NOCASE ORDER BY brand COLLATE NOCASE, kind, name", brand) : all('SELECT * FROM assets ORDER BY brand COLLATE NOCASE, kind, name');
   if (ag === 'designer') return catalogoArte(rows.filter(a => a.colecao === 'arte' || ['logo', 'fonte'].includes(a.kind)));
-  if (ag === 'editor') { const vid = rows.filter(a => a.colecao !== 'arte'); rows.length = 0; rows.push(...vid); }
+  if (ag === 'editor') { const vid = rows.filter(a => !['arte', 'stories'].includes(a.colecao)); rows.length = 0; rows.push(...vid); }   // Artes e Stories são só do Designer
   const out = ['### [ARQUIVOS DA MARCA — catálogo]', 'A biblioteca tem duas seções: “Motion” = imagens, fotos, elementos, fundos e vídeos para o estilo motion 2D (imagem solta entra como item {"type":"img","asset":…}; fundo de cena vai em bg); “VSL” = imagens, vídeos e animações para o estilo VSL, em que cada cena é uma imagem ou vídeo inteiro com o texto por cima (bg, shade 0.25 a 0.4). Arquivos sem seção (logos, fontes, músicas, narrações) servem aos dois estilos.', 'Cite SEMPRE os arquivos pelo nome exato desta lista (ex.: “logo-clara”, “fundo-floresta-01”) ao indicar logo, fundo, mascote, foto, textura, fonte ou trilha. Não invente arquivos. Se a peça precisar de um arquivo que não está na lista, escreva “ARQUIVO FALTANDO: <o que falta>”.'];
   if (!rows.length) { out.push('(Nenhum arquivo cadastrado ainda.)'); return out.join('\n'); }
   const mascs = rows.filter(a => a.kind === 'mascote' && IMG_EXT.includes(a.ext));
@@ -2315,7 +2315,7 @@ function paraAprovacao(c0, txtLog) {
 const ARTE_DIR = id => path.join(RENDER_DIR, String(id), 'arte');
 const arteState = new Map();   // id -> { status:'running'|'done'|'error', started }
 const ART_SIZE = { feed: [1080, 1350], carrossel: [1080, 1350], stories: [1080, 1920], video_vertical: [1080, 1920], video_horizontal: [1280, 720] };
-const ART_MAX = { feed: 1, carrossel: 10, stories: 7, video_vertical: 1, video_horizontal: 1 };
+const ART_MAX = { feed: 1, carrossel: 10, stories: 30, video_vertical: 1, video_horizontal: 1 };   // stories de venda: 16 a 20 telas (às vezes mais)
 const ICONES_OK = ['seta', 'seta-diag', 'seta-baixo', 'whatsapp', 'instagram', 'facebook', 'tiktok', 'youtube', 'site', 'telefone', 'local', 'email', 'check', 'estrela', 'play', 'carrinho', 'porcento', 'coracao', 'comentario', 'enviar', 'salvar', 'raio', 'trofeu', 'relogio', 'dinheiro', 'grafico', 'presente', 'cadeado', 'usuario', 'cursor', 'chat', 'alvo', 'foguete', 'ovni'];
 const ICONES_TODOS = Object.keys(ICONES_DESENHOS);   // catálogo completo do Estúdio (o Designer só recebe a lista curta acima)
 const ARTE_SPEC_GUIA = `# ESPECIFICAÇÃO VISUAL (obrigatória)
@@ -2625,9 +2625,11 @@ const TEMPLATES_CASA = [
   { id: 'espaco', marcas: ['007 Spyhacker'], nome: '13 · Espaço (azul neon)', nivel: 'robusto', formatos: ['carrossel'], uso: 'Carrossel de segredos, dicas ou verdades de marketing/tecnologia (ex.: "4 segredos de marketing que ninguém te conta"): réplica do kit espacial azul do dono. Capa com o astronauta segurando o tablet e o título preto na tela (última linha gigante), botão ciano "Arraste para o lado"; miolo com a pílula "Segredos do MKT" e 2 itens numerados por página (título ciano + texto com *negrito*), caneta digital e computador com barra de ferramentas cruzando as divisas; fim com "Gostou do conteúdo?", ícones e pílula do CTA.',
     seq: [{ modelo: 'espaco-capa', papel: 'capa' }, { modelo: 'espaco-par', repetir: true }, { modelo: 'espaco-fim', papel: 'fim' }] },
   { id: 'stories-sequencia', oculto: true, nome: 'Sequência de stories', nivel: 'simples', formatos: ['stories'], uso: 'Stories em sequência: gancho, desenvolvimento curto e chamada para responder ou clicar.',
-    seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] }
+    seq: [{ modelo: 'heroi', papel: 'capa', mascote: true }, { modelo: 'frase', repetir: true }, { modelo: 'texto', mascote: true }, { modelo: 'cta', papel: 'fim' }] },
+  { id: 'caixinha', nome: '14 · Caixinha de pergunta (stories de venda)', nivel: 'simples', formatos: ['stories'], uso: 'Stories de venda: cada tela é a caixinha "Faça uma pergunta" do Instagram com a pergunta dentro e a resposta embaixo, em tom de gente. Fundo só da seção Stories da Biblioteca, escolhido pelo assunto da tela. Aprovado pelo dono em 19/11/2026.',
+    seq: [{ modelo: 'caixinha', repetir: true }] },
 ];
-const TEMA_CASA = { espaco: 'lista', colagem: 'educativo', 'tipos-clientes': 'educativo', xadrez: 'educativo', 'identidade-roxo': 'educativo', 'lista-erros': 'lista', fogo: 'educativo', mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral' };
+const TEMA_CASA = { espaco: 'lista', colagem: 'educativo', 'tipos-clientes': 'educativo', xadrez: 'educativo', 'identidade-roxo': 'educativo', 'lista-erros': 'lista', fogo: 'educativo', mitos: 'educativo', 'lista-numerada': 'lista', 'passo-a-passo': 'tutorial', oferta: 'oferta', opiniao: 'opiniao', 'post-heroi': 'geral', 'post-objeto': 'geral', noticia: 'noticia', 'noticia-jornal': 'noticia', 'frase-personalidade': 'geral', 'manchete-perfil': 'geral', 'manchete-bet': 'geral', 'manchete-raiz': 'geral', 'stories-sequencia': 'geral', caixinha: 'oferta' };
 for (const t of TEMPLATES_CASA) t.tema = TEMA_CASA[t.id] || 'geral';
 const TEMAS = { educativo: 'Educativo', lista: 'Lista', tutorial: 'Tutorial', oferta: 'Oferta', noticia: 'Notícia', opiniao: 'Opinião', geral: 'Geral' };
 db.exec(`CREATE TABLE IF NOT EXISTS art_templates(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, uso TEXT DEFAULT '', nivel TEXT DEFAULT 'simples', formatos TEXT DEFAULT '["carrossel"]', seq TEXT NOT NULL, exemplo TEXT DEFAULT '', brand TEXT DEFAULT '', usos INTEGER DEFAULT 0, created_at TEXT NOT NULL)`);
@@ -2824,8 +2826,54 @@ function roteiroNoticiaFallback(c) {
   const lm = String(c.script || '').match(/(?:^|\n)\s*[#>*]*\s*(?:chamada|legenda da arte)\s*[^:\n]*:\s*(.+)/i); leg = lm ? limpa(lm[1]).slice(0, 40) : '';
   return { script: `📌 Arte — CAPA\nTítulo: ${tit.slice(0, 160)}\nLegenda: ${leg || 'Leia a legenda'}`, origem };
 }
+// ───────── STORIES DE VENDA (template 14 · Caixinha de pergunta) ─────────
+// O roteiro já vem no modelo do dono ("📌 Tela N — TIPO", "Pergunta:", "Resposta:"); o painel monta uma tela por bloco, sem IA.
+function telasStoriesVenda(script) {
+  const limpa = v => String(v || '').replace(/[*_`#>]/g, '').replace(/^[\s"“'‘-]+|[\s"”'’]+$/g, '').replace(/\s+/g, ' ').trim();
+  const blocos = String(script || '').replace(/\r/g, '').split(/\n(?=[^\n]*📌\s*Tela\s*\d+)/i).filter(b => /📌\s*Tela\s*\d+/i.test(b));
+  return blocos.map(b => {
+    const L = b.split('\n').slice(1), campo = re => { const i = L.findIndex(x => re.test(x)); if (i < 0) return ''; const resto = [L[i].replace(re, '')]; for (const x of L.slice(i + 1)) { if (!x.trim() || /^\s*[*_]*\s*(pergunta|resposta|texto|visual|t[ií]tulo|legenda|cta)\s*[*_]*\s*:/i.test(x) || /^#{1,4}\s/.test(x)) break; resto.push(x); } return limpa(resto.join(' ')); };
+    const pergunta = campo(/^\s*[*_]*\s*pergunta\s*[*_]*\s*:\s*/i), resposta = campo(/^\s*[*_]*\s*(?:resposta|texto)\s*[*_]*\s*:\s*/i);
+    return { pergunta, resposta: resposta || limpa(L.filter(x => x.trim() && !/:/.test(x.slice(0, 20))).join(' ')) };
+  }).filter(t => t.resposta);
+}
+const fundosStories = () => all("SELECT name, tags, note FROM assets WHERE colecao='stories' AND kind IN ('fundo','foto') AND ext IN ('jpg','jpeg','png','webp') ORDER BY id");
+// escolhe o fundo de cada tela pelo assunto: o Designer lê as descrições da seção Stories; plano B por palavras. Imagem do banco SEMPRE primeiro;
+// fundo preto liso só numa tela ou outra, quando nenhuma imagem combina (dono, 19/11/2026)
+async function fundosDasTelas(c, telas) {
+  const F = fundosStories(); if (!F.length) return telas.map(() => 'preto');
+  const nomes = new Set(F.map(f => f.name)), maxPreto = Math.max(1, Math.floor(telas.length / 8));
+  let esc = null;
+  if (!als.getStore()?.dry) try {
+    const user = `# TAREFA\nEscolha o FUNDO de cada tela de uma sequência de stories de venda. Regra do dono: o fundo é o que MAIS combina com o assunto daquela tela (pergunta e resposta). Use SEMPRE uma imagem da lista; "preto" (fundo preto liso, sem imagem) só em no máximo ${maxPreto} tela(s), quando nenhuma imagem combinar mesmo. Evite repetir a mesma imagem em telas seguidas e varie ao longo da sequência.\n\n# FUNDOS DISPONÍVEIS (seção Stories da Biblioteca)\n${F.map(f => `- ${f.name}: ${f.note}${f.tags ? ' (usar quando: ' + f.tags.replace(/^stories de venda,?\s*/, '') + ')' : ''}`).join('\n')}\n\n# TELAS\n${telas.map((t, i) => `${i + 1}. ${t.pergunta ? 'Pergunta: ' + t.pergunta + ' | ' : ''}Resposta: ${t.resposta}`).join('\n')}\n\nResponda SÓ com um array JSON com ${telas.length} nomes, na ordem das telas. Ex.: ["${F[0].name}", "preto"]`;
+    const r = await callClaude({ agent: agentRow('designer'), user, maxTokens: 1500 }), m = String(r.text || '').match(/\[[\s\S]*\]/);
+    const arr = m ? JSON.parse(m[0]) : null; if (Array.isArray(arr) && arr.length >= telas.length) esc = arr.slice(0, telas.length).map(x => String(x || '').trim());
+  } catch (e) { console.error('fundos dos stories (Designer):', e.message); }
+  const sem = v => String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const uso = new Map(); let pretos = 0, ant = '';
+  return telas.map((t, i) => {
+    let f = esc?.[i];
+    if (f === 'preto' && pretos < maxPreto) { pretos++; ant = f; return f; }
+    if (!nomes.has(f) || f === ant) {   // plano B: palavras da tela contra o "usar quando" de cada fundo, preferindo o menos usado
+      const pal = new Set(sem(t.pergunta + ' ' + t.resposta).match(/[a-z]{4,}/g) || []);
+      f = F.filter(x => x.name !== ant).map(x => ({ n: x.name, p: (sem(x.tags + ' ' + x.note).match(/[a-z]{4,}/g) || []).filter(w => pal.has(w)).length * 3 - (uso.get(x.name) || 0) })).sort((a, b) => b.p - a.p)[0]?.n || F[0].name;
+    }
+    uso.set(f, (uso.get(f) || 0) + 1); ant = f; return f;
+  });
+}
+async function arteStoriesVenda(c, origem) {
+  const telas = telasStoriesVenda(c.script); if (telas.length < 2) return false;
+  const fundos = await fundosDasTelas(c, telas), pags = telas.slice(0, ART_MAX.stories).map((t, i) => ({ modelo: 'caixinha', dados: { pergunta: t.pergunta || undefined, resposta: t.resposta, fundo: fundos[i] } }));
+  const spec = sanitizeArteSpec(compoeModelos({ slides: pags, template: 'caixinha', estilo: 'caixinha' }, 'stories', c.brand, c), 'stories'); if (!spec) return false;
+  const resumo = `Stories de venda montados pelo painel a partir do roteiro, no template 14 · Caixinha de pergunta (${origem}).\n` + pags.map((p, i) => `Tela ${i + 1}${p.dados.pergunta ? ' · ' + p.dados.pergunta : ' · sem caixinha'} · fundo: ${p.dados.fundo === 'preto' ? 'preto liso' : p.dados.fundo.replace('tpl-stories-fundo-', '')}`).join('\n');
+  setContent(c.id, { art: resumo, art_spec: JSON.stringify(spec), art_spec_base: JSON.stringify(spec), art_status: '', art_note: '', estilo_arte: 't:caixinha', ...(!c.caption && parseCaption(c.script) ? { caption: parseCaption(c.script) } : {}) });
+  log('designer', `Stories de venda montados (${pags.length} telas): "${c.title}"`, c.id);
+  await renderArte(c.id);
+  return true;
+}
 async function arteDoRoteiro(id, origem = 'painel') {
   let c = getContent(id); if (!c || !['feed', 'carrossel', 'stories'].includes(c.format)) return false;
+  if (c.format === 'stories' && storiesTipo(c.brand) === 'venda' && await arteStoriesVenda(c, origem)) return true;
   let format = c.format, pags = paginasDoRoteiro(c.script, format, c.brand);
   if (!pags && format === 'feed') { const p2 = paginasDoRoteiro(c.script, 'carrossel', c.brand); if (p2 && p2.length > 1) { format = 'carrossel'; pags = p2; } }
   if (!pags && format !== 'feed' && lerRoteiroModelo(c.script).length === 1) { const t1 = templateDe(c.estilo_arte && /^t:/.test(c.estilo_arte) ? c.estilo_arte.slice(2) : ''), p1 = paginasDoRoteiro(c.script, 'feed', c.brand); if (p1 && p1.length === 1 && (!t1 || t1.seq.length === 1)) { format = 'feed'; pags = p1; } }   // template de notícia de uma página só: o roteiro de 1 slide é válido (antes dava "o Designer não entregou a especificação visual")
@@ -4690,6 +4738,18 @@ for (const [pasta, rotulo] of Object.entries(TPL_PASTAS)) try {
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   }
 } catch (e) { console.error('template', pasta, e.message); }
+// fundos dos stories de venda (banco/tpl-stories, enviados pelo dono em 19/11/2026): biblioteca própria, seção Stories.
+// O Designer só usa fundo de stories desta seção e escolhe o que mais combina com o assunto de cada tela (descrição e "usar quando" no fundos.json).
+try {
+  const dir = path.join(__dirname, 'banco', 'tpl-stories'), fichas = jparse(fs.existsSync(path.join(dir, 'fundos.json')) ? fs.readFileSync(path.join(dir, 'fundos.json'), 'utf8') : '{}', {}) || {};
+  for (const arqN of fs.existsSync(dir) ? fs.readdirSync(dir).sort() : []) {
+    const m = arqN.match(/^(tpl-stories-fundo-[a-z0-9-]+)\.(png|jpg)$/); if (!m || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", m[1])) continue;
+    const [, nome, ext] = m, f = fichas[nome] || {}, buf = fs.readFileSync(path.join(dir, arqN));
+    const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'fundo', ['stories de venda', f.usar_quando].filter(Boolean).join(', '), f.descricao || 'Fundo dos stories de venda', 'stories', arqN, ext, buf.length, 'Stories de venda/Fundos', T());
+    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.' + ext), buf);
+    const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+  }
+} catch (e) { console.error('fundos dos stories', e.message); }
 // mascotes e logos oficiais das marcas (banco/marcas/<pasta>/: marca.json + PNG sem fundo), enviados pelo dono no treino do Designer.
 // Entram uma vez como arquivo "mascote" da marca, já com a ficha técnica; o dono pode editar depois na Biblioteca.
 try {
@@ -5727,6 +5787,8 @@ const HANDLERS = {
     if (c.kind === 'noticia' && !input.encurtado) { const p = partesNoticia(c.script), card = [p.contra, p.chamada].filter(Boolean).join(' ');
       if (p.capa.length > LIM_CAPA_NOTICIA || card.length > LIM_CARD_NOTICIA) { enqueue(c.id, 'roteirista', 'encurtar', { capa: p.capa, contra: p.contra, chamada: p.chamada, ...(input.feedback ? { feedback: input.feedback, from: input.from } : {}) }, 'manual'); addChat('gerente', `O Designer pediu ao Copy para encurtar o texto da arte de “${c.title}”: ${p.capa.length > LIM_CAPA_NOTICIA ? `o título da capa tem ${p.capa.length} caracteres e cabem ${LIM_CAPA_NOTICIA}` : `a contracapa tem ${card.length} caracteres e cabem ${LIM_CARD_NOTICIA}`}. Não é erro: só o texto da arte muda (a matéria do site não), e depois a arte volta para o Designer${input.feedback ? ' com o seu pedido' : ''}.`); log('designer', `"${c.title}": o texto não cabe na arte (capa ${p.capa.length}/${LIM_CAPA_NOTICIA}, contracapa ${card.length}/${LIM_CARD_NOTICIA} caracteres). Devolvido ao Copy para encurtar.`, c.id); return { text: 'Texto maior que a arte: devolvido ao Copy para encurtar', tin: 0, tout: 0 }; } }
     { const fmt = formatoPeloRoteiro(c); if (fmt && fmt !== c.format) { setContent(c.id, { format: fmt }); log('designer', fmt === 'carrossel' ? `O roteiro de "${c.title}" tem várias páginas: a peça passou de post único para carrossel` : `O roteiro de "${c.title}" tem uma página só: a peça passou de carrossel para post único`, c.id); c = getContent(c.id); } }
+    if (c.format === 'stories' && storiesTipo(c.brand) === 'venda' && !(input.feedback && c.art_spec && !input.refazer) && !als.getStore()?.dry && await arteStoriesVenda(c, input.refazer ? 'refeita do zero' : 'Designer'))
+      return { text: getContent(c.id).art, tin: 0, tout: 0 };   // stories de venda: template 14 montado pelo roteiro, fundo escolhido pela tela
     let user = `# TAREFA\n${ARTE_GUIA[c.format] || 'Crie a direção de arte completa para a peça abaixo.'}\n\n# PEÇA\n${brief(c)}\n\n# ROTEIRO APROVADO\n${c.script}\n\n${ARTE_SPEC_GUIA}\n\n${estiloTexto(c.brand)}${PROMPT_IMAGEM_GUIA}`;
     if (input.feedback && (c.art || c.art_spec)) user += `\n\n# VERSÃO ANTERIOR\n${c.art}${c.art_spec ? '\n\n# ESPECIFICAÇÃO VISUAL ANTERIOR (JSON)\n```json\n' + c.art_spec + '\n```\nMantenha tudo o que não foi pedido para mudar (textos, cores, prompts de fundo "gen" idênticos) e altere somente o que os ajustes pedem.' : ''}\n\n# AJUSTES PEDIDOS ${input.from === 'dono' ? 'PELO DONO (prioridade máxima; o roteiro e os textos continuam os mesmos, ajuste a diagramação e os elementos visuais)' : input.from === 'sistema' ? 'PELO SISTEMA' : 'PELO REVISOR'} (aplique todos e entregue a direção de arte completa de novo, com a especificação visual em JSON)\n${input.feedback}`;
     if (input.ped?.acao === 'editar' && input.ped.elementos.length) user += `\n\n# O QUE MUDAR (o Gerente leu o pedido do dono)\n${input.ped.entendi}\nElementos que podem mudar: ${input.ped.elementos.map(e => (e.pagina === 0 ? 'capa' : 'página ' + (e.pagina + 1)) + ' › ' + (e.tipo === 'novo' ? 'acrescentar elemento' : e.tipo + (e.tipo === 'fundo' ? '' : '#' + e.indice))).join('; ')}. TODO o resto da especificação volta igual (mesmos índices, mesmos valores); o painel desfaz qualquer outra mudança.\n# ELEMENTOS DA ARTE ATUAL\n${descreveArte(jparse(c.art_spec, {}))}`;
@@ -7685,7 +7747,7 @@ async function api(req, res, url) {
     }
     if (mt[2] === 'do-roteiro' && m === 'POST') {   // monta a arte direto do roteiro no modelo do dono (sem IA); o pedido do Designer na fila sai
       if (!c.script) throw fail(400, 'Esta peça ainda não tem roteiro');
-      if (!paginasDoRoteiro(c.script, c.format, c.brand)) throw fail(400, 'O roteiro não está no modelo de páginas ("📌 Slide 1 — CAPA" com "Título:", "Texto:"…). Peça ao Designer pelo chat ou ajuste o roteiro.');
+      if (!(c.format === 'stories' && storiesTipo(c.brand) === 'venda' && telasStoriesVenda(c.script).length >= 2) && !paginasDoRoteiro(c.script, c.format, c.brand)) throw fail(400, 'O roteiro não está no modelo de páginas ("📌 Slide 1 — CAPA" com "Título:", "Texto:"…). Peça ao Designer pelo chat ou ajuste o roteiro.');
       if (arteState.get(id)?.status === 'running') throw fail(409, 'A arte desta peça já está sendo gerada');
       const ok = await arteDoRoteiro(id, 'pedido do dono'); if (!ok) throw fail(400, 'Não consegui montar a arte pelo roteiro');
       for (const j of all("SELECT id FROM jobs WHERE content_id=? AND agent='designer' AND kind='arte' AND status='queued'", id)) run("UPDATE jobs SET status='done', finished_at=?, output='Montada pelo painel a partir do roteiro' WHERE id=?", T(), j.id);
