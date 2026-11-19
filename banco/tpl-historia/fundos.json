@@ -28,5 +28,29 @@
   "cores": "preto, cinza",
   "tom": "escuro",
   "usar_quando": "miolo de carrossel de história real ou de venda de marca com cores preto, cinza"
+ },
+ "tpl-historia-fundo-preto-circulos": {
+  "descricao": "Fundo preto/grafite com grandes círculos sutis em tons de preto, minimalista",
+  "cores": "preto, grafite",
+  "tom": "escuro",
+  "usar_quando": "miolo de carrossel de história real ou de venda de marca com cores preto, grafite"
+ },
+ "tpl-historia-fundo-laranja-madeira": {
+  "descricao": "Fundo laranja com textura de tábuas de madeira na vertical, centro mais claro (pêssego)",
+  "cores": "laranja, pêssego",
+  "tom": "claro",
+  "usar_quando": "miolo de carrossel de história real ou de venda de marca com cores laranja, pêssego"
+ },
+ "tpl-historia-fundo-branco-granulado": {
+  "descricao": "Fundo off-white com manchas de granulado/spray cinza-escuro nos cantos",
+  "cores": "branco, cinza-escuro",
+  "tom": "claro",
+  "usar_quando": "miolo de carrossel de história real ou de venda de marca com cores branco, cinza-escuro"
+ },
+ "tpl-historia-fundo-roxo-pincelada": {
+  "descricao": "Parede de tijolos branca com pinceladas largas roxas na diagonal",
+  "cores": "roxo, branco",
+  "tom": "misto",
+  "usar_quando": "miolo de carrossel de história real ou de venda de marca com cores roxo, branco"
  }
 }
