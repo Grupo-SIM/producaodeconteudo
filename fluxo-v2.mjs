@@ -313,6 +313,8 @@ export function criarFluxoV2(ctx) {
         log(null, `Você descartou a edição do vídeo de "${c.title}" (foi para a lixeira). O roteiro aprovado continua; o Editor edita de novo quando você clicar em Editar novamente`, id);
         return { ok: true };
       }
+      run('CREATE TABLE IF NOT EXISTS artes_lixeira(id INTEGER PRIMARY KEY, content_id INTEGER, ts TEXT, art TEXT, art_spec TEXT)');
+      if (c.art || c.art_spec) run('INSERT INTO artes_lixeira(content_id,ts,art,art_spec) VALUES(?,?,?,?)', id, T(), c.art || '', c.art_spec || '');   // só a arte vai para a lixeira; a copy fica
       setContent(id, { art_spec: '', art_status: '', art: '', status: 'producing', error: ARTE_DESCARTADA, em_ajuste: 0, ajuste_motivo: '' });   // pedido do dono: descartar NÃO refaz sozinho
       log(null, `Você descartou a arte de "${c.title}". A copy aprovada continua; o Designer só faz outra quando você clicar em Resolvido`, id);
       return { ok: true };
