@@ -42,3 +42,6 @@ Referência aprovada (Controle Patrimonial, 9 páginas): capa · narrativa · fo
 - Nunca duas páginas seguidas na mesma forma de texto; foto nunca em páginas vizinhas.
 - Fotos: no máximo 2 (3 só em carrossel de 9+ páginas). Só em página de cena concreta, e só se a foto, vista sem o texto, já contar o trecho. Reprovado pelo dono: foto de "views/algoritmo" no celular para um trecho que falava de outra coisa. Melhor 1 foto certeira que 2 mais ou menos.
 - O painel monta esse ritmo sozinho (`ritmoVenda`) quando a forma não vem; foto que falha refaz a página só com texto (sem buraco).
+
+## Padrão aprovado (dono, 20/11/2026): pronto só com texto + até 3 sugestões de foto
+O carrossel de venda sai PRONTO só com texto (capa, narrativa/virada alternadas, fim): é o post que pode ser postado. Depois, você deixa até 3 sugestões de foto (página + trecho + foto escolhida olhando as opções do banco). Na Mesa elas aparecem como etiqueta "💡 Sugestão de foto · página N" em cima do editor; o dono clica, vê a foto ao lado da página e aprova a troca ou recusa. Sugestão ruim não atrapalha nada: o post já está pronto. Só sugira foto que conte o trecho sozinha.

@@ -185,7 +185,7 @@ if (!db.prepare('PRAGMA table_info(products)').all().some(c => c.name === 'image
 const pbExistia = !!db.prepare("SELECT 1 x FROM sqlite_master WHERE type='table' AND name='product_brands'").get();
 db.exec(`CREATE TABLE IF NOT EXISTS product_brands(product_id INTEGER NOT NULL, brand TEXT NOT NULL, PRIMARY KEY(product_id, brand))`);
 if (!pbExistia) db.exec("INSERT OR IGNORE INTO product_brands(product_id,brand) SELECT id, brand FROM products WHERE brand<>''");
-for (const [col, def] of [['owner_asks', "TEXT DEFAULT '[]'"], ['copy_review', "TEXT DEFAULT ''"], ['materia', "TEXT DEFAULT ''"], ['seo_review', "TEXT DEFAULT ''"], ['goal', "TEXT DEFAULT ''"], ['art_spec_base', "TEXT DEFAULT ''"], ['spec_base', "TEXT DEFAULT ''"], ['spec_edit_at', "TEXT DEFAULT ''"], ['product_id', 'INTEGER'], ['brand', "TEXT DEFAULT ''"], ['spec', "TEXT DEFAULT ''"], ['prod_revisions', 'INTEGER DEFAULT 0'], ['art_spec', "TEXT DEFAULT ''"], ['art_status', "TEXT DEFAULT ''"], ['art_note', "TEXT DEFAULT ''"], ['render_status', "TEXT DEFAULT ''"], ['teste', 'INTEGER DEFAULT 0'], ['manager', "TEXT DEFAULT ''"]]) {
+for (const [col, def] of [['owner_asks', "TEXT DEFAULT '[]'"], ['copy_review', "TEXT DEFAULT ''"], ['materia', "TEXT DEFAULT ''"], ['seo_review', "TEXT DEFAULT ''"], ['goal', "TEXT DEFAULT ''"], ['art_spec_base', "TEXT DEFAULT ''"], ['spec_base', "TEXT DEFAULT ''"], ['spec_edit_at', "TEXT DEFAULT ''"], ['product_id', 'INTEGER'], ['brand', "TEXT DEFAULT ''"], ['spec', "TEXT DEFAULT ''"], ['prod_revisions', 'INTEGER DEFAULT 0'], ['art_spec', "TEXT DEFAULT ''"], ['art_status', "TEXT DEFAULT ''"], ['art_note', "TEXT DEFAULT ''"], ['render_status', "TEXT DEFAULT ''"], ['teste', 'INTEGER DEFAULT 0'], ['manager', "TEXT DEFAULT ''"], ['art_sugestoes', "TEXT DEFAULT ''"]]) {
   if (!db.prepare('PRAGMA table_info(contents)').all().some(c => c.name === col)) db.exec(`ALTER TABLE contents ADD COLUMN ${col} ${def}`);
 }
 // Migração dos formatos antigos (2026-10-14.17): formato = onde posta; texto/carta de vendas viraram TIPO de conteúdo
@@ -5701,7 +5701,7 @@ async function gerenteDireto(text) {
 // O copy só escreve. O Designer lê o texto pronto, escolhe as 2 ou 3 páginas em que existe foto real fácil de achar que mostre
 // EXATAMENTE um trecho do que está sendo dito, busca várias opções nos bancos, OLHA as opções e fica com a que mostra o trecho.
 // Nenhuma opção serve: tenta outro termo; ainda nada: a página fica sem foto e o dono é avisado (nunca entra foto que não tem a ver).
-async function fotosDoDesigner(c, { quer = 0 } = {}) {
+async function fotosDoDesigner(c, { quer = 0, sugestao = false } = {}) {
   if (MANUAL || als.getStore()?.dry) return null;
   const sp = jparse(c.art_spec, null); if (!sp?.slides?.length) return null;
   const n = sp.slides.length, mod = sl => sl?.modelo || sl?.modeloOrigem || '';
@@ -5731,6 +5731,7 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
     }
     if (!escolhida) { falhas.push({ i, trecho: f.trecho }); continue; }
     usados.add(escolhida.id);
+    if (sugestao) { try { const chave = `${termoOk} #${escolhida.id}`, arq = path.join(dir, crypto.createHash('sha1').update(chave.toLowerCase() + '|false').digest('hex').slice(0, 14)); const { buf, ext } = await baixaImagemSegura(escolhida.full); fs.writeFileSync(arq + '.' + ext, buf); fs.writeFileSync(arq + '.txt', `${escolhida.autor || 'autor'} (${escolhida.fonte}${escolhida.licenca ? ', ' + escolhida.licenca : ''})`); feitas.push({ i, trecho: f.trecho, cena: f.cena, fonte: escolhida.fonte, chave, arquivo: arq + '.' + ext }); } catch (e) { falhas.push({ i, trecho: f.trecho, erro: e.message }); } continue; }
     try {   // grava a foto escolhida no cache do termo: o render usa exatamente ela
       const chave = `${termoOk} #${escolhida.id}`, arq = path.join(dir, crypto.createHash('sha1').update(chave.toLowerCase() + '|false').digest('hex').slice(0, 14));
       const { buf, ext } = await baixaImagemSegura(escolhida.full); fs.writeFileSync(arq + '.' + ext, buf); fs.writeFileSync(arq + '.txt', `${escolhida.autor || 'autor'} (${escolhida.fonte}${escolhida.licenca ? ', ' + escolhida.licenca : ''})`);
@@ -5739,6 +5740,7 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
       if (ns) { sp.slides[i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; feitas.push({ i, trecho: f.trecho, cena: f.cena, fonte: escolhida.fonte }); }
     } catch (e) { falhas.push({ i, trecho: f.trecho, erro: e.message }); }
   }
+  if (sugestao) return { feitas, falhas };
   // páginas que tinham foto marcada (pelo copy ou pelo template) e não foram escolhidas pelo Designer ficam sem foto
   for (const p of sp.slides.map((sl, i) => ({ i })).filter(p => p.i > 0 && p.i < n - 1 && mod(sp.slides[p.i]) === 'venda-pagina')) if (!feitas.some(x => x.i === p.i) && (sp.slides[p.i]?.dados?.foto || sp.slides[p.i]?.dados?.forma === 'foto')) { const sl = sp.slides[p.i], d = { ...sl.dados }; delete d.foto; if (d.forma === 'foto') d.forma = String(d.texto || '').trim() ? 'virada' : 'narrativa'; const ns = comporSlide({ modelo: mod(sl), dados: d }, { ...base, i: p.i, total: n }); if (ns) sp.slides[p.i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; }
   setContent(c.id, { art_spec: JSON.stringify(sp), art_status: '' });
@@ -5755,6 +5757,23 @@ function ritmoVenda(slides) {
     if (alvo != null) slides[alvo].dados.forma = 'virada';
   }
   for (let k = 1; k < mi.length; k++) { const a = slides[mi[k - 1]].dados, b = slides[mi[k]].dados; if (mi[k] === mi[k - 1] + 1 && a.forma === b.forma && b.forma !== 'foto') b.forma = b.forma === 'virada' ? 'narrativa' : (String(b.texto || '').trim() ? 'virada' : b.forma); }
+}
+// Sugestões de foto (dono, 20/11/2026): o carrossel de venda fica PRONTO só com texto; o Designer manda até 3 sugestões de foto
+// (página + trecho + foto). Na Mesa o dono clica "Usar" (a página vira foto + frase) ou descarta. Foto ruim não atrasa o post.
+async function sugereFotos(id) {
+  const c = getContent(id); if (!c) return;
+  const r = await fotosDoDesigner(c, { quer: 3, sugestao: true }); if (!r) return;
+  setContent(id, { art_sugestoes: JSON.stringify(r.feitas.map(f => ({ i: f.i, trecho: f.trecho, cena: f.cena, fonte: f.fonte, chave: f.chave, arquivo: f.arquivo }))) }); changed();
+  if (r.feitas.length) addChat('gerente', `O carrossel **${clip(c.title, 60)}** está pronto só com texto, na Mesa.\n\nO Designer deixou ${r.feitas.length} sugestão(ões) de foto:\n` + r.feitas.map(f => `- Página ${f.i + 1}: ${f.cena}`).join('\n') + '\n\nSe gostar, clique em **Usar** na sugestão; se não, descarte e o post já está pronto.');
+}
+async function usaSugestao(id, k) {
+  const c = getContent(id), L = jparse(c?.art_sugestoes, []), sg = L[k]; if (!sg) throw fail(404, 'Sugestão não encontrada');
+  const sp = jparse(c.art_spec, {}), sl = sp.slides?.[sg.i]; if (!sl) throw fail(400, 'A página da sugestão não existe mais');
+  const m = sl.modelo || sl.modeloOrigem, ns = comporSlide({ modelo: m, dados: { ...(sl.dados || {}), foto: sg.chave, ...(m === 'venda-pagina' ? { forma: 'foto' } : {}) } }, { ...ctxMarca(c.brand, c.format, sp), i: sg.i, total: sp.slides.length });
+  if (!ns) throw fail(400, 'Não consegui montar a página com a foto');
+  sp.slides[sg.i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0];
+  L.splice(k, 1); setContent(id, { art_spec: JSON.stringify(sp), art_sugestoes: JSON.stringify(L), art_status: '' });
+  await renderArte(id); log('designer', `Foto sugerida aplicada na página ${sg.i + 1} de "${c.title}" (pelo dono)`, id);
 }
 // carrossel de venda (template 15): toda página usa o fundo da seção História e venda da marca; fundo por IA ou outro que tenha entrado volta para ele
 function fundoVendaFixo(sp, c) {
@@ -6263,6 +6282,7 @@ const HANDLERS = {
     if (sp) {
       if (c.format === 'carrossel' && settings().venda_fotos_banco === '1' && !(input.from === 'dono' && input.feedback) && sp.spec.slides.some(x => x.modelo === 'venda-pagina')) { try { const fd = await fotosDoDesigner(getContent(c.id)); if (fd) log('designer', `"${c.title}": ${textoFotosDesigner(fd)}`, c.id); } catch (e) { console.error('fotos do designer:', e.message); } }   // foto: o Designer escolhe página e imagem olhando as opções (o copy não decide)
       await renderArte(c.id);   // gera as imagens aqui, antes de a peça ir para o Revisor
+      if (c.format === 'carrossel' && settings().venda_fotos_banco !== '1' && !(input.from === 'dono' && input.feedback) && sp.spec.slides.some(x => x.modelo === 'venda-pagina')) sugereFotos(c.id).catch(e => console.error('sugestões de foto:', e.message));   // pronto só com texto + até 3 sugestões de foto
       const treino = c.created_by === 'treino_designer';   // treino: uma chamada só, sem inspeção nem refazer automático (o dono corrige)
       if (!treino && !MANUAL && !als.getStore()?.dry && visualLigado() && getContent(c.id)?.art_status === 'ok') { try { await inspecionaArte(c.id); } catch (e) { console.error('inspeção visual da arte:', e.message); } }
       const falhas = checksLer(getContent(c.id)?.art_checks).filter(x => !x.corrigido && x.sev === 'erro');
@@ -8246,7 +8266,7 @@ async function api(req, res, url) {
       run('UPDATE art_templates SET tema=?, nome=?, uso=?, nivel=?, seq=?, formatos=?, exemplo=? WHERE id=?', TEMAS[b.tema] ? b.tema : (row.tema || 'geral'), str(b.nome ?? row.nome, 80, 'Nome'), str(b.uso ?? row.uso, 400, 'Quando usar', false), b.nivel === 'robusto' ? 'robusto' : b.nivel === 'simples' ? 'simples' : row.nivel, seq ? JSON.stringify(seq) : row.seq, fm?.length ? JSON.stringify(fm) : row.formatos, seq && JSON.stringify(seq) !== row.seq ? '' : row.exemplo, row.id);   // mudou as páginas: o exemplo antigo deixa de valer
       changed(); return send(res, 200, { ok: true }); }
   }
-  if ((mt = p.match(/^\/api\/contents\/(\d+)\/arte(?:\/(file\/\d+|zip|render|spec|modelo|do-roteiro|atualizar-layout|ajuste))?$/))) {
+  if ((mt = p.match(/^\/api\/contents\/(\d+)\/arte(?:\/(file\/\d+|zip|render|spec|modelo|do-roteiro|atualizar-layout|ajuste|sugestoes|sugerir-fotos|sugestao-\d+))?$/))) {
     const id = +mt[1], c = getContent(id); if (!c) throw fail(404, 'Conteúdo não encontrado');
     if (!mt[2] && m === 'GET') return send(res, 200, arteInfo(id));
     if (mt[2] === 'spec' && m === 'POST') {
@@ -8268,6 +8288,10 @@ async function api(req, res, url) {
       for (const j of all("SELECT id FROM jobs WHERE content_id=? AND agent='designer' AND kind='arte' AND status='queued'", id)) run("UPDATE jobs SET status='done', finished_at=?, output='Montada pelo painel a partir do roteiro' WHERE id=?", T(), j.id);
       checkProduction(id); changed(); return send(res, 200, arteInfo(id));
     }
+    if (mt[2] === 'sugestoes' && m === 'GET') return send(res, 200, { sugestoes: jparse(c.art_sugestoes, []).map((x, k) => ({ k, pagina: x.i + 1, trecho: x.trecho, cena: x.cena, fonte: x.fonte, img: `/api/contents/${id}/arte/sugestao-${k}` })) });
+    if (/^sugestao-\d+$/.test(mt[2] || '') && m === 'GET') { const sg = jparse(c.art_sugestoes, [])[+mt[2].slice(9)]; if (!sg || !fs.existsSync(sg.arquivo)) throw fail(404, 'Sem imagem'); res.writeHead(200, { 'content-type': /png$/.test(sg.arquivo) ? 'image/png' : /webp$/.test(sg.arquivo) ? 'image/webp' : 'image/jpeg', 'cache-control': 'private, max-age=3600' }); return res.end(fs.readFileSync(sg.arquivo)); }
+    if (/^sugestao-\d+$/.test(mt[2] || '') && m === 'POST') { const b = await readBody(req, 2000), k = +mt[2].slice(9); if (b.acao === 'usar') await usaSugestao(id, k); else { const L = jparse(c.art_sugestoes, []); L.splice(k, 1); setContent(id, { art_sugestoes: JSON.stringify(L) }); } changed(); return send(res, 200, { ok: true }); }
+    if (mt[2] === 'sugerir-fotos' && m === 'POST') { sugereFotos(id).catch(e => console.error('sugestões de foto:', e.message)); return send(res, 200, { ok: true }); }
     if (mt[2] === 'ajuste' && m === 'POST') {   // ajuste direto nos campos do template (o mesmo caminho do "Mandar ajustar"), com conferência antes de devolver
       const b = await readBody(req, 2e4), ped = str(b.pedido, 2000, 'Pedido'); if (arteState.get(id)?.status === 'running') throw fail(409, 'A arte desta peça está sendo gerada; espere terminar');
       const r = await executaAjusteModelo(c, ped); if (!r?.ok) throw fail(400, r?.naoDa?.length ? 'Não deu para aplicar: ' + r.naoDa.join(', ') : 'Não entendi o pedido como mudança de template (entrelinha, tamanho, logo, fotos). Mande pelo "Mandar ajustar" que o Designer edita os elementos.');
