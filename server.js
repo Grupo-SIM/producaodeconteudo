@@ -695,7 +695,7 @@ const KNOWLEDGE_SEED = [{
 const SETTINGS_DEFAULTS = {
   model: DEFAULT_MODEL, autopilot: '0', per_day: '3', start_hour: '7', tz: 'America/Rio_Branco', themes: '',
   score_min: '7.5', copy_review: '1', max_revisions: '2', max_jobs_day: '60', concurrency: '4', web_search: '0',
-  webhook_url: '', report_hour: '20', auto_produce: '1', approve_script: '0', night_hour: '22', art_gen: '1', fal_pausa: '0', arte_do_roteiro: 'chat', visual_check: '1', max_art_gen: '8', max_pose_gen: '0', q_feed: '1', q_carrossel: '1', q_stories: '0', q_video_vertical: '1', q_video_horizontal: '0', quota_days: '0,1,2,3,4,5,6', carousel_slides: '7', stories_slides: '5', video_secs: '30', img_budget_day: '1', pacote_ia: '0', kb_budget: '60000', auto_render: '1', max_gen_objects: '5', img_qualidade: 'alta', voz_provider: 'auto', brain_auto: '0', brain_daily: '1', brain_hour: '21', 
+  webhook_url: '', report_hour: '20', auto_produce: '1', approve_script: '0', night_hour: '22', art_gen: '1', fal_pausa: '0', fal_pausa_info: '', fal_ultimo_erro: '', arte_do_roteiro: 'chat', visual_check: '1', max_art_gen: '8', max_pose_gen: '0', q_feed: '1', q_carrossel: '1', q_stories: '0', q_video_vertical: '1', q_video_horizontal: '0', quota_days: '0,1,2,3,4,5,6', carousel_slides: '7', stories_slides: '5', video_secs: '30', img_budget_day: '1', pacote_ia: '0', kb_budget: '60000', auto_render: '1', max_gen_objects: '5', img_qualidade: 'alta', voz_provider: 'auto', brain_auto: '0', brain_daily: '1', brain_hour: '21', 
 };
 
 if (!one('SELECT COUNT(*) c FROM agents').c) {
@@ -958,6 +958,8 @@ function settings() {
 // pausa geral do fal.ai (botão em Configurações): enquanto ligada NENHUMA chamada paga ao fal.ai sai do painel, nem fundo, nem pose, nem recorte, nem objeto 3D
 const falPausado = () => { try { return settings().fal_pausa === '1'; } catch { return false; } };
 const falMsg = m => falPausado() ? 'O fal.ai está em standby (Configurações › Vídeo e voz): nada foi cobrado. Desligue o standby para usar.' : m;
+// quem ligou/desligou o standby do fal.ai e quando (para o Gerente explicar ao dono)
+function marcaFalPausa(antes, quem) { try { const d = settings().fal_pausa; if (d !== antes) run('INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)', 'fal_pausa_info', `${quem}, em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`); } catch { /* sem registro */ } }
 const falKey = () => falPausado() ? '' : (process.env.FAL_KEY || '');
 function localParts(tz) {
   let fmt;
@@ -3347,7 +3349,7 @@ function dadosOk(d) {
   if (d.contraste) out.contraste = true;
   for (const k of ['caixa_titulo', 'caixa_rotulo', 'caixa_botao']) if (['alta', 'baixa', 'frase', 'titulo', 'normal'].includes(d[k])) out[k] = d[k];
   if (d.recorte === false) out.recorte = false;
-  for (const k of ['foto', 'objeto']) { const v = d[k]; if (typeof v === 'string' && v.trim()) out[k] = t(v, 500); else if (v && typeof v === 'object' && (v.asset || v.gen)) out[k] = v.asset ? { asset: t(v.asset, 80) } : { gen: t(v.gen, 500) }; }
+  for (const k of ['foto', 'objeto']) { const v = d[k]; if (typeof v === 'string' && v.trim()) out[k] = t(v, 500); else if (v && typeof v === 'object' && (v.asset || v.gen || v.banco)) out[k] = v.asset ? { asset: t(v.asset, 80) } : v.banco ? { banco: t(v.banco, 120) } : { gen: t(v.gen, 500) }; }
   if (Array.isArray(d.itens)) out.itens = d.itens.slice(0, 6).map(x => typeof x === 'string' ? t(x, 200) : x && typeof x === 'object' ? limpaUndef({ t: t(x.t || x.titulo, 120), d: t(x.d || x.texto, 220) }) : null).filter(x => x && (typeof x === 'string' || x.t));
   else if (typeof d.itens === 'string') out.itens = t(d.itens, 800);
   if (d.brilho === false) out.brilho = false;
@@ -3357,6 +3359,12 @@ function dadosOk(d) {
   if (d.estilo === 'nuvo') out.estilo = 'nuvo';
   for (const k of ['pb', 'urgente']) if (d[k]) out[k] = true;
   for (const k of ['foto2', 'circulo']) { const v = d[k]; if (typeof v === 'string' && v.trim()) out[k] = t(v, 500); else if (v && typeof v === 'object' && (v.asset || v.gen)) out[k] = v.asset ? { asset: t(v.asset, 80) } : { gen: t(v.gen, 500) }; }
+  // campos de outros templates (investigativo, caixinha, venda) e os AJUSTES do dono: sem eles a entrelinha/escala/logo pedida se perdia ao salvar (bug de 20/11/2026)
+  for (const k of ['pergunta', 'resposta', 'nota', 'fecho', 'n']) { const v = t(d[k], 600); if (v) out[k] = v; }
+  if (Array.isArray(d.paragrafos)) out.paragrafos = d.paragrafos.slice(0, 12).map(x => t(x, 600)).filter(Boolean); else if (typeof d.paragrafos === 'string') out.paragrafos = t(d.paragrafos, 3000);
+  { const v = +d.entrelinha; if (v >= 1 && v <= 2.2) out.entrelinha = Math.round(v * 100) / 100; }
+  { const v = +d.escala; if (v >= .6 && v <= 1.4) out.escala = Math.round(v * 100) / 100; }
+  if (['direita', 'esquerda'].includes(d.logo)) out.logo = d.logo;
   return out;
 }
 // Limpa e limita a especificação (vinda do Designer ou do editor visual): só campos conhecidos, números dentro de faixa, sem HTML
@@ -3370,7 +3378,7 @@ function sanitizeArteSpec(found, format, doAgente = false) {
     modelo: MODELO_IDS.includes(s.modelo) ? s.modelo : undefined, dados: MODELO_IDS.includes(s.modelo) ? dadosOk(s.dados) : undefined,
     shade: s.shade == null ? undefined : num(s.shade, 0, .92, .5), shade_dir: pick(s.shade_dir, ['bottom', 'top', 'full', 'left', 'right'], 'bottom'), fx: fxOk(s.fx, hex, num), pager: s.pager !== false,
     texts: (Array.isArray(s.texts) ? s.texts : []).slice(0, 30).map(t => ({ z: zOk(t.z), value: txt(t.value, 600), role: pick(t.role, ['badge', 'title', 'body', 'number', 'cta', 'label', 'footer'], 'title'), x: num(t.x, -4, 5, .5), y: num(t.y, -4, 5, .5), align: pick(t.align, ['left', 'center', 'right'], 'center'), size: t.size == null ? undefined : num(t.size, 8, 3000, undefined), color: hex(t.color), bg: hex(t.bg), weight: t.weight == null ? undefined : num(t.weight, 100, 900, undefined), w: t.w == null ? undefined : num(t.w, .05, 4, undefined), rot: t.rot ? num(t.rot, -360, 360, 0) : undefined, opacity: t.opacity == null || t.opacity >= 1 ? undefined : num(t.opacity, 0, 1, 1), ...textoPro(t, hex, num, pick), ...flags(t, ['nowrap', 'reflow', 'icon_end', 'decor', 'front', 'mexido', 'hide', 'lock']), hl: hex(t.hl), mk: t.mk ? true : undefined, fundo: hex(t.fundo), fundo_pad: Array.isArray(t.fundo_pad) ? t.fundo_pad.slice(0, 2).map(v => Math.max(0, Math.min(200, +v || 0))) : undefined, sh_color: hex(t.sh_color), hw: t.hw ? num(t.hw, 300, 900, undefined) : undefined })).map(limpaUndef).filter(t => t.value),
-    items: (Array.isArray(s.items) ? s.items : []).slice(0, 30).map(it => ({ z: zOk(it.z), asset: txt(it.asset, 80), pose: txt(it.pose, 240) || undefined, x: num(it.x, -4, 5, .5), y: num(it.y, -4, 5, .5), size: num(it.size, 8, 30000, 200), rot: num(it.rot, -360, 360, 0), round: !!it.round, flip: it.flip ? true : undefined, opacity: it.opacity == null || it.opacity >= 1 ? undefined : num(it.opacity, 0, 1, 1), gen: txt(it.gen, 500) || undefined, banco: txt(it.banco, 120) || undefined, front: it.front ? true : undefined, cruza: it.cruza ? true : undefined, shadow: it.shadow ? num(it.shadow, 0, 3, 1) : undefined, blur: it.blur ? num(it.blur, 0, 60, 0) : undefined, glow: hex(it.glow), grade: gradeOk(it.grade, hex, num), grp: grpId(it.grp), fil: filtroOk(it.fil, num), ...flags(it, ['hero', 'copia', 'moldura', 'pessoa', 'particula', 'card', 'fotoCard', 'hide', 'lock']), forma: pick(it.forma, ['arredondado', 'losango', 'hexagono', 'estrela', 'arco', 'triangulo'], undefined), box: it.box && typeof it.box === 'object' ? limpaUndef({ w: num(it.box.w, .02, 2, .5), h: num(it.box.h, .02, 2, .5), circle: it.box.circle ? true : undefined, border: it.box.border ? num(it.box.border, 0, .05, 0) : undefined, bc: hex(it.box.bc), fade: it.box.fade ? num(it.box.fade, 0, 1, 0) : undefined, r: it.box.r ? num(it.box.r, 0, .5, 0) : undefined, pos: /^(\d{1,3}% \d{1,3}%|center( \d{1,3}%)?|top|bottom|left|right)$/.test(String(it.box.pos || '')) ? String(it.box.pos) : undefined }) : undefined, h: it.h ? num(it.h, .02, 2, .3) : undefined, radius: it.radius ? num(it.radius, 0, .5, 0) : undefined })).map(limpaUndef).filter(it => it.asset || ((it.gen || it.banco) && it.hero)),
+    items: (Array.isArray(s.items) ? s.items : []).slice(0, 30).map(it => ({ z: zOk(it.z), asset: txt(it.asset, 80), pose: txt(it.pose, 240) || undefined, x: num(it.x, -4, 5, .5), y: num(it.y, -4, 5, .5), size: num(it.size, 8, 30000, 200), rot: num(it.rot, -360, 360, 0), round: !!it.round, flip: it.flip ? true : undefined, opacity: it.opacity == null || it.opacity >= 1 ? undefined : num(it.opacity, 0, 1, 1), gen: txt(it.gen, 500) || undefined, banco: txt(it.banco, 120) || undefined, front: it.front ? true : undefined, cruza: it.cruza ? true : undefined, shadow: it.shadow ? num(it.shadow, 0, 3, 1) : undefined, blur: it.blur ? num(it.blur, 0, 60, 0) : undefined, glow: hex(it.glow), grade: gradeOk(it.grade, hex, num), grp: grpId(it.grp), fil: filtroOk(it.fil, num), ...flags(it, ['hero', 'copia', 'moldura', 'pessoa', 'particula', 'card', 'fotoCard', 'hide', 'lock']), forma: pick(it.forma, ['arredondado', 'losango', 'hexagono', 'estrela', 'arco', 'triangulo'], undefined), box: it.box && typeof it.box === 'object' ? limpaUndef({ w: num(it.box.w, .02, 2, .5), h: num(it.box.h, .02, 2, .5), circle: it.box.circle ? true : undefined, border: it.box.border ? num(it.box.border, 0, .05, 0) : undefined, bc: hex(it.box.bc), fade: it.box.fade ? num(it.box.fade, 0, 1, 0) : undefined, r: it.box.r ? num(it.box.r, 0, .5, 0) : undefined, pos: /^(\d{1,3}% \d{1,3}%|center( \d{1,3}%)?|top|bottom|left|right)$/.test(String(it.box.pos || '')) ? String(it.box.pos) : undefined }) : undefined, h: it.h ? num(it.h, .02, 2, .3) : undefined, radius: it.radius ? num(it.radius, 0, .5, 0) : undefined })).map(limpaUndef).filter(it => it.asset || it.banco || (it.gen && it.hero)),   // foto de banco SEMPRE fica (a do cartão do carrossel de venda não é hero e era jogada fora)
     shapes: (Array.isArray(s.shapes) ? s.shapes : []).slice(0, 30).map(sh => ({ z: zOk(sh.z), kind: pick(sh.kind, ['rect', 'circle', 'line', 'pill', 'ring', 'star', 'icon', 'triangle', 'diamond', 'hexagon', 'arrow', 'pentagon', 'octagon', 'chevron', 'cross', 'parallelogram', 'trapezoid', 'bubble', 'ribbon', 'etiqueta'], 'rect'), x: num(sh.x, -4, 5, .5), y: num(sh.y, -4, 5, .5), w: num(sh.w, .005, 30, .3), h: num(sh.h, .0005, 30, .2), rot: num(sh.rot, -360, 360, 0), color: hex(sh.color), opacity: num(sh.opacity, 0, 1, 1), radius: num(sh.radius, 0, .5, 0), ...formaPro(sh, hex, num, pick), ...flags(sh, ['tile', 'moldura', 'behind', 'decor', 'hide', 'lock']) })).map(limpaUndef)
   }));
   if (!slides.length) return null;
@@ -3832,7 +3840,7 @@ async function renderArte(id, { regen = false } = {}) {
           const corte = !it.fotoCard && !it.card, kB = 'b|' + corte + '|' + it.banco, ja = objFeitos.get(kB);
           if (ja) { slide.items.push({ ...it, src: pathToFileURL(ja).href }); resCopies.push([`it-${i + 1}-${ik}`, ja]); continue; }
           try { const f = await fotoBanco(it.banco, corte, credBanco); objFeitos.set(kB, f); slide.items.push({ ...it, src: pathToFileURL(f).href }); resCopies.push([`it-${i + 1}-${ik}`, f]); }
-          catch (e) { warn.push(`Slide ${i + 1}: não consegui usar a foto do banco “${it.banco.slice(0, 40)}” (${e.message.slice(0, 100)}).`); }
+          catch (e) { warn.push(`Slide ${i + 1}: não consegui usar a foto do banco “${it.banco.slice(0, 40)}” (${e.message.slice(0, 400)}).`); }
           continue;
         }
         if (it.gen && !it.asset && PROMPT_MASCOTE.test(it.gen)) {   // a IA nunca desenha "o mascote": se a marca tem um cadastrado, entra o arquivo dele (o avatar de verdade)
@@ -3874,7 +3882,7 @@ async function renderArte(id, { regen = false } = {}) {
       out.slides.push(slide); break;
      }
     }
-    if (semFal) warn.push(!falKey() ? (falPausado() ? 'fal.ai em standby: os fundos de IA foram trocados por fundo liso/cor da marca (nada cobrado).' : 'Sem FAL_KEY no .env: os fundos de IA foram trocados por fundo liso/cor da marca.') : 'Fundos de IA desligados em Configurações › Vídeo e voz.');
+    if (semFal) warn.push(!falKey() ? (falPausado() ? `O fal.ai está em STANDBY (interruptor de economia em Configurações › Vídeo e voz${settings().fal_pausa_info ? ', ligado ' + settings().fal_pausa_info : ''}): não é falta de saldo nem erro. Por isso o fundo pedido como imagem por IA saiu liso na cor da marca, sem cobrança. Para ter imagem por IA, desligue o standby lá (ou me peça aqui no chat).` : 'Sem FAL_KEY no .env: os fundos de IA foram trocados por fundo liso/cor da marca.') : 'Fundos de IA desligados em Configurações › Vídeo e voz.');
     const dir = ARTE_DIR(id); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
     { const rd = path.join(dir, 'res'); fs.mkdirSync(rd, { recursive: true }); for (const [n, src] of resCopies) { try { fs.copyFileSync(src, path.join(rd, n + path.extname(src))); } catch { /* sem cópia */ } } }
     const specFile = path.join(RENDER_DIR, String(id), 'arte.spec.json'); fs.writeFileSync(specFile, JSON.stringify(out));
@@ -3902,7 +3910,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS art_edits(id INTEGER PRIMARY KEY AUTOINCREME
 const LAYOUT_DIR = path.join(DATA_DIR, 'layouts'); fs.mkdirSync(LAYOUT_DIR, { recursive: true });
 const ART_FORMATS = ['feed', 'carrossel', 'stories'];
 const ROLE_PT = { title: 'título', body: 'texto de apoio', number: 'número grande', badge: 'selo', cta: 'botão (CTA)' };
-const jparse = (s, d = null) => { try { return s ? JSON.parse(s) : d; } catch { return d; } };
+function jparse(s, d = null) { try { return s ? JSON.parse(s) : d; } catch { return d; } }
 // Lixeira de artes: layout ou estilo apagado (e a versão anterior de um layout atualizado) fica 7 dias para recuperar e depois some de vez. Enquanto está na lixeira NADA usa: nem Designer, nem Cérebro, nem notícias.
 db.exec("CREATE TABLE IF NOT EXISTS lixeira_arte(id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, orig_id INTEGER, brand TEXT DEFAULT '', nome TEXT DEFAULT '', dados TEXT NOT NULL, thumb TEXT DEFAULT '', motivo TEXT DEFAULT '', apagado_em TEXT NOT NULL)");
 const LIXEIRA_DIAS = 30;   // pedido do dono: toda lixeira some sozinha depois de 30 dias
@@ -4293,7 +4301,7 @@ async function falPost(model, body, timeout = 170000) {
   const key = falKey(); if (!key) throw new Error(falPausado() ? 'fal.ai em standby (Configurações › Vídeo e voz): nada foi cobrado' : 'FAL_KEY não configurada no .env');
   const lim = +settings().img_budget_day || 0; if (lim > 0 && gastoImagensHoje() >= lim) throw new Error(`Limite diário de gasto com imagens por IA atingido (US$ ${lim.toFixed(2)}). Aumente em Configurações › Automação se quiser continuar hoje.`);
   const r = await fetch(`${(process.env.FAL_BASE || 'https://fal.run').replace(/\/$/, '')}/${model}`, { method: 'POST', signal: AbortSignal.timeout(timeout), headers: { Authorization: `Key ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const t = await r.text(); if (!r.ok) throw new Error(`fal HTTP ${r.status}: ${t.slice(0, 220)}`);
+  const t = await r.text(); if (!r.ok) { try { run('INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)', 'fal_ultimo_erro', `${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}: HTTP ${r.status} ${t.slice(0, 160)}`); } catch { /* sem registro */ } throw new Error(`fal HTTP ${r.status}: ${t.slice(0, 220)}`); }
   return JSON.parse(t);
 }
 async function falBaixar(u) { const im = await fetch(u, { signal: AbortSignal.timeout(90000) }); if (!im.ok) throw new Error('Não consegui baixar a imagem gerada'); return Buffer.from(await im.arrayBuffer()); }
@@ -4610,7 +4618,7 @@ function gerenteAcao(a) {
     const chave = String(a.chave || ''); if (!SETTING_KEYS.includes(chave)) throw new Error(`a configuração “${chave}” não pode ser mudada por aqui`);
     let valor = a.valor;   // chaves liga/desliga: o texto “0”, “não”, “desligado” precisa virar falso (o validador só olha se o valor é “verdadeiro”)
     if (['autopilot', 'web_search', 'auto_produce', 'approve_script', 'pacote_ia', 'auto_render', 'brain_auto', 'brain_daily', 'art_gen', 'fal_pausa', 'visual_check'].includes(chave) && typeof valor === 'string') valor = !/^\s*(0|false|nao|não|off|desligad[oa]|desligar)\s*$/i.test(valor);
-    const antes = settings()[chave]; applySettings({ [chave]: valor }); const depois = settings()[chave];
+    const antes = settings()[chave]; applySettings({ [chave]: valor }); const depois = settings()[chave]; if (chave === 'fal_pausa') marcaFalPausa(antes, 'pelo Gerente, num pedido no chat');
     log('chefe', `Configuração ${chave}: ${clip(antes, 40)} → ${clip(depois, 40)}`);
     return { texto: `${chave}: ${clip(antes, 60) || '(vazio)'} → ${clip(depois, 60) || '(vazio)'}` };
   }
@@ -5371,9 +5379,9 @@ async function radarEscolheImagem(cands, referer, ents = [], max = 6, min = [800
 function descreveArte(sp) {
   const nomeP = (i, n) => i === 0 ? 'capa (página 1)' : i === n - 1 && n === 2 ? 'contracapa (página 2)' : 'página ' + (i + 1);
   return (sp?.slides || []).map((sl, i, L) => {
-    const bg = sl.bg?.asset ? 'foto “' + sl.bg.asset + '”' : sl.bg?.gen ? 'imagem por IA' : sl.bg?.grad ? 'degradê' : 'cor ' + (sl.bg?.color || 'da marca');
+    const bg = sl.bg?.asset ? 'foto “' + sl.bg.asset + '”' : sl.bg?.banco ? 'foto de banco “' + sl.bg.banco + '”' : sl.bg?.gen ? 'imagem por IA' : sl.bg?.grad ? 'degradê' : 'cor ' + (sl.bg?.color || 'da marca');
     const tx = (sl.texts || []).map((t, k) => `  - texto#${k} (${({ ...ROLE_PT, label: 'rótulo pequeno', footer: 'rodapé' })[t.role] || t.role}${t.decor ? ', decorativo' : ''}): “${String(t.value || '').replace(/\s+/g, ' ').slice(0, 90)}”`);
-    const im = (sl.items || []).map((t, k) => `  - imagem#${k}: ${t.asset || 'gerada'}${t.round || t.box?.circle ? ' (em círculo)' : t.box ? ' (em quadro)' : ''}${t.moldura ? ' (logo/moldura)' : ''}`);
+    const im = (sl.items || []).map((t, k) => `  - imagem#${k}: ${t.asset || (t.banco ? 'foto de banco “' + t.banco + '”' : 'gerada por IA')}${t.round || t.box?.circle ? ' (em círculo)' : t.box ? ' (em quadro)' : ''}${t.moldura ? ' (logo/moldura)' : ''}`);
     const fm = (sl.shapes || []).map((t, k) => `  - forma#${k}: ${t.kind}${t.moldura ? ' (moldura)' : ''}`);
     return `${nomeP(i, L.length)}${sl.modelo ? ' · template ' + sl.modelo : ''}\n  - fundo: ${bg}\n${[...tx, ...im, ...fm].join('\n')}`;
   }).join('\n');
@@ -5388,6 +5396,294 @@ async function entendePedidoArte(c, fb, sp) {
     const el = (Array.isArray(j.elementos) ? j.elementos : []).filter(e => e && ['fundo', 'texto', 'imagem', 'forma', 'novo'].includes(e.tipo) && Number.isInteger(+e.pagina) && +e.pagina >= 0 && +e.pagina < n).map(e => ({ pagina: +e.pagina, tipo: e.tipo, indice: Number.isInteger(+e.indice) ? +e.indice : 0 }));
     return { acao: j.acao, paginas: pg.length ? pg : [...new Set(el.map(e => e.pagina))], elementos: el, entendi: String(j.entendi || '').slice(0, 300) };
   } catch (e) { console.error('entender pedido:', e.message); return null; }
+}
+// ───────── Ajuste do dono em página de template (dono, 20/11/2026: "tem que funcionar como a conversa com o Claude") ─────────
+// O pedido vira mudança EXATA nos campos do modelo (entrelinha, escala, logo, foto...), o painel recompõe só as páginas pedidas,
+// confere o resultado contra o pedido (fundo igual, nenhum elemento a mais, cada mudança aplicada, foto que veio de verdade) e
+// só então devolve para a Mesa. Nada passa pelo Designer "redesenhando" a página: fundo, efeitos e textos não pedidos ficam idênticos.
+const semAcento = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const LH_PAD = { 'venda-capa': 1.32, 'venda-pagina': 1.6, 'venda-fim': 1.6 }, LH_MIN_MK = 1.25;   // abaixo de 1,25 o marca-texto de uma linha encosta na outra
+const camposDoModelo = id => MODELOS_ARTE.find(m => m.id === id)?.campos || [];
+const nomePg = (i, n) => i === 0 ? 'capa' : i === n - 1 ? 'última página' : 'página ' + (i + 1);
+// lê o pedido em partes ("capa menos espaçada, logo do outro lado e põe as fotos") e devolve as operações que o painel sabe fazer sozinho
+function lerPedidoModelo(fb, sp) {
+  const n = (sp?.slides || []).length, ops = [], resto = [];
+  const partes = String(fb || '').split(/[,;\n]+|\.\s+|\s+e\s+(?=(?:a\s+|o\s+|as\s+|os\s+)?(?:p[õo]e|poe|coloc|bota|tir|troc|mud|logo|capa|foto|letra|texto|deix|aument|diminu|inverte|passa))/i).map(s => s.trim()).filter(Boolean);
+  let pgAnt = null;
+  for (const p of partes) {
+    const t = semAcento(p), pgs = paginasPedidas(p); let ok = false;
+    if (/espacad|espacament|entrelinha|espaco entre|encavalad|apertad|grudad|colad|encost|linhas? (mais |menos )?(junt|separad)/.test(t)) {
+      const dir = /encavalad|apertad|grudad|colad|encost|mais (espac|separad|folg)|aument|abr[ei]|folg|solt/.test(t) && !/menos/.test(t) ? 1 : -1;
+      ops.push({ tipo: 'entrelinha', dir, paginas: pgs ? [...pgs] : pgAnt || null, texto: p }); ok = true;
+    }
+    if (/(letra|texto|fonte|titulo|frase)s?\b.*\b(maior|menor|grande|pequen)|(aument|diminu|reduz)\w*\b.*\b(letra|texto|fonte|titulo|frase)/.test(t)) {
+      ops.push({ tipo: 'escala', dir: /maior|grande|aument/.test(t) ? 1 : -1, paginas: pgs ? [...pgs] : pgAnt || null, texto: p }); ok = true;
+    }
+    if (/\blogo\b/.test(t)) {
+      const lado = /direit/.test(t) ? 'direita' : /esquerd/.test(t) ? 'esquerda' : /outro lado|lado oposto|invert|troc|mud|pass|vir/.test(t) ? 'inverter' : '';
+      if (lado) { ops.push({ tipo: 'logo', lado, paginas: null, texto: p }); ok = true; }
+    }
+    if (/\bfotos?\b|\bimage(m|ns)\b/.test(t) && !/fundo/.test(t)) {
+      if (/\b(tir|remov|sem\b|apag)/.test(t)) { ops.push({ tipo: 'sem_foto', paginas: pgs ? [...pgs] : null, texto: p }); ok = true; }
+      else if (/\b(poe|po[eê]|coloc|bota|adicion|inclu|falt|cade|quero|usa|com\b|mais)|^fotos?$/.test(t) || /p[õo]e/.test(p)) { ops.push({ tipo: 'fotos', paginas: pgs ? [...pgs] : null, texto: p }); ok = true; }
+    }
+    if (pgs) pgAnt = [...pgs];
+    if (!ok) resto.push(p);
+  }
+  for (const o of ops) if (o.paginas) o.paginas = o.paginas.filter(i => i >= 0 && i < n);
+  return { ops, resto };
+}
+// termo de busca para a foto da página: o que a frase mostra, em poucas palavras (o banco acha muito mais que a frase inteira)
+const STOP_PT = new Set('a o as os um uma uns umas de da do das dos em na no nas nos por pra para com sem que se e ou mas mais menos muito muita seu sua seus suas voce voces ele ela eles elas isso esse essa este esta aquilo aquele aquela ja nao sim tem ter ser estar esta foi era ao aos como quando onde porque sobre entre ate tudo todo toda cada outro outra mesmo so ainda pelo pela pelos pelas me te lhe nos vos meu minha qual quem quer pode precisa fazer faz vai vao ha la aqui ali'.split(' '));
+function termoFoto(frase) {
+  const pal = semAcento(String(frase || '').replace(/[*|_]/g, ' ')).replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 2 && !STOP_PT.has(w));
+  return pal.slice(0, 4).join(' ') || 'pessoa trabalhando notebook';
+}
+// termo em inglês para o banco de imagens (Openverse e boa parte do Unsplash/Pixabay só acham em inglês): Claude quando há IA, senão um glossário
+const GLOSS_FOTO = { pix: 'mobile payment', pagamento: 'payment', pagar: 'payment', paga: 'payment', dinheiro: 'money', celular: 'smartphone', cartao: 'credit card', boleto: 'bill', venda: 'sale', vendas: 'sales', vende: 'sale', cliente: 'customer', clientes: 'customers', checkout: 'checkout', loja: 'store', empresa: 'business', negocio: 'business', conta: 'account', banco: 'bank', taxa: 'fee', mensalidade: 'subscription', lucro: 'profit', compra: 'shopping', comprar: 'shopping', carrinho: 'shopping cart', link: 'link', notebook: 'laptop', computador: 'computer', escritorio: 'office', equipe: 'team', reuniao: 'meeting', grafico: 'chart', crescimento: 'growth', marketing: 'marketing', redes: 'social media', instagram: 'instagram', sucesso: 'success', problema: 'problem', desiste: 'frustrated', frustrado: 'frustrated', perdida: 'lost', perder: 'loss', tempo: 'time', relogio: 'clock', casa: 'home', familia: 'family', pessoa: 'person', mulher: 'woman', homem: 'man', cafe: 'coffee', mesa: 'desk', contrato: 'contract', seguranca: 'security', entrega: 'delivery', caixa: 'cash register', maquininha: 'card machine', acompanha: 'checking phone' };
+async function termoIngles(t) {
+  t = String(t || '').trim(); if (!t) return '';
+  const chave = crypto.createHash('sha1').update('foto|' + t).digest('hex'); try { const ja = one('SELECT texto FROM traducoes WHERE chave=?', chave); if (ja) return ja.texto; } catch { /* sem cache */ }
+  let out = '';
+  if (!MANUAL && !als.getStore()?.dry) { try { const r = await callClaude({ agent: agentRow('designer'), maxTokens: 60, user: `Termo de busca em INGLÊS, 2 a 4 palavras, para achar num banco de fotos (Pexels/Unsplash) uma foto real que mostre isto: "${t}". Responda só o termo.` }); out = String(r.text || '').split('\n')[0].replace(/["“”.]/g, '').trim().slice(0, 60); } catch { /* sem IA: glossário */ } }
+  if (!out) out = [...new Set(semAcento(t).split(/[^a-z]+/).map(w => GLOSS_FOTO[w]).filter(Boolean))].slice(0, 3).join(' ');
+  if (out) try { run('INSERT OR REPLACE INTO traducoes(chave,texto,created_at) VALUES(?,?,?)', chave, out, T()); } catch { /* sem cache */ }
+  return out;
+}
+// descreve a mudança para o chat, em português de gente
+const fmtN = v => String(Math.round(v * 100) / 100).replace('.', ',');
+// aplica as operações nos DADOS do modelo, recompõe só as páginas mexidas e confere o resultado. Devolve null quando o pedido não é deste tipo.
+function ajusteDeModelo(c, fb, extras = [], termos = {}) {
+  const ant = jparse(c.art_spec, null); if (!ant?.slides?.length) return null;
+  const n = ant.slides.length, modeloDe = sl => MODELO_IDS.includes(sl?.modelo) ? sl.modelo : MODELO_IDS.includes(sl?.modeloOrigem) ? sl.modeloOrigem : '';
+  if (!ant.slides.some(modeloDe)) return null;
+  const { ops, resto } = lerPedidoModelo(fb, ant); ops.push(...extras);
+  if (!ops.length) return null;
+  const dados = ant.slides.map(sl => JSON.parse(JSON.stringify(sl?.dados || {}))), mex = new Set(), feito = [], naoDa = [], fotosPedidas = [];
+  const logoX = sl => (sl?.items || []).find(it => it.moldura)?.x;
+  for (const o of ops) {
+    const alvo = (o.paginas?.length ? o.paginas : [...Array(n).keys()]).filter(i => modeloDe(ant.slides[i]));
+    if (o.tipo === 'entrelinha') {
+      const ms = [];
+      for (const i of alvo) { const m = modeloDe(ant.slides[i]); if (!camposDoModelo(m).includes('entrelinha')) { naoDa.push(`entrelinha da ${nomePg(i, n)}`); continue; }
+        const cur = +dados[i].entrelinha || +(ant.slides[i].texts || []).find(x => x.mk || x.role === 'title')?.lh || LH_PAD[m] || 1.4, novo = o.dir < 0 ? Math.max(LH_MIN_MK + .03, Math.round(cur * .83 * 100) / 100) : Math.min(2, Math.round(cur * 1.15 * 100) / 100);
+        if (Math.abs(novo - cur) < .01) { ms.push(`${nomePg(i, n)} já está no limite seguro (${fmtN(cur)})`); continue; }
+        dados[i].entrelinha = novo; mex.add(i); ms.push(`${nomePg(i, n)}: entrelinha ${fmtN(cur)} → ${fmtN(novo)}`); }
+      if (ms.length) feito.push(ms.join('; '));
+    } else if (o.tipo === 'escala') {
+      const ms = [];
+      for (const i of alvo) { const m = modeloDe(ant.slides[i]); if (!camposDoModelo(m).includes('escala')) { naoDa.push(`tamanho do texto da ${nomePg(i, n)}`); continue; }
+        const cur = +dados[i].escala || 1, novo = Math.max(.7, Math.min(1.3, Math.round(cur * (o.dir > 0 ? 1.12 : .88) * 100) / 100)); if (novo === cur) continue;
+        dados[i].escala = novo; mex.add(i); ms.push(`${nomePg(i, n)}: texto ${o.dir > 0 ? 'maior' : 'menor'} (${fmtN(cur)} → ${fmtN(novo)})`); }
+      if (ms.length) feito.push(ms.join('; '));
+    } else if (o.tipo === 'logo') {
+      const atual = (logoX(ant.slides[0]) ?? .9) < .5 ? 'esquerda' : 'direita', lado = o.lado === 'inverter' ? (atual === 'direita' ? 'esquerda' : 'direita') : o.lado;
+      let k = 0; for (const i of alvo) { if (!camposDoModelo(modeloDe(ant.slides[i])).includes('logo')) continue; dados[i].logo = lado; mex.add(i); k++; }
+      if (k) feito.push(`logo no canto de cima à ${lado} em ${k === n ? 'todas as páginas' : k + ' página(s)'}`); else naoDa.push('lado da logo');
+    } else if (o.tipo === 'campo') {   // o Gerente traduziu uma parte do pedido em campo do modelo (só campos que o modelo tem)
+      const i = o.pagina, m = modeloDe(ant.slides[i]); if (!m || !camposDoModelo(m).includes(o.campo) || ['titulo', 'texto', 'apoio', 'cta'].includes(o.campo) && !o.texto_ok) { naoDa.push(`${o.campo} da ${nomePg(i, n)}`); continue; }
+      dados[i][o.campo] = o.valor; mex.add(i); feito.push(`${nomePg(i, n)}: ${o.campo} → ${typeof o.valor === 'object' ? JSON.stringify(o.valor) : o.valor}`); if (o.campo === 'foto' && o.valor) fotosPedidas.push(i);
+    } else if (o.tipo === 'sem_foto') {
+      for (const i of alvo) if (dados[i].foto) { delete dados[i].foto; mex.add(i); feito.push(`tirei a foto da ${nomePg(i, n)}`); }
+    } else if (o.tipo === 'fotos') {
+      const comFoto = i => camposDoModelo(modeloDe(ant.slides[i])).includes('foto') && !['venda-capa', 'venda-fim'].includes(modeloDe(ant.slides[i]));
+      let pg = (o.paginas?.length ? o.paginas : []).filter(comFoto), ja = [];
+      if (!pg.length) {   // "põe as fotos": 2 ou 3 páginas do miolo, espalhadas (as que já têm foto contam)
+        const miolo = [...Array(n).keys()].filter(i => i > 0 && i < n - 1 && comFoto(i)); ja = miolo.filter(i => dados[i].foto); const quer = Math.max(2, Math.min(3, Math.round(miolo.length / 3)));
+        const livres = miolo.filter(i => !dados[i].foto), passo = livres.length / (quer - ja.length + 1);
+        for (let k = 1; pg.length < quer - ja.length && k <= quer + 2; k++) { const i = livres[Math.min(livres.length - 1, Math.max(0, Math.round(k * passo) - 1))]; if (i != null && !pg.includes(i)) pg.push(i); }
+        for (const i of ja) fotosPedidas.push(i);   // as que já tinham foto também precisam aparecer de verdade
+      }
+      for (const i of ja) if (termos[i] && typeof dados[i].foto === 'string' && dados[i].foto.split(/\s+/).length > 5) { dados[i].foto = termos[i]; mex.add(i); }   // frase inteira como termo quase nunca acha foto
+      for (const i of pg) { if (!dados[i].foto) dados[i].foto = termos[i] || termoFoto(dados[i].titulo); mex.add(i); fotosPedidas.push(i); }
+      { const todas = [...new Set([...pg, ...fotosPedidas])].sort((x, y) => x - y); if (todas.length) feito.push(`foto real de banco nas páginas ${todas.map(i => i + 1).join(', ')}`); } if (!pg.length && !fotosPedidas.length) naoDa.push('fotos (nenhuma página deste template aceita foto)');
+    }
+  }
+  if (!mex.size && !feito.length) return { ok: false, ops, resto, feito, naoDa };
+  // recompõe só as páginas mexidas, pelo modelo, com as cores/fontes/logo da marca
+  const base = ctxMarca(c.brand, c.format, ant), novo = JSON.parse(JSON.stringify(ant));
+  for (const i of mex) {
+    const sl = comporSlide({ modelo: modeloDe(ant.slides[i]), dados: dados[i] }, { ...base, i, total: n }); if (!sl) continue;
+    const pr = sanitizeArteSpec({ slides: [sl] }, 'carrossel').slides[0]; if (ant.slides[i].bgLivre) pr.bgLivre = ant.slides[i].bgLivre;
+    novo.slides[i] = pr;
+  }
+  const problemas = confereAjuste(ant, novo, ops, fb, fotosPedidas);
+  return { ok: true, novo, ops, resto, feito, naoDa, fotosPedidas: [...new Set(fotosPedidas)], problemas };
+}
+// confere a arte nova contra o pedido e CORRIGE sozinha o que fugiu: fundo, efeitos e elementos a mais voltam como estavam.
+// Devolve a lista do que precisou corrigir (vazia = saiu certo de primeira).
+function confereAjuste(ant, novo, ops, fb, fotosPedidas = []) {
+  const t = semAcento(fb), pediuFundo = /\bfundo|background|degrad|sombra|escurec|clare/.test(t), pediuNovo = /acrescent|adicion|inclu|coloc|bota|p[oõ]e\b|poe\b|insir/.test(t), out = [];
+  const sem = x => JSON.stringify(x ?? null);
+  novo.slides.forEach((sl, i) => {
+    const a = ant.slides[i]; if (!a || !sl) return;
+    if (!pediuFundo) {
+      if (sem(sl.bg) !== sem(a.bg)) { sl.bg = JSON.parse(JSON.stringify(a.bg)); out.push(`${nomePg(i, novo.slides.length)}: o fundo tinha mudado sem você pedir e voltou ao original`); }
+      for (const k of ['fx', 'shade', 'shade_dir', 'paper']) if (sem(sl[k]) !== sem(a[k])) { if (a[k] === undefined) delete sl[k]; else sl[k] = JSON.parse(JSON.stringify(a[k])); out.push(`${nomePg(i, novo.slides.length)}: ${k === 'fx' ? 'efeito/degradê' : k === 'shade' ? 'sombra de leitura' : k} que ninguém pediu foi tirado`); }
+    }
+    if (!pediuNovo) {
+      for (const k of ['texts', 'items', 'shapes']) { const na = (a[k] || []).length; if ((sl[k] || []).length > na && !fotosPedidas.includes(i)) { sl[k] = sl[k].slice(0, na); out.push(`${nomePg(i, novo.slides.length)}: elemento a mais que ninguém pediu foi tirado`); } }
+    }
+    // marca-texto nunca encavala: entrelinha mínima de segurança
+    for (const tx of sl.texts || []) if (tx.mk && String(tx.value || '').includes('|') && (+tx.lh || 1.6) < LH_MIN_MK) { tx.lh = LH_MIN_MK; out.push(`${nomePg(i, novo.slides.length)}: entrelinha estava apertada demais (linhas encavaladas) e subiu para ${fmtN(LH_MIN_MK)}`); }
+  });
+  // cada mudança pedida tem de estar lá
+  for (const o of ops) {
+    if (o.tipo === 'logo') { const lado = novo.slides.map(sl => (sl.items || []).find(it => it.moldura)?.x).filter(x => x != null); if (o.lado !== 'inverter' && lado.some(x => (x > .5 ? 'direita' : 'esquerda') !== o.lado)) out.push('ATENÇÃO: a logo não ficou do lado pedido em todas as páginas'); }
+  }
+  for (const i of fotosPedidas) if (!(novo.slides[i]?.items || []).some(it => it.fotoCard || it.banco)) out.push(`ATENÇÃO: a ${nomePg(i, novo.slides.length)} ficou sem a foto pedida`);
+  return out;
+}
+// roda o ajuste de ponta a ponta: aplica, renderiza, confere se a foto veio de verdade (senão tenta outro termo) e conta ao dono
+async function pedidoEmCampos(c, partes, sp) {
+  if (MANUAL || als.getStore()?.dry || !partes.length) return [];
+  const pgs = (sp.slides || []).map((sl, i) => { const m = sl.modelo || sl.modeloOrigem; return m && MODELO_IDS.includes(m) ? `página ${i} (${nomePg(i, sp.slides.length)}) · modelo ${m} · campos: ${camposDoModelo(m).join(', ')} · dados atuais: ${JSON.stringify(sl.dados || {}).slice(0, 400)}` : `página ${i}: sem modelo`; }).join('\n');
+  try {
+    const r = await callClaude({ agent: agentRow('gerente'), maxTokens: 700, user: `Transforme o pedido do dono em mudanças EXATAS nos campos dos modelos das páginas. Só mude o que foi pedido; nunca troque fundo, nunca acrescente elemento, nunca reescreva texto que não foi pedido.\n# PÁGINAS\n${pgs}\n# PEDIDO\n${partes.join('; ')}\n# SAÍDA\nSó JSON: {"mudancas":[{"pagina":0,"campo":"nome do campo","valor":"novo valor"}]}. entrelinha: número de 1,25 a 2 (menor = linhas mais juntas). escala: 0,7 a 1,3. logo: "direita" ou "esquerda". foto: termo curto de busca em banco de imagens, em inglês, do que a frase mostra. Se nada do pedido couber nos campos, devolva {"mudancas":[]}.` });
+    const j = extrairJSON(r.text, '{'); const pedeTexto = /\b(texto|t[ií]tulo|frase|escrev|reescrev|palavra)/i.test(partes.join(' '));
+    return (Array.isArray(j?.mudancas) ? j.mudancas : []).filter(m => Number.isInteger(+m?.pagina) && m.campo).map(m => ({ tipo: 'campo', pagina: +m.pagina, campo: String(m.campo), valor: m.campo === 'entrelinha' ? Math.max(LH_MIN_MK, Math.min(2, +m.valor || 1.4)) : m.campo === 'escala' ? Math.max(.7, Math.min(1.3, +m.valor || 1)) : m.valor, texto_ok: pedeTexto }));
+  } catch (e) { console.error('pedido em campos:', e.message); return []; }
+}
+async function executaAjusteModelo(c, fb, extras = []) {
+  const termos = {};   // pedido de foto: termo de busca em inglês pela frase de cada página (Claude; sem IA, glossário)
+  if (/\bfotos?\b|\bimage(m|ns)\b/i.test(fb)) { const sp0 = jparse(c.art_spec, {}); for (const [i, sl] of (sp0.slides || []).entries()) if (camposDoModelo(sl.modelo || sl.modeloOrigem).includes('foto') && sl.dados?.titulo) { try { termos[i] = await termoIngles(String(sl.dados.titulo).replace(/[*|]/g, '')); } catch { /* fica o termo em português */ } } }
+  let r = ajusteDeModelo(c, fb, extras, termos);
+  if (r?.resto?.length) { const ex = await pedidoEmCampos(c, r.resto, jparse(c.art_spec, {})); if (ex.length) { r = ajusteDeModelo(c, fb, [...extras, ...ex], termos); if (r) r.resto = []; } }
+  if (!r?.ok) return r;
+  setContent(c.id, { art_spec: JSON.stringify(r.novo), art_status: '' });
+  await renderArte(c.id);
+  let c2 = getContent(c.id); const falhou = i => new RegExp(`Slide ${i + 1}: não consegui usar a foto do banco`).test(c2.art_note || '');
+  for (let tent = 0; tent < 2 && r.fotosPedidas.some(falhou); tent++) {   // foto não veio: tenta termos mais simples (2 palavras, depois genérico do produto) antes de desistir
+    const sp = jparse(c2.art_spec, {}), base = ctxMarca(c.brand, c.format, sp);
+    for (const i of r.fotosPedidas.filter(falhou)) { const sl = sp.slides[i], d = { ...(sl.dados || {}) }; d.foto = tent === 0 ? termoFoto(d.titulo).split(' ').slice(0, 2).join(' ') : (c.product ? termoFoto(c.product) : 'pessoa usando celular'); const ns = comporSlide({ modelo: sl.modelo || sl.modeloOrigem, dados: d }, { ...base, i, total: sp.slides.length }); if (ns) sp.slides[i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; }
+    setContent(c.id, { art_spec: JSON.stringify(sp), art_status: '' }); await renderArte(c.id); c2 = getContent(c.id);
+    r.problemas.push(`a foto de ${r.fotosPedidas.filter(i => !falhou(i)).length ? 'algumas páginas' : 'uma página'} não veio pelo termo da frase; busquei de novo com termo mais simples`);
+  }
+  r.semFoto = r.fotosPedidas.filter(falhou); r.render = c2.art_status; r.note = c2.art_note || '';
+  return r;
+}
+function relatoAjuste(c, r) {
+  const L = [];
+  L.push(`Ajustei “${clip(c.title || '', 60)}”: ${r.feito.join('; ')}.`);
+  if (r.naoDa.length) L.push(`Não deu para mexer em: ${r.naoDa.join(', ')} (o template não tem esse ajuste).`);
+  if (r.resto.length) L.push(`Esta parte do pedido eu não consegui transformar em mudança: “${r.resto.join('”, “')}”. Me diga com outras palavras (ex.: "título da página 3 maior").`);
+  if (r.semFoto?.length) L.push(`A foto não veio nas páginas ${r.semFoto.map(i => i + 1).join(', ')}: ${(r.note.match(/não consegui usar a foto do banco[^\n]*/) || ['nenhum banco respondeu'])[0]}. Mande "testar bancos de imagem" aqui no chat que eu mostro qual banco falhou e por quê.`);
+  const corr = r.problemas.filter(p => !/^ATENÇÃO/.test(p)), aten = r.problemas.filter(p => /^ATENÇÃO/.test(p));
+  if (corr.length) L.push(`Conferi o resultado e corrigi sozinho: ${corr.join('; ')}.`);
+  else L.push('Conferi o resultado: fundo, textos e o resto ficaram exatamente como estavam.');
+  if (aten.length) L.push(aten.map(a => a.replace(/^ATENÇÃO: /, '')).join('; ') + '.');
+  L.push(r.render === 'ok' ? 'Está na Mesa de revisão.' : `O render não terminou (${clip(r.note, 160)}).`);
+  return L.join(' ');
+}
+// ───────── Bancos de imagem e fal.ai: teste visível em produção ─────────
+async function testaBancos(termo = 'office') {
+  const out = [];
+  for (const b of BANCOS) {
+    const chave = b.chave ? process.env[b.chave] : null, linha = { banco: b.nome, variavel: b.chave || '(sem chave)', chave: b.chave ? (chave ? `presente (${chave.length} caracteres)` : 'AUSENTE no container') : 'não precisa' };
+    if (b.chave && !chave) { out.push({ ...linha, ok: false, motivo: `a variável ${b.chave} não chegou ao container (confira o nome exato no Komodo e faça Redeploy)` }); continue; }
+    const t0 = Date.now();
+    try { const r = await b.busca(termo, 1, chave || ''); linha.ms = Date.now() - t0; linha.resultados = r.length;
+      if (!r.length) { out.push({ ...linha, ok: false, motivo: 'respondeu, mas sem nenhuma foto para o termo' }); continue; }
+      try { const { buf } = await baixaImagemSegura(r[0].full); out.push({ ...linha, ok: true, motivo: `${r.length} fotos; baixei a primeira (${Math.round(buf.length / 1024)} KB)` }); }
+      catch (e) { out.push({ ...linha, ok: false, motivo: `achou fotos, mas o download falhou: ${e.message}` }); }
+    } catch (e) {
+      const st = +(String(e.message).match(/\b(\d{3})\b/) || [])[1];
+      out.push({ ...linha, ok: false, ms: Date.now() - t0, motivo: (st === 401 || st === 403 || (st === 400 && /key/i.test(e.message))) && b.chave ? `chave recusada (${st}): a ${b.chave} está errada, vencida ou é de outro tipo (Unsplash usa a "Access Key", não a "Secret key"). Resposta do banco: ${e.message}` : st === 429 ? 'limite de buscas da conta atingido (429); volta sozinho mais tarde' : /timeout|aborted/i.test(e.message) ? 'não respondeu em 15 s (rede do servidor ou banco fora do ar)' : /fetch failed|ENOTFOUND|ECONN/i.test(e.message + (e.cause?.code || '')) ? `o servidor não conseguiu conectar (${e.cause?.code || e.message})` : e.message });
+    }
+  }
+  return out;
+}
+const textoTesteBancos = (L, termo) => `Testei os bancos de imagem agora, buscando “${termo}”:\n` + L.map(x => `${x.ok ? '✓' : '✖'} ${x.banco}: ${x.ok ? x.motivo : x.motivo}${x.variavel !== '(sem chave)' ? ` · ${x.variavel} ${x.chave}` : ''}${x.ms ? ` · ${x.ms} ms` : ''}`).join('\n') + `\n${L.some(x => x.ok) ? `As fotos saem por: ${L.filter(x => x.ok).map(x => x.banco).join(', ')}.` : 'Nenhum banco respondeu: as páginas com foto vão sair sem foto até isso ser resolvido.'}`;
+// fal.ai: o que está acontecendo, em linguagem de gente
+function falStatus() {
+  const s = settings(), info = s.fal_pausa_info || '';
+  if (s.fal_pausa === '1') return { ok: false, motivo: 'standby', texto: `O fal.ai está em STANDBY: é um interruptor de economia em Configurações › Vídeo e voz${info ? ` (ligado ${info})` : ''}. Não é falta de saldo nem chave errada: enquanto ele estiver ligado, o sistema não faz NENHUMA chamada paga ao fal.ai (imagem por IA, recorte de fundo, objeto 3D) e nada é cobrado. O que muda: fundo "gerado por IA" sai liso na cor da marca e recorte de foto não acontece. Fotos de banco (Pexels, Unsplash, Pixabay) e fundos da Biblioteca NÃO dependem do fal.ai. Para voltar: desligue o standby em Configurações › Vídeo e voz (ou me peça "desliga o standby do fal.ai").` };
+  if (!process.env.FAL_KEY) return { ok: false, motivo: 'sem_chave', texto: 'Não há FAL_KEY no container: imagem por IA, recorte e 3D ficam desligados. Cadastre a FAL_KEY no Komodo e faça Redeploy.' };
+  const e = s.fal_ultimo_erro || '';
+  if (e && /40[13]|balance|exhaust|locked|saldo/i.test(e)) return { ok: false, motivo: 'saldo_ou_chave', texto: `A última chamada ao fal.ai foi recusada: ${e}. ${/balance|exhaust|locked/i.test(e) ? 'É falta de saldo: recarregue em fal.ai › Billing.' : 'A chave foi recusada: gere outra em fal.ai › Keys e troque a FAL_KEY no Komodo.'}` };
+  return { ok: true, motivo: 'ok', texto: `Agora o fal.ai NÃO está em standby: está ligado e com chave${info ? ` (o standby foi mexido ${info})` : ''}. "Standby" é o interruptor de economia em Configurações › Vídeo e voz: ligado, o sistema não faz nenhuma chamada paga ao fal.ai (imagem por IA, recorte, objeto 3D) e o fundo "gerado por IA" sai liso na cor da marca. Fotos de banco e fundos da Biblioteca não dependem dele.${e ? ` Último erro do fal.ai registrado: ${e}.` : ''}` };
+}
+// ───────── Gerente com ferramentas (dono, 20/11/2026): conversa como o Claude Code, investiga, age, confere e só então responde ─────────
+// Protocolo em texto (funciona pela API e pela assinatura): o Gerente pede uma ferramenta com um bloco ```ferramenta {"nome":..,"args":{..}}```,
+// o painel executa e devolve o resultado; ele repete até resolver (no máximo GER_PASSOS vezes) e então responde ao dono.
+const GER_PASSOS = 6;
+const GERENTE_FERRAMENTAS = `# FERRAMENTAS (use antes de responder sempre que precisar ver, testar ou corrigir algo; nunca chute)
+Para usar, escreva SÓ um bloco e mais nada:
+\`\`\`ferramenta
+{"nome":"ver_peca","args":{"id":123}}
+\`\`\`
+Você recebe o resultado e continua. Pode usar várias, uma por vez (até ${GER_PASSOS}). Quando tiver resolvido, responda ao dono normalmente (sem bloco ferramenta).
+- ver_peca {"id"}: título, marca, etapa, avisos da arte, cada página (template, dados, fundo, elementos), roteiro e o que aconteceu com ela.
+- ver_paginas {"id","paginas":[1,3]}: mostra as imagens renderizadas das páginas (número começando em 1) para você OLHAR a arte.
+- ajustar_arte {"id","pedido"}: aplica um ajuste de arte do jeito confiável: em página de template muda os campos exatos (entrelinha, escala, logo, fotos) e confere o resultado antes de devolver; em página livre manda o Designer editar só os elementos pedidos. Use o pedido do dono com as palavras dele.
+- editar_campo {"id","pagina","campo","valor"}: muda UM campo do modelo de uma página (pagina começa em 1). Campos comuns: titulo, texto, cta, foto (termo de busca em inglês), entrelinha (1,25 a 2), escala (0,7 a 1,3), logo (direita|esquerda). Re-renderiza e confere.
+- testar_bancos {"termo"}: busca uma palavra em cada banco de imagem (Pexels, Unsplash, Pixabay, Openverse) e diz qual respondeu, qual falhou e o motivo real (inclusive se a chave chegou ao servidor).
+- status_servicos {}: fal.ai (standby, chave, último erro), bancos de imagem ativos, IA dos agentes, fila de trabalhos e erros recentes.
+- ler_logs {"id"?,"n"?}: últimos registros de atividade e erros (de uma peça, se passar o id).
+- refazer_etapa {"id","agente":"designer|roteirista|editor","pedido"?}: manda a peça de volta para o agente refazer (com o pedido, se houver).`;
+function gerentePecaTexto(c) {
+  const sp = jparse(c.art_spec, null);
+  const pags = (sp?.slides || []).map((sl, i) => `  página ${i + 1}: ${sl.modelo || sl.modeloOrigem || 'livre'} · dados ${JSON.stringify(sl.dados || {}).slice(0, 300)}`).join('\n');
+  const logs = all('SELECT ts,agent,message msg FROM activity WHERE content_id=? ORDER BY id DESC LIMIT 8', c.id).map(l => `  ${l.ts} ${l.agent || 'sistema'}: ${clip(l.msg, 200)}`).join('\n');
+  return `#${c.id} “${c.title}” · marca ${c.brand || '-'} · ${c.format} · tipo ${c.kind || '-'} · etapa ${c.status}${c.error ? ' · erro: ' + clip(c.error, 200) : ''}
+Arte: ${c.art_status || 'sem render'} · template ${sp?.template || sp?.estilo || '-'} · ${(sp?.slides || []).length} página(s)
+Avisos da arte: ${c.art_note || '(nenhum)'}
+Páginas (dados do template):
+${pags || '  (sem especificação)'}
+Elementos:
+${sp ? descreveArte(sp) : '(sem arte)'}
+Roteiro (início): ${clip(c.script || '', 900)}
+Últimos registros da peça:
+${logs || '  (nenhum)'}`;
+}
+async function gerenteFerramenta(nome, a = {}) {
+  const peca = () => { const c = getContent(+a.id); if (!c) throw new Error(`não existe peça #${a.id}`); return c; };
+  if (nome === 'ver_peca') return { texto: gerentePecaTexto(peca()) };
+  if (nome === 'ver_paginas') {
+    const c = peca(), fl = arteFiles(c.id); if (!fl.length) return { texto: 'Esta peça ainda não tem imagens renderizadas.' };
+    const ps = (Array.isArray(a.paginas) && a.paginas.length ? a.paginas : [1, 2, 3]).map(Number).filter(n => n >= 1 && n <= fl.length).slice(0, 4);
+    return { texto: `Imagens das páginas ${ps.join(', ')} de ${fl.length} (logo abaixo).`, imgs: ps.map(n => visionImg(path.join(ARTE_DIR(c.id), fl[n - 1]))).filter(Boolean) };
+  }
+  if (nome === 'ajustar_arte') {
+    const c = peca(), ped = String(a.pedido || '').slice(0, 1500); if (!ped) throw new Error('faltou o pedido');
+    if (arteState.get(c.id)?.status === 'running') return { texto: 'A arte desta peça está sendo gerada agora; tente de novo em alguns segundos.' };
+    const r = c.kind !== 'noticia' ? await executaAjusteModelo(c, ped) : null;
+    if (r?.ok) { const rel = relatoAjuste(c, r); if (r.resto.length) enqueue(c.id, 'designer', 'arte', { feedback: r.resto.join('; '), from: 'dono' }, 'manual'); return { texto: rel + (r.resto.length ? ' (O resto do pedido foi para o Designer editar os elementos.)' : ''), feito: `ajustou a arte de #${c.id}` }; }
+    const job = enqueue(c.id, 'designer', 'arte', { feedback: ped, from: 'dono' }, 'manual');
+    return { texto: `Esta página não é de template com campos de ajuste (ou o pedido não é de entrelinha/tamanho/logo/fotos): mandei para o Designer editar só os elementos pedidos (trabalho #${job}). Quando terminar, o painel confere fundo e elementos não pedidos e desfaz o que fugir do pedido.`, feito: `mandou o ajuste de #${c.id} ao Designer` };
+  }
+  if (nome === 'editar_campo') {
+    const c = peca(), i = (+a.pagina || 1) - 1, campo = String(a.campo || ''); if (!campo) throw new Error('faltou o campo');
+    const v = campo === 'entrelinha' ? Math.max(LH_MIN_MK, Math.min(2, +String(a.valor).replace(',', '.') || 1.4)) : campo === 'escala' ? Math.max(.7, Math.min(1.3, +String(a.valor).replace(',', '.') || 1)) : a.valor;
+    const r = await executaAjusteModelo(c, '', [{ tipo: 'campo', pagina: i, campo, valor: v, texto_ok: true }]);
+    if (!r?.ok) return { texto: `Não deu para mudar “${campo}” na página ${i + 1}: ${r?.naoDa?.join(', ') || 'a página não é de template'}.` };
+    return { texto: relatoAjuste(c, r), feito: `mudou ${campo} da página ${i + 1} de #${c.id}` };
+  }
+  if (nome === 'testar_bancos') { const t = String(a.termo || 'office').slice(0, 60), L = await testaBancos(t); return { texto: textoTesteBancos(L, t), feito: 'testou os bancos de imagem' }; }
+  if (nome === 'status_servicos') {
+    const f = falStatus(), q = all("SELECT agent,kind,status,COUNT(*) n FROM jobs WHERE status IN ('queued','running') GROUP BY agent,kind,status"), er = all("SELECT id,agent,kind,error,content_id FROM jobs WHERE status='error' ORDER BY id DESC LIMIT 6");
+    return { texto: `fal.ai: ${f.texto}\nBancos de imagem com chave/ativos: ${bancosAtivos().map(b => b.nome).join(', ')} (para saber se respondem, use testar_bancos)\nIA dos agentes: ${MANUAL ? 'DESLIGADA (sem chave de API e sem assinatura conectada)' : 'ligada'}\nFila: ${q.map(x => `${x.agent}/${x.kind} ${x.status}: ${x.n}`).join('; ') || 'vazia'}\nErros recentes: ${er.map(x => `#${x.id} ${x.agent}/${x.kind}${x.content_id ? ' (peça #' + x.content_id + ')' : ''}: ${clip(x.error, 160)}`).join(' | ') || 'nenhum'}` };
+  }
+  if (nome === 'ler_logs') {
+    const n = Math.max(5, Math.min(40, +a.n || 15)), L = a.id ? all('SELECT ts,agent,message msg FROM activity WHERE content_id=? ORDER BY id DESC LIMIT ?', +a.id, n) : all('SELECT ts,agent,message msg,content_id FROM activity ORDER BY id DESC LIMIT ?', n);
+    return { texto: L.map(l => `${l.ts} ${l.agent || 'sistema'}${l.content_id ? ' #' + l.content_id : ''}: ${clip(l.msg, 220)}`).join('\n') || '(sem registros)' };
+  }
+  if (nome === 'refazer_etapa') {
+    const c = peca(), ag = String(a.agente || 'designer');
+    if (ag === 'designer') { const j = enqueue(c.id, 'designer', 'arte', a.pedido ? { feedback: String(a.pedido).slice(0, 1500), from: 'dono' } : { refazer: true, from: 'dono', feedback: 'refazer' }, 'manual'); return { texto: `Designer vai ${a.pedido ? 'ajustar' : 'refazer'} a arte de #${c.id} (trabalho #${j}).`, feito: `mandou o Designer refazer #${c.id}` }; }
+    if (ag === 'editor') { const j = enqueue(c.id, 'editor', 'video', { feedback: String(a.pedido || 'refazer'), from: 'dono' }, 'manual'); return { texto: `Editor vai refazer o vídeo de #${c.id} (trabalho #${j}).`, feito: `mandou o Editor refazer #${c.id}` }; }
+    if (ag === 'roteirista') { const j = enqueue(c.id, 'roteirista', 'roteiro', a.pedido ? { feedback: String(a.pedido).slice(0, 1500), from: 'dono' } : {}, 'manual'); return { texto: `Roteirista vai reescrever #${c.id} (trabalho #${j}).`, feito: `mandou o Roteirista reescrever #${c.id}` }; }
+    throw new Error('agente desconhecido: ' + ag);
+  }
+  throw new Error('ferramenta desconhecida: ' + nome);
+}
+const pedidoFerramenta = t => { const m = String(t || '').match(/```ferramenta\s*([\s\S]*?)```/i); if (!m) return null; try { const j = JSON.parse(m[1].trim()); return j?.nome ? { nome: String(j.nome), args: j.args && typeof j.args === 'object' ? j.args : {} } : null; } catch { return { erro: 'JSON inválido no bloco ferramenta' }; } };
+// respostas diretas que não dependem de IA (funcionam até sem chave): teste dos bancos e o que é o standby do fal.ai
+async function gerenteDireto(text) {
+  const t = semAcento(text);
+  if (/\btest\w*\b.*\bbancos?\b|\bbancos? de (imagem|foto)s?\b.*\b(funciona|test|respond|falh)/.test(t)) { const termo = (text.match(/["“]([^"”]{2,40})["”]/) || [])[1] || 'office', L = await testaBancos(termo); return textoTesteBancos(L, termo); }
+  if (/\bfal(\.ai|ai)?\b/.test(t) && /standby|stand by|pausa|o que (e|significa)|por que|porque|cad[eê]|desligad/.test(t) && !/\b(liga|desliga|tira|ative|ativa)\b/.test(t)) return falStatus().texto;
+  return '';
 }
 // junta a arte nova com a anterior deixando mudar SÓ os elementos pedidos
 function soElementos(ant, novo, els) {
@@ -5809,6 +6105,15 @@ const HANDLERS = {
       input.feedback = ''; input.from = '';   // fora da notícia: o Designer cria de novo, sem partir da versão que você recusou
     }
     // notícia: o texto precisa caber na arte. Se a capa ou a contracapa passam do tamanho, o Designer devolve para o Copy dizer o mesmo com menos palavras
+    // página de template (venda, carrosséis aprovados...): o pedido vira mudança exata nos campos do modelo, conferida antes de voltar para a Mesa
+    if (input.from === 'dono' && input.feedback && c.art_spec && !input.refazer && !input.ped && c.kind !== 'noticia' && !als.getStore()?.dry && !/\b(volt[ae]|desfa[zç]|como estava|vers[ãa]o anterior|refa[zç])/i.test(input.feedback)) {
+      const r = await executaAjusteModelo(c, input.feedback);
+      if (r?.ok) {
+        addChat('gerente', relatoAjuste(c, r)); log('designer', `Ajuste do dono aplicado direto nos campos do template em "${c.title}": ${r.feito.join('; ')}`, c.id);
+        if (!r.resto.length) return { text: 'Ajuste aplicado: ' + r.feito.join('; '), tin: 0, tout: 0 };
+        input.feedback = r.resto.join('; '); c = getContent(c.id);   // o que sobrou do pedido segue para o Designer, sobre a arte já ajustada
+      }
+    }
     // o Gerente entende o pedido elemento por elemento e diz no chat o que vai mudar; depois cada ação segue o caminho certo
     if (input.from === 'dono' && input.feedback && c.art_spec && !input.ped) {
       const ped = await entendePedidoArte(c, input.feedback, jparse(c.art_spec, {}));
@@ -5870,6 +6175,7 @@ const HANDLERS = {
     if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const so = input.ped?.paginas?.length ? new Set(input.ped.paginas) : paginasPedidas(input.feedback), ant = jparse(c.art_spec, null);
       if (input.ped?.acao === 'editar' && input.ped.elementos.length && ant?.slides?.length) { sp.spec = { ...soElementos(ant, sp.spec, input.ped.elementos), accent: ant.accent, ink: ant.ink, paper: ant.paper }; sp.format = c.format; log('designer', `Mexeu só no que você pediu em "${c.title}" (${input.ped.elementos.length} elemento(s)); o resto ficou igual`, c.id); }
       else if (so && ant?.slides?.length) { sp.spec.slides = ant.slides.map((x, i) => so.has(i) && sp.spec.slides[i] ? sp.spec.slides[i] : x); sp.format = c.format; for (const k of ['accent', 'ink', 'paper']) if (ant[k] !== undefined) sp.spec[k] = ant[k]; log('designer', `Mexeu só ${[...so].map(i => i === 0 ? 'na capa' : i === 1 && ant.slides.length === 2 ? 'na contracapa' : 'na página ' + (i + 1)).join(' e ')} de "${c.title}", como você pediu; o resto ficou igual`, c.id); } }
+    if (sp && input.from === 'dono' && input.feedback && c.art_spec) { const ant = jparse(c.art_spec, null); if (ant?.slides?.length === sp.spec.slides?.length) { const prob = confereAjuste(ant, sp.spec, [], input.feedback); if (prob.length) { log('designer', `Conferi o ajuste de "${c.title}" e desfiz o que não foi pedido: ${prob.join('; ')}`, c.id); addChat('gerente', `Conferi o ajuste de “${clip(c.title, 60)}” antes de mandar para a Mesa e corrigi: ${prob.join('; ')}.`); } } }
     if (sp && sp.format !== c.format && ['feed', 'carrossel'].includes(c.format)) { setContent(c.id, { format: sp.format }); log('designer', `A peça "${c.title}" tem ${sp.spec.slides.length} páginas: virou carrossel`, c.id); }
     setContent(c.id, { art: sp ? r.text.replace(sp.raw, '').trim() : r.text, art_spec: sp ? JSON.stringify(sp.spec) : '', art_spec_base: sp ? JSON.stringify(sp.spec) : '', art_status: '', art_note: '' });
     log('designer', `Direção de arte pronta: "${c.title}"`, c.id);
@@ -5986,9 +6292,18 @@ const HANDLERS = {
     const pecaCtx = pc ? `\n\n# PEÇA DO AJUSTE (o dono escreveu pelo botão "Mandar ajustar" na Mesa de revisão; o pedido de ajuste JÁ FOI ENVIADO ao agente da etapa, não repita como ação)\nTítulo: ${pc.title} · Marca: ${pc.brand || '-'} · Formato: ${pc.format} · Tipo: ${pc.kind || '-'} · Etapa: ${pc.status}${(() => { try { const sp = JSON.parse(pc.art_spec || '{}'), sl = sp.slides || [], fotos = sl.filter(x => (x.items || []).some(it => it.banco || it.fotoCard) || x.dados?.foto).length; return '\nArte: template ' + (sp.template || sp.estilo || '-') + ', ' + sl.length + ' páginas, ' + fotos + ' com foto.'; } catch { return ''; } })()}\nAvisos da arte: ${pc.art_note || '(nenhum)'}\nResponda às PERGUNTAS do dono sobre esta peça com base nesses dados (diga o que aconteceu e por quê, sem inventar), confirme em uma linha o que vai ser ajustado e, se for regra para as próximas, diga onde vai valer.` : '';
     const user = `# ESTADO ATUAL DO SISTEMA (dados reais; não invente nada além disto)\n${gerenteSnapshot(msg.text)}\n\n# CONVERSA ATÉ AGORA\n${gerenteHistorico(msg.id) || '(início da conversa)'}${pecaCtx}\n\n# MENSAGEM DO DONO\n${msg.text}\n\n${GERENTE_ACOES}\n\nResponda agora ao dono. ${GERENTE_JEITO}`;
     const imgs = printsDaMsg(msg.id).map(f => visionImg(f)).filter(Boolean);
-    const r = await callClaude({ agent: agentRow('chefe'), user: imgs.length ? user + `\n\nO dono mandou ${imgs.length} print(s) junto com a mensagem (as imagens acima). Olhe com atenção, diga o que você está vendo e responda com base nelas.` : user, maxTokens: 4000, images: imgs });
+    const base = (imgs.length ? user + `\n\nO dono mandou ${imgs.length} print(s) junto com a mensagem (as imagens). Olhe com atenção, diga o que você está vendo e responda com base nelas.` : user) + `\n\n${GERENTE_FERRAMENTAS}\n\nQuando o dono reclamar de algo ou pedir correção: investigue com as ferramentas (ver a peça, olhar as páginas, testar o serviço), corrija com elas, CONFIRA o resultado (ver_paginas depois de ajustar) e só então responda dizendo a causa real, o que você fez e o próximo passo.`;
+    let r, trilha = '', imgsT = [...imgs]; const passos = [];
+    for (let k = 0; k <= GER_PASSOS; k++) {
+      r = await callClaude({ agent: agentRow('chefe'), user: base + trilha + (k === GER_PASSOS ? '\n\nChega de ferramentas: responda agora ao dono com o que você já sabe.' : ''), maxTokens: 4000, images: imgsT.slice(-6) });
+      const pf = k < GER_PASSOS ? pedidoFerramenta(r.text) : null; if (!pf) break;
+      let out; try { out = pf.erro ? { texto: pf.erro } : pc && +pf.args?.id === pc.id && ['ajustar_arte', 'editar_campo', 'refazer_etapa'].includes(pf.nome) ? { texto: 'Este ajuste já foi mandado pela Mesa e está sendo aplicado agora (o resultado e a conferência chegam aqui no chat). Não repita: use ver_peca/ver_paginas para acompanhar, ou só corrija se o dono pedir outra coisa.' } : await gerenteFerramenta(pf.nome, pf.args); } catch (e) { out = { texto: 'Falhou: ' + e.message }; }
+      passos.push({ ok: !/^Falhou/.test(out.texto), texto: out.feito || `${pf.nome}${pf.args?.id ? ' #' + pf.args.id : ''}` });
+      if (out.imgs?.length) imgsT.push(...out.imgs);
+      trilha += `\n\n# VOCÊ USOU: ${pf.nome} ${JSON.stringify(pf.args)}\n# RESULTADO\n${String(out.texto).slice(0, 6000)}`;
+    }
     const { fala, acoes } = gerenteResposta(r.text);
-    const res = [];
+    const res = passos.filter(p => p.texto);
     if (acoes === null) res.push({ ok: false, texto: 'Não consegui ler as ações que eu mesmo montei (JSON inválido). Peça de novo, por favor.' });
     else for (const a of acoes) { try { res.push({ ok: true, acao: a.acao, ...gerenteAcao(a) }); } catch (e) { res.push({ ok: false, acao: a?.acao, texto: `Não consegui executar “${a?.acao}”: ${e.message}` }); } }
     addChat('gerente', fala || (res.length ? 'Pronto, executei o que você pediu.' : '…'), { actions: res.length ? res : null, job: job.id });
@@ -6647,16 +6962,16 @@ async function bibPublica(sel) {
 // (fotos com licença que permite uso comercial). A foto escolhida é baixada para a Biblioteca da marca com o crédito do autor.
 const BANCOS = [
   { id: 'pexels', nome: 'Pexels', chave: 'PEXELS_API_KEY', async busca(q, pag, key) {
-    const r = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=24&page=${pag}&locale=pt-BR`, { headers: { Authorization: key }, signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Pexels ' + r.status);
+    const r = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=24&page=${pag}&locale=pt-BR`, { headers: { Authorization: key }, signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Pexels ' + r.status + ' ' + (await r.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160));
     return (await r.json()).photos.map(p => ({ id: 'pexels-' + p.id, thumb: p.src.medium, full: p.src.large2x || p.src.original, w: p.width, h: p.height, autor: p.photographer, link: p.url, licenca: 'Licença Pexels (uso comercial livre)', alt: p.alt || '' })); } },
   { id: 'unsplash', nome: 'Unsplash', chave: 'UNSPLASH_ACCESS_KEY', async busca(q, pag, key) {
-    const r = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=24&page=${pag}`, { headers: { Authorization: 'Client-ID ' + key, 'Accept-Version': 'v1' }, signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Unsplash ' + r.status);
+    const r = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=24&page=${pag}`, { headers: { Authorization: 'Client-ID ' + key, 'Accept-Version': 'v1' }, signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Unsplash ' + r.status + ' ' + (await r.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160));
     return (await r.json()).results.map(p => ({ id: 'unsplash-' + p.id, thumb: p.urls.small, full: p.urls.regular.replace(/w=\d+/, 'w=2000'), w: p.width, h: p.height, autor: p.user?.name || '', link: p.links?.html || '', licenca: 'Licença Unsplash (uso comercial livre)', alt: p.alt_description || '', ping: p.links?.download_location })); } },
   { id: 'pixabay', nome: 'Pixabay', chave: 'PIXABAY_API_KEY', async busca(q, pag, key) {
-    const r = await fetch(`https://pixabay.com/api/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=24&page=${pag}&lang=pt&safesearch=true`, { signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Pixabay ' + r.status);
+    const r = await fetch(`https://pixabay.com/api/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=24&page=${pag}&lang=pt&safesearch=true`, { signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Pixabay ' + r.status + ' ' + (await r.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160));
     return (await r.json()).hits.map(p => ({ id: 'pixabay-' + p.id, thumb: p.webformatURL, full: p.largeImageURL, w: p.imageWidth, h: p.imageHeight, autor: p.user, link: p.pageURL, licenca: 'Licença Pixabay (uso comercial livre)', alt: p.tags || '' })); } },
   { id: 'openverse', nome: 'Openverse', chave: null, async busca(q, pag) {
-    const r = await fetch(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&license_type=commercial&page_size=24&page=${pag}&mature=false`, { headers: { 'user-agent': 'AgentesSIM/1.0' }, signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Openverse ' + r.status);
+    const r = await fetch(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&license_type=commercial&page_size=20&page=${pag}&mature=false`, { headers: { 'user-agent': 'AgentesSIM/1.0' }, signal: AbortSignal.timeout(15000) }); if (!r.ok) throw new Error('Openverse ' + r.status + ' ' + (await r.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 160));
     return (await r.json()).results.filter(p => p.url && (p.width || 0) >= 800).map(p => ({ id: 'openverse-' + p.id, thumb: p.thumbnail || p.url, full: p.url, w: p.width, h: p.height, autor: p.creator || '', link: p.foreign_landing_url || '', licenca: `${String(p.license || '').toUpperCase()} ${p.license_version || ''}`.trim(), alt: p.title || '' })); } }
 ];
 const thumbCache = new Map();
@@ -6667,7 +6982,7 @@ const avisoBanco = new Map();
 function avisoBancoFalhou(b, e) {
   if (Date.now() - (avisoBanco.get(b.id) || 0) < 6 * 3600e3) return; avisoBanco.set(b.id, Date.now());
   const st = +(String(e?.message || '').match(/\b(\d{3})\b/) || [])[1], outros = bancosAtivos().filter(x => x.id !== b.id).map(x => x.nome).join(', ') || 'nenhum outro banco';
-  const motivo = st === 401 || st === 403 ? `chave recusada (${st}): confira a ${b.chave} no Komodo` : st === 429 ? 'limite de buscas atingido (429)' : `erro: ${String(e?.message || e).slice(0, 120)}`;
+  const motivo = (st === 401 || st === 403) && b.chave ? `chave recusada (${st}): confira a ${b.chave} no Komodo. O banco respondeu: ${String(e?.message || '').slice(0, 160)}` : st === 429 ? 'limite de buscas atingido (429)' : `erro: ${String(e?.message || e).slice(0, 120)}`;
   const msg = `⚠ Banco de imagens ${b.nome} falhou (${motivo}). As fotos continuam saindo pelos outros bancos (${outros}).`;
   try { log(null, msg); } catch { /* sem log */ }
   try { addChat('gerente', msg); } catch { /* sem chat */ }
@@ -6769,7 +7084,14 @@ async function fotoBanco(termo, recorte, creditos) {
   const dir = path.join(RENDER_DIR, '_banco'); fs.mkdirSync(dir, { recursive: true });
   const base = path.join(dir, crypto.createHash('sha1').update(termo.toLowerCase() + '|' + recorte).digest('hex').slice(0, 14));
   for (const e of ['png', 'jpg', 'webp']) if (fs.existsSync(base + '.' + e)) { try { const cr = fs.readFileSync(base + '.txt', 'utf8'); if (cr) creditos?.add(cr); } catch { /* sem crédito */ } return base + '.' + e; }
-  const r = await buscaImagens(termo, 1); const it = r.itens.find(x => (x.w || 0) >= 900 && (x.h || 0) >= 600) || r.itens[0]; if (!it) throw new Error('nenhum resultado');
+  // a frase inteira quase nunca acha foto: tenta o termo, depois as palavras-chave, depois 2 palavras; um banco que falha não para a busca (os outros seguem)
+  let it = null; const errosB = new Set(), tentados = [];
+  for (const t of [...new Set([termo, termoFoto(termo), termoFoto(termo).split(' ').slice(0, 2).join(' ')])].filter(x => x && x.length >= 2)) {
+    tentados.push(t); const r = await buscaImagens(t, 1); (r.erros || []).forEach(e => errosB.add(e));
+    it = r.itens.find(x => (x.w || 0) >= 900 && (x.h || 0) >= 600) || r.itens[0]; if (it) break;
+  }
+  if (!it) { const en = await termoIngles(termo); if (en && !tentados.includes(en)) { tentados.push(en); const r = await buscaImagens(en, 1); (r.erros || []).forEach(e => errosB.add(e)); it = r.itens.find(x => (x.w || 0) >= 900 && (x.h || 0) >= 600) || r.itens[0]; } }
+  if (!it) throw new Error(`nenhum banco achou foto (busquei: ${tentados.map(t => '“' + t + '”').join(', ')}; bancos ativos: ${bancosAtivos().map(b => b.nome).join(', ')}${errosB.size ? '; erros: ' + [...errosB].join(' · ') : ''})`);
   let buf, ext;
   if (recorte) { if (!falKey()) throw new Error(falMsg('recorte precisa da FAL_KEY')); const c = await falPost(process.env.FAL_BG_MODEL || 'fal-ai/birefnet/v2', { image_url: it.full }, 120000); const cu = c.image?.url || c.images?.[0]?.url; if (!cu) throw new Error('sem recorte'); buf = await falBaixar(cu); ext = 'png'; addCost('recorte', 'birefnet', FAL_PRECO.recorte, 'banco'); }
   else ({ buf, ext } = await baixaImagemSegura(it.full));
@@ -7184,6 +7506,7 @@ async function api(req, res, url) {
     const job = enqueue(null, 'designer', 'estilo', { brand: nome, origem, assets }, 'manual'); return send(res, 200, { ok: true, job });
   }
   if ((mt = p.match(/^\/api\/gerente\/print\/(\d+-\d\.(?:png|jpg|webp|gif))$/)) && m === 'GET') { const f = path.join(CHAT_IMG_DIR, mt[1]); if (!fs.existsSync(f)) throw fail(404, 'Print não encontrado'); res.writeHead(200, { 'content-type': { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' }[f.split('.').pop()], 'cache-control': 'private, max-age=86400' }); return res.end(fs.readFileSync(f)); }
+  if (p === '/api/bancos/teste' && m === 'GET') { const q = String(url.searchParams.get('q') || 'office').slice(0, 60), L = await testaBancos(q); return send(res, 200, { termo: q, bancos: L, texto: textoTesteBancos(L, q), fal: falStatus() }); }
   if (p === '/api/gerente' && m === 'GET') {
     const msgs = all('SELECT * FROM chat_msgs ORDER BY id DESC LIMIT 80').reverse().map(x => ({ ...x, actions: x.actions ? JSON.parse(x.actions) : null, ...(x.role === 'user' ? { imgs: printsDaMsg(x.id).map(f => '/api/gerente/print/' + path.basename(f)) } : {}) }));
     const pend = all("SELECT j.id,j.kind,j.status,j.agent,j.input,j.created_at FROM jobs j WHERE j.kind IN ('chat','teste') AND j.status IN ('queued','running') ORDER BY j.id").map(j => ({ id: j.id, kind: j.kind, status: j.status, agent: agentRow(j.agent)?.name || j.agent, resumo: j.kind === 'teste' ? clip((() => { try { return JSON.parse(j.input).pedido; } catch { return ''; } })(), 90) : '' }));
@@ -7196,6 +7519,7 @@ async function api(req, res, url) {
     const mid = addChat('user', text);
     const prints = (Array.isArray(b.imagens) ? b.imagens : []).slice(0, 4).map((u, k) => { const m = String(u || '').match(/^data:image\/(png|jpe?g|webp|gif);base64,([A-Za-z0-9+/=]+)$/); if (!m) return null; const buf = Buffer.from(m[2], 'base64'); if (buf.length < 500 || buf.length > 4.5e6) return null; const f = path.join(CHAT_IMG_DIR, `${mid}-${k}.${m[1] === 'jpeg' ? 'jpg' : m[1]}`); fs.writeFileSync(f, buf); return f; }).filter(Boolean);   // prints que o dono arrastou/colou no chat
     if (prints.length) { const jid = enqueue(null, 'chefe', 'chat', { msg: mid }, 'chat'); changed(); return send(res, 200, { ok: true, msg: mid, job: jid }); }   // com print, quem responde é o Gerente olhando a imagem
+    { const dir = await gerenteDireto(text); if (dir) { addChat('gerente', dir); changed(); return send(res, 200, { ok: true, msg: mid, local: true }); } }   // "testar bancos de imagem", "o que é o standby do fal.ai": resposta real na hora
     {   // ordens claras (aprovar, criar, ensinar, montar arte, pautas, ligar o autônomo…) executam na hora, com ou sem API; o resto vai para a IA
       let ac = null, err = '';
       try { ac = gerenteInterpreta(text); } catch (e) { err = e.message; }
@@ -7204,7 +7528,7 @@ async function api(req, res, url) {
       if (ac?.length) {
         const feitos = [], jobs = [];
         for (const a of ac) { try { const r = { ok: true, acao: a.acao, ...gerenteAcao(a) }; feitos.push(r); if (r.job) jobs.push(r.job); } catch (e) { feitos.push({ ok: false, acao: a.acao, texto: 'Não consegui: ' + e.message }); } }
-        addChat('gerente', feitos.length === 1 ? (feitos[0].ok ? 'Feito.' : 'Não deu certo.') : `Executei ${feitos.filter(x => x.ok).length} de ${feitos.length} ordens.`, { actions: feitos }); changed();
+        addChat('gerente', feitos.map(f => f.texto).filter(Boolean).join(' ') || (feitos.every(f => f.ok) ? 'Pronto.' : 'Não deu certo.'), { actions: feitos.filter(f => !f.ok || f.tipo).length ? feitos.filter(f => !f.ok || f.tipo) : null });   // diz o que fez, não só "Feito." changed();
         return send(res, 200, { ok: true, msg: mid, local: true, job: jobs[0] || null });
       }
       if (MANUAL) addChat('gerente', 'Isso não é uma ordem que eu executo sozinho sem a API, então deixei o pedido pronto para o Claude (aparece em Pedidos pendentes). Escreva "ajuda" para ver tudo o que eu faço na hora.');
@@ -7840,7 +8164,7 @@ async function api(req, res, url) {
       run('UPDATE art_templates SET tema=?, nome=?, uso=?, nivel=?, seq=?, formatos=?, exemplo=? WHERE id=?', TEMAS[b.tema] ? b.tema : (row.tema || 'geral'), str(b.nome ?? row.nome, 80, 'Nome'), str(b.uso ?? row.uso, 400, 'Quando usar', false), b.nivel === 'robusto' ? 'robusto' : b.nivel === 'simples' ? 'simples' : row.nivel, seq ? JSON.stringify(seq) : row.seq, fm?.length ? JSON.stringify(fm) : row.formatos, seq && JSON.stringify(seq) !== row.seq ? '' : row.exemplo, row.id);   // mudou as páginas: o exemplo antigo deixa de valer
       changed(); return send(res, 200, { ok: true }); }
   }
-  if ((mt = p.match(/^\/api\/contents\/(\d+)\/arte(?:\/(file\/\d+|zip|render|spec|modelo|do-roteiro|atualizar-layout))?$/))) {
+  if ((mt = p.match(/^\/api\/contents\/(\d+)\/arte(?:\/(file\/\d+|zip|render|spec|modelo|do-roteiro|atualizar-layout|ajuste))?$/))) {
     const id = +mt[1], c = getContent(id); if (!c) throw fail(404, 'Conteúdo não encontrado');
     if (!mt[2] && m === 'GET') return send(res, 200, arteInfo(id));
     if (mt[2] === 'spec' && m === 'POST') {
@@ -7861,6 +8185,11 @@ async function api(req, res, url) {
       const ok = await arteDoRoteiro(id, 'pedido do dono'); if (!ok) throw fail(400, 'Não consegui montar a arte pelo roteiro');
       for (const j of all("SELECT id FROM jobs WHERE content_id=? AND agent='designer' AND kind='arte' AND status='queued'", id)) run("UPDATE jobs SET status='done', finished_at=?, output='Montada pelo painel a partir do roteiro' WHERE id=?", T(), j.id);
       checkProduction(id); changed(); return send(res, 200, arteInfo(id));
+    }
+    if (mt[2] === 'ajuste' && m === 'POST') {   // ajuste direto nos campos do template (o mesmo caminho do "Mandar ajustar"), com conferência antes de devolver
+      const b = await readBody(req, 2e4), ped = str(b.pedido, 2000, 'Pedido'); if (arteState.get(id)?.status === 'running') throw fail(409, 'A arte desta peça está sendo gerada; espere terminar');
+      const r = await executaAjusteModelo(c, ped); if (!r?.ok) throw fail(400, r?.naoDa?.length ? 'Não deu para aplicar: ' + r.naoDa.join(', ') : 'Não entendi o pedido como mudança de template (entrelinha, tamanho, logo, fotos). Mande pelo "Mandar ajustar" que o Designer edita os elementos.');
+      const relato = relatoAjuste(c, r); addChat('gerente', relato); changed(); return send(res, 200, { ...arteInfo(id), relato, feito: r.feito, problemas: r.problemas, sem_foto: r.semFoto });
     }
     if (mt[2] === 'modelo' && m === 'POST') {   // editor: (re)compõe uma página com um modelo profissional, com as cores, fontes, logo e moldura da marca
       const b = await readBody(req, 2e5), mod = String(b.modelo || ''); if (!MODELO_IDS.includes(mod)) throw fail(400, 'Modelo desconhecido');
@@ -8482,7 +8811,7 @@ async function api(req, res, url) {
   if (p === '/api/assinatura' && m === 'DELETE') { fs.rmSync(CLAUDE_DIR, { recursive: true, force: true }); await assinaturaStatus(); changed(); return send(res, 200, ASSINATURA); }
   if (p === '/api/settings' && m === 'PUT') {
     const b = await readBody(req);
-    applySettings(b);
+    const falAntes = settings().fal_pausa; applySettings(b); marcaFalPausa(falAntes, "pelo dono em Configurações › Vídeo e voz");
     return send(res, 200, { settings: settings() });
   }
   throw fail(404, 'Rota não encontrada');

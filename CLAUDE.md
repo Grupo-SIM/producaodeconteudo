@@ -12,6 +12,17 @@ Hoje: Editor de vídeo só faz motion; no Reels, a opção "Designer faz a capa"
 
 ## Ajustes em produção (regra do dono, 20/11/2026)
 Tudo o que o Claude consegue editar aqui, o agente em produção tem que conseguir corrigir pelo "Mandar ajustar". No Designer: página em que ele mexeu nos elementos (posição, tamanho, espaçamento, cor, logo) fica como ele deixou, sem o template remontar (`__prevSpec` em `extractArteSpec`); só mudança de conteúdo (dados) remonta pelo modelo. O que o dono escreve no ajuste vai para o chat do Gerente, que responde (`ctxFluxo.ajusteDono`).
+- Página de template (venda-*, e todo modelo com campos): o pedido vira mudança EXATA nos campos do modelo pelo código, sem o Designer redesenhar (`lerPedidoModelo` → `ajusteDeModelo` → `executaAjusteModelo` no `server.js`): "menos/mais espaçada" = `entrelinha` (mínimo 1,25 com marca-texto), "letra maior/menor" = `escala`, "logo do outro lado/à direita" = `logo`, "põe as fotos" = `foto` em 2 ou 3 páginas (termo em inglês pela frase). O que a leitura não entende vira campo pelo Gerente (`pedidoEmCampos`); o que nem assim cabe vai para o Designer.
+- Conferência no código (`confereAjuste`), nos dois caminhos: fundo, efeitos (degradê/sombra) e elementos não pedidos voltam como estavam; marca-texto nunca abaixo de 1,25; cada mudança pedida tem de estar lá; foto que não veio é buscada de novo com termo mais simples; o Gerente conta no chat o que mudou e o que corrigiu sozinho.
+- Campo novo de modelo precisa entrar em `dadosOk` (senão é apagado ao salvar) e foto de banco nunca pode ser filtrada no `sanitizeArteSpec`.
+
+## Gerente com ferramentas (dono, 20/11/2026)
+O chat do Gerente funciona como a conversa com o Claude Code: ele usa ferramentas em loop (até 6) antes de responder: `ver_peca`, `ver_paginas` (olha as PNGs), `ajustar_arte`, `editar_campo`, `testar_bancos`, `status_servicos`, `ler_logs`, `refazer_etapa` (`GERENTE_FERRAMENTAS`/`gerenteFerramenta` no `server.js`). Aceita prints (arrastar, colar, 📎). Respostas diretas sem IA: "testar bancos de imagem" e perguntas sobre o standby do fal.ai (`gerenteDireto`). Ferramenta nova: entra na lista e na função, e na ficha `conhecimento/agentes/chefe/04-ferramentas-do-chat.md`.
+
+## Bancos de imagem e fal.ai
+- Chaves no Komodo: `PEXELS_API_KEY`, `UNSPLASH_ACCESS_KEY` (Access Key, não a Secret), `PIXABAY_API_KEY`; sem chave o banco fica de fora; Openverse não precisa (máximo 20 por página sem conta). Teste em produção: "testar bancos de imagem" no chat ou `GET /api/bancos/teste?q=office` (diz se a variável chegou ao container e o que cada banco respondeu).
+- `fotoBanco` tenta a frase, palavras-chave, 2 palavras e o termo em inglês (`termoIngles`); banco que falha avisa o dono com a resposta real e a busca segue nos outros.
+- Standby do fal.ai = interruptor manual de economia (Configurações › Vídeo e voz, setting `fal_pausa`); o sistema guarda quem ligou (`fal_pausa_info`) e o último erro do fal (`fal_ultimo_erro`). `falStatus()` explica ao dono em linguagem clara.
 
 ## Sites no Atlas (postagem automática)
 Os agentes publicam nos sites da conta master do Atlas Hosting (Criador de Sites e WordPress). Código em `atlas-sites.mjs`; o Atlas expõe só a API `/api/pdc/sites` e `/api/pdc/posts` (outro repositório, nada do PDC aparece dentro do Atlas).

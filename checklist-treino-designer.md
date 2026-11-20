@@ -55,3 +55,8 @@ Template 13 já está no `main` e é só da 007 Spyhacker.
 - Depois: vídeo (Reels).
 - Pendências menores: revisão fina dos carrosséis 7 a 13 em produção; institucionais (Atlas, SimIntPay, Teron, PagaTG) sem carrossel até novas referências.
 - Guardado para depois: escritório 3D (docs/pendente/escritorio3d.patch) e Cérebro; botão do Treino vai para dentro do "+ Novo conteúdo" no fim do treino.
+
+## 20/11/2026 · Ajuste em produção confiável
+- [x] "Mandar ajustar" em página de template vira mudança exata nos campos (entrelinha, escala, logo, fotos), conferida pelo código antes da Mesa. Teste: carrossel de venda SimIntPay / Marketing Raiz, "capa menos espaçada, logo do outro lado e põe as fotos" → capa 1,33, logo à direita, fundo branco granulado mantido, fotos reais nas páginas 3 e 4.
+- [x] Bugs que tiravam as fotos: o filtro do `sanitizeArteSpec` jogava fora a foto de banco em cartão (só aceitava "hero"); `dadosOk` apagava entrelinha/escala/logo; Openverse falhava sempre (page_size 24 > 20); erro de inicialização (`jparse`) impedia atribuir o template 15 às marcas.
+- [ ] Em produção: rodar "testar bancos de imagem" no chat e conferir o primeiro carrossel de venda real.

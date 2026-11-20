@@ -28,3 +28,4 @@ O desenho da página é fixo do template: mudar a posição de um texto no JSON 
 - `logo`: "direita" (padrão) ou "esquerda".
 - `foto`: termo em inglês para pôr foto real numa página ("senti falta das imagens" → ponha foto em 2 ou 3 páginas).
 Aplique em TODAS as páginas quando o pedido for geral, e só na página citada quando ele apontar uma.
+Desde 20/11/2026 o painel aplica esses ajustes SOZINHO, direto nos campos, antes de chegar a você ("capa menos espaçada, logo do outro lado e põe as fotos" → capa 1,6 → 1,33, logo à direita em todas, foto real em 2 ou 3 páginas). Se um pedido chegar até você neste formato, mexa só nos `dados`: NUNCA troque o fundo (é sempre o da seção História e venda), NUNCA acrescente degradê, sombra ou elemento, e nunca use entrelinha abaixo de 1,25 (o marca-texto encavala). O painel confere e desfaz o que fugir do pedido.
