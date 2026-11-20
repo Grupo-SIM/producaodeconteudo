@@ -42,7 +42,7 @@ export function estadoDe(c, jobs = []) {
   const futuro = t => t && new Date(t).getTime() > Date.now();
   const comErro = jobs.some(j => j.status === 'error') && !ativos.length;
   const ajuste = !!c.em_ajuste;
-  if (c.error === ARTE_DESCARTADA && c.status !== 'discarded') return { estado: 'fila', etapa: 'designer', motivo: 'Arte descartada: espera Refazer arte ou a meta do dia na Produção diária' };   // copy na fila de arte
+  if (c.error === ARTE_DESCARTADA && c.status !== 'discarded') return { estado: 'fila', etapa: 'designer', motivo: 'Arte descartada: a copy aprovada espera o Designer. Clique em "Fazer arte agora" (ou a meta do dia na Produção diária puxa sozinha)' };   // copy na fila de arte
   switch (c.status) {
     case 'posted': return { estado: 'finalizado', etapa: 'publicacao' };
     case 'discarded': return { estado: 'descartado', etapa: '' };
