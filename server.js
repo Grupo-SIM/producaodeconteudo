@@ -1965,7 +1965,7 @@ O motor só entende este vocabulário, então traduza o que você vê para ele:
 ${looks}
 - Cenas "light" e "dark" (alternância de fundo), cores "accent", "accent2", "light" e "dark" em hexadecimal.
 - Transições ("in"): cut, fade, dim, zoom, whip, circle.
-- Decoração ("decor"): grid, dots, scan, stripes, blobs, bars, barcode, badge, curve:s|left|right|arc, none.
+- Decoração ("decor"): grid, dots, scan, stripes, blobs, bars, curve:s|left|right|arc, none.
 - Texto: "mode" stack (blocos), ticker (palavras deslizando) ou word (uma palavra por vez); tamanho em px (40 a 240); palavra-chave marcada com *asteriscos*.
 - Objetos (NUNCA emoji): img (arquivo da biblioteca), orb (esfera 3D), ring (anel), chart (gráfico), card (lista com ícone numérico), profile, gradientWord, counter (número que sobe), figure, circle; entrada pop, fade, slideL, slideR, slideB, slideT, drop, zoom; movimento parado float, spin, sway, drift, none.
 - Câmera por cena: "cam":{"from":1,"to":1.1,"rotTo":-3}.
@@ -2054,7 +2054,7 @@ Formato:
 {"fps":30,"look":"editorial|neon|minimal|impacto|gradiente|cinema","estilo":"id do estilo escolhido","accent":"#E5141B","accent2":"#7C3AED (opcional)","light":"#F5F2EB","dark":"#0A0A0A (opcional)","brand":"MARCA • 2026",
  "scenes":[{"dur":1.6,"theme":"light|dark",
    "in":"cut|fade|dim|zoom|whip|circle",
-   "decor":["grid","dots","scan","stripes","blobs","bars","barcode","badge","curve:s|left|right|arc","scatter:🤡","none"],
+   "decor":["grid","dots","scan","stripes","blobs","bars","curve:s|left|right|arc","none"],
    "narration":"frase falada nesta cena",
    "text":{"value":"Você tem as | *ideias* e | *conteúdo*","y":0.42,"size":66,"align":"center|left|right","x":0.42,"mode":"stack|ticker|word"},
    "items":[{"type":"img|orb|ring|chart|card|profile|gradientWord|counter|figure|circle","asset":"nome-exato (se img)","gen":"opcional, em inglês","color":"#hex opcional (orb, ring, chart)","x":0.5,"y":0.5,"size":420,"rot":0,"at":0,"enter":"pop|fade|slideL|slideR|slideB|slideT|drop|zoom","idle":"float|spin|sway|drift|none"}]}]}

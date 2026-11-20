@@ -236,7 +236,7 @@ function load(spec){
       if(s.bg.shade){const sh=el('div','abs',d);sh.style.cssText='inset:0;background:rgba(0,0,0,'+s.bg.shade+')'}
       bgEl={im,frames:s.bg.frames||null,fps:s.bg.fps||24,loop:s.bg.loop!==false,k:0};
     }
-    const decor=(s.decor||[]).includes('none')?[]:[...new Set([...(s.decor||[]),...(LOOK.auto||[])])];
+    const decor=(s.decor||[]).includes('none')?[]:[...new Set([...(s.decor||[]),...(LOOK.auto||[])])].filter(d=>!['barcode','badge'].includes(d)&&!String(d).startsWith('scatter:'));   // dono 20/11: sem selo com nome, sem código de barras, sem emoji espalhado
     if(decor.includes('grid'))el('div','grid',cam);
     if(decor.includes('dots'))el('div','dots',cam);
     if(decor.includes('scan'))el('div','scan',cam);
