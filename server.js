@@ -5702,7 +5702,7 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
   const alvo = quer || Math.max(2, Math.min(3, Math.round(cand.length / 3)));
   let plano;
   try {
-    const r = await callClaude({ agent: agentRow('designer'), maxTokens: 900, user: `Você é o Designer. O copy escreveu o carrossel abaixo; o copy NÃO decide foto, você decide.\nEscolha ${alvo} páginas (no máximo ${alvo + 1}) em que dá para achar num banco de fotos (Pexels/Unsplash) uma foto REAL que mostre literalmente um trecho específico do que a página diz: uma pessoa fazendo a ação dita, o objeto citado, a cena descrita. Pule páginas abstratas (conceito, promessa, número) onde qualquer foto seria genérica.\n# PÁGINAS\n${cand.map(p => `página ${p.i + 1}: "${p.t}"${p.x ? ' / apoio: "' + p.x + '"' : ''}`).join('\n')}\n# SAÍDA\nSó JSON: {"fotos":[{"pagina":3,"trecho":"parte exata do texto que a foto mostra","cena":"o que aparece na foto, em português","termos":["2 a 3 buscas em inglês, concretas e literais (ex.: 'woman paying with smartphone at counter'), da mais específica para a mais simples"]}]}` });
+    const r = await callClaude({ agent: agentRow('designer'), maxTokens: 900, user: `Você é o Designer. O copy escreveu o carrossel abaixo; o copy NÃO decide foto, você decide.\nEscolha ${alvo} páginas (no máximo ${alvo + 1}); prefira cenas que rendem foto bonita, colorida e nítida em que dá para achar num banco de fotos (Pexels/Unsplash) uma foto REAL que mostre literalmente um trecho específico do que a página diz: uma pessoa fazendo a ação dita, o objeto citado, a cena descrita. Pule páginas abstratas (conceito, promessa, número) onde qualquer foto seria genérica.\n# PÁGINAS\n${cand.map(p => `página ${p.i + 1}: "${p.t}"${p.x ? ' / apoio: "' + p.x + '"' : ''}`).join('\n')}\n# SAÍDA\nSó JSON: {"fotos":[{"pagina":3,"trecho":"parte exata do texto que a foto mostra","cena":"o que aparece na foto, em português","termos":["2 a 3 buscas em inglês, concretas e literais (ex.: 'woman paying with smartphone at counter'), da mais específica para a mais simples"]}]}` });
     plano = (extrairJSON(r.text, '{')?.fotos || []).filter(f => cand.some(p => p.i === +f.pagina - 1) && Array.isArray(f.termos) && f.termos.length).slice(0, alvo + 1);
   } catch (e) { console.error('fotos do designer:', e.message); return null; }
   if (!plano.length) return null;
@@ -5711,13 +5711,13 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
   for (const f of plano) {
     const i = +f.pagina - 1; let escolhida = null, termoOk = '';
     for (const termo of f.termos.slice(0, 3).map(t => String(t).slice(0, 80))) {
-      let itens = []; try { itens = (await buscaImagens(termo, 1)).itens.filter(x => !usados.has(x.id) && (x.w || 0) >= 700).slice(0, 8); } catch { /* banco fora: próximo termo */ }
+      let itens = []; try { itens = (await buscaImagens(termo, 1)).itens.filter(x => !usados.has(x.id) && (x.w || 0) >= 1600 && (x.h || 0) >= 1000).slice(0, 8); } catch { /* banco fora: próximo termo */ }
       if (!itens.length) continue;
       const imgs = []; const ok = [];
       for (const it of itens) { try { const { buf, ext } = await baixaImagemSegura(it.thumb, 4e6); imgs.push({ data: buf.toString('base64'), type: ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg' }); ok.push(it); } catch { /* miniatura falhou */ } }
       if (!ok.length) continue;
       try {
-        const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: imgs, user: `Você vê ${ok.length} fotos de banco, numeradas de 1 a ${ok.length} na ordem. A página diz: "${cand.find(p => p.i === i)?.t}". A foto precisa mostrar exatamente: ${f.cena} (trecho: "${f.trecho}"). Escolha a que mostra isso de forma clara, sem texto/marca d'água e sem parecer genérica. Se NENHUMA mostrar de verdade, responda 0. Responda só JSON: {"foto":N,"porque":"curto"}` });
+        const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: imgs, user: `Você vê ${ok.length} fotos de banco, numeradas de 1 a ${ok.length} na ordem. A página diz: "${cand.find(p => p.i === i)?.t}". A foto precisa mostrar exatamente: ${f.cena} (trecho: "${f.trecho}"). Escolha a que mostra isso de forma clara E que pare o dedo no feed: nítida (foco certo, sem borrão, sem granulado, sem cara de foto antiga ou de celular ruim), boa luz, cores fortes e vivas, assunto grande e fácil de entender numa tela pequena, sem texto/marca d'água e sem parecer genérica. Rede social é briga de atenção: foto apagada, escura, desbotada ou sem graça perde, mesmo que mostre o assunto. Se NENHUMA for boa nos dois sentidos (assunto e qualidade), responda 0. Responda só JSON: {"foto":N,"porque":"curto"}` });
         const k = +(extrairJSON(r.text, '{')?.foto || 0); if (k >= 1 && k <= ok.length) { escolhida = ok[k - 1]; termoOk = termo; break; }
       } catch (e) { console.error('escolha da foto:', e.message); }
     }
