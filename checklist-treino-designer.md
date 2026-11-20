@@ -60,3 +60,8 @@ Template 13 já está no `main` e é só da 007 Spyhacker.
 - [x] "Mandar ajustar" em página de template vira mudança exata nos campos (entrelinha, escala, logo, fotos), conferida pelo código antes da Mesa. Teste: carrossel de venda SimIntPay / Marketing Raiz, "capa menos espaçada, logo do outro lado e põe as fotos" → capa 1,33, logo à direita, fundo branco granulado mantido, fotos reais nas páginas 3 e 4.
 - [x] Bugs que tiravam as fotos: o filtro do `sanitizeArteSpec` jogava fora a foto de banco em cartão (só aceitava "hero"); `dadosOk` apagava entrelinha/escala/logo; Openverse falhava sempre (page_size 24 > 20); erro de inicialização (`jparse`) impedia atribuir o template 15 às marcas.
 - [ ] Em produção: rodar "testar bancos de imagem" no chat e conferir o primeiro carrossel de venda real.
+
+## Onde paramos (20/11/2026, para a próxima conversa)
+- Carrossel de venda (15) TREINADO e em produção: sai pronto só com texto (capa, narrativa/virada alternadas, fim), fundo da História e venda, marca-texto com entrelinha mínima 1,3, e até 3 sugestões de foto do Designer que o dono aprova ou recusa num cartão em cima do slide (slider com setas, X, texto inteiro da página). Testado em produção pelo dono.
+- "Mandar ajustar" em template: campos exatos (entrelinha, escala, logo, fundo, fotos) com conferência no código; Gerente com ferramentas no chat; bancos de imagem com teste no chat ("testar bancos de imagem").
+- Próximo: treino do Editor de vídeo (Reels), em conversa nova.
