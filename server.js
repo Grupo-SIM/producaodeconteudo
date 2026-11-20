@@ -5485,6 +5485,7 @@ function ajusteDeModelo(c, fb, extras = [], termos = {}) {
       dados[i][o.campo] = o.valor; mex.add(i); feito.push(`${nomePg(i, n)}: ${o.campo} → ${typeof o.valor === 'object' ? JSON.stringify(o.valor) : o.valor}`); if (o.campo === 'foto' && o.valor) fotosPedidas.push(i);
     } else if (o.tipo === 'sem_foto') {
       for (const i of alvo) if (dados[i].foto) { delete dados[i].foto; mex.add(i); feito.push(`tirei a foto da ${nomePg(i, n)}`); }
+    } else if (o.tipo === 'fotos' && termos.__designer) { fotosPedidas.length = 0;   // quem escolhe página e foto é o Designer, depois (fotosDoDesigner)
     } else if (o.tipo === 'fotos') {
       const comFoto = i => camposDoModelo(modeloDe(ant.slides[i])).includes('foto') && !['venda-capa', 'venda-fim'].includes(modeloDe(ant.slides[i]));
       let pg = (o.paginas?.length ? o.paginas : []).filter(comFoto), ja = [];
@@ -5547,10 +5548,13 @@ async function pedidoEmCampos(c, partes, sp) {
 async function executaAjusteModelo(c, fb, extras = []) {
   const termos = {};   // pedido de foto: termo de busca em inglês pela frase de cada página (Claude; sem IA, glossário)
   if (/\bfotos?\b|\bimage(m|ns)\b/i.test(fb)) { const sp0 = jparse(c.art_spec, {}); for (const [i, sl] of (sp0.slides || []).entries()) if (camposDoModelo(sl.modelo || sl.modeloOrigem).includes('foto') && sl.dados?.titulo) { try { termos[i] = await termoIngles(String(sl.dados.titulo).replace(/[*|]/g, '')); } catch { /* fica o termo em português */ } } }
+  const peloDesigner = !MANUAL && !als.getStore()?.dry && lerPedidoModelo(fb, jparse(c.art_spec, {})).ops.some(o => o.tipo === 'fotos');
+  if (peloDesigner) termos.__designer = true;
   let r = ajusteDeModelo(c, fb, extras, termos);
   if (r?.resto?.length) { const ex = await pedidoEmCampos(c, r.resto, jparse(c.art_spec, {})); if (ex.length) { r = ajusteDeModelo(c, fb, [...extras, ...ex], termos); if (r) r.resto = []; } }
-  if (!r?.ok) return r;
-  setContent(c.id, { art_spec: JSON.stringify(r.novo), art_status: '' });
+  if (!r?.ok && !peloDesigner) return r;
+  if (r?.ok) setContent(c.id, { art_spec: JSON.stringify(r.novo), art_status: '' });
+  if (peloDesigner) { const fd = await fotosDoDesigner(getContent(c.id)); r ||= { ok: true, ops: [], resto: [], feito: [], naoDa: [], fotosPedidas: [], problemas: [] }; r.ok = true; if (fd) { r.feito.push(textoFotosDesigner(fd)); r.fotosPedidas = fd.feitas.map(f => f.i); } else r.naoDa.push('fotos (o Designer não conseguiu escolher agora)'); }
   await renderArte(c.id);
   let c2 = getContent(c.id); const falhou = i => new RegExp(`Slide ${i + 1}: não consegui usar a foto do banco`).test(c2.art_note || '');
   for (let tent = 0; tent < 2 && r.fotosPedidas.some(falhou); tent++) {   // foto não veio: tenta termos mais simples (2 palavras, depois genérico do produto) antes de desistir
@@ -5685,6 +5689,54 @@ async function gerenteDireto(text) {
   if (/\bfal(\.ai|ai)?\b/.test(t) && /standby|stand by|pausa|o que (e|significa)|por que|porque|cad[eê]|desligad/.test(t) && !/\b(liga|desliga|tira|ative|ativa)\b/.test(t)) return falStatus().texto;
   return '';
 }
+// ───────── Fotos do carrossel: quem escolhe é o DESIGNER (dono, 20/11/2026) ─────────
+// O copy só escreve. O Designer lê o texto pronto, escolhe as 2 ou 3 páginas em que existe foto real fácil de achar que mostre
+// EXATAMENTE um trecho do que está sendo dito, busca várias opções nos bancos, OLHA as opções e fica com a que mostra o trecho.
+// Nenhuma opção serve: tenta outro termo; ainda nada: a página fica sem foto e o dono é avisado (nunca entra foto que não tem a ver).
+async function fotosDoDesigner(c, { quer = 0 } = {}) {
+  if (MANUAL || als.getStore()?.dry) return null;
+  const sp = jparse(c.art_spec, null); if (!sp?.slides?.length) return null;
+  const n = sp.slides.length, mod = sl => sl?.modelo || sl?.modeloOrigem || '';
+  const cand = sp.slides.map((sl, i) => ({ i, m: mod(sl), t: String(sl?.dados?.titulo || '').replace(/[*|]/g, '').trim(), x: String(sl?.dados?.texto || '').trim() })).filter(p => p.i > 0 && p.i < n - 1 && camposDoModelo(p.m).includes('foto') && !/-(capa|fim)$/.test(p.m) && p.t);
+  if (!cand.length) return null;
+  const alvo = quer || Math.max(2, Math.min(3, Math.round(cand.length / 3)));
+  let plano;
+  try {
+    const r = await callClaude({ agent: agentRow('designer'), maxTokens: 900, user: `Você é o Designer. O copy escreveu o carrossel abaixo; o copy NÃO decide foto, você decide.\nEscolha ${alvo} páginas (no máximo ${alvo + 1}) em que dá para achar num banco de fotos (Pexels/Unsplash) uma foto REAL que mostre literalmente um trecho específico do que a página diz: uma pessoa fazendo a ação dita, o objeto citado, a cena descrita. Pule páginas abstratas (conceito, promessa, número) onde qualquer foto seria genérica.\n# PÁGINAS\n${cand.map(p => `página ${p.i + 1}: "${p.t}"${p.x ? ' / apoio: "' + p.x + '"' : ''}`).join('\n')}\n# SAÍDA\nSó JSON: {"fotos":[{"pagina":3,"trecho":"parte exata do texto que a foto mostra","cena":"o que aparece na foto, em português","termos":["2 a 3 buscas em inglês, concretas e literais (ex.: 'woman paying with smartphone at counter'), da mais específica para a mais simples"]}]}` });
+    plano = (extrairJSON(r.text, '{')?.fotos || []).filter(f => cand.some(p => p.i === +f.pagina - 1) && Array.isArray(f.termos) && f.termos.length).slice(0, alvo + 1);
+  } catch (e) { console.error('fotos do designer:', e.message); return null; }
+  if (!plano.length) return null;
+  const dir = path.join(RENDER_DIR, '_banco'); fs.mkdirSync(dir, { recursive: true });
+  const usados = new Set(), feitas = [], falhas = [], base = ctxMarca(c.brand, c.format, sp);
+  for (const f of plano) {
+    const i = +f.pagina - 1; let escolhida = null, termoOk = '';
+    for (const termo of f.termos.slice(0, 3).map(t => String(t).slice(0, 80))) {
+      let itens = []; try { itens = (await buscaImagens(termo, 1)).itens.filter(x => !usados.has(x.id) && (x.w || 0) >= 700).slice(0, 8); } catch { /* banco fora: próximo termo */ }
+      if (!itens.length) continue;
+      const imgs = []; const ok = [];
+      for (const it of itens) { try { const { buf, ext } = await baixaImagemSegura(it.thumb, 4e6); imgs.push({ data: buf.toString('base64'), type: ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg' }); ok.push(it); } catch { /* miniatura falhou */ } }
+      if (!ok.length) continue;
+      try {
+        const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: imgs, user: `Você vê ${ok.length} fotos de banco, numeradas de 1 a ${ok.length} na ordem. A página diz: "${cand.find(p => p.i === i)?.t}". A foto precisa mostrar exatamente: ${f.cena} (trecho: "${f.trecho}"). Escolha a que mostra isso de forma clara, sem texto/marca d'água e sem parecer genérica. Se NENHUMA mostrar de verdade, responda 0. Responda só JSON: {"foto":N,"porque":"curto"}` });
+        const k = +(extrairJSON(r.text, '{')?.foto || 0); if (k >= 1 && k <= ok.length) { escolhida = ok[k - 1]; termoOk = termo; break; }
+      } catch (e) { console.error('escolha da foto:', e.message); }
+    }
+    if (!escolhida) { falhas.push({ i, trecho: f.trecho }); continue; }
+    usados.add(escolhida.id);
+    try {   // grava a foto escolhida no cache do termo: o render usa exatamente ela
+      const chave = `${termoOk} #${escolhida.id}`, arq = path.join(dir, crypto.createHash('sha1').update(chave.toLowerCase() + '|false').digest('hex').slice(0, 14));
+      const { buf, ext } = await baixaImagemSegura(escolhida.full); fs.writeFileSync(arq + '.' + ext, buf); fs.writeFileSync(arq + '.txt', `${escolhida.autor || 'autor'} (${escolhida.fonte}${escolhida.licenca ? ', ' + escolhida.licenca : ''})`);
+      if (escolhida.ping && process.env.UNSPLASH_ACCESS_KEY) fetch(escolhida.ping, { headers: { Authorization: 'Client-ID ' + process.env.UNSPLASH_ACCESS_KEY } }).catch(() => {});
+      const sl = sp.slides[i], ns = comporSlide({ modelo: mod(sl), dados: { ...(sl.dados || {}), foto: chave } }, { ...base, i, total: n });
+      if (ns) { sp.slides[i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; feitas.push({ i, trecho: f.trecho, cena: f.cena, fonte: escolhida.fonte }); }
+    } catch (e) { falhas.push({ i, trecho: f.trecho, erro: e.message }); }
+  }
+  // páginas que tinham foto marcada (pelo copy ou pelo template) e não foram escolhidas pelo Designer ficam sem foto
+  for (const p of cand) if (!feitas.some(x => x.i === p.i) && sp.slides[p.i]?.dados?.foto) { const sl = sp.slides[p.i], d = { ...sl.dados }; delete d.foto; const ns = comporSlide({ modelo: mod(sl), dados: d }, { ...base, i: p.i, total: n }); if (ns) sp.slides[p.i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; }
+  setContent(c.id, { art_spec: JSON.stringify(sp), art_status: '' });
+  return { feitas, falhas };
+}
+const textoFotosDesigner = r => [r.feitas.length ? `fotos escolhidas pelo Designer: ${r.feitas.map(f => `página ${f.i + 1} mostra ${f.cena} (“${clip(f.trecho, 60)}”)`).join('; ')}` : '', r.falhas.length ? `sem foto boa no banco para ${r.falhas.map(f => `a página ${f.i + 1} (“${clip(f.trecho, 50)}”)`).join(', ')}: preferi não pôr foto que não tem a ver` : ''].filter(Boolean).join('; ');
 // junta a arte nova com a anterior deixando mudar SÓ os elementos pedidos
 function soElementos(ant, novo, els) {
   const out = JSON.parse(JSON.stringify(ant)), K = { texto: 'texts', imagem: 'items', forma: 'shapes' };
@@ -6180,6 +6232,7 @@ const HANDLERS = {
     setContent(c.id, { art: sp ? r.text.replace(sp.raw, '').trim() : r.text, art_spec: sp ? JSON.stringify(sp.spec) : '', art_spec_base: sp ? JSON.stringify(sp.spec) : '', art_status: '', art_note: '' });
     log('designer', `Direção de arte pronta: "${c.title}"`, c.id);
     if (sp) {
+      if (c.format === 'carrossel' && !(input.from === 'dono' && input.feedback) && sp.spec.slides.some(x => x.modelo === 'venda-pagina')) { try { const fd = await fotosDoDesigner(getContent(c.id)); if (fd) log('designer', `"${c.title}": ${textoFotosDesigner(fd)}`, c.id); } catch (e) { console.error('fotos do designer:', e.message); } }   // foto: o Designer escolhe página e imagem olhando as opções (o copy não decide)
       await renderArte(c.id);   // gera as imagens aqui, antes de a peça ir para o Revisor
       const treino = c.created_by === 'treino_designer';   // treino: uma chamada só, sem inspeção nem refazer automático (o dono corrige)
       if (!treino && !MANUAL && !als.getStore()?.dry && visualLigado() && getContent(c.id)?.art_status === 'ok') { try { await inspecionaArte(c.id); } catch (e) { console.error('inspeção visual da arte:', e.message); } }
