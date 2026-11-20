@@ -1317,10 +1317,11 @@ function vdFrase(s, e, txt, f, size, x, yTop, maxW, C, lh = 1.6) {
 }
 const vdApoio = (s, e, txt, f, size, x, yTop, maxW, C) => { const ls = quebra(limpa(txt), f, size, maxW), L = size * 1.45; ls.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(yTop + L * i + L / 2), align: 'left', size: e.P(size), font: f.k, weight: f.w, lh: 1, color: C.apoio, nowrap: true, shadow: false })); return ls.length * L; };
 // campos de ajuste (o Designer usa quando o dono pede): entrelinha (1 a 2), escala (0,7 a 1,3) e logo (direita/esquerda)
-const vdLh = (d, pad) => { const v = +d.entrelinha; return v >= 1 && v <= 2.2 ? v : pad; }, vdZ = d => { const v = +d.escala; return v >= .6 && v <= 1.4 ? v : 1; };
+// entrelinha mínima 1,3: abaixo disso a faixa do marca-texto encosta na linha de baixo (dono, 20/11/2026)
+const vdLh = (d, pad) => { const v = +d.entrelinha; return v >= 1 && v <= 2.2 ? Math.max(1.3, v) : pad; }, vdZ = d => { const v = +d.escala; return v >= .6 && v <= 1.4 ? v : 1; };
 const vdCabe = (txt, f, max, min, maxW, maxL) => { let z = max; while (z > min && fgAst(erQuebra(String(txt || ''), f, z, maxW)).length > maxL) z -= 2; return z; };
 COMPOR_EXTRA['venda-capa'] = (d, ctx) => {
-  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), x = 100, mw = 880, LH = vdLh(d, 1.32), tz = Math.round(vdCabe(d.titulo, tf, 100, 64, mw, 6) * vdZ(d));
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), x = 100, mw = 880, LH = vdLh(d, 1.32), tz = Math.round(vdCabe(d.titulo, tf, 84, 56, mw, 5) * vdZ(d));
   const th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, ph = 64, cta = String(d.cta || 'Arraste para o lado →'), cf = { k: 'inter', w: 600, ls: 0 }, cw = largura(cta, cf, 30) + 60;
   const y0 = 675 - (th + 70 + ph) / 2;
   vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C, LH);

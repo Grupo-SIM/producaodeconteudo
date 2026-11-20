@@ -3803,7 +3803,7 @@ async function renderArte(id, { regen = false } = {}) {
     { const fr = await garanteFontes().catch(() => null); if (fr?.falhas?.length) warn.push(`Faltam ${fr.falhas.length} arquivo(s) de fonte em public/fonts e não consegui baixar (sem internet?). O texto pode sair em Arial e fora do lugar: reinstale a pasta public/fonts.`); }
     if (!mo.playwright) { status = 'sem_motor'; throw new Error('O motor de imagem não está instalado (falta o playwright: npm i playwright && npx playwright install chromium). Veja o README.'); }
     const sp = JSON.parse(c.art_spec), [w, h] = ART_SIZE[c.format] || [1080, 1350];
-    if (fundoVendaFixo(sp, c)) setContent(id, { art_spec: JSON.stringify(sp) });   // carrossel de venda: fundo da História e venda em todas as páginas, nunca IA
+    if (fundoVendaFixo(sp, c) | vendaSoTexto(sp, c)) setContent(id, { art_spec: JSON.stringify(sp) });   // carrossel de venda: fundo da História e venda em todas as páginas, nunca IA
     const findAsset = name => { const n = slugName(name); if (!n) return null; return one('SELECT * FROM assets WHERE name=? AND brand=? COLLATE NOCASE', n, c.brand || '') || one("SELECT * FROM assets WHERE name=? AND brand=''", n); };
     const aPath = a => path.join(ASSET_DIR, a.id + '.' + a.ext), IMG = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'];
     const previa = c.teste === 3;   // prévia de estilo no Estúdio: nunca gasta com IA
@@ -5776,11 +5776,25 @@ async function usaSugestao(id, k) {
   L.splice(k, 1); setContent(id, { art_spec: JSON.stringify(sp), art_sugestoes: JSON.stringify(L), art_status: '' });
   await renderArte(id); log('designer', `Foto sugerida aplicada na página ${sg.i + 1} de "${c.title}" (pelo dono)`, id);
 }
+// carrossel de venda sai só com texto (dono, 20/11/2026): foto de banco entra só por sugestão aprovada (chave "termo #id") ou da Biblioteca da marca.
+// Vale no render, venha a arte do Designer, do roteiro (marcações antigas de foto do copy) ou de uma versão anterior.
+function vendaSoTexto(sp, c) {
+  if (settings().venda_fotos_banco === '1' || c?.teste === 3) return false;
+  let mud = false; const n = (sp?.slides || []).length; let base = null;
+  (sp?.slides || []).forEach((sl, i) => {
+    const m = sl?.modelo || sl?.modeloOrigem || '', f = sl?.dados?.foto; if (m !== 'venda-pagina' || !f) return;
+    const v = typeof f === 'object' ? (f.asset ? '' : String(f.banco || f.gen || '')) : String(f); if (!v || /^[a-z0-9-]{2,80}$/.test(v) || / #/.test(v)) return;
+    base ||= ctxMarca(c.brand, c.format, sp); const d = { ...sl.dados }; delete d.foto; if (d.forma === 'foto') d.forma = String(d.texto || '').trim() ? 'virada' : 'narrativa';
+    const ns = comporSlide({ modelo: m, dados: d }, { ...base, i, total: n }); if (ns) { sp.slides[i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; mud = true; }
+  });
+  return mud;
+}
 // carrossel de venda (template 15): toda página usa o fundo da seção História e venda da marca; fundo por IA ou outro que tenha entrado volta para ele
 function fundoVendaFixo(sp, c) {
   let mud = false; const n = (sp?.slides || []).length; let base = null;
   (sp?.slides || []).forEach((sl, i) => {
-    const m = sl?.modelo || sl?.modeloOrigem || ''; if (!/^venda-/.test(m) || /^tpl-historia-/.test(sl.bg?.asset || '')) return;
+    const m = sl?.modelo || sl?.modeloOrigem || ''; if (/^venda-/.test(m)) for (const t of sl.texts || []) if (t.mk && String(t.value || '').includes('|') && (+t.lh || 1.6) < 1.3) { t.lh = 1.3; mud = true; }   // marca-texto nunca encosta na linha de baixo
+    if (!/^venda-/.test(m) || /^tpl-historia-/.test(sl.bg?.asset || '')) return;
     base ||= ctxMarca(c.brand, c.format, sp); const ns = comporSlide({ modelo: m, dados: sl.dados || {} }, { ...base, i, total: n }); if (!ns?.bg) return;
     sl.bg = ns.bg; for (const k of ['fx', 'shade', 'shade_dir']) delete sl[k]; if (ns.fx) sl.fx = ns.fx; mud = true;
   });
@@ -7092,7 +7106,7 @@ function avisoBancoFalhou(b, e) {
   console.error(msg);
 }
 async function buscaImagens(q, pag = 1, banco = '') {
-  q = String(q || '').trim().slice(0, 120); if (q.length < 2) throw fail(400, 'Escreva o que procurar');
+  q = String(q || '').trim().slice(0, 95).replace(/\s+\S*$/, m => q.length > 95 ? '' : m); if (q.length < 2) throw fail(400, 'Escreva o que procurar');
   const lista = bancosAtivos().filter(b => !banco || b.id === banco), k = q.toLowerCase() + '|' + pag + '|' + banco, ck = buscaCache.get(k);
   if (ck && Date.now() - ck.t < 600000) return ck.v;
   const out = [], erros = [];
