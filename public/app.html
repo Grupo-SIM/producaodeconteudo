@@ -104,7 +104,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .card .ac{display:flex;gap:6px;margin-top:auto}
 .card .ac .btn{flex:1;justify-content:center}
 /* chat */
-.chat{width:360px;flex:none;background:#0f0f10;border-left:1px solid #1f1f22;display:flex;flex-direction:column;min-height:0}
+.chat{position:relative;width:360px;flex:none;background:#0f0f10;border-left:1px solid #1f1f22;display:flex;flex-direction:column;min-height:0}
 .ch{padding:16px 18px;border-bottom:1px solid #1f1f22;font-weight:600;display:flex;align-items:center;gap:8px}
 .live{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84}
 .ch .x{margin-left:auto;display:none;font-size:20px;color:var(--tx3)}
@@ -283,6 +283,7 @@ img.av{object-fit:contain;padding:3px}
 .etl em b{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;background:#18181b;border:1px solid #2a2a2f;color:#666}
 .etl em.ok{color:#9a9aa2}.etl em.ok b{background:#1d2a20;border-color:#2e4a35;color:#7fd79b}.etl em.now{color:#f2d58f;font-weight:600}.etl em.now b{background:#e8c36a;border-color:#e8c36a;color:#1a1408}
 .etl i{flex:1;height:2px;background:#2a2a2f;margin:0 10px;min-width:14px}.etl i.ok{background:#2e4a35}
+.chat.drop{outline:2px dashed var(--gold,#d4b06a);outline-offset:-8px}.chat.drop::after{content:'Solte o print aqui';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-weight:600;pointer-events:none;z-index:50}.prints{display:flex;gap:6px;padding:6px 10px;flex-wrap:wrap}.prints .pr{position:relative}.prints img{height:54px;border-radius:6px;display:block}.prints button{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;border:0;background:#000;color:#fff;font-size:12px;line-height:18px;padding:0;cursor:pointer}.mimgs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.mimgs img{max-width:160px;max-height:120px;border-radius:6px;display:block}
 </style>
 </head>
 <body>
@@ -294,7 +295,8 @@ img.av{object-fit:contain;padding:3px}
     <div class="msgs" id="msgs"></div>
     <div class="typing hidden" id="typing">Gerente digitando…</div>
     <div class="sugs" id="sugs"></div>
-    <div class="cin"><button class="ibtn" title="Enviar arquivo ao gerente (logo, foto, fundo…)" onclick="$('#cfile').click()" style="flex:none">📎</button><input type="file" id="cfile" hidden onchange="anexo(this.files[0]);this.value=''"><textarea id="cin" placeholder="Fale com o gerente…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea><button class="btn ok sm" onclick="chatSend()">Enviar</button></div>
+    <div class="prints hidden" id="prints"></div>
+    <div class="cin"><button class="ibtn" title="Enviar arquivo ao gerente (logo, foto, fundo…)" onclick="$('#cfile').click()" style="flex:none">📎</button><input type="file" id="cfile" hidden onchange="if(!addPrint(this.files[0]))anexo(this.files[0]);this.value=''"><textarea id="cin" placeholder="Fale com o gerente…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea><button class="btn ok sm" onclick="chatSend()">Enviar</button></div>
   </aside>
   <button class="fab" id="fab" onclick="chatToggle(true)" aria-label="Gerente"><svg viewBox="0 0 24 24" width="22" height="22" fill="#141006"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H9l-5 4v-4a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg><span class="dot"></span><span class="cnt" id="fabcnt"></span></button>
 </div>
@@ -1287,7 +1289,7 @@ async function loadChat() {
   if (sig === S.chatSig) return; S.chatSig = sig; S.chat = d.msgs;
   if (S.chatDesde == null) S.chatDesde = d.msgs.at(-1)?.id || 0;   // a conversa começa zerada a cada vez que o sistema abre (o histórico continua no servidor)
   const vis = S.chatTudo ? d.msgs : d.msgs.filter(m => m.id > S.chatDesde), antigas = d.msgs.length - vis.length;
-  $('#msgs').innerHTML = (antigas ? `<button class="vermais" onclick="S.chatTudo=true;S.chatSig='';loadChat()">ver conversa anterior (${antigas})</button>` : '') + vis.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${esc(textoChat(m))}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || (antigas ? '' : '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>');
+  $('#msgs').innerHTML = (antigas ? `<button class="vermais" onclick="S.chatTudo=true;S.chatSig='';loadChat()">ver conversa anterior (${antigas})</button>` : '') + vis.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${(m.imgs || []).length ? `<div class="mimgs">${m.imgs.map(u => `<a href="${u}" target="_blank"><img src="${u}"></a>`).join('')}</div>` : ''}${esc(textoChat(m))}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || (antigas ? '' : '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>');
   $('#msgs').scrollTop = 1e9;
   const ult = d.msgs.at(-1)?.id || 0, novas = d.msgs.filter(m => m.role !== 'user' && m.id > S.lidas).length;
   if ($('#chat').classList.contains('open') || !isMobile()) { S.lidas = ult; store.set('chatLidas', ult); $('#fabcnt').textContent = ''; } else $('#fabcnt').textContent = novas || '';
@@ -1317,12 +1319,27 @@ async function enviaAnexo() {
   } catch (e) { toast(e.message); }
 }
 async function chatSend(t) {
-  const text = t || $('#cin').value.trim(); if (!text) return; $('#cin').value = '';
+  const imagens = t ? [] : (S.prints || []).slice(0, 4), text = t || $('#cin').value.trim() || (imagens.length ? 'O que você vê nesse print?' : ''); if (!text) return; $('#cin').value = '';
+  if (!t) { S.prints = []; mostraPrints(); }
   $('#typing').classList.remove('hidden');
   if (S.view === 'cerebro') cerAcende(text).catch(() => { });
-  try { await api('/api/gerente/chat', { body: { text } }); } catch (e) { toast(e.message); }
+  try { await api('/api/gerente/chat', { body: { text, imagens } }); } catch (e) { toast(e.message); }
   await loadChat(); refresh();
 }
+// prints para o gerente: arraste em qualquer lugar do chat, cole (Ctrl/Cmd+V) ou use o 📎 com imagem; ele vê e responde (não vai para a Biblioteca)
+function addPrint(f) {
+  if (!f || !/^image\/(png|jpe?g|webp|gif)$/.test(f.type)) return false; if ((S.prints || []).length >= 4) { toast('Até 4 prints por mensagem'); return true; }
+  const rd = new FileReader(); rd.onload = () => { const im = new Image(); im.onload = () => { const k = Math.min(1, 1600 / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); (S.prints ||= []).push(cv.toDataURL('image/jpeg', .85)); mostraPrints(); $('#cin').focus(); }; im.src = rd.result; }; rd.readAsDataURL(f); return true;
+}
+function mostraPrints() { const el = $('#prints'), L = S.prints || []; el.classList.toggle('hidden', !L.length); el.innerHTML = L.map((u, i) => `<span class="pr"><img src="${u}"><button title="Tirar" onclick="S.prints.splice(${i},1);mostraPrints()">×</button></span>`).join(''); }
+const ligaPrints = () => {
+  const ch = $('#chat'); if (!ch || ch.dataset.prints) return; ch.dataset.prints = 1;
+  ch.addEventListener('dragover', e => { if ([...(e.dataTransfer?.items || [])].some(i => i.kind === 'file')) { e.preventDefault(); ch.classList.add('drop'); } });
+  ch.addEventListener('dragleave', e => { if (!ch.contains(e.relatedTarget)) ch.classList.remove('drop'); });
+  ch.addEventListener('drop', e => { e.preventDefault(); ch.classList.remove('drop'); const fs = [...(e.dataTransfer?.files || [])], im = fs.filter(f => f.type.startsWith('image/')); im.forEach(addPrint); const outro = fs.find(f => !f.type.startsWith('image/')); if (outro) anexo(outro); });
+  $('#cin')?.addEventListener('paste', e => { const fs = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith('image/')); if (fs.length) { e.preventDefault(); fs.forEach(addPrint); } });
+};
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ligaPrints); else ligaPrints();
 async function desfazRegra(id, b) { b.disabled = true; await tryDo(() => api(`/api/v2/regras/${id}/desfazer`, { body: {} }), 'Regra desfeita'); loadChat(); }
 function chatToggle(on) { $('#chat').classList.toggle('open', on); if (on) { S.lidas = S.chat.at(-1)?.id || 0; store.set('chatLidas', S.lidas); $('#fabcnt').textContent = ''; } }
 $('#sugs').innerHTML = SUGS.map(s => `<button onclick="chatSend(${esc(JSON.stringify(s))})">${esc(s)}</button>`).join('');

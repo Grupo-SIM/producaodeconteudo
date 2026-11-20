@@ -651,6 +651,8 @@ ${MOTION_V2_AVOID}` },
 4. Nunca escrever texto fora do JSON.` }
 };
 // Onde cada agente se encaixa no fluxo do sistema (vai em todo pedido; não fica salvo no banco, então sempre reflete o fluxo atual)
+// jeito de falar do Gerente (dono, 20/11/2026): igual ao Claude na conversa com o dono, um gerente de verdade e não um robô
+const GERENTE_JEITO = `COMO VOCÊ CONVERSA COM O DONO: fale como um gerente de verdade que conhece o sistema por dentro, no mesmo jeito do Claude na conversa com ele. Português do Brasil natural, frases completas, tom de colega experiente, direto e seguro, sem formalidade e sem jargão técnico (nada de nomes de código, tabelas ou campos). Comece pela resposta, não por "Entendi" ou repetindo a pergunta. Quando ele perguntar "por que", explique a causa real com o que você vê nos dados, sem inventar; se não souber, diga que não sabe e o que vai fazer para descobrir. Quando algo deu errado, assuma, diga o que aconteceu, o que já foi feito e o que falta. Quando ele mandar print, diga o que viu na imagem antes de responder. Termine com o próximo passo concreto (o que você vai fazer ou o que ele precisa decidir), sem lista de opções que você não recomenda. Respostas curtas quando o assunto é simples; mais completas quando ele pede explicação. Sem emoji, sem "Prezado", sem "Fico à disposição".`;
 const AGENT_STAGE = {
   roteirista: 'Sua etapa: escrever o roteiro. Você recebe a pauta/briefing, a marca, o produto (se houver) e, em reescritas, os ajustes do Revisor ou do dono. Você entrega o roteiro e a legenda, que vão para a revisão do Revisor.',
   designer: 'Sua etapa: direção de arte, só das peças estáticas (carrossel, feed, stories); peças de vídeo não passam por você, são do Editor. Você recebe o roteiro aprovado, a identidade visual e o catálogo de arquivos da marca. Você entrega a direção de arte executável que o dono usa para montar as peças.',
@@ -658,7 +660,7 @@ const AGENT_STAGE = {
   radar: 'Sua etapa: o começo do fluxo. Você pesquisa o que está em alta (Google Trends, Google Notícias, sites de tecnologia), relaciona com cada marca e entrega a pauta/notícia que vai ao Roteirista. Você não escreve copy nem revisa nada.',
   revisorcopy: 'Sua etapa: guardrail da copy, logo depois do Roteirista. Você recebe o roteiro e devolve um laudo (veredito e correções obrigatórias). Reprovado volta ao Roteirista; aprovado segue para o Agente de SEO (só notícia com matéria) ou direto para o Revisor.',
   seo: 'Sua etapa: só nas notícias com matéria completa para o site de jornal, depois do Revisor de Copy. Você revisa a matéria (SEO de notícias, Google Notícias/Discover, busca por IA) e devolve um laudo. Com pendências a matéria volta ao Roteirista; aprovada (ou esgotadas as rodadas) segue para o Revisor.',
-  chefe: 'Sua etapa: fora da linha de produção. Você é o braço direito do dono: conversa com ele, comanda os agentes, define pautas, lê métricas, consolida o Cérebro e executa as ordens.',
+  chefe: 'Sua etapa: fora da linha de produção. Você é o braço direito do dono: conversa com ele, comanda os agentes, define pautas, lê métricas, consolida o Cérebro e executa as ordens. ' + GERENTE_JEITO,
   gerente: 'Sua etapa: revisar e aprovar as etapas depois da copy já conferida pelo Revisor de Copy (e pelo Agente de SEO nas notícias). Você revisa o roteiro (reprovado volta ao Roteirista) e, depois, a entrega de arte e/ou vídeo (reprovado volta ao Designer e/ou ao Editor, com ajustes). Aprovada a entrega, ela segue para o Social Media e depois para o dono. Pautas, métricas e Cérebro são do Gerente (chefe), não seus.',
   publicador: 'Sua etapa: pacote de postagem. Você recebe o conteúdo já aprovado pelo dono. Você entrega legenda final e horário; o envio ao Make/n8n/Zapier (webhook) ou a postagem manual é feita depois, não por você.'
 };
@@ -4336,6 +4338,8 @@ CREATE TABLE IF NOT EXISTS agent_versions(id INTEGER PRIMARY KEY AUTOINCREMENT, 
 `);
 const AGENT_ALIAS = { 'revisor de copy': 'revisorcopy', 'revisor copy': 'revisorcopy', revisorcopy: 'revisorcopy', roteirista: 'roteirista', designer: 'designer', editor: 'editor', revisor: 'gerente', gerente: 'chefe', chefe: 'chefe', 'social media': 'publicador', social: 'publicador', publicador: 'publicador' };
 const agId = v => { const k = String(v || '').toLowerCase().trim(); const id = AGENT_ALIAS[k] || k; return one('SELECT id FROM agents WHERE id=?', id) ? id : (one('SELECT id FROM agents WHERE nick<>\'\' AND lower(nick)=?', k)?.id || null); };
+const CHAT_IMG_DIR = path.join(DATA_DIR, 'chat_prints'); fs.mkdirSync(CHAT_IMG_DIR, { recursive: true });
+const printsDaMsg = id => { try { return fs.readdirSync(CHAT_IMG_DIR).filter(n => n.startsWith(id + '-')).sort().map(n => path.join(CHAT_IMG_DIR, n)); } catch { return []; } };
 const addChat = (role, text, extra = {}) => { const r = run('INSERT INTO chat_msgs(ts,role,agent,text,actions,job_id) VALUES(?,?,?,?,?,?)', T(), role, extra.agent || '', String(text || '').slice(0, 30000), extra.actions ? JSON.stringify(extra.actions) : '', extra.job || null); run('DELETE FROM chat_msgs WHERE id < (SELECT MAX(id) FROM chat_msgs) - 400'); changed(); return +r.lastInsertRowid; };
 const clip = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 // build .138: cada estilo passa a ter UMA marca dona. Estilos já salvos viram da marca em que foram ajustados; ajustes de várias marcas viram uma cópia por marca; o original da casa volta nas outras
@@ -5980,8 +5984,9 @@ const HANDLERS = {
     if (!msg) return { text: '' };
     const pc = input.content ? getContent(input.content) : null;   // mensagem que veio do "Mandar ajustar" da Mesa: o Gerente vê a peça
     const pecaCtx = pc ? `\n\n# PEÇA DO AJUSTE (o dono escreveu pelo botão "Mandar ajustar" na Mesa de revisão; o pedido de ajuste JÁ FOI ENVIADO ao agente da etapa, não repita como ação)\nTítulo: ${pc.title} · Marca: ${pc.brand || '-'} · Formato: ${pc.format} · Tipo: ${pc.kind || '-'} · Etapa: ${pc.status}${(() => { try { const sp = JSON.parse(pc.art_spec || '{}'), sl = sp.slides || [], fotos = sl.filter(x => (x.items || []).some(it => it.banco || it.fotoCard) || x.dados?.foto).length; return '\nArte: template ' + (sp.template || sp.estilo || '-') + ', ' + sl.length + ' páginas, ' + fotos + ' com foto.'; } catch { return ''; } })()}\nAvisos da arte: ${pc.art_note || '(nenhum)'}\nResponda às PERGUNTAS do dono sobre esta peça com base nesses dados (diga o que aconteceu e por quê, sem inventar), confirme em uma linha o que vai ser ajustado e, se for regra para as próximas, diga onde vai valer.` : '';
-    const user = `# ESTADO ATUAL DO SISTEMA (dados reais; não invente nada além disto)\n${gerenteSnapshot(msg.text)}\n\n# CONVERSA ATÉ AGORA\n${gerenteHistorico(msg.id) || '(início da conversa)'}${pecaCtx}\n\n# MENSAGEM DO DONO\n${msg.text}\n\n${GERENTE_ACOES}\n\nResponda agora ao dono, em português do Brasil, de forma direta e curta.`;
-    const r = await callClaude({ agent: agentRow('chefe'), user, maxTokens: 4000 });
+    const user = `# ESTADO ATUAL DO SISTEMA (dados reais; não invente nada além disto)\n${gerenteSnapshot(msg.text)}\n\n# CONVERSA ATÉ AGORA\n${gerenteHistorico(msg.id) || '(início da conversa)'}${pecaCtx}\n\n# MENSAGEM DO DONO\n${msg.text}\n\n${GERENTE_ACOES}\n\nResponda agora ao dono. ${GERENTE_JEITO}`;
+    const imgs = printsDaMsg(msg.id).map(f => visionImg(f)).filter(Boolean);
+    const r = await callClaude({ agent: agentRow('chefe'), user: imgs.length ? user + `\n\nO dono mandou ${imgs.length} print(s) junto com a mensagem (as imagens acima). Olhe com atenção, diga o que você está vendo e responda com base nelas.` : user, maxTokens: 4000, images: imgs });
     const { fala, acoes } = gerenteResposta(r.text);
     const res = [];
     if (acoes === null) res.push({ ok: false, texto: 'Não consegui ler as ações que eu mesmo montei (JSON inválido). Peça de novo, por favor.' });
@@ -7178,8 +7183,9 @@ async function api(req, res, url) {
     const nome = br ? one('SELECT name FROM brands WHERE name=? COLLATE NOCASE', br).name : '';
     const job = enqueue(null, 'designer', 'estilo', { brand: nome, origem, assets }, 'manual'); return send(res, 200, { ok: true, job });
   }
+  if ((mt = p.match(/^\/api\/gerente\/print\/(\d+-\d\.(?:png|jpg|webp|gif))$/)) && m === 'GET') { const f = path.join(CHAT_IMG_DIR, mt[1]); if (!fs.existsSync(f)) throw fail(404, 'Print não encontrado'); res.writeHead(200, { 'content-type': { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' }[f.split('.').pop()], 'cache-control': 'private, max-age=86400' }); return res.end(fs.readFileSync(f)); }
   if (p === '/api/gerente' && m === 'GET') {
-    const msgs = all('SELECT * FROM chat_msgs ORDER BY id DESC LIMIT 80').reverse().map(x => ({ ...x, actions: x.actions ? JSON.parse(x.actions) : null }));
+    const msgs = all('SELECT * FROM chat_msgs ORDER BY id DESC LIMIT 80').reverse().map(x => ({ ...x, actions: x.actions ? JSON.parse(x.actions) : null, ...(x.role === 'user' ? { imgs: printsDaMsg(x.id).map(f => '/api/gerente/print/' + path.basename(f)) } : {}) }));
     const pend = all("SELECT j.id,j.kind,j.status,j.agent,j.input,j.created_at FROM jobs j WHERE j.kind IN ('chat','teste') AND j.status IN ('queued','running') ORDER BY j.id").map(j => ({ id: j.id, kind: j.kind, status: j.status, agent: agentRow(j.agent)?.name || j.agent, resumo: j.kind === 'teste' ? clip((() => { try { return JSON.parse(j.input).pedido; } catch { return ''; } })(), 90) : '' }));
     const versions = all('SELECT id,ts,agent,field,nota,undone FROM agent_versions ORDER BY id DESC LIMIT 15').map(v => ({ ...v, agent_name: agentRow(v.agent)?.name || v.agent }));
     return send(res, 200, { msgs, pending: pend, versions, agent: agentRow('chefe') });
@@ -7188,6 +7194,8 @@ async function api(req, res, url) {
     const b = await readBody(req, 4e5), text = str(b.text, 20000, 'Mensagem');
     if (!agenteLigado('chefe')) throw fail(400, 'O Gerente está desativado (aba Agentes). Ative-o para conversar.');
     const mid = addChat('user', text);
+    const prints = (Array.isArray(b.imagens) ? b.imagens : []).slice(0, 4).map((u, k) => { const m = String(u || '').match(/^data:image\/(png|jpe?g|webp|gif);base64,([A-Za-z0-9+/=]+)$/); if (!m) return null; const buf = Buffer.from(m[2], 'base64'); if (buf.length < 500 || buf.length > 4.5e6) return null; const f = path.join(CHAT_IMG_DIR, `${mid}-${k}.${m[1] === 'jpeg' ? 'jpg' : m[1]}`); fs.writeFileSync(f, buf); return f; }).filter(Boolean);   // prints que o dono arrastou/colou no chat
+    if (prints.length) { const jid = enqueue(null, 'chefe', 'chat', { msg: mid }, 'chat'); changed(); return send(res, 200, { ok: true, msg: mid, job: jid }); }   // com print, quem responde é o Gerente olhando a imagem
     {   // ordens claras (aprovar, criar, ensinar, montar arte, pautas, ligar o autônomo…) executam na hora, com ou sem API; o resto vai para a IA
       let ac = null, err = '';
       try { ac = gerenteInterpreta(text); } catch (e) { err = e.message; }
