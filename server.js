@@ -2581,14 +2581,16 @@ function compoeModelos(found, format, brand, c = null) {
   if (c?.kind === 'noticia') found.slides = found.slides.map(sl => MODELO_IDS.includes(sl?.modelo) ? semMascoteNoticia(sl, brand, nfoto) : sl);
   // carrossel de venda (15): 2 ou 3 páginas com foto REAL de banco são obrigatórias; se o Designer não pediu, o sistema escolhe as páginas e busca pela frase, e o Gerente avisa o dono
   if (!found.previa && Array.isArray(found.slides) && (found.template === 'venda-ebook' || found.estilo === 'venda-ebook' || found.slides.some(s => s?.modelo === 'venda-pagina'))) {
-    const pg = found.slides.map((s, i) => s?.modelo === 'venda-pagina' || (i > 0 && i < found.slides.length - 1 && !s?.modelo) ? i : -1).filter(i => i >= 0), com = pg.filter(i => found.slides[i]?.dados?.foto), quer = pg.length >= 6 ? 3 : pg.length >= 3 ? 2 : 0;
+    const pg = found.slides.map((s, i) => s?.modelo === 'venda-pagina' || (i > 0 && i < found.slides.length - 1 && !s?.modelo) ? i : -1).filter(i => i >= 0), com = pg.filter(i => found.slides[i]?.dados?.foto), quer = found.slides.length >= 9 ? 3 : pg.length >= 3 ? 2 : 0;
     if (com.length < quer) {
-      const livres = pg.filter(i => !found.slides[i]?.dados?.foto), alvo = [], passo = livres.length / (quer - com.length + 1);
-      for (let k = 1; alvo.length < quer - com.length && k <= quer; k++) { const i = livres[Math.min(livres.length - 1, Math.round(k * passo) - 1)]; if (i != null && !alvo.includes(i)) alvo.push(i); }
+      const livres = pg.filter(i => !found.slides[i]?.dados?.foto && !String(found.slides[i]?.dados?.texto || '').trim() && found.slides[i]?.dados?.forma !== 'virada'), alvo = [], passo = livres.length / (quer - com.length + 1);
+      for (const i of [...livres.slice(1), livres[0]].filter(x => x != null)) if (alvo.length < quer - com.length && ![...alvo, ...com].some(a => Math.abs(a - i) <= 1)) alvo.push(i);   // espalhadas, nunca em páginas vizinhas (sem IA; com IA quem escolhe é o Designer)
+      alvo.sort((x, y) => x - y);
       for (const i of alvo) { const sl = found.slides[i]; sl.modelo ||= 'venda-pagina'; sl.dados = { ...(sl.dados || {}), foto: String(sl.dados?.titulo || '').replace(/[*|_]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90) }; }
       if (alvo.length && c?.id) { try { addChat('gerente', `Aviso no carrossel de venda “${clip(c.title || '', 60)}”: o Designer não marcou as fotos (o formato pede 2 ou 3). Escolhi as páginas ${alvo.map(i => i + 1).join(', ')} e busquei fotos reais pela frase de cada uma. Confira na Mesa se combinam.`); } catch { /* sem chat */ } }
     }
   }
+  if (Array.isArray(found?.slides) && found.slides.some(s => s?.modelo === 'venda-pagina')) ritmoVenda(found.slides);
   const base = ctxMarca(brand, format, found), n = Math.min(found.slides.length, ART_MAX[format] || 10);
   found.slides = found.slides.map((s, i) => { if (!MODELO_IDS.includes(s?.modelo)) return s; try { const r = comporSlide({ modelo: s.modelo, dados: s.dados && typeof s.dados === 'object' ? s.dados : {} }, { ...base, i, total: n }); if (r && s.bgLivre?.asset) r.bg = { ...s.bgLivre }; return r || s; } catch (e) { console.error('modelo', s.modelo, e.message); return s; } });
   const fotoNoticiaIdx = nfoto ? found.slides.map((sl, i) => FOTO_MODELOS.includes(sl?.modelo) ? i : -1).filter(i => i >= 0) : [];
@@ -3259,7 +3261,7 @@ function modeloSemImagem(s, format, brand, i, n, tudo = false) {
     const v = d[k]; if (!v || (typeof v === 'object' && v.asset) || (typeof v === 'string' && /^[a-z0-9-]{2,60}$/.test(v) && v.includes('-'))) continue;
     const ps = typeof v === 'string' && v.match(/^\s*([a-z0-9-]{2,80})\s*\(pose:/); if (ps) { d[k] = ps[1]; mud = true; continue; }   // sem gerar pose: usa o mascote como está
     const banco = typeof v === 'string' ? /^\s*banco\s*:/i.test(v) : !!v.banco, cartao = k === 'foto' && ['texto', 'numero', 'venda-pagina'].includes(s.modelo);
-    if (k === 'foto' && s.modelo === 'venda-pagina') continue;   // carrossel de venda: foto SEMPRE de banco (nunca gerada), não depende do fal.ai
+    if (k === 'foto' && s.modelo === 'venda-pagina' && !tudo) continue;   // carrossel de venda: foto SEMPRE de banco (nunca gerada), não depende do fal.ai
     if (banco && !tudo && (cartao || falKey())) continue;   // foto de banco: só precisa do fal.ai para recortar
     delete d[k]; mud = true;
   }
@@ -3365,6 +3367,7 @@ function dadosOk(d) {
   { const v = +d.entrelinha; if (v >= 1 && v <= 2.2) out.entrelinha = Math.round(v * 100) / 100; }
   { const v = +d.escala; if (v >= .6 && v <= 1.4) out.escala = Math.round(v * 100) / 100; }
   if (['direita', 'esquerda'].includes(d.logo)) out.logo = d.logo;
+  if (['narrativa', 'virada', 'foto'].includes(d.forma)) out.forma = d.forma;
   return out;
 }
 // Limpa e limita a especificação (vinda do Designer ou do editor visual): só campos conhecidos, números dentro de faixa, sem HTML
@@ -3877,7 +3880,7 @@ async function renderArte(id, { regen = false } = {}) {
           }
         }
         if (a && IMG.includes(a.ext) && fs.existsSync(aPath(a))) slide.items.push({ ...it, src: pathToFileURL(aPath(a)).href }); else warn.push(`Slide ${i + 1}: arquivo “${it.asset}” não está cadastrado na marca: item removido.`); }
-      const pediu = !!(s.bg.gen || s.bg.banco) || s.items.some(it => (it.gen || it.banco) && it.hero), veio = !!slide.bg.src || slide.items.some(it => it.hero && it.src);
+      const pediu = !!(s.bg.gen || s.bg.banco) || s.items.some(it => (it.gen || it.banco) && (it.hero || it.fotoCard)), veio = !!slide.bg.src || slide.items.some(it => (it.hero || it.fotoCard) && it.src);   // foto do cartão que não veio: a página se refaz só com o texto (sem buraco)
       if (tent === 0 && s.modelo && pediu && !veio) { const ms = modeloSemImagem(s, c.format, c.brand, i, sp.slides.length, true); if (ms) { s = ms; continue; } }
       if (slide.fx?.textura) slide.fx = { ...slide.fx, textura: slide.fx.textura.map(x => { if (!x.asset) return x; const a = findAsset(x.asset); return a && IMG.includes(a.ext) && fs.existsSync(aPath(a)) ? { ...x, src: pathToFileURL(aPath(a)).href } : null; }).filter(Boolean) };
       if (!sp.editada && !s.modelo) composicaoAplica(slide, comp, i, warn);   // arte editada à mão ou composta por modelo: a composição da marca não mexe
@@ -5702,13 +5705,13 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
   if (MANUAL || als.getStore()?.dry) return null;
   const sp = jparse(c.art_spec, null); if (!sp?.slides?.length) return null;
   const n = sp.slides.length, mod = sl => sl?.modelo || sl?.modeloOrigem || '';
-  const cand = sp.slides.map((sl, i) => ({ i, m: mod(sl), t: String(sl?.dados?.titulo || '').replace(/[*|]/g, '').trim(), x: String(sl?.dados?.texto || '').trim() })).filter(p => p.i > 0 && p.i < n - 1 && camposDoModelo(p.m).includes('foto') && !/-(capa|fim)$/.test(p.m) && p.t);
+  const cand = sp.slides.map((sl, i) => ({ i, m: mod(sl), f: sl?.dados?.forma, t: String(sl?.dados?.titulo || '').replace(/[*|]/g, '').trim(), x: String(sl?.dados?.texto || '').trim() })).filter(p => p.i > 0 && p.i < n - 1 && camposDoModelo(p.m).includes('foto') && !/-(capa|fim)$/.test(p.m) && p.f !== 'virada' && p.t);
   if (!cand.length) return null;
-  const alvo = quer || Math.max(2, Math.min(3, Math.round(cand.length / 3)));
+  const alvo = quer || (n >= 9 ? 3 : 2);   // dono: no máximo 2 fotos (3 só em carrossel de 9+ páginas); foto fraca é pior que nenhuma
   let plano;
   try {
-    const r = await callClaude({ agent: agentRow('designer'), maxTokens: 900, user: `Você é o Designer. O copy escreveu o carrossel abaixo; o copy NÃO decide foto, você decide.\nEscolha ${alvo} páginas (no máximo ${alvo + 1}); prefira cenas que rendem foto bonita, colorida e nítida em que dá para achar num banco de fotos (Pexels/Unsplash) uma foto REAL que mostre literalmente um trecho específico do que a página diz: uma pessoa fazendo a ação dita, o objeto citado, a cena descrita. Pule páginas abstratas (conceito, promessa, número) onde qualquer foto seria genérica.\n# PÁGINAS\n${cand.map(p => `página ${p.i + 1}: "${p.t}"${p.x ? ' / apoio: "' + p.x + '"' : ''}`).join('\n')}\n# SAÍDA\nSó JSON: {"fotos":[{"pagina":3,"trecho":"parte exata do texto que a foto mostra","cena":"o que aparece na foto, em português","termos":["2 a 3 buscas em inglês, concretas e literais (ex.: 'woman paying with smartphone at counter'), da mais específica para a mais simples"]}]}` });
-    plano = (extrairJSON(r.text, '{')?.fotos || []).filter(f => cand.some(p => p.i === +f.pagina - 1) && Array.isArray(f.termos) && f.termos.length).slice(0, alvo + 1);
+    const r = await callClaude({ agent: agentRow('designer'), maxTokens: 900, user: `Você é o Designer. O copy escreveu o carrossel abaixo; o copy NÃO decide foto, você decide.\nEscolha ${alvo} páginas (no máximo ${alvo + 1}); prefira cenas que rendem foto bonita, colorida e nítida em que dá para achar num banco de fotos (Pexels/Unsplash) uma foto REAL que mostre literalmente um trecho específico do que a página diz: uma pessoa fazendo a ação dita, o objeto citado, a cena descrita. Pule páginas abstratas (conceito, promessa, número, produto/sistema, algoritmo) onde qualquer foto seria genérica, e nunca escolha duas páginas vizinhas. Só escolha uma página se a foto, vista SEM o texto, já contar o que o trecho diz. Melhor 1 foto certeira que 2 mais ou menos.\n# PÁGINAS\n${cand.map(p => `página ${p.i + 1}: "${p.t}"${p.x ? ' / apoio: "' + p.x + '"' : ''}`).join('\n')}\n# SAÍDA\nSó JSON: {"fotos":[{"pagina":3,"trecho":"parte exata do texto que a foto mostra","cena":"o que aparece na foto, em português","termos":["2 a 3 buscas em inglês, concretas e literais (ex.: 'woman paying with smartphone at counter'), da mais específica para a mais simples"]}]}` });
+    plano = (extrairJSON(r.text, '{')?.fotos || []).filter(f => cand.some(p => p.i === +f.pagina - 1) && Array.isArray(f.termos) && f.termos.length).filter((f, k, L) => !L.slice(0, k).some(g => Math.abs(+g.pagina - +f.pagina) <= 1)).slice(0, alvo);
   } catch (e) { console.error('fotos do designer:', e.message); return null; }
   if (!plano.length) return null;
   const dir = path.join(RENDER_DIR, '_banco'); fs.mkdirSync(dir, { recursive: true });
@@ -5722,7 +5725,7 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
       for (const it of itens) { try { const { buf, ext } = await baixaImagemSegura(it.thumb, 4e6); imgs.push({ data: buf.toString('base64'), type: ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg' }); ok.push(it); } catch { /* miniatura falhou */ } }
       if (!ok.length) continue;
       try {
-        const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: imgs, user: `Você vê ${ok.length} fotos de banco, numeradas de 1 a ${ok.length} na ordem. A página diz: "${cand.find(p => p.i === i)?.t}". A foto precisa mostrar exatamente: ${f.cena} (trecho: "${f.trecho}"). Escolha a que mostra isso de forma clara E que pare o dedo no feed: nítida (foco certo, sem borrão, sem granulado, sem cara de foto antiga ou de celular ruim), boa luz, cores fortes e vivas, assunto grande e fácil de entender numa tela pequena, sem texto/marca d'água e sem parecer genérica. Rede social é briga de atenção: foto apagada, escura, desbotada ou sem graça perde, mesmo que mostre o assunto. Se NENHUMA for boa nos dois sentidos (assunto e qualidade), responda 0. Responda só JSON: {"foto":N,"porque":"curto"}` });
+        const r = await callClaude({ agent: agentRow('designer'), maxTokens: 200, images: imgs, user: `Você vê ${ok.length} fotos de banco, numeradas de 1 a ${ok.length} na ordem. A página diz: "${cand.find(p => p.i === i)?.t}". A foto precisa mostrar exatamente: ${f.cena} (trecho: "${f.trecho}"). Escolha a que mostra isso de forma clara E que pare o dedo no feed: nítida (foco certo, sem borrão, sem granulado, sem cara de foto antiga ou de celular ruim), boa luz, cores fortes e vivas, assunto grande e fácil de entender numa tela pequena, sem texto/marca d'água e sem parecer genérica. Rede social é briga de atenção: foto apagada, escura, desbotada ou sem graça perde, mesmo que mostre o assunto. Reprove foto genérica de tecnologia (tela com gráfico, ícones, 'algoritmo', views no celular) quando o trecho fala de outra coisa: quem olha a foto sem ler tem de entender o trecho. Se NENHUMA for boa nos dois sentidos (assunto e qualidade), responda 0. Responda só JSON: {"foto":N,"porque":"curto"}` });
         const k = +(extrairJSON(r.text, '{')?.foto || 0); if (k >= 1 && k <= ok.length) { escolhida = ok[k - 1]; termoOk = termo; break; }
       } catch (e) { console.error('escolha da foto:', e.message); }
     }
@@ -5732,16 +5735,27 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
       const chave = `${termoOk} #${escolhida.id}`, arq = path.join(dir, crypto.createHash('sha1').update(chave.toLowerCase() + '|false').digest('hex').slice(0, 14));
       const { buf, ext } = await baixaImagemSegura(escolhida.full); fs.writeFileSync(arq + '.' + ext, buf); fs.writeFileSync(arq + '.txt', `${escolhida.autor || 'autor'} (${escolhida.fonte}${escolhida.licenca ? ', ' + escolhida.licenca : ''})`);
       if (escolhida.ping && process.env.UNSPLASH_ACCESS_KEY) fetch(escolhida.ping, { headers: { Authorization: 'Client-ID ' + process.env.UNSPLASH_ACCESS_KEY } }).catch(() => {});
-      const sl = sp.slides[i], ns = comporSlide({ modelo: mod(sl), dados: { ...(sl.dados || {}), foto: chave } }, { ...base, i, total: n });
+      const sl = sp.slides[i], ns = comporSlide({ modelo: mod(sl), dados: { ...(sl.dados || {}), foto: chave, ...(mod(sl) === 'venda-pagina' ? { forma: 'foto' } : {}) } }, { ...base, i, total: n });
       if (ns) { sp.slides[i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; feitas.push({ i, trecho: f.trecho, cena: f.cena, fonte: escolhida.fonte }); }
     } catch (e) { falhas.push({ i, trecho: f.trecho, erro: e.message }); }
   }
   // páginas que tinham foto marcada (pelo copy ou pelo template) e não foram escolhidas pelo Designer ficam sem foto
-  for (const p of cand) if (!feitas.some(x => x.i === p.i) && sp.slides[p.i]?.dados?.foto) { const sl = sp.slides[p.i], d = { ...sl.dados }; delete d.foto; const ns = comporSlide({ modelo: mod(sl), dados: d }, { ...base, i: p.i, total: n }); if (ns) sp.slides[p.i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; }
+  for (const p of sp.slides.map((sl, i) => ({ i })).filter(p => p.i > 0 && p.i < n - 1 && mod(sp.slides[p.i]) === 'venda-pagina')) if (!feitas.some(x => x.i === p.i) && (sp.slides[p.i]?.dados?.foto || sp.slides[p.i]?.dados?.forma === 'foto')) { const sl = sp.slides[p.i], d = { ...sl.dados }; delete d.foto; if (d.forma === 'foto') d.forma = String(d.texto || '').trim() ? 'virada' : 'narrativa'; const ns = comporSlide({ modelo: mod(sl), dados: d }, { ...base, i: p.i, total: n }); if (ns) sp.slides[p.i] = sanitizeArteSpec({ slides: [ns] }, 'carrossel').slides[0]; }
   setContent(c.id, { art_spec: JSON.stringify(sp), art_status: '' });
   return { feitas, falhas };
 }
 const textoFotosDesigner = r => [r.feitas.length ? `fotos escolhidas pelo Designer: ${r.feitas.map(f => `página ${f.i + 1} mostra ${f.cena} (“${clip(f.trecho, 60)}”)`).join('; ')}` : '', r.falhas.length ? `sem foto boa no banco para ${r.falhas.map(f => `a página ${f.i + 1} (“${clip(f.trecho, 50)}”)`).join(', ')}: preferi não pôr foto que não tem a ver` : ''].filter(Boolean).join('; ');
+// ritmo do miolo do carrossel de venda (referências aprovadas pelo dono, 20/11/2026): três formas alternadas, nunca tudo igual.
+// foto = foto + frase; virada = frase inteira em marca-texto + apoio menor (a página da solução/produto); narrativa = só a frase.
+function ritmoVenda(slides) {
+  const mi = slides.map((s, i) => s?.modelo === 'venda-pagina' ? i : -1).filter(i => i >= 0); if (!mi.length) return;
+  for (const i of mi) { const d = slides[i].dados ||= {}; if (!d.forma) d.forma = d.foto ? 'foto' : String(d.texto || '').trim() ? 'virada' : 'narrativa'; }
+  if (!mi.some(i => slides[i].dados.forma === 'virada')) {   // toda venda tem a virada: a página que apresenta a solução
+    const sol = mi.filter(i => slides[i].dados.forma !== 'foto'), alvo = sol.find(i => /exist[ei]|por isso|solu[cç][aã]o|precisa saber|com o |com a /i.test(String(slides[i].dados.titulo || '') + ' ' + String(slides[i].dados.texto || ''))) ?? sol[Math.floor(sol.length * .66)];
+    if (alvo != null) slides[alvo].dados.forma = 'virada';
+  }
+  for (let k = 1; k < mi.length; k++) { const a = slides[mi[k - 1]].dados, b = slides[mi[k]].dados; if (mi[k] === mi[k - 1] + 1 && a.forma === b.forma && b.forma !== 'foto') b.forma = b.forma === 'virada' ? 'narrativa' : (String(b.texto || '').trim() ? 'virada' : b.forma); }
+}
 // carrossel de venda (template 15): toda página usa o fundo da seção História e venda da marca; fundo por IA ou outro que tenha entrado volta para ele
 function fundoVendaFixo(sp, c) {
   let mud = false; const n = (sp?.slides || []).length; let base = null;

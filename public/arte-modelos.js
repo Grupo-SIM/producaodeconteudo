@@ -1334,6 +1334,10 @@ COMPOR_EXTRA['venda-pagina'] = (d, ctx) => {
   const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880, LH = vdLh(d, 1.6), Z = vdZ(d);
   const foto = d.foto ? String(typeof d.foto === 'object' ? (d.foto.banco || d.foto.gen || '') : d.foto).replace(/^\s*banco\s*:\s*/i, '').trim() : '';
   const ap = String(d.texto || '').trim();
+  // forma da página (referências aprovadas): narrativa = só a frase, destaque no máximo no fim; virada = frase INTEIRA em marca-texto + apoio menor; foto = foto em cima + frase
+  const tiraAst = t => String(t || '').replace(/\*/g, '');
+  if (d.forma === 'virada') d = { ...d, titulo: '*' + tiraAst(d.titulo).replace(/\|/g, ' ').trim() + '*' };
+  else if (d.forma === 'narrativa') { const t = String(d.titulo || ''), m = t.match(/\*([^*]+)\*([.!?…]?)\s*$/); d = { ...d, titulo: m ? tiraAst(t.slice(0, m.index)) + '*' + m[1] + m[2] + '*' : tiraAst(t) }; }   // destaque só se for o fim da frase
   if (foto) {
     const tz = Math.round(vdCabe(d.titulo, tf, 54, 40, mw, 5) * Z), fh = 620, th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, y0 = 675 - (fh + 56 + th) / 2;
     const ehAsset = /^[a-z0-9-]{2,80}$/.test(foto) && foto.includes('-');   // arquivo da Biblioteca (ex.: prévia); o resto é termo de busca no banco de imagens
@@ -1360,7 +1364,7 @@ COMPOR_EXTRA['venda-fim'] = (d, ctx) => {
 };
 MODELOS.push(
   { id: 'venda-capa', nome: '15 · Venda: capa', uso: 'capa de carrossel', desc: 'Template aprovado do carrossel de venda: fundo de História e venda pela cor da marca, logo pequena no canto de cima à direita, frase grande na fonte da marca com o trecho-chave (*assim*) em marca-texto e a pílula "Arraste para o lado →". Ajustes do dono: entrelinha (1 a 2; menor = linhas mais juntas), escala (0,7 a 1,3 = tamanho do texto), logo ("direita" ou "esquerda").', campos: ['titulo', 'cta', 'entrelinha', 'escala', 'logo'] },
-  { id: 'venda-pagina', nome: '15 · Venda: página', uso: 'página interna', desc: 'Uma frase grande por página com o trecho-chave (*assim*) em marca-texto e, opcional, um apoio menor (texto). Com "foto": foto REAL de banco de imagens (Pexels, Unsplash, Pixabay; nunca gerada) com cantos arredondados em cima e a frase embaixo. Use foto em 2 ou 3 páginas, a cada 3 ou 4, mostrando exatamente o que a frase diz. Ajustes do dono: entrelinha, escala, logo.', campos: ['titulo', 'texto', 'foto', 'entrelinha', 'escala', 'logo'] },
+  { id: 'venda-pagina', nome: '15 · Venda: página', uso: 'página interna', desc: 'Forma (campo "forma"): "narrativa" (só a frase, destaque no máximo no fim), "virada" (frase inteira em marca-texto + apoio menor em "texto") ou "foto" (foto real em cima + frase). Alterne as formas, nunca duas iguais seguidas. Uma frase grande por página com o trecho-chave (*assim*) em marca-texto e, opcional, um apoio menor (texto). Com "foto": foto REAL de banco de imagens (Pexels, Unsplash, Pixabay; nunca gerada) com cantos arredondados em cima e a frase embaixo. Use foto em 2 ou 3 páginas, a cada 3 ou 4, mostrando exatamente o que a frase diz. Ajustes do dono: entrelinha, escala, logo.', campos: ['titulo', 'texto', 'foto', 'forma', 'entrelinha', 'escala', 'logo'] },
   { id: 'venda-fim', nome: '15 · Venda: fim', uso: 'última página', desc: 'Pergunta grande com marca-texto, uma linha com o preço/condição (texto) e "Clique no link da bio" com círculo e seta. Ajustes do dono: entrelinha, escala, logo.', campos: ['titulo', 'texto', 'cta', 'entrelinha', 'escala', 'logo'] });
 MODELO_IDS.push('venda-capa', 'venda-pagina', 'venda-fim');
 Object.assign(COMPOR, COMPOR_EXTRA);
