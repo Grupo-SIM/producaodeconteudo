@@ -3787,6 +3787,7 @@ async function garanteFontes() {
   })();
   try { return await fontesReparo; } finally { fontesReparo = null; }
 }
+const avisoArte = new Map();
 async function renderArte(id, { regen = false } = {}) {
   const cur = arteState.get(id); if (cur?.status === 'running') return;
   const c = getContent(id); if (!c) return;
@@ -3798,6 +3799,7 @@ async function renderArte(id, { regen = false } = {}) {
     { const fr = await garanteFontes().catch(() => null); if (fr?.falhas?.length) warn.push(`Faltam ${fr.falhas.length} arquivo(s) de fonte em public/fonts e não consegui baixar (sem internet?). O texto pode sair em Arial e fora do lugar: reinstale a pasta public/fonts.`); }
     if (!mo.playwright) { status = 'sem_motor'; throw new Error('O motor de imagem não está instalado (falta o playwright: npm i playwright && npx playwright install chromium). Veja o README.'); }
     const sp = JSON.parse(c.art_spec), [w, h] = ART_SIZE[c.format] || [1080, 1350];
+    if (fundoVendaFixo(sp, c)) setContent(id, { art_spec: JSON.stringify(sp) });   // carrossel de venda: fundo da História e venda em todas as páginas, nunca IA
     const findAsset = name => { const n = slugName(name); if (!n) return null; return one('SELECT * FROM assets WHERE name=? AND brand=? COLLATE NOCASE', n, c.brand || '') || one("SELECT * FROM assets WHERE name=? AND brand=''", n); };
     const aPath = a => path.join(ASSET_DIR, a.id + '.' + a.ext), IMG = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'];
     const previa = c.teste === 3;   // prévia de estilo no Estúdio: nunca gasta com IA
@@ -3892,7 +3894,7 @@ async function renderArte(id, { regen = false } = {}) {
     try { checksSalva('designer', id, checksLer(fs.readFileSync(path.join(dir, 'checks.json'), 'utf8')), 'art_checks'); } catch (e) { console.error('checagem da arte:', e.message); }
     if (credBanco.size) warn.push('Fotos de banco: ' + [...credBanco].join(' · '));
     setContent(id, { art_status: 'ok', art_note: warn.join('\n') });
-    { const fw = c.teste === 3 ? [] : warn.filter(w => /foto do banco|no banco|imagem|fundo/i.test(w)); if (fw.length) try { addChat('gerente', `Aviso na arte de “${clip(c.title || '', 60)}” (${c.brand || 'sem marca'}): ${fw.slice(0, 4).join(' ')} Confira na Mesa de revisão.`); } catch { /* sem chat */ } }   // o dono sabe na hora quando faltou foto ou fundo
+    { const jaAvisou = k => { const ch = id + '|' + k, t0 = avisoArte.get(ch) || 0; if (Date.now() - t0 < 6 * 3600e3) return true; avisoArte.set(ch, Date.now()); return false; }; const fw = c.teste === 3 ? [] : warn.filter(w => /foto do banco|no banco|imagem|fundo/i.test(w)).filter(w => !/STANDBY/.test(w) || !jaAvisou('standby')); if (fw.length) try { addChat('gerente', `Aviso na arte de “${clip(c.title || '', 60)}” (${c.brand || 'sem marca'}): ${fw.slice(0, 4).join(' ')} Confira na Mesa de revisão.`); } catch { /* sem chat */ } }   // o dono sabe na hora quando faltou foto ou fundo
     log('designer', `Arte renderizada em PNG (${arteFiles(id).length} ${arteFiles(id).length === 1 ? 'imagem' : 'imagens'}): "${c.title}"`, id);
   } catch (e) {
     status = status === 'ok' ? 'erro' : status;
@@ -5427,6 +5429,7 @@ function lerPedidoModelo(fb, sp) {
       if (/\b(tir|remov|sem\b|apag)/.test(t)) { ops.push({ tipo: 'sem_foto', paginas: pgs ? [...pgs] : null, texto: p }); ok = true; }
       else if (/\b(poe|po[eê]|coloc|bota|adicion|inclu|falt|cade|quero|usa|com\b|mais)|^fotos?$/.test(t) || /p[õo]e/.test(p)) { ops.push({ tipo: 'fotos', paginas: pgs ? [...pgs] : null, texto: p }); ok = true; }
     }
+    if (/\bfund[oa]s?\b/.test(t) && /mesmo|igual|padr[aã]o|dos outros|das outras|template|historia|granulad|tira.*(ia|liso)|liso/.test(t)) { ops.push({ tipo: 'fundo_template', paginas: null, texto: p }); ok = true; }
     if (pgs) pgAnt = [...pgs];
     if (!ok) resto.push(p);
   }
@@ -5483,6 +5486,8 @@ function ajusteDeModelo(c, fb, extras = [], termos = {}) {
     } else if (o.tipo === 'campo') {   // o Gerente traduziu uma parte do pedido em campo do modelo (só campos que o modelo tem)
       const i = o.pagina, m = modeloDe(ant.slides[i]); if (!m || !camposDoModelo(m).includes(o.campo) || ['titulo', 'texto', 'apoio', 'cta'].includes(o.campo) && !o.texto_ok) { naoDa.push(`${o.campo} da ${nomePg(i, n)}`); continue; }
       dados[i][o.campo] = o.valor; mex.add(i); feito.push(`${nomePg(i, n)}: ${o.campo} → ${typeof o.valor === 'object' ? JSON.stringify(o.valor) : o.valor}`); if (o.campo === 'foto' && o.valor) fotosPedidas.push(i);
+    } else if (o.tipo === 'fundo_template') {   // "mesmo fundo nos slides": todas as páginas com o fundo do template
+      const tmp = JSON.parse(JSON.stringify(ant)); if (fundoVendaFixo(tmp, c)) { tmp.slides.forEach((sl, i) => { if (JSON.stringify(sl.bg) !== JSON.stringify(ant.slides[i].bg)) { ant.slides[i] = { ...ant.slides[i], bg: sl.bg }; mex.add(i); } }); feito.push('mesmo fundo do template (História e venda) em todas as páginas'); } else feito.push('o fundo já é o mesmo em todas as páginas');
     } else if (o.tipo === 'sem_foto') {
       for (const i of alvo) if (dados[i].foto) { delete dados[i].foto; mex.add(i); feito.push(`tirei a foto da ${nomePg(i, n)}`); }
     } else if (o.tipo === 'fotos' && termos.__designer) { fotosPedidas.length = 0;   // quem escolhe página e foto é o Designer, depois (fotosDoDesigner)
@@ -5514,7 +5519,7 @@ function ajusteDeModelo(c, fb, extras = [], termos = {}) {
 // confere a arte nova contra o pedido e CORRIGE sozinha o que fugiu: fundo, efeitos e elementos a mais voltam como estavam.
 // Devolve a lista do que precisou corrigir (vazia = saiu certo de primeira).
 function confereAjuste(ant, novo, ops, fb, fotosPedidas = []) {
-  const t = semAcento(fb), pediuFundo = /\bfundo|background|degrad|sombra|escurec|clare/.test(t), pediuNovo = /acrescent|adicion|inclu|coloc|bota|p[oõ]e\b|poe\b|insir/.test(t), out = [];
+  const t = semAcento(fb), pediuFundo = /\bfund[oa]s?\b|background|degrad|sombra|escurec|clare/.test(t), pediuNovo = /acrescent|adicion|inclu|coloc|bota|p[oõ]e\b|poe\b|insir/.test(t), out = [];
   const sem = x => JSON.stringify(x ?? null);
   novo.slides.forEach((sl, i) => {
     const a = ant.slides[i]; if (!a || !sl) return;
@@ -5574,7 +5579,7 @@ function relatoAjuste(c, r) {
   if (r.semFoto?.length) L.push(`A foto não veio nas páginas ${r.semFoto.map(i => i + 1).join(', ')}: ${(r.note.match(/não consegui usar a foto do banco[^\n]*/) || ['nenhum banco respondeu'])[0]}. Mande "testar bancos de imagem" aqui no chat que eu mostro qual banco falhou e por quê.`);
   const corr = r.problemas.filter(p => !/^ATENÇÃO/.test(p)), aten = r.problemas.filter(p => /^ATENÇÃO/.test(p));
   if (corr.length) L.push(`Conferi o resultado e corrigi sozinho: ${corr.join('; ')}.`);
-  else L.push('Conferi o resultado: fundo, textos e o resto ficaram exatamente como estavam.');
+  else L.push('Conferi o resultado: o que você não pediu ficou exatamente como estava.');
   if (aten.length) L.push(aten.map(a => a.replace(/^ATENÇÃO: /, '')).join('; ') + '.');
   L.push(r.render === 'ok' ? 'Está na Mesa de revisão.' : `O render não terminou (${clip(r.note, 160)}).`);
   return L.join('\n\n');
@@ -5737,6 +5742,16 @@ async function fotosDoDesigner(c, { quer = 0 } = {}) {
   return { feitas, falhas };
 }
 const textoFotosDesigner = r => [r.feitas.length ? `fotos escolhidas pelo Designer: ${r.feitas.map(f => `página ${f.i + 1} mostra ${f.cena} (“${clip(f.trecho, 60)}”)`).join('; ')}` : '', r.falhas.length ? `sem foto boa no banco para ${r.falhas.map(f => `a página ${f.i + 1} (“${clip(f.trecho, 50)}”)`).join(', ')}: preferi não pôr foto que não tem a ver` : ''].filter(Boolean).join('; ');
+// carrossel de venda (template 15): toda página usa o fundo da seção História e venda da marca; fundo por IA ou outro que tenha entrado volta para ele
+function fundoVendaFixo(sp, c) {
+  let mud = false; const n = (sp?.slides || []).length; let base = null;
+  (sp?.slides || []).forEach((sl, i) => {
+    const m = sl?.modelo || sl?.modeloOrigem || ''; if (!/^venda-/.test(m) || /^tpl-historia-/.test(sl.bg?.asset || '')) return;
+    base ||= ctxMarca(c.brand, c.format, sp); const ns = comporSlide({ modelo: m, dados: sl.dados || {} }, { ...base, i, total: n }); if (!ns?.bg) return;
+    sl.bg = ns.bg; for (const k of ['fx', 'shade', 'shade_dir']) delete sl[k]; if (ns.fx) sl.fx = ns.fx; mud = true;
+  });
+  return mud;
+}
 // junta a arte nova com a anterior deixando mudar SÓ os elementos pedidos
 function soElementos(ant, novo, els) {
   const out = JSON.parse(JSON.stringify(ant)), K = { texto: 'texts', imagem: 'items', forma: 'shapes' };
