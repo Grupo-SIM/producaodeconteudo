@@ -652,7 +652,7 @@ ${MOTION_V2_AVOID}` },
 };
 // Onde cada agente se encaixa no fluxo do sistema (vai em todo pedido; não fica salvo no banco, então sempre reflete o fluxo atual)
 // jeito de falar do Gerente (dono, 20/11/2026): igual ao Claude na conversa com o dono, um gerente de verdade e não um robô
-const GERENTE_JEITO = `COMO VOCÊ CONVERSA COM O DONO: fale como um gerente de verdade que conhece o sistema por dentro, no mesmo jeito do Claude na conversa com ele. Português do Brasil natural, frases completas, tom de colega experiente, direto e seguro, sem formalidade e sem jargão técnico (nada de nomes de código, tabelas ou campos). Comece pela resposta, não por "Entendi" ou repetindo a pergunta. Quando ele perguntar "por que", explique a causa real com o que você vê nos dados, sem inventar; se não souber, diga que não sabe e o que vai fazer para descobrir. Quando algo deu errado, assuma, diga o que aconteceu, o que já foi feito e o que falta. Quando ele mandar print, diga o que viu na imagem antes de responder. Termine com o próximo passo concreto (o que você vai fazer ou o que ele precisa decidir), sem lista de opções que você não recomenda. Respostas curtas quando o assunto é simples; mais completas quando ele pede explicação. Sem emoji, sem "Prezado", sem "Fico à disposição".`;
+const GERENTE_JEITO = `COMO VOCÊ CONVERSA COM O DONO: fale como um gerente de verdade que conhece o sistema por dentro, no mesmo jeito do Claude na conversa com ele. Português do Brasil natural, frases completas, tom de colega experiente, direto e seguro, sem formalidade e sem jargão técnico (nada de nomes de código, tabelas ou campos). Comece pela resposta, não por "Entendi" ou repetindo a pergunta. Quando ele perguntar "por que", explique a causa real com o que você vê nos dados, sem inventar; se não souber, diga que não sabe e o que vai fazer para descobrir. Quando algo deu errado, assuma, diga o que aconteceu, o que já foi feito e o que falta. Quando ele mandar print, diga o que viu na imagem antes de responder. Termine com o próximo passo concreto (o que você vai fazer ou o que ele precisa decidir), sem lista de opções que você não recomenda. Respostas curtas quando o assunto é simples; mais completas quando ele pede explicação. Sem emoji, sem "Prezado", sem "Fico à disposição". FORMATO (é um chat tipo WhatsApp): parágrafos curtos de 1 a 3 frases separados por linha em branco; quando houver vários itens (o que você fez, causas, passos), use lista com "- " (ou "1." para passos em ordem), um item por linha; destaque o essencial com **negrito**, com moderação; nunca um bloco de texto corrido amontoado.`;
 const AGENT_STAGE = {
   roteirista: 'Sua etapa: escrever o roteiro. Você recebe a pauta/briefing, a marca, o produto (se houver) e, em reescritas, os ajustes do Revisor ou do dono. Você entrega o roteiro e a legenda, que vão para a revisão do Revisor.',
   designer: 'Sua etapa: direção de arte, só das peças estáticas (carrossel, feed, stories); peças de vídeo não passam por você, são do Editor. Você recebe o roteiro aprovado, a identidade visual e o catálogo de arquivos da marca. Você entrega a direção de arte executável que o dono usa para montar as peças.',
@@ -5568,7 +5568,7 @@ async function executaAjusteModelo(c, fb, extras = []) {
 }
 function relatoAjuste(c, r) {
   const L = [];
-  L.push(`Ajustei “${clip(c.title || '', 60)}”: ${r.feito.join('; ')}.`);
+  L.push(`Ajustei **${clip(c.title || '', 60)}**:\n` + r.feito.map(f => '- ' + f.charAt(0).toUpperCase() + f.slice(1)).join('\n'));
   if (r.naoDa.length) L.push(`Não deu para mexer em: ${r.naoDa.join(', ')} (o template não tem esse ajuste).`);
   if (r.resto.length) L.push(`Esta parte do pedido eu não consegui transformar em mudança: “${r.resto.join('”, “')}”. Me diga com outras palavras (ex.: "título da página 3 maior").`);
   if (r.semFoto?.length) L.push(`A foto não veio nas páginas ${r.semFoto.map(i => i + 1).join(', ')}: ${(r.note.match(/não consegui usar a foto do banco[^\n]*/) || ['nenhum banco respondeu'])[0]}. Mande "testar bancos de imagem" aqui no chat que eu mostro qual banco falhou e por quê.`);
@@ -5577,7 +5577,7 @@ function relatoAjuste(c, r) {
   else L.push('Conferi o resultado: fundo, textos e o resto ficaram exatamente como estavam.');
   if (aten.length) L.push(aten.map(a => a.replace(/^ATENÇÃO: /, '')).join('; ') + '.');
   L.push(r.render === 'ok' ? 'Está na Mesa de revisão.' : `O render não terminou (${clip(r.note, 160)}).`);
-  return L.join(' ');
+  return L.join('\n\n');
 }
 // ───────── Bancos de imagem e fal.ai: teste visível em produção ─────────
 async function testaBancos(termo = 'office') {
@@ -5592,20 +5592,20 @@ async function testaBancos(termo = 'office') {
       catch (e) { out.push({ ...linha, ok: false, motivo: `achou fotos, mas o download falhou: ${e.message}` }); }
     } catch (e) {
       const st = +(String(e.message).match(/\b(\d{3})\b/) || [])[1];
-      out.push({ ...linha, ok: false, ms: Date.now() - t0, motivo: (st === 401 || st === 403 || (st === 400 && /key/i.test(e.message))) && b.chave ? `chave recusada (${st}): a ${b.chave} está errada, vencida ou é de outro tipo (Unsplash usa a "Access Key", não a "Secret key"). Resposta do banco: ${e.message}` : st === 429 ? 'limite de buscas da conta atingido (429); volta sozinho mais tarde' : /timeout|aborted/i.test(e.message) ? 'não respondeu em 15 s (rede do servidor ou banco fora do ar)' : /fetch failed|ENOTFOUND|ECONN/i.test(e.message + (e.cause?.code || '')) ? `o servidor não conseguiu conectar (${e.cause?.code || e.message})` : e.message });
+      out.push({ ...linha, ok: false, ms: Date.now() - t0, motivo: (st === 401 || st === 403 || (st === 400 && /key/i.test(e.message))) && b.chave ? `chave recusada (${st}): a ${b.chave} está errada ou vencida${b.id === 'unsplash' ? ' (use a "Access Key", não a "Secret key")' : ''}. O banco disse: ${e.message.replace(/^\w+ \d{3} /, '').slice(0, 90)}` : st === 429 ? 'limite de buscas da conta atingido (429); volta sozinho mais tarde' : /timeout|aborted/i.test(e.message) ? 'não respondeu em 15 s (rede do servidor ou banco fora do ar)' : /fetch failed|ENOTFOUND|ECONN/i.test(e.message + (e.cause?.code || '')) ? `o servidor não conseguiu conectar (${e.cause?.code || e.message})` : e.message });
     }
   }
   return out;
 }
-const textoTesteBancos = (L, termo) => `Testei os bancos de imagem agora, buscando “${termo}”:\n` + L.map(x => `${x.ok ? '✓' : '✖'} ${x.banco}: ${x.ok ? x.motivo : x.motivo}${x.variavel !== '(sem chave)' ? ` · ${x.variavel} ${x.chave}` : ''}${x.ms ? ` · ${x.ms} ms` : ''}`).join('\n') + `\n${L.some(x => x.ok) ? `As fotos saem por: ${L.filter(x => x.ok).map(x => x.banco).join(', ')}.` : 'Nenhum banco respondeu: as páginas com foto vão sair sem foto até isso ser resolvido.'}`;
+const textoTesteBancos = (L, termo) => `Testei os bancos de imagem agora, buscando **${termo}**.\n\n` + L.map(x => `${x.ok ? '✓' : '✖'} **${x.banco}**: ${x.motivo}${!x.ok && x.variavel !== '(sem chave)' ? ` (${x.variavel} ${x.chave})` : ''}`).join('\n') + `\n\n${L.some(x => x.ok) ? `As fotos saem por **${L.filter(x => x.ok).map(x => x.banco).join(', ')}**.${L.some(x => !x.ok) ? ' Quem falhou fica de fora até ser resolvido, sem parar o trabalho.' : ''}` : 'Nenhum banco respondeu: as páginas com foto vão sair sem foto até isso ser resolvido.'}`;
 // fal.ai: o que está acontecendo, em linguagem de gente
 function falStatus() {
   const s = settings(), info = s.fal_pausa_info || '';
-  if (s.fal_pausa === '1') return { ok: false, motivo: 'standby', texto: `O fal.ai está em STANDBY: é um interruptor de economia em Configurações › Vídeo e voz${info ? ` (ligado ${info})` : ''}. Não é falta de saldo nem chave errada: enquanto ele estiver ligado, o sistema não faz NENHUMA chamada paga ao fal.ai (imagem por IA, recorte de fundo, objeto 3D) e nada é cobrado. O que muda: fundo "gerado por IA" sai liso na cor da marca e recorte de foto não acontece. Fotos de banco (Pexels, Unsplash, Pixabay) e fundos da Biblioteca NÃO dependem do fal.ai. Para voltar: desligue o standby em Configurações › Vídeo e voz (ou me peça "desliga o standby do fal.ai").` };
+  if (s.fal_pausa === '1') return { ok: false, motivo: 'standby', texto: `O fal.ai está em STANDBY: é um interruptor de economia em Configurações › Vídeo e voz${info ? ` (ligado ${info})` : ''}. Não é falta de saldo nem chave errada: enquanto ele estiver ligado, o sistema não faz NENHUMA chamada paga ao fal.ai (imagem por IA, recorte de fundo, objeto 3D) e nada é cobrado.\n\nO que muda: fundo "gerado por IA" sai liso na cor da marca e recorte de foto não acontece. Fotos de banco (Pexels, Unsplash, Pixabay) e fundos da Biblioteca NÃO dependem do fal.ai.\n\nPara voltar: desligue o standby em Configurações › Vídeo e voz (ou me peça "desliga o standby do fal.ai").` };
   if (!process.env.FAL_KEY) return { ok: false, motivo: 'sem_chave', texto: 'Não há FAL_KEY no container: imagem por IA, recorte e 3D ficam desligados. Cadastre a FAL_KEY no Komodo e faça Redeploy.' };
   const e = s.fal_ultimo_erro || '';
   if (e && /40[13]|balance|exhaust|locked|saldo/i.test(e)) return { ok: false, motivo: 'saldo_ou_chave', texto: `A última chamada ao fal.ai foi recusada: ${e}. ${/balance|exhaust|locked/i.test(e) ? 'É falta de saldo: recarregue em fal.ai › Billing.' : 'A chave foi recusada: gere outra em fal.ai › Keys e troque a FAL_KEY no Komodo.'}` };
-  return { ok: true, motivo: 'ok', texto: `Agora o fal.ai NÃO está em standby: está ligado e com chave${info ? ` (o standby foi mexido ${info})` : ''}. "Standby" é o interruptor de economia em Configurações › Vídeo e voz: ligado, o sistema não faz nenhuma chamada paga ao fal.ai (imagem por IA, recorte, objeto 3D) e o fundo "gerado por IA" sai liso na cor da marca. Fotos de banco e fundos da Biblioteca não dependem dele.${e ? ` Último erro do fal.ai registrado: ${e}.` : ''}` };
+  return { ok: true, motivo: 'ok', texto: `Agora o fal.ai NÃO está em standby: está ligado e com chave${info ? ` (o standby foi mexido ${info})` : ''}.\n\n"Standby" é o interruptor de economia em Configurações › Vídeo e voz: ligado, o sistema não faz nenhuma chamada paga ao fal.ai (imagem por IA, recorte, objeto 3D) e o fundo "gerado por IA" sai liso na cor da marca. Fotos de banco e fundos da Biblioteca não dependem dele.${e ? ` Último erro do fal.ai registrado: ${e}.` : ''}` };
 }
 // ───────── Gerente com ferramentas (dono, 20/11/2026): conversa como o Claude Code, investiga, age, confere e só então responde ─────────
 // Protocolo em texto (funciona pela API e pela assinatura): o Gerente pede uma ferramenta com um bloco ```ferramenta {"nome":..,"args":{..}}```,
@@ -7061,7 +7061,7 @@ async function baixaImagemSegura(u, max = 20e6, referer = '') {
     if (url.protocol !== 'https:') throw fail(400, 'Só imagens em https');
     let addr; try { addr = (await dns.promises.lookup(url.hostname)).address; } catch { throw fail(400, 'Não consegui encontrar o endereço da imagem'); }
     if (ipPrivado(addr)) throw fail(400, 'Endereço não permitido');
-    r = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(40000), headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36', accept: 'image/avif,image/webp,image/*,*/*;q=0.8', ...(referer ? { referer } : {}) } });
+    r = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(40000), headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36', accept: 'image/jpeg,image/png,image/webp;q=0.9,*/*;q=0.5', ...(referer ? { referer } : {}) } });
     if (r.status >= 300 && r.status < 400 && r.headers.get('location')) { url = new URL(r.headers.get('location'), url); continue; }
     break;
   }

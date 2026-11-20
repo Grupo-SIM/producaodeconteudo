@@ -110,6 +110,7 @@ table.lst tr:hover td{background:#141416;cursor:pointer}
 .ch .x{margin-left:auto;display:none;font-size:20px;color:var(--tx3)}
 .msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.45}
 .m{padding:9px 12px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-wrap:break-word}
+.m.g{white-space:normal;line-height:1.5}.m.g p{margin:0 0 9px;text-align:justify;hyphens:auto}.m.g p:last-child,.m.g ul:last-child{margin-bottom:0}.m.g ul{margin:0 0 9px;padding-left:4px;list-style:none}.m.g li{margin:0 0 5px;padding-left:16px;position:relative;text-align:left}.m.g li::before{content:'•';position:absolute;left:2px;color:var(--tx3)}.m.g li.ok::before{content:'✓';color:#7fd79b}.m.g li.no::before{content:'✖';color:#ff9b9b}.m.g li.n::before{content:attr(data-n);color:var(--tx3)}.m.g b{font-weight:600}.m.g code{font-size:12px;background:#0006;padding:1px 4px;border-radius:4px}
 .m.u{background:var(--tx);color:var(--bg);align-self:flex-end}
 .m.g{background:var(--field);border:1px solid var(--line2)}
 .m small{display:block;color:#c9b37f;margin-top:6px;font-size:11.5px}
@@ -1289,12 +1290,25 @@ async function loadChat() {
   if (sig === S.chatSig) return; S.chatSig = sig; S.chat = d.msgs;
   if (S.chatDesde == null) S.chatDesde = d.msgs.at(-1)?.id || 0;   // a conversa começa zerada a cada vez que o sistema abre (o histórico continua no servidor)
   const vis = S.chatTudo ? d.msgs : d.msgs.filter(m => m.id > S.chatDesde), antigas = d.msgs.length - vis.length;
-  $('#msgs').innerHTML = (antigas ? `<button class="vermais" onclick="S.chatTudo=true;S.chatSig='';loadChat()">ver conversa anterior (${antigas})</button>` : '') + vis.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${(m.imgs || []).length ? `<div class="mimgs">${m.imgs.map(u => `<a href="${u}" target="_blank"><img src="${u}"></a>`).join('')}</div>` : ''}${esc(textoChat(m))}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || (antigas ? '' : '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>');
+  $('#msgs').innerHTML = (antigas ? `<button class="vermais" onclick="S.chatTudo=true;S.chatSig='';loadChat()">ver conversa anterior (${antigas})</button>` : '') + vis.map(m => `<div class="m ${m.role === 'user' ? 'u' : 'g'}">${(m.imgs || []).length ? `<div class="mimgs">${m.imgs.map(u => `<a href="${u}" target="_blank"><img src="${u}"></a>`).join('')}</div>` : ''}${m.role === 'user' ? esc(textoChat(m)) : fmtChat(textoChat(m))}${(m.actions || []).length ? `<div class="acts">${m.actions.map(a => a.tipo === 'desfazer_regra' ? `<button class="btn sm" onclick="desfazRegra(${a.regra},this)">Desfazer</button>` : a.texto ? `<small>${a.ok === false ? '✖' : '✓'} ${esc(a.texto)}</small>` : '').join('')}</div>` : ''}</div>`).join('') || (antigas ? '' : '<p class="muted small">Pergunte qualquer coisa ao gerente.</p>');
   $('#msgs').scrollTop = 1e9;
   const ult = d.msgs.at(-1)?.id || 0, novas = d.msgs.filter(m => m.role !== 'user' && m.id > S.lidas).length;
   if ($('#chat').classList.contains('open') || !isMobile()) { S.lidas = ult; store.set('chatLidas', ult); $('#fabcnt').textContent = ''; } else $('#fabcnt').textContent = novas || '';
 }
 // o gerente às vezes devolve as ordens em JSON: na tela vira uma frase curta (as ações aparecem embaixo)
+// resposta do Gerente organizada como conversa de WhatsApp: parágrafos curtos justificados, listas (-, •, ✓, ✖, 1.), **negrito** e `código`
+function fmtChat(t) {
+  const inl = s => esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>');
+  const out = []; let ul = null, par = [];
+  const fechaP = () => { if (par.length) { out.push('<p>' + par.map(inl).join('<br>') + '</p>'); par = []; } }, fechaU = () => { if (ul) { out.push('<ul>' + ul.join('') + '</ul>'); ul = null; } };
+  for (const l0 of String(t || '').split('\n')) {
+    const l = l0.trim(); if (!l) { fechaP(); fechaU(); continue; }
+    const m = l.match(/^(?:([-•*])\s+|([✓✔])\s*|([✖✗❌])\s*|(\d{1,2})[.)]\s+)(.*)$/);
+    if (m) { fechaP(); (ul ||= []).push(`<li class="${m[2] ? 'ok' : m[3] ? 'no' : m[4] ? 'n' : ''}"${m[4] ? ` data-n="${m[4]}."` : ''}>${inl(m[5])}</li>`); }
+    else { fechaU(); par.push(l); }
+  }
+  fechaP(); fechaU(); return out.join('');
+}
 function textoChat(m) {
   const t = String(m.text || '').trim(), sem = t.replace(/```json[\s\S]*?```/g, '').trim();
   if (/^[\[{]/.test(sem)) { try { const j = JSON.parse(sem), n = [].concat(j).length; return n ? `Pronto, executei ${n} ação(ões).` : 'Pronto.'; } catch { const fora = sem.replace(/\[[\s\S]*\]|\{[\s\S]*\}/g, '').trim(); return fora || 'Pronto, executei o pedido.'; } }
