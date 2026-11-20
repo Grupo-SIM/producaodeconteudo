@@ -1344,7 +1344,7 @@ COMPOR_EXTRA['venda-pagina'] = (d, ctx) => {
     s.items.push({ ...(ehAsset ? { asset: foto } : { banco: foto }), x: .5, y: e.Y(y0 + fh / 2), size: e.P(880), h: e.Y(fh), radius: 28 / 1080, fotoCard: true });
     vdFrase(s, e, d.titulo, tf, tz, x, y0 + fh + 56, mw, C, LH);
   } else {
-    const tz = Math.round(vdCabe(d.titulo, tf, 64, 44, mw, 7) * Z), lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.45 : 0, y0 = 675 - (lt + (ap ? 60 + la : 0)) / 2;
+    const tz = Math.round((() => { const apH = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.45 + 60 : 0; let z = vdCabe(d.titulo, tf, 64, 40, mw, 5); while (z > 40 && fgAst(erQuebra(String(d.titulo || ''), tf, z, mw)).length * z * LH + apH > 860) z -= 2; return z; })() * Z), lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.45 : 0, y0 = 675 - (lt + (ap ? 60 + la : 0)) / 2;
     vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C, LH);
     if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 60, mw, C, LH);
   }

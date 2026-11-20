@@ -695,7 +695,7 @@ const KNOWLEDGE_SEED = [{
 const SETTINGS_DEFAULTS = {
   model: DEFAULT_MODEL, autopilot: '0', per_day: '3', start_hour: '7', tz: 'America/Rio_Branco', themes: '',
   score_min: '7.5', copy_review: '1', max_revisions: '2', max_jobs_day: '60', concurrency: '4', web_search: '0',
-  webhook_url: '', report_hour: '20', auto_produce: '1', approve_script: '0', night_hour: '22', art_gen: '1', fal_pausa: '0', fal_pausa_info: '', fal_ultimo_erro: '', arte_do_roteiro: 'chat', visual_check: '1', max_art_gen: '8', max_pose_gen: '0', q_feed: '1', q_carrossel: '1', q_stories: '0', q_video_vertical: '1', q_video_horizontal: '0', quota_days: '0,1,2,3,4,5,6', carousel_slides: '7', stories_slides: '5', video_secs: '30', img_budget_day: '1', pacote_ia: '0', kb_budget: '60000', auto_render: '1', max_gen_objects: '5', img_qualidade: 'alta', voz_provider: 'auto', brain_auto: '0', brain_daily: '1', brain_hour: '21', 
+  webhook_url: '', report_hour: '20', auto_produce: '1', approve_script: '0', night_hour: '22', art_gen: '1', fal_pausa: '0', fal_pausa_info: '', venda_fotos_banco: '0', fal_ultimo_erro: '', arte_do_roteiro: 'chat', visual_check: '1', max_art_gen: '8', max_pose_gen: '0', q_feed: '1', q_carrossel: '1', q_stories: '0', q_video_vertical: '1', q_video_horizontal: '0', quota_days: '0,1,2,3,4,5,6', carousel_slides: '7', stories_slides: '5', video_secs: '30', img_budget_day: '1', pacote_ia: '0', kb_budget: '60000', auto_render: '1', max_gen_objects: '5', img_qualidade: 'alta', voz_provider: 'auto', brain_auto: '0', brain_daily: '1', brain_hour: '21', 
 };
 
 if (!one('SELECT COUNT(*) c FROM agents').c) {
@@ -2582,7 +2582,7 @@ function compoeModelos(found, format, brand, c = null) {
   // carrossel de venda (15): 2 ou 3 páginas com foto REAL de banco são obrigatórias; se o Designer não pediu, o sistema escolhe as páginas e busca pela frase, e o Gerente avisa o dono
   if (!found.previa && Array.isArray(found.slides) && (found.template === 'venda-ebook' || found.estilo === 'venda-ebook' || found.slides.some(s => s?.modelo === 'venda-pagina'))) {
     const pg = found.slides.map((s, i) => s?.modelo === 'venda-pagina' || (i > 0 && i < found.slides.length - 1 && !s?.modelo) ? i : -1).filter(i => i >= 0), com = pg.filter(i => found.slides[i]?.dados?.foto), quer = found.slides.length >= 9 ? 3 : pg.length >= 3 ? 2 : 0;
-    if (com.length < quer) {
+    if (com.length < quer && settings().venda_fotos_banco === '1') {   // dono, 20/11/2026: carrossel de venda sai SEM foto de banco por padrão (foto só da Biblioteca da marca ou quando o dono pede)
       const livres = pg.filter(i => !found.slides[i]?.dados?.foto && !String(found.slides[i]?.dados?.texto || '').trim() && found.slides[i]?.dados?.forma !== 'virada'), alvo = [], passo = livres.length / (quer - com.length + 1);
       for (const i of [...livres.slice(1), livres[0]].filter(x => x != null)) if (alvo.length < quer - com.length && ![...alvo, ...com].some(a => Math.abs(a - i) <= 1)) alvo.push(i);   // espalhadas, nunca em páginas vizinhas (sem IA; com IA quem escolhe é o Designer)
       alvo.sort((x, y) => x - y);
@@ -6261,7 +6261,7 @@ const HANDLERS = {
     setContent(c.id, { art: sp ? r.text.replace(sp.raw, '').trim() : r.text, art_spec: sp ? JSON.stringify(sp.spec) : '', art_spec_base: sp ? JSON.stringify(sp.spec) : '', art_status: '', art_note: '' });
     log('designer', `Direção de arte pronta: "${c.title}"`, c.id);
     if (sp) {
-      if (c.format === 'carrossel' && !(input.from === 'dono' && input.feedback) && sp.spec.slides.some(x => x.modelo === 'venda-pagina')) { try { const fd = await fotosDoDesigner(getContent(c.id)); if (fd) log('designer', `"${c.title}": ${textoFotosDesigner(fd)}`, c.id); } catch (e) { console.error('fotos do designer:', e.message); } }   // foto: o Designer escolhe página e imagem olhando as opções (o copy não decide)
+      if (c.format === 'carrossel' && settings().venda_fotos_banco === '1' && !(input.from === 'dono' && input.feedback) && sp.spec.slides.some(x => x.modelo === 'venda-pagina')) { try { const fd = await fotosDoDesigner(getContent(c.id)); if (fd) log('designer', `"${c.title}": ${textoFotosDesigner(fd)}`, c.id); } catch (e) { console.error('fotos do designer:', e.message); } }   // foto: o Designer escolhe página e imagem olhando as opções (o copy não decide)
       await renderArte(c.id);   // gera as imagens aqui, antes de a peça ir para o Revisor
       const treino = c.created_by === 'treino_designer';   // treino: uma chamada só, sem inspeção nem refazer automático (o dono corrige)
       if (!treino && !MANUAL && !als.getStore()?.dry && visualLigado() && getContent(c.id)?.art_status === 'ok') { try { await inspecionaArte(c.id); } catch (e) { console.error('inspeção visual da arte:', e.message); } }
