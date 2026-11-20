@@ -1304,8 +1304,8 @@ function vdBase(ctx) {
 const vdFT = ctx => { const k = fMarca(ctx, 't') || 'lora'; return { k, w: pesoDe(k, 700), ls: 0 }; };
 const vdFX = ctx => { const k = fMarca(ctx, 'x') && fMarca(ctx, 'x') !== fMarca(ctx, 't') ? fMarca(ctx, 'x') : 'inter'; return { k, w: pesoDe(k, 400), ls: 0 }; };
 // logo pequena no canto de cima e número da página embaixo, iguais em todas as páginas
-function vdMoldura(s, ctx, e, C) {
-  const lg = ctx.avatar || ctx.logo; if (lg) s.items.push({ asset: lg, x: e.X(980 - 36), y: e.Y(52 + 36), size: e.P(72), moldura: true });   // canto de cima à direita (dono, 19/11/2026)
+function vdMoldura(s, ctx, e, C, d = {}) {
+  const lg = ctx.avatar || ctx.logo; if (lg) s.items.push({ asset: lg, x: e.X(/esq/i.test(String(d.logo || '')) ? 100 + 36 : 980 - 36), y: e.Y(52 + 36), size: e.P(72), moldura: true });   // canto de cima à direita (dono, 19/11/2026)
   if ((ctx.total || 0) > 1) s.texts.push({ role: 'body', value: `${(ctx.i || 0) + 1}/${ctx.total}`, x: e.X(980), y: e.Y(1294), align: 'right', size: e.P(26), font: 'inter', weight: 600, ls: 0, color: C.pag, nowrap: true, shadow: false });
 }
 // frase com marca-texto: *trecho* sai em faixa (cor de destaque) com a letra clara (o navegador desenha a faixa na largura real da fonte);
@@ -1316,50 +1316,52 @@ function vdFrase(s, e, txt, f, size, x, yTop, maxW, C, lh = 1.6) {
   return h;
 }
 const vdApoio = (s, e, txt, f, size, x, yTop, maxW, C) => { const ls = quebra(limpa(txt), f, size, maxW), L = size * 1.45; ls.forEach((l, i) => s.texts.push({ role: 'body', value: l, x: e.X(x), y: e.Y(yTop + L * i + L / 2), align: 'left', size: e.P(size), font: f.k, weight: f.w, lh: 1, color: C.apoio, nowrap: true, shadow: false })); return ls.length * L; };
+// campos de ajuste (o Designer usa quando o dono pede): entrelinha (1 a 2), escala (0,7 a 1,3) e logo (direita/esquerda)
+const vdLh = (d, pad) => { const v = +d.entrelinha; return v >= 1 && v <= 2.2 ? v : pad; }, vdZ = d => { const v = +d.escala; return v >= .6 && v <= 1.4 ? v : 1; };
 const vdCabe = (txt, f, max, min, maxW, maxL) => { let z = max; while (z > min && fgAst(erQuebra(String(txt || ''), f, z, maxW)).length > maxL) z -= 2; return z; };
 COMPOR_EXTRA['venda-capa'] = (d, ctx) => {
-  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), x = 100, mw = 880, tz = vdCabe(d.titulo, tf, 100, 64, mw, 6);
-  const th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.32, ph = 64, cta = String(d.cta || 'Arraste para o lado →'), cf = { k: 'inter', w: 600, ls: 0 }, cw = largura(cta, cf, 30) + 60;
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), x = 100, mw = 880, LH = vdLh(d, 1.32), tz = Math.round(vdCabe(d.titulo, tf, 100, 64, mw, 6) * vdZ(d));
+  const th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, ph = 64, cta = String(d.cta || 'Arraste para o lado →'), cf = { k: 'inter', w: 600, ls: 0 }, cw = largura(cta, cf, 30) + 60;
   const y0 = 675 - (th + 70 + ph) / 2;
-  vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C, 1.32);
+  vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C, LH);
   const py = y0 + th + 70;
   s.shapes.push({ kind: 'pill', x: e.X(x + cw / 2), y: e.Y(py + ph / 2), w: e.X(cw), h: e.Y(ph), color: 'transparent', stroke: C.borda, stroke_w: 2 / 1080 });
   s.texts.push({ role: 'body', value: cta, x: e.X(x + cw / 2), y: e.Y(py + ph / 2), align: 'center', size: e.P(30), font: 'inter', weight: 600, ls: 0, caixa: 'normal', color: C.tinta, nowrap: true, shadow: false });
-  vdMoldura(s, ctx, e, C); return s;
+  vdMoldura(s, ctx, e, C, d); return s;
 };
 // miolo: frase grande (+ apoio menor). Com "foto": foto REAL de banco (cantos arredondados, ~60% da página) em cima e a frase embaixo
 COMPOR_EXTRA['venda-pagina'] = (d, ctx) => {
-  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880;
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880, LH = vdLh(d, 1.6), Z = vdZ(d);
   const foto = d.foto ? String(typeof d.foto === 'object' ? (d.foto.banco || d.foto.gen || '') : d.foto).replace(/^\s*banco\s*:\s*/i, '').trim() : '';
   const ap = String(d.texto || '').trim();
   if (foto) {
-    const tz = vdCabe(d.titulo, tf, 54, 40, mw, 5), fh = 620, th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, y0 = 675 - (fh + 56 + th) / 2;
+    const tz = Math.round(vdCabe(d.titulo, tf, 54, 40, mw, 5) * Z), fh = 620, th = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, y0 = 675 - (fh + 56 + th) / 2;
     const ehAsset = /^[a-z0-9-]{2,80}$/.test(foto) && foto.includes('-');   // arquivo da Biblioteca (ex.: prévia); o resto é termo de busca no banco de imagens
     s.items.push({ ...(ehAsset ? { asset: foto } : { banco: foto }), x: .5, y: e.Y(y0 + fh / 2), size: e.P(880), h: e.Y(fh), radius: 28 / 1080, fotoCard: true });
-    vdFrase(s, e, d.titulo, tf, tz, x, y0 + fh + 56, mw, C);
+    vdFrase(s, e, d.titulo, tf, tz, x, y0 + fh + 56, mw, C, LH);
   } else {
-    const tz = vdCabe(d.titulo, tf, 64, 44, mw, 7), lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.45 : 0, y0 = 675 - (lt + (ap ? 60 + la : 0)) / 2;
-    vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C);
-    if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 60, mw, C);
+    const tz = Math.round(vdCabe(d.titulo, tf, 64, 44, mw, 7) * Z), lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.45 : 0, y0 = 675 - (lt + (ap ? 60 + la : 0)) / 2;
+    vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C, LH);
+    if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 60, mw, C, LH);
   }
-  vdMoldura(s, ctx, e, C); return s;
+  vdMoldura(s, ctx, e, C, d); return s;
 };
 // fim (versão B aprovada): pergunta grande com marca-texto, uma linha com preço/condição e "Clique no link da bio" com círculo e seta
 COMPOR_EXTRA['venda-fim'] = (d, ctx) => {
-  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880, tz = vdCabe(d.titulo, tf, 60, 44, mw, 5);
-  const lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * 1.6, ap = String(d.texto || '').trim(), la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.5 : 0, cta = String(d.cta || 'Clique no link da bio'), y0 = 675 - (lt + (ap ? 50 + la : 0) + 56 + 84) / 2;
-  vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C);
-  if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 50, mw, C);
+  const e = erEsc(ctx, ctx.W, ctx.H), { s, C } = vdBase(ctx), tf = vdFT(ctx), af = vdFX(ctx), x = 100, mw = 880, LH = vdLh(d, 1.6), tz = Math.round(vdCabe(d.titulo, tf, 60, 44, mw, 5) * vdZ(d));
+  const lt = fgAst(erQuebra(String(d.titulo || ''), tf, tz, mw)).length * tz * LH, ap = String(d.texto || '').trim(), la = ap ? quebra(limpa(ap), af, 40, mw).length * 40 * 1.5 : 0, cta = String(d.cta || 'Clique no link da bio'), y0 = 675 - (lt + (ap ? 50 + la : 0) + 56 + 84) / 2;
+  vdFrase(s, e, d.titulo, tf, tz, x, y0, mw, C, LH);
+  if (ap) vdApoio(s, e, ap, af, 40, x, y0 + lt + 50, mw, C, LH);
   const cy = y0 + lt + (ap ? 50 + la : 0) + 56 + 42, cor = VD_FUNDOS[vdFundo(ctx)] ? C.hl : '#111111';
   s.shapes.push({ kind: 'circle', x: e.X(x + 42), y: e.Y(cy), w: e.X(84), h: e.Y(84), color: cor });
   s.shapes.push({ kind: 'icon', icon: 'arrow-up-right', x: e.X(x + 42), y: e.Y(cy), w: e.X(40), h: e.Y(40), icon_color: sobre(cor) });
   s.texts.push({ role: 'title', value: cta, x: e.X(x + 84 + 24), y: e.Y(cy), align: 'left', size: e.P(40), font: 'inter', weight: 600, color: C.tinta, nowrap: true, shadow: false });
-  vdMoldura(s, ctx, e, C); return s;
+  vdMoldura(s, ctx, e, C, d); return s;
 };
 MODELOS.push(
-  { id: 'venda-capa', nome: '15 · Venda: capa', uso: 'capa de carrossel', desc: 'Template aprovado do carrossel de venda: fundo de História e venda pela cor da marca, logo pequena no canto de cima à direita, frase grande na fonte da marca com o trecho-chave (*assim*) em marca-texto e a pílula "Arraste para o lado →".', campos: ['titulo', 'cta'] },
-  { id: 'venda-pagina', nome: '15 · Venda: página', uso: 'página interna', desc: 'Uma frase grande por página com o trecho-chave (*assim*) em marca-texto e, opcional, um apoio menor (texto). Com "foto": foto REAL de banco de imagens (Pexels, Unsplash, Pixabay; nunca gerada) com cantos arredondados em cima e a frase embaixo. Use foto em 2 ou 3 páginas, a cada 3 ou 4, mostrando exatamente o que a frase diz.', campos: ['titulo', 'texto', 'foto'] },
-  { id: 'venda-fim', nome: '15 · Venda: fim', uso: 'última página', desc: 'Pergunta grande com marca-texto, uma linha com o preço/condição (texto) e "Clique no link da bio" com círculo e seta.', campos: ['titulo', 'texto', 'cta'] });
+  { id: 'venda-capa', nome: '15 · Venda: capa', uso: 'capa de carrossel', desc: 'Template aprovado do carrossel de venda: fundo de História e venda pela cor da marca, logo pequena no canto de cima à direita, frase grande na fonte da marca com o trecho-chave (*assim*) em marca-texto e a pílula "Arraste para o lado →". Ajustes do dono: entrelinha (1 a 2; menor = linhas mais juntas), escala (0,7 a 1,3 = tamanho do texto), logo ("direita" ou "esquerda").', campos: ['titulo', 'cta', 'entrelinha', 'escala', 'logo'] },
+  { id: 'venda-pagina', nome: '15 · Venda: página', uso: 'página interna', desc: 'Uma frase grande por página com o trecho-chave (*assim*) em marca-texto e, opcional, um apoio menor (texto). Com "foto": foto REAL de banco de imagens (Pexels, Unsplash, Pixabay; nunca gerada) com cantos arredondados em cima e a frase embaixo. Use foto em 2 ou 3 páginas, a cada 3 ou 4, mostrando exatamente o que a frase diz. Ajustes do dono: entrelinha, escala, logo.', campos: ['titulo', 'texto', 'foto', 'entrelinha', 'escala', 'logo'] },
+  { id: 'venda-fim', nome: '15 · Venda: fim', uso: 'última página', desc: 'Pergunta grande com marca-texto, uma linha com o preço/condição (texto) e "Clique no link da bio" com círculo e seta. Ajustes do dono: entrelinha, escala, logo.', campos: ['titulo', 'texto', 'cta', 'entrelinha', 'escala', 'logo'] });
 MODELO_IDS.push('venda-capa', 'venda-pagina', 'venda-fim');
 Object.assign(COMPOR, COMPOR_EXTRA);
 
