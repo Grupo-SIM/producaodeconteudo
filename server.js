@@ -2590,6 +2590,7 @@ function compoeModelos(found, format, brand, c = null) {
       if (alvo.length && c?.id) { try { addChat('gerente', `Aviso no carrossel de venda “${clip(c.title || '', 60)}”: o Designer não marcou as fotos (o formato pede 2 ou 3). Escolhi as páginas ${alvo.map(i => i + 1).join(', ')} e busquei fotos reais pela frase de cada uma. Confira na Mesa se combinam.`); } catch { /* sem chat */ } }
     }
   }
+  if (Array.isArray(found?.slides) && found.slides.some(s => s?.modelo === 'venda-pagina') && !found.previa && settings().venda_fotos_banco !== '1') for (const sl of found.slides) if (sl?.modelo === 'venda-pagina' && sl.dados?.foto && !/^[a-z0-9-]{2,80}$/.test(String(sl.dados.foto)) && !/ #/.test(String(sl.dados.foto))) { delete sl.dados.foto; if (sl.dados.forma === 'foto') delete sl.dados.forma; }   // venda sai só com texto: foto de banco só por sugestão aprovada pelo dono (foto da Biblioteca fica)
   if (Array.isArray(found?.slides) && found.slides.some(s => s?.modelo === 'venda-pagina')) ritmoVenda(found.slides);
   const base = ctxMarca(brand, format, found), n = Math.min(found.slides.length, ART_MAX[format] || 10);
   found.slides = found.slides.map((s, i) => { if (!MODELO_IDS.includes(s?.modelo)) return s; try { const r = comporSlide({ modelo: s.modelo, dados: s.dados && typeof s.dados === 'object' ? s.dados : {} }, { ...base, i, total: n }); if (r && s.bgLivre?.asset) r.bg = { ...s.bgLivre }; return r || s; } catch (e) { console.error('modelo', s.modelo, e.message); return s; } });
