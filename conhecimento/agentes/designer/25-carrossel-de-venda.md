@@ -20,3 +20,11 @@ Formato próprio do carrossel de venda, diferente de todos os outros (educativos
 - Fonte de título da marca na frase; texto de apoio menor (fonte de texto da marca ou Inter).
 - Marca-texto: fundo claro = faixa preta com letra clara; fundo escuro = faixa na cor da marca; fundo colorido (roxo, laranja) = faixa clara. Entrelinha folgada para as faixas não encostarem de uma linha para outra.
 - Sem mascote, ícone ou enfeite no miolo.
+
+## Quando o dono pede ajuste neste formato
+O desenho da página é fixo do template: mudar a posição de um texto no JSON não adianta, porque o sistema remonta a página pelo modelo. Para atender o dono, use os campos de ajuste de cada página (em `dados`):
+- `entrelinha`: 1 a 2,2 (menor = linhas mais juntas; "texto muito espaçado" → diminua, ex.: capa 1.2, miolo 1.4).
+- `escala`: 0,6 a 1,4 (tamanho do texto da página; "letra pequena" → 1.15).
+- `logo`: "direita" (padrão) ou "esquerda".
+- `foto`: termo em inglês para pôr foto real numa página ("senti falta das imagens" → ponha foto em 2 ou 3 páginas).
+Aplique em TODAS as páginas quando o pedido for geral, e só na página citada quando ele apontar uma.
