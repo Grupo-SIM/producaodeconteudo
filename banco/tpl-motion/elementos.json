@@ -1,0 +1,685 @@
+{
+ "tpl-motion-alvo-01": {
+  "descricao": "Alvo com dardo",
+  "usar_quando": "meta, foco, objetivo, acertar o público, precisão, estratégia",
+  "categoria": "Alvo com dardo"
+ },
+ "tpl-motion-alvo-02": {
+  "descricao": "Alvo com dardo",
+  "usar_quando": "meta, foco, objetivo, acertar o público, precisão, estratégia",
+  "categoria": "Alvo com dardo"
+ },
+ "tpl-motion-alvo-03": {
+  "descricao": "Alvo com dardo",
+  "usar_quando": "meta, foco, objetivo, acertar o público, precisão, estratégia",
+  "categoria": "Alvo com dardo"
+ },
+ "tpl-motion-alvo-04": {
+  "descricao": "Alvo com dardo · alvo com desfoque de movimento (cena rápida)",
+  "usar_quando": "meta, foco, objetivo, acertar o público, precisão, estratégia",
+  "categoria": "Alvo com dardo"
+ },
+ "tpl-motion-alvo-05": {
+  "descricao": "Alvo com dardo · lupa sobre alvo com pessoas (público-alvo)",
+  "usar_quando": "meta, foco, objetivo, acertar o público, precisão, estratégia",
+  "categoria": "Alvo com dardo"
+ },
+ "tpl-motion-ampulheta-01": {
+  "descricao": "Ampulheta",
+  "usar_quando": "tempo, prazo, urgência, paciência, tempo acabando, oferta limitada",
+  "categoria": "Ampulheta"
+ },
+ "tpl-motion-ampulheta-02": {
+  "descricao": "Ampulheta",
+  "usar_quando": "tempo, prazo, urgência, paciência, tempo acabando, oferta limitada",
+  "categoria": "Ampulheta"
+ },
+ "tpl-motion-ampulheta-03": {
+  "descricao": "Ampulheta",
+  "usar_quando": "tempo, prazo, urgência, paciência, tempo acabando, oferta limitada",
+  "categoria": "Ampulheta"
+ },
+ "tpl-motion-ampulheta-05": {
+  "descricao": "Ampulheta",
+  "usar_quando": "tempo, prazo, urgência, paciência, tempo acabando, oferta limitada",
+  "categoria": "Ampulheta"
+ },
+ "tpl-motion-ampulheta-06": {
+  "descricao": "Ampulheta",
+  "usar_quando": "tempo, prazo, urgência, paciência, tempo acabando, oferta limitada",
+  "categoria": "Ampulheta"
+ },
+ "tpl-motion-ampulheta-07": {
+  "descricao": "Ampulheta",
+  "usar_quando": "tempo, prazo, urgência, paciência, tempo acabando, oferta limitada",
+  "categoria": "Ampulheta"
+ },
+ "tpl-motion-balanca-01": {
+  "descricao": "Balança da justiça",
+  "usar_quando": "comparação, equilíbrio, decisão, prós e contras, justiça, escolha",
+  "categoria": "Balança da justiça"
+ },
+ "tpl-motion-cadeado-01": {
+  "descricao": "Cadeado",
+  "usar_quando": "segurança, proteção de dados, privacidade, acesso, senha",
+  "categoria": "Cadeado"
+ },
+ "tpl-motion-cadeado-02": {
+  "descricao": "Cadeado",
+  "usar_quando": "segurança, proteção de dados, privacidade, acesso, senha",
+  "categoria": "Cadeado",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-cadeado-03": {
+  "descricao": "Cadeado",
+  "usar_quando": "segurança, proteção de dados, privacidade, acesso, senha",
+  "categoria": "Cadeado"
+ },
+ "tpl-motion-cadeado-04": {
+  "descricao": "Cadeado",
+  "usar_quando": "segurança, proteção de dados, privacidade, acesso, senha",
+  "categoria": "Cadeado",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-cadeado-05": {
+  "descricao": "Cadeado",
+  "usar_quando": "segurança, proteção de dados, privacidade, acesso, senha",
+  "categoria": "Cadeado",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-cadeado-06": {
+  "descricao": "Cadeado",
+  "usar_quando": "segurança, proteção de dados, privacidade, acesso, senha",
+  "categoria": "Cadeado"
+ },
+ "tpl-motion-cartao-01": {
+  "descricao": "Cartão de crédito · cartão preto com logo Visa",
+  "usar_quando": "pagamento, cartão, compra, parcelado, aprovação, crédito",
+  "categoria": "Cartão de crédito",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-cartao-02": {
+  "descricao": "Cartão de crédito · cartão preto Visa com nome e número",
+  "usar_quando": "pagamento, cartão, compra, parcelado, aprovação, crédito",
+  "categoria": "Cartão de crédito",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-cartao-03": {
+  "descricao": "Cartão de crédito · cartão American Express preto",
+  "usar_quando": "pagamento, cartão, compra, parcelado, aprovação, crédito",
+  "categoria": "Cartão de crédito",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-cartao-04": {
+  "descricao": "Cartão de crédito · cartão American Express prata com nome",
+  "usar_quando": "pagamento, cartão, compra, parcelado, aprovação, crédito",
+  "categoria": "Cartão de crédito",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-cartao-05": {
+  "descricao": "Cartão de crédito · cartão preto \"Parcele em 48x\"",
+  "usar_quando": "pagamento, cartão, compra, parcelado, aprovação, crédito",
+  "categoria": "Cartão de crédito"
+ },
+ "tpl-motion-cartao-06": {
+  "descricao": "Cartão de crédito · cartão Black dentro de carteira",
+  "usar_quando": "pagamento, cartão, compra, parcelado, aprovação, crédito",
+  "categoria": "Cartão de crédito"
+ },
+ "tpl-motion-celular-01": {
+  "descricao": "Celular · tela vazia (pôr conteúdo dentro)",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-02": {
+  "descricao": "Celular",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-03": {
+  "descricao": "Celular · tela vazia (pôr conteúdo dentro)",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-04": {
+  "descricao": "Celular · tela transparente (conteúdo por trás)",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-05": {
+  "descricao": "Celular · tela vazia (pôr conteúdo dentro)",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-06": {
+  "descricao": "Celular · tela de bloqueio com hora",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-07": {
+  "descricao": "Celular",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-08": {
+  "descricao": "Celular · tela de bloqueio com hora",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-celular-09": {
+  "descricao": "Celular · tela vazia (pôr conteúdo dentro)",
+  "usar_quando": "redes sociais, app, Instagram, notificação, mobile, mensagem",
+  "categoria": "Celular"
+ },
+ "tpl-motion-cerebro-01": {
+  "descricao": "Cérebro · com fita \"NOT WORKING\": cabeça travada, bloqueio",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-cerebro-02": {
+  "descricao": "Cérebro · cérebro em gravura usando óculos (estudar, inteligência)",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro"
+ },
+ "tpl-motion-cerebro-03": {
+  "descricao": "Cérebro · cérebro com luzes (IA, tecnologia)",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro"
+ },
+ "tpl-motion-cerebro-04": {
+  "descricao": "Cérebro · lâmpada com cérebro em gravura",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro"
+ },
+ "tpl-motion-cerebro-05": {
+  "descricao": "Cérebro",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro"
+ },
+ "tpl-motion-cerebro-06": {
+  "descricao": "Cérebro · lâmpada com cérebro aceso (ideia brilhante)",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro"
+ },
+ "tpl-motion-cerebro-07": {
+  "descricao": "Cérebro · cérebro de rede neural (IA)",
+  "usar_quando": "mente, ideia, pensamento, inteligência, aprendizado, psicologia, IA",
+  "categoria": "Cérebro"
+ },
+ "tpl-motion-cofre-01": {
+  "descricao": "Cofre / baú",
+  "usar_quando": "guardar dinheiro, segurança, proteção, reserva, tesouro, segredo",
+  "categoria": "Cofre / baú"
+ },
+ "tpl-motion-cofre-02": {
+  "descricao": "Cofre / baú · cofre aberto cheio de dinheiro",
+  "usar_quando": "guardar dinheiro, segurança, proteção, reserva, tesouro, segredo",
+  "categoria": "Cofre / baú"
+ },
+ "tpl-motion-cofre-03": {
+  "descricao": "Cofre / baú · baú do tesouro aberto com ouro",
+  "usar_quando": "guardar dinheiro, segurança, proteção, reserva, tesouro, segredo",
+  "categoria": "Cofre / baú"
+ },
+ "tpl-motion-cofre-04": {
+  "descricao": "Cofre / baú",
+  "usar_quando": "guardar dinheiro, segurança, proteção, reserva, tesouro, segredo",
+  "categoria": "Cofre / baú"
+ },
+ "tpl-motion-cofre-07": {
+  "descricao": "Cofre / baú · baú do tesouro fechado",
+  "usar_quando": "guardar dinheiro, segurança, proteção, reserva, tesouro, segredo",
+  "categoria": "Cofre / baú"
+ },
+ "tpl-motion-escudo-01": {
+  "descricao": "Escudo",
+  "usar_quando": "segurança, proteção, garantia, confiança, antifraude",
+  "categoria": "Escudo"
+ },
+ "tpl-motion-escudo-03": {
+  "descricao": "Escudo",
+  "usar_quando": "segurança, proteção, garantia, confiança, antifraude",
+  "categoria": "Escudo"
+ },
+ "tpl-motion-escudo-04": {
+  "descricao": "Escudo",
+  "usar_quando": "segurança, proteção, garantia, confiança, antifraude",
+  "categoria": "Escudo"
+ },
+ "tpl-motion-escudo-05": {
+  "descricao": "Escudo",
+  "usar_quando": "segurança, proteção, garantia, confiança, antifraude",
+  "categoria": "Escudo"
+ },
+ "tpl-motion-escudo-06": {
+  "descricao": "Escudo",
+  "usar_quando": "segurança, proteção, garantia, confiança, antifraude",
+  "categoria": "Escudo"
+ },
+ "tpl-motion-escudo-07": {
+  "descricao": "Escudo",
+  "usar_quando": "segurança, proteção, garantia, confiança, antifraude",
+  "categoria": "Escudo"
+ },
+ "tpl-motion-lampada-01": {
+  "descricao": "Lâmpada",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-02": {
+  "descricao": "Lâmpada",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-03": {
+  "descricao": "Lâmpada",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-04": {
+  "descricao": "Lâmpada · gravura P&B",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-05": {
+  "descricao": "Lâmpada",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-06": {
+  "descricao": "Lâmpada · pontilhado P&B",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-07": {
+  "descricao": "Lâmpada · lâmpada com engrenagens",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-lampada-08": {
+  "descricao": "Lâmpada · lâmpada com engrenagens douradas",
+  "usar_quando": "ideia, solução, criatividade, insight, descoberta",
+  "categoria": "Lâmpada"
+ },
+ "tpl-motion-mala-01": {
+  "descricao": "Mala com dinheiro",
+  "usar_quando": "dinheiro, riqueza, grande quantia, pagamento grande, lucro, faturamento",
+  "categoria": "Mala com dinheiro"
+ },
+ "tpl-motion-mala-02": {
+  "descricao": "Mala com dinheiro",
+  "usar_quando": "dinheiro, riqueza, grande quantia, pagamento grande, lucro, faturamento",
+  "categoria": "Mala com dinheiro"
+ },
+ "tpl-motion-mala-03": {
+  "descricao": "Mala com dinheiro",
+  "usar_quando": "dinheiro, riqueza, grande quantia, pagamento grande, lucro, faturamento",
+  "categoria": "Mala com dinheiro"
+ },
+ "tpl-motion-mala-04": {
+  "descricao": "Mala com dinheiro",
+  "usar_quando": "dinheiro, riqueza, grande quantia, pagamento grande, lucro, faturamento",
+  "categoria": "Mala com dinheiro"
+ },
+ "tpl-motion-maquininha-01": {
+  "descricao": "Maquininha de cartão · tem texto \"EUR client card\" na tela",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-maquininha-02": {
+  "descricao": "Maquininha de cartão",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão"
+ },
+ "tpl-motion-maquininha-03": {
+  "descricao": "Maquininha de cartão · maquininha com cartão aproximando",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão"
+ },
+ "tpl-motion-maquininha-04": {
+  "descricao": "Maquininha de cartão",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-maquininha-05": {
+  "descricao": "Maquininha de cartão · maquininha com \"Aprovado\" na tela",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão"
+ },
+ "tpl-motion-maquininha-06": {
+  "descricao": "Maquininha de cartão",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão"
+ },
+ "tpl-motion-maquininha-07": {
+  "descricao": "Maquininha de cartão",
+  "usar_quando": "pagamento, receber, venda no cartão, checkout, aprovação, lojista",
+  "categoria": "Maquininha de cartão"
+ },
+ "tpl-motion-moeda-01": {
+  "descricao": "Moeda(s) de ouro",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-02": {
+  "descricao": "Moeda(s) de ouro",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-03": {
+  "descricao": "Moeda(s) de ouro",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-04": {
+  "descricao": "Moeda(s) de ouro",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-05": {
+  "descricao": "Moeda(s) de ouro · moeda de 1 real, dinheiro brasileiro",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-06": {
+  "descricao": "Moeda(s) de ouro · moeda antiga com perfil de mulher",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-07": {
+  "descricao": "Moeda(s) de ouro · pilha de moedas prateadas",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-moeda-08": {
+  "descricao": "Moeda(s) de ouro · moeda com cifrão",
+  "usar_quando": "dinheiro, economia, cashback, crédito, ganho, investimento",
+  "categoria": "Moeda(s) de ouro"
+ },
+ "tpl-motion-notas-01": {
+  "descricao": "Maço de notas · maço de R$ 100 (dinheiro brasileiro), alta resolução",
+  "usar_quando": "dinheiro, faturamento, lucro, pagamento, grande quantia",
+  "categoria": "Maço de notas"
+ },
+ "tpl-motion-notas-02": {
+  "descricao": "Maço de notas",
+  "usar_quando": "dinheiro, faturamento, lucro, pagamento, grande quantia",
+  "categoria": "Maço de notas"
+ },
+ "tpl-motion-notas-03": {
+  "descricao": "Maço de notas",
+  "usar_quando": "dinheiro, faturamento, lucro, pagamento, grande quantia",
+  "categoria": "Maço de notas"
+ },
+ "tpl-motion-notas-04": {
+  "descricao": "Maço de notas",
+  "usar_quando": "dinheiro, faturamento, lucro, pagamento, grande quantia",
+  "categoria": "Maço de notas"
+ },
+ "tpl-motion-notas-05": {
+  "descricao": "Maço de notas",
+  "usar_quando": "dinheiro, faturamento, lucro, pagamento, grande quantia",
+  "categoria": "Maço de notas"
+ },
+ "tpl-motion-notas-06": {
+  "descricao": "Maço de notas · leque de notas de 100 dólares",
+  "usar_quando": "dinheiro, faturamento, lucro, pagamento, grande quantia",
+  "categoria": "Maço de notas"
+ },
+ "tpl-motion-notebook-01": {
+  "descricao": "Notebook",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-notebook-02": {
+  "descricao": "Notebook · logo da Apple",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-notebook-03": {
+  "descricao": "Notebook · logo da Apple",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-notebook-04": {
+  "descricao": "Notebook",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-notebook-05": {
+  "descricao": "Notebook · tela branca lisa (pôr site/painel dentro)",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-notebook-06": {
+  "descricao": "Notebook · tela com loja virtual",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-notebook-07": {
+  "descricao": "Notebook · logo da Apple",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-notebook-08": {
+  "descricao": "Notebook",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-notebook-09": {
+  "descricao": "Notebook",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-notebook-10": {
+  "descricao": "Notebook",
+  "usar_quando": "trabalho online, site, sistema, computador, home office",
+  "categoria": "Notebook"
+ },
+ "tpl-motion-nuvem-01": {
+  "descricao": "Nuvem",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-nuvem-02": {
+  "descricao": "Nuvem · servidores dentro da nuvem",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-nuvem-03": {
+  "descricao": "Nuvem · nuvem de vidro com servidores",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-nuvem-04": {
+  "descricao": "Nuvem",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-nuvem-05": {
+  "descricao": "Nuvem",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-nuvem-06": {
+  "descricao": "Nuvem · nuvem com pasta (armazenamento)",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-nuvem-07": {
+  "descricao": "Nuvem",
+  "usar_quando": "nuvem, hospedagem, armazenamento, dados, servidor online",
+  "categoria": "Nuvem"
+ },
+ "tpl-motion-olho-01": {
+  "descricao": "Olho · olho azul tecnológico",
+  "usar_quando": "atenção, visão, ver, observar, chamar atenção, perceber",
+  "categoria": "Olho",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-olho-02": {
+  "descricao": "Olho · olho em papel rasgado (colagem)",
+  "usar_quando": "atenção, visão, ver, observar, chamar atenção, perceber",
+  "categoria": "Olho"
+ },
+ "tpl-motion-olho-03": {
+  "descricao": "Olho · olho com zíper (colagem, revelar)",
+  "usar_quando": "atenção, visão, ver, observar, chamar atenção, perceber",
+  "categoria": "Olho"
+ },
+ "tpl-motion-olho-04": {
+  "descricao": "Olho",
+  "usar_quando": "atenção, visão, ver, observar, chamar atenção, perceber",
+  "categoria": "Olho"
+ },
+ "tpl-motion-olho-05": {
+  "descricao": "Olho · olho em gravura P&B",
+  "usar_quando": "atenção, visão, ver, observar, chamar atenção, perceber",
+  "categoria": "Olho"
+ },
+ "tpl-motion-quebracabeca-01": {
+  "descricao": "Quebra-cabeça",
+  "usar_quando": "peça que falta, solução, encaixe, estratégia, montar o plano",
+  "categoria": "Quebra-cabeça"
+ },
+ "tpl-motion-quebracabeca-02": {
+  "descricao": "Quebra-cabeça",
+  "usar_quando": "peça que falta, solução, encaixe, estratégia, montar o plano",
+  "categoria": "Quebra-cabeça"
+ },
+ "tpl-motion-quebracabeca-03": {
+  "descricao": "Quebra-cabeça",
+  "usar_quando": "peça que falta, solução, encaixe, estratégia, montar o plano",
+  "categoria": "Quebra-cabeça"
+ },
+ "tpl-motion-quebracabeca-04": {
+  "descricao": "Quebra-cabeça · retrato com peças faltando",
+  "usar_quando": "peça que falta, solução, encaixe, estratégia, montar o plano",
+  "categoria": "Quebra-cabeça"
+ },
+ "tpl-motion-quebracabeca-05": {
+  "descricao": "Quebra-cabeça · boneco encaixando a peça vermelha",
+  "usar_quando": "peça que falta, solução, encaixe, estratégia, montar o plano",
+  "categoria": "Quebra-cabeça"
+ },
+ "tpl-motion-quebracabeca-06": {
+  "descricao": "Quebra-cabeça · cabeça vermelha com peças",
+  "usar_quando": "peça que falta, solução, encaixe, estratégia, montar o plano",
+  "categoria": "Quebra-cabeça"
+ },
+ "tpl-motion-relogio-01": {
+  "descricao": "Relógio",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-02": {
+  "descricao": "Relógio · relógio de bolso com ponteiro em movimento",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-03": {
+  "descricao": "Relógio · relógio quebrado (tempo perdido)",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-04": {
+  "descricao": "Relógio · relógio derretendo (tempo escorrendo)",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-05": {
+  "descricao": "Relógio",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-06": {
+  "descricao": "Relógio",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-07": {
+  "descricao": "Relógio",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-relogio-08": {
+  "descricao": "Relógio",
+  "usar_quando": "tempo, horário, rotina, prazo, pontualidade, tempo perdido",
+  "categoria": "Relógio"
+ },
+ "tpl-motion-saco-01": {
+  "descricao": "Saco de dinheiro",
+  "usar_quando": "dinheiro, lucro, ganho, recompensa, bônus, cashback",
+  "categoria": "Saco de dinheiro"
+ },
+ "tpl-motion-saco-02": {
+  "descricao": "Saco de dinheiro · saco com barras de ouro",
+  "usar_quando": "dinheiro, lucro, ganho, recompensa, bônus, cashback",
+  "categoria": "Saco de dinheiro"
+ },
+ "tpl-motion-saco-03": {
+  "descricao": "Saco de dinheiro",
+  "usar_quando": "dinheiro, lucro, ganho, recompensa, bônus, cashback",
+  "categoria": "Saco de dinheiro"
+ },
+ "tpl-motion-saco-04": {
+  "descricao": "Saco de dinheiro",
+  "usar_quando": "dinheiro, lucro, ganho, recompensa, bônus, cashback",
+  "categoria": "Saco de dinheiro"
+ },
+ "tpl-motion-saco-05": {
+  "descricao": "Saco de dinheiro · pequeno, usar só como apoio",
+  "usar_quando": "dinheiro, lucro, ganho, recompensa, bônus, cashback",
+  "categoria": "Saco de dinheiro",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-saco-06": {
+  "descricao": "Saco de dinheiro",
+  "usar_quando": "dinheiro, lucro, ganho, recompensa, bônus, cashback",
+  "categoria": "Saco de dinheiro"
+ },
+ "tpl-motion-servidor-01": {
+  "descricao": "Servidor / data center",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center"
+ },
+ "tpl-motion-servidor-02": {
+  "descricao": "Servidor / data center · logo da Dell na frente",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center",
+  "aviso": "tem marca/texto de terceiro: não usar como herói em vídeo de marca"
+ },
+ "tpl-motion-servidor-03": {
+  "descricao": "Servidor / data center",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center"
+ },
+ "tpl-motion-servidor-04": {
+  "descricao": "Servidor / data center",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center"
+ },
+ "tpl-motion-servidor-05": {
+  "descricao": "Servidor / data center",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ },
+ "tpl-motion-servidor-06": {
+  "descricao": "Servidor / data center",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center"
+ },
+ "tpl-motion-servidor-07": {
+  "descricao": "Servidor / data center",
+  "usar_quando": "hospedagem, servidor, site no ar, velocidade, infraestrutura",
+  "categoria": "Servidor / data center",
+  "aviso": "imagem pequena: só como elemento de apoio, nunca grande"
+ }
+}

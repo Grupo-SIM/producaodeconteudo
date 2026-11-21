@@ -4826,6 +4826,18 @@ for (const [pasta, col, rotulo, uso] of [['tpl-stories', 'stories', 'Stories de 
     const pr = probeAsset(+r.lastInsertRowid, ext); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
   }
 } catch (e) { console.error('fundos de', pasta, e.message); }
+// elementos do Editor de vídeo (banco/tpl-motion, 21/11/2026): objetos recortados (PNG transparente) enviados pelo dono, ficha em elementos.json.
+// Entram na seção Motion; o Editor escolhe pela ficha (descrição + usar quando) e usa como {"type":"img","asset":nome}. Fundo, letra e transição continuam no código.
+try {
+  const dir = path.join(__dirname, 'banco', 'tpl-motion'), fichas = jparse(fs.existsSync(path.join(dir, 'elementos.json')) ? fs.readFileSync(path.join(dir, 'elementos.json'), 'utf8') : '{}', {}) || {};
+  for (const arqN of fs.existsSync(dir) ? fs.readdirSync(dir).sort() : []) {
+    const m = arqN.match(/^(tpl-motion-[a-z0-9-]+)\.png$/); if (!m || one("SELECT 1 x FROM assets WHERE name=? AND brand=''", m[1])) continue;
+    const nome = m[1], f = fichas[nome] || {}, buf = fs.readFileSync(path.join(dir, arqN));
+    const r = run('INSERT INTO assets(brand,name,kind,tags,note,colecao,filename,ext,size,pasta,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)', '', nome, 'foto', ['elemento recortado', f.categoria, 'usar quando: ' + (f.usar_quando || '')].filter(Boolean).join(', '), [f.descricao || 'Elemento recortado', f.aviso ? 'ATENÇÃO: ' + f.aviso : ''].filter(Boolean).join('. '), 'motion', arqN, 'png', buf.length, 'Motion/Elementos', T());
+    fs.writeFileSync(path.join(ASSET_DIR, r.lastInsertRowid + '.png'), buf);
+    const pr = probeAsset(+r.lastInsertRowid, 'png'); run('UPDATE assets SET dur=?, w=?, h=? WHERE id=?', pr.dur, pr.w, pr.h, +r.lastInsertRowid);
+  }
+} catch (e) { console.error('elementos do motion', e.message); }
 // mascotes e logos oficiais das marcas (banco/marcas/<pasta>/: marca.json + PNG sem fundo), enviados pelo dono no treino do Designer.
 // Entram uma vez como arquivo "mascote" da marca, já com a ficha técnica; o dono pode editar depois na Biblioteca.
 try {
